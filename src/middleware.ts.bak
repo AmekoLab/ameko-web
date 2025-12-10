@@ -1,0 +1,35 @@
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+const protectedRoutes = ["/profile", "/builder", "/checkout"];
+// Danh sách route dành cho khách (Đã login rồi thì không cho vào lại)
+const authRoutes = ["/login", "/register"];
+
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get("token")?.value;
+  const { pathname } = request.nextUrl;
+
+  // 1. Nếu chưa login mà cố vào trang bảo mật -> Đá về Login
+  if (protectedRoutes.some((route) => pathname.startsWith(route))) {
+    if (!token) {
+      const url = new URL("/login", request.url);
+      // Lưu lại trang họ muốn vào để login xong redirect ngược lại
+      url.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // 2. Nếu đã login mà cố vào trang Login/Register -> Đá về trang chủ
+  if (authRoutes.includes(pathname)) {
+    if (token) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
+  return NextResponse.next();
+}
+
+// Cấu hình matcher để middleware không chạy trên các file ảnh, api...
+export const config = {
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+};
