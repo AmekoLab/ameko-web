@@ -24,3 +24,45 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* --- CUSTOM SWIPER STYLES --- */
+
+/* Đổi màu mũi tên navigation */
+.hero-swiper .swiper-button-next,
+.hero-swiper .swiper-button-prev {
+  color: #fff; /* Hoặc màu #000 tùy nền */
+  width: 50px;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.hero-swiper .swiper-button-next:after,
+.hero-swiper .swiper-button-prev:after {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.hero-swiper .swiper-button-next:hover,
+.hero-swiper .swiper-button-prev:hover {
+  background: #ce2a32; /* Màu đỏ Cherry */
+  color: white;
+}
+
+/* Đổi màu dấu chấm pagination */
+.hero-swiper .swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  background: white;
+  opacity: 0.5;
+  transition: all 0.3s;
+}
+
+.hero-swiper .swiper-pagination-bullet-active {
+  background: #ce2a32; /* Màu đỏ Cherry */
+  opacity: 1;
+  width: 30px; /* Kéo dài ra khi active nhìn pro hơn */
+  border-radius: 6px;
+}

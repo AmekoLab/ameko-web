@@ -1,10 +1,11 @@
 "use client";
 
 import { AuthWrapper } from "@/src/wrapper/AuthWrapper";
-import Header from "../../components/Header";
+
 import Sidebar from "../../components/Sidebar";
 
 import { ReactNode } from "react";
+import { Header } from "@/src/components/Header/Header";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (

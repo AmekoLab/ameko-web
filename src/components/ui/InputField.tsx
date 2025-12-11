@@ -5,7 +5,7 @@ interface InputFieldProps {
   label: string;
   type?: string;
   placeholder?: string;
-  registration: UseFormRegisterReturn; // Props của react-hook-form
+  registration: UseFormRegisterReturn;
   error?: string;
 }
 

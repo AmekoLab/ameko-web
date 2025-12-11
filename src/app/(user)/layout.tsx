@@ -1,5 +1,5 @@
 import { AuthWrapper } from "@/src/wrapper/AuthWrapper";
-import Header from "../../components/Header";
+import { Header } from "../../components/Header/Header";
 
 import { ReactNode } from "react";
 
