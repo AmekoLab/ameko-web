@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, useState } from "react";
-import Link from "next/link"; // Dùng Link thay thẻ a
+import Link from "next/link";
 import { Logo } from "./Logo";
 import { Nav } from "./Nav";
 import { SearchBar } from "./SearchBar";
@@ -11,7 +11,6 @@ import { logout as logoutAction } from "@/src/store/slices/authSlice";
 import { logout as logoutService } from "@/src/services/authServices";
 import Image from "next/image";
 
-// Icon SVG đơn giản (hoặc bạn dùng thư viện lucide-react / heroicons)
 const MenuIcon = () => (
   <svg
     className="w-6 h-6"

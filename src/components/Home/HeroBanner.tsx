@@ -13,7 +13,6 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "swiper/css/effect-fade";
 
-// --- INTERFACE & DATA ---
 interface BannerData {
   id: number;
   image: string;
@@ -26,7 +25,6 @@ interface BannerData {
   theme: "dark" | "light";
 }
 
-// --- DATA ---
 const BANNERS: BannerData[] = [
   {
     id: 1,
@@ -60,12 +58,9 @@ const BANNERS: BannerData[] = [
   },
 ];
 
-// --- COMPONENT CON: HERO SLIDE ITEM ---
-// Tách hẳn ra để dùng hook useSwiperSlide an toàn nhất
 const HeroSlideItem = ({ banner }: { banner: BannerData }) => {
-  const { isActive } = useSwiperSlide(); // Kiểm tra xem slide này có đang hiện không
+  const { isActive } = useSwiperSlide();
 
-  // Helper chỉnh vị trí chữ
   const getPositionClasses = (pos: string) => {
     switch (pos) {
       case "left":
@@ -86,7 +81,6 @@ const HeroSlideItem = ({ banner }: { banner: BannerData }) => {
           src={banner.image}
           alt={banner.title}
           fill
-          // Chỉ ưu tiên load ảnh nếu là slide 1, các slide sau để lazy load cho nhẹ
           priority={banner.id === 1}
           className="object-cover object-center hidden md:block transition-transform duration-[10000ms] hover:scale-105"
           sizes="100vw"
@@ -147,7 +141,7 @@ const HeroSlideItem = ({ banner }: { banner: BannerData }) => {
           >
             <Link
               href={banner.ctaLink}
-              className="group/btn relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black overflow-hidden font-bold tracking-wider uppercase text-sm md:text-base hover:bg-primary-600 hover:text-white transition-all duration-300 rounded-sm shadow-xl hover:shadow-primary-600/30"
+              className="group/btn relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black overflow-hidden font-bold tracking-wider uppercase text-sm md:text-base hover:bg-primary-600 hover:text-black transition-all duration-300 rounded-sm shadow-xl hover:shadow-primary-600/30"
             >
               <span className="relative z-10">{banner.ctaText}</span>
               <ArrowRight className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover/btn:translate-x-1" />
@@ -166,7 +160,6 @@ export const HeroBanner: FC = () => {
       <Swiper
         modules={[Autoplay, Pagination, Navigation, EffectFade]}
         effect="fade"
-        // 🔥 FIX QUAN TRỌNG: crossFade=true giúp ảnh không bị chồng lấn nhau
         fadeEffect={{ crossFade: true }}
         speed={1000}
         loop={true}
@@ -176,12 +169,11 @@ export const HeroBanner: FC = () => {
           pauseOnMouseEnter: true,
         }}
         pagination={{ clickable: true }}
-        navigation={true}
+        // navigation={true}
         className="w-full h-full hero-swiper"
       >
         {BANNERS.map((banner) => (
           <SwiperSlide key={banner.id} className="relative w-full h-full">
-            {/* Gọi Component con đã tách */}
             <HeroSlideItem banner={banner} />
           </SwiperSlide>
         ))}

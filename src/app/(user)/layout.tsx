@@ -2,6 +2,7 @@ import { AuthWrapper } from "@/src/wrapper/AuthWrapper";
 import { Header } from "../../components/Header/Header";
 
 import { ReactNode } from "react";
+import { Footer } from "@/src/components/Footer/Footer";
 
 export default function UserLayout({ children }: { children: ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
             {children}
           </main>
         </div>
+        <Footer />
       </div>
     </AuthWrapper>
   );

@@ -1,0 +1,188 @@
+"use client";
+
+import { FC, useEffect, useRef, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Autoplay } from "swiper/modules";
+import { Swiper as SwiperType } from "swiper";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { ProductCard, Product } from "../Product/ProductCard";
+
+import "swiper/css";
+import "swiper/css/navigation";
+import { ProductSkeleton } from "../Product/ProductSkeleton";
+
+const MOCK_PRODUCTS: Product[] = [
+  {
+    id: 1,
+    name: "CHERRY XTRFY K5V2 + GP6 NORTHERN LIGHT BUNDLE",
+    price: 159.0,
+    image:
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548984/M64-Prow-White-Wireless-Gaming-Mouse_Category-1_qfbdhu.png",
+    tag: "NEW",
+    category: "Bundles",
+    slug: "k5v2-bundle",
+    features: [
+      "Limited-edition keyboard and mousepad bundle",
+      "K5V2 Compact keyboard with CHERRY MX Northern Light switches",
+      "GP6 Northern Light XL mousepad",
+    ],
+  },
+  {
+    id: 2,
+    name: "CHERRY XTRFY H3 WIRELESS",
+    price: 99.0,
+    image:
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/CHERRY-XTRFY-H3-WIRELESS_category_nmdupa.png",
+    tag: "NEW",
+    category: "Audio",
+    slug: "h3-wireless",
+    features: [
+      "Multi-platform wireless headset",
+      "Closed over-ear design",
+      "53 mm speaker drivers",
+      "Esports-optimized sound",
+    ],
+  },
+  {
+    id: 3,
+    name: "CHERRY XTRFY K4V2 TKL BLACK",
+    price: 119.0,
+    image:
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/produc1_jc0ojq.png",
+    category: "Keyboards",
+    slug: "k4v2-tkl",
+    features: [
+      "Tenkeyless design",
+      "Customizable RGB illumination",
+      "Mechanical CHERRY MX2A Red switches",
+    ],
+  },
+  {
+    id: 4,
+    name: "CHERRY XTRFY M64 PRO 8K WIRELESS BLACK",
+    price: 139.0,
+    image:
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/456_qcrwfk.png",
+    category: "Mice",
+    slug: "m64-pro-8k",
+    features: [
+      "Ultra-fast 8K mouse",
+      "Ergonomic shape with ultra-low front",
+      "55 grams Lightweight with a solid shell",
+    ],
+  },
+  {
+    id: 5,
+    name: "K5V2 COMPACT TRANSPARENT WHITE",
+    price: 149.0,
+    image:
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548984/cat3_ky7ssk.png",
+    category: "Keyboards",
+    slug: "k5v2-white",
+    features: [
+      "65% size",
+      "Ultra-customizable",
+      "Hot-swappable CHERRY MX2A Red switches",
+    ],
+  },
+];
+
+export const BrandNew: FC = () => {
+  const swiperRef = useRef<SwiperType>(null);
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setProducts(MOCK_PRODUCTS);
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <section className="w-full py-12 ">
+      <div className="max-w-[1920px] mx-auto px-4 lg:px-8 relative">
+        {/* --- HEADER --- */}
+        <div className="mb-8">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="space-y-2"
+          >
+            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-black">
+              Brand New
+            </h2>
+            <div className="h-1 w-12 bg-[#ce2a32]"></div>
+          </motion.div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="relative group"
+        >
+          <button
+            onClick={() => swiperRef.current?.slidePrev()}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-xl flex items-center justify-center text-black border border-gray-100 hover:bg-black hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:-translate-x-1/2 disabled:opacity-30 disabled:cursor-not-allowed"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+
+          <Swiper
+            modules={[Navigation, Autoplay]}
+            spaceBetween={20}
+            slidesPerView={1.2}
+            breakpoints={{
+              640: { slidesPerView: 2.2 },
+              1024: { slidesPerView: 3.2 },
+              1400: { slidesPerView: 4 },
+            }}
+            loop={!loading}
+            autoplay={
+              loading
+                ? false
+                : {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                  }
+            }
+            onBeforeInit={(swiper) => {
+              swiperRef.current = swiper;
+            }}
+            className="w-full !pb-10 !px-2"
+          >
+            {loading
+              ? Array.from({ length: 4 }).map((_, index) => (
+                  <SwiperSlide
+                    key={`skeleton-${index}`}
+                    className="!h-auto flex"
+                  >
+                    <ProductSkeleton />
+                  </SwiperSlide>
+                ))
+              : products.map((product) => (
+                  <SwiperSlide key={product.id} className="!h-auto flex">
+                    <ProductCard product={product} />
+                  </SwiperSlide>
+                ))}
+          </Swiper>
+
+          <button
+            onClick={() => swiperRef.current?.slideNext()}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-xl flex items-center justify-center text-black border border-gray-100 hover:bg-black hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-1/2 disabled:opacity-30 disabled:cursor-not-allowed"
+            aria-label="Next slide"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </motion.div>
+      </div>
+    </section>
+  );
+};

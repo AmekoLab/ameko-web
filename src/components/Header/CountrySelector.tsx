@@ -4,7 +4,6 @@ import { FC, useState, useEffect } from "react";
 import Image from "next/image";
 import { COUNTRIES } from "../../data/countries";
 
-// --- ICONS (Inline SVG cho gọn) ---
 const ChevronDown = ({ className }: { className?: string }) => (
   <svg
     className={className}
@@ -56,12 +55,10 @@ export const CountrySelector: FC = () => {
   const [country, setCountry] = useState(COUNTRIES[0]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // 1. Logic lọc danh sách quốc gia theo từ khóa tìm kiếm
   const filteredCountries = COUNTRIES.filter((c) =>
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // 2. Logic Scroll Lock: Khi mở modal thì cấm body cuộn
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -75,7 +72,6 @@ export const CountrySelector: FC = () => {
 
   return (
     <>
-      {/* --- TRIGGER BUTTON (Giữ nguyên vẻ đẹp cũ) --- */}
       <button
         type="button"
         className="flex items-center gap-2 text-xs font-medium text-gray-700 hover:text-primary-600 transition-colors py-1 group"
@@ -95,7 +91,6 @@ export const CountrySelector: FC = () => {
       {/* --- MODAL OVERLAY & CONTENT --- */}
       {open && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
-          {/* Backdrop (Nền tối làm mờ) - Click vào đây để đóng */}
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={() => setOpen(false)}
@@ -128,7 +123,7 @@ export const CountrySelector: FC = () => {
                   className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg leading-5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition sm:text-sm"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  autoFocus // Tự động focus vào ô tìm kiếm khi mở
+                  autoFocus
                 />
               </div>
             </div>
@@ -143,7 +138,7 @@ export const CountrySelector: FC = () => {
                       onClick={() => {
                         setCountry(c);
                         setOpen(false);
-                        setSearchTerm(""); // Reset search khi chọn xong
+                        setSearchTerm("");
                       }}
                       className={`
                         flex items-center gap-3 p-3 rounded-lg transition-all border
