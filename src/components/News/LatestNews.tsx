@@ -3,6 +3,7 @@
 import { FC } from "react";
 import { NewsCard, NewsItem } from "../News/NewsCard";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 const NEWS_DATA: NewsItem[] = [
   {
@@ -38,7 +39,7 @@ const NEWS_DATA: NewsItem[] = [
 
 export const LatestNews: FC = () => {
   return (
-    <section className="w-full py-12 ">
+    <section className="py-20 bg-white border-t border-gray-100">
       <div className="max-w-[1920px] mx-auto px-4 lg:px-8">
         {/* HEADER SECTION */}
         <div className="mb-10">
@@ -56,10 +57,21 @@ export const LatestNews: FC = () => {
         </div>
 
         {/* NEWS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 mb-16">
           {NEWS_DATA.map((item, index) => (
             <NewsCard key={item.id} item={item} index={index} />
           ))}
+        </div>
+
+        <div className="flex justify-center">
+          <Link
+            href="/news"
+            className="relative group inline-flex items-center justify-center bg-black px-12 py-4 hover:bg-[#ce2a32] transition-colors duration-300"
+          >
+            <span className="relative z-10 text-sm font-black uppercase tracking-widest text-white">
+              View All News
+            </span>
+          </Link>
         </div>
       </div>
     </section>
