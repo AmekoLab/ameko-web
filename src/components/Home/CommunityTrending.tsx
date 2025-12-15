@@ -4,7 +4,7 @@ import { FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Heart, MessageCircle, User, ArrowUpRight } from "lucide-react";
+import { Heart, MessageCircle, ArrowUpRight } from "lucide-react";
 
 const TRENDING_BUILDS = [
   {

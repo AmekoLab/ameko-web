@@ -1,4 +1,6 @@
 import { BrandNew } from "@/src/components/Home/BrandNew";
+import { BuilderCTA } from "@/src/components/Home/BuilderCTA";
+import { CategoryGrid } from "@/src/components/Home/CategoryGrid";
 import { CommunityTrending } from "@/src/components/Home/CommunityTrending";
 
 import { HeroBanner } from "@/src/components/Home/HeroBanner";
@@ -11,9 +13,12 @@ export default function Home() {
     <div>
       <div>
         <HeroBanner />
-        <BrandNew />
+
         <CommunityTrending />
+        <BuilderCTA />
+        <BrandNew />
         <PromoList />
+        <CategoryGrid />
         <LatestNews />
         <TopCreators />
       </div>
