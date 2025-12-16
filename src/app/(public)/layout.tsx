@@ -1,8 +1,8 @@
 import { Oswald } from "next/font/google";
-import "./globals.css";
-import LayoutWrapper from "../wrapper/LayoutWrapper";
-import { Header } from "../components/Header/Header";
-import { Footer } from "../components/Footer/Footer";
+import "../globals.css";
+import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
+import { Header } from "@/src/components/Header/Header";
+import { Footer } from "@/src/components/Footer/Footer";
 
 // Cấu hình font
 const font = Oswald({
@@ -18,7 +18,7 @@ export const metadata = {
   icons: { icon: "/logo.png" },
 };
 
-export default function RootLayout({
+export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;

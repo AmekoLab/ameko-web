@@ -74,7 +74,7 @@ export const Header: FC = () => {
     <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-200 shadow-sm">
       <div className="w-full max-w-[1920px] mx-auto">
         {/* --- TOP BAR (Utility) --- */}
-        <div className="flex justify-end items-center h-10 space-x-6 pr-4 bg-gray-50 border-b border-gray-100 text-xs font-medium">
+        <div className="flex justify-end items-center h-10 space-x-6 pr-4 bg-white  text-xs font-medium">
           {/* Logic Auth: Đã login hiện tên, chưa login hiện nút Login */}
           {isAuthenticated && user ? (
             <div className="flex items-center gap-4">
@@ -175,7 +175,7 @@ export const Header: FC = () => {
                   className="flex items-center gap-2 text-gray-800 font-medium"
                   onClick={() => setMobileOpen(false)}
                 >
-                  <CartIcon /> Giỏ hàng (0)
+                  <CartIcon /> Cart (0)
                 </Link>
 
                 {!isAuthenticated && (
@@ -184,7 +184,7 @@ export const Header: FC = () => {
                     className="text-gray-800 font-medium"
                     onClick={() => setMobileOpen(false)}
                   >
-                    Đăng nhập / Đăng ký
+                    Login / Register
                   </Link>
                 )}
               </div>
