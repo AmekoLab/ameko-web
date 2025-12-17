@@ -1,9 +1,8 @@
 import { Oswald } from "next/font/google";
 import "../globals.css";
-import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 import { Header } from "@/src/components/Header/Header";
+import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 
-// Cấu hình font
 const font = Oswald({
   subsets: ["latin", "vietnamese"],
   weight: ["300", "400", "500", "700"],
@@ -12,12 +11,11 @@ const font = Oswald({
 });
 
 export const metadata = {
-  title: "Cherry Xtrfy - Gaming Gear",
-  description: "Bàn phím, chuột và phụ kiện gaming cao cấp",
-  icons: { icon: "/logo.png" },
+  title: "Cherry Xtrfy - Profile",
+  description: "Cộng đồng bàn phím cơ Việt Nam",
 };
 
-export default function PublicLayout({
+export default function ProfileLayout({
   children,
 }: {
   children: React.ReactNode;
