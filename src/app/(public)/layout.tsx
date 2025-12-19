@@ -2,6 +2,7 @@ import { Oswald } from "next/font/google";
 import "../globals.css";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 import { Header } from "@/src/components/Header/Header";
+import { Footer } from "@/src/components/Footer/Footer";
 
 // Cấu hình font
 const font = Oswald({
@@ -29,6 +30,7 @@ export default function PublicLayout({
       <LayoutWrapper>
         <Header />
         <main className="flex-grow">{children}</main>
+        <Footer />
       </LayoutWrapper>
     </div>
   );
