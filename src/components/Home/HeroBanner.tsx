@@ -156,7 +156,7 @@ const HeroSlideItem = ({ banner }: { banner: BannerData }) => {
 // --- COMPONENT CHÍNH ---
 export const HeroBanner: FC = () => {
   return (
-    <section className="relative w-full h-[600px] md:h-[700px] lg:h-[850px] bg-black overflow-hidden group">
+    <section className="relative w-full h-[350px] md:h-[450px] lg:h-[600px] bg-black overflow-hidden group">
       <Swiper
         modules={[Autoplay, Pagination, Navigation, EffectFade]}
         effect="fade"

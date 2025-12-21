@@ -1,11 +1,9 @@
-import { Oswald } from "next/font/google";
+import { Header } from "@/src/components/Header/Header";
 import "../globals.css";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 
-import { Footer } from "@/src/components/Footer/Footer";
-import { Header } from "@/src/components/Header/Header";
+import { Oswald } from "next/font/google";
 
-// Cấu hình font
 const font = Oswald({
   subsets: ["latin", "vietnamese"],
   weight: ["300", "400", "500", "700"],
@@ -14,12 +12,11 @@ const font = Oswald({
 });
 
 export const metadata = {
-  title: "Cherry Xtrfy - Gaming Gear",
-  description: "Bàn phím, chuột và phụ kiện gaming cao cấp",
-  icons: { icon: "/logo.png" },
+  title: "Cherry Xtrfy - Community",
+  description: "Cộng đồng bàn phím cơ Việt Nam",
 };
 
-export default function PublicLayout({
+export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -29,9 +26,7 @@ export default function PublicLayout({
       className={`flex flex-col min-h-screen bg-[#f0f2f5] ${font.className}`}
     >
       <LayoutWrapper>
-        <Header />
         <main className="flex-grow">{children}</main>
-        <Footer />
       </LayoutWrapper>
     </div>
   );
