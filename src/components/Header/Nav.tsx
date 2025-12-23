@@ -26,7 +26,7 @@ export const Nav: FC<Props> = ({ onNavigate, orientation = "horizontal" }) => {
             <a
               href={item.href}
               onClick={onNavigate}
-              className="text-xl text-black hover:text-gray-400 focus:text-gray-400 transition-colors"
+              className="text-md text-black hover:text-gray-400 focus:text-gray-400 transition-colors "
             >
               {item.label}
             </a>

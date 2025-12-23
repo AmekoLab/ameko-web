@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export const ProfileSidebar: FC<{ profile: UserProfile }> = ({ profile }) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 ">
       {/* Intro Box */}
       <div className="bg-white p-4 rounded-sm shadow-sm border border-gray-100">
         <h3 className="text-xs font-black uppercase text-gray-900 mb-3 tracking-widest">

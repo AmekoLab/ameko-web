@@ -1,9 +1,10 @@
 import { Header } from "@/src/components/Header/Header";
-import "../globals.css";
+import "../../../globals.css";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
+import { Footer } from "@/src/components/Footer/Footer";
+import { Oswald, Inter } from "next/font/google";
 
-import { Inter, Oswald } from "next/font/google";
-
+// 1. Cấu hình Font Oswald (Cho Header)
 const oswald = Oswald({
   subsets: ["latin", "vietnamese"],
   weight: ["300", "400", "500", "700"],
@@ -11,6 +12,7 @@ const oswald = Oswald({
   variable: "--font-oswald",
 });
 
+// 2. Cấu hình Font Inter (Cho nội dung trang)
 const inter = Inter({
   subsets: ["latin", "vietnamese"],
   display: "swap",
@@ -22,7 +24,7 @@ export const metadata = {
   description: "Cộng đồng bàn phím cơ Việt Nam",
 };
 
-export default function SocialLayout({
+export default function ProductLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -37,6 +39,8 @@ export default function SocialLayout({
         </div>
 
         <main className="flex-grow">{children}</main>
+
+        <Footer />
       </LayoutWrapper>
     </div>
   );

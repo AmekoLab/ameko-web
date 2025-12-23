@@ -72,7 +72,7 @@ export const Header: FC = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="w-full max-w-[1920px] mx-auto">
+      <div className="w-full max-w-[1920px] mx-auto ">
         {/* --- TOP BAR (Utility) --- */}
         <div className="flex justify-end items-center h-10 space-x-6 pr-4 bg-white  text-xs font-medium">
           {/* Logic Auth: Đã login hiện tên, chưa login hiện nút Login */}
@@ -155,7 +155,7 @@ export const Header: FC = () => {
 
         {/* --- MOBILE DRAWER --- */}
         {mobileOpen && (
-          <div className="lg:hidden border-t border-gray-100 bg-white absolute w-full left-0 shadow-lg h-screen">
+          <div className="lg:hidden border-t border-gray-100 bg-white absolute w-full left-0 shadow-lg h-screen ">
             <div className="p-4 space-y-6">
               {/* Search Mobile */}
               <div>

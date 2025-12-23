@@ -146,7 +146,7 @@ export const ProfileView: FC<{
       {/* MAIN CONTENT */}
       <div className="lg:col-span-8 xl:col-span-9">
         {/* TABS NAVIGATION */}
-        <div className="bg-white rounded-sm shadow-sm border border-gray-100 mb-6 sticky top-[70px] z-30">
+        <div className="bg-white rounded-sm shadow-sm border border-gray-100 mb-6  top-[70px] z-30">
           <div className="flex overflow-x-auto no-scrollbar">
             {[
               { id: "posts", label: "Posts", icon: List },

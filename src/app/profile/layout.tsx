@@ -1,13 +1,19 @@
-import { Oswald } from "next/font/google";
+import { Inter, Oswald } from "next/font/google";
 import "../globals.css";
 import { Header } from "@/src/components/Header/Header";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 
-const font = Oswald({
+const oswald = Oswald({
   subsets: ["latin", "vietnamese"],
   weight: ["300", "400", "500", "700"],
   display: "swap",
   variable: "--font-oswald",
+});
+
+const inter = Inter({
+  subsets: ["latin", "vietnamese"],
+  display: "swap",
+  variable: "--font-inter",
 });
 
 export const metadata = {
@@ -22,10 +28,12 @@ export default function ProfileLayout({
 }) {
   return (
     <div
-      className={`flex flex-col min-h-screen bg-[#f0f2f5] ${font.className}`}
+      className={`flex flex-col min-h-screen bg-[#f0f2f5] ${inter.className} ${oswald.variable}`}
     >
       <LayoutWrapper>
-        <Header />
+        <div className={`${oswald.className} sticky top-0 z-40`}>
+          <Header />
+        </div>
         <main className="flex-grow">{children}</main>
       </LayoutWrapper>
     </div>

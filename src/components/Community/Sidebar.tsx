@@ -4,7 +4,7 @@ import { Flame, Hash, Users, TrendingUp } from "lucide-react";
 
 // --- LEFT SIDEBAR ---
 export const LeftSidebar: FC = () => (
-  <div className="sticky top-28 space-y-2">
+  <div className="sticky top-6 space-y-2">
     <SidebarLink
       icon={<Flame className="w-5 h-5 text-[#ce2a32]" />}
       text="News Feed"
@@ -30,7 +30,7 @@ export const LeftSidebar: FC = () => (
 
 // --- RIGHT SIDEBAR ---
 export const RightSidebar: FC = () => (
-  <div className="sticky top-28 space-y-6">
+  <div className="sticky top-6 space-y-6">
     {/* Trending Tags */}
     <div className="bg-white p-4 rounded-sm shadow-sm border border-gray-100">
       <h3 className="text-sm font-black uppercase mb-4 text-black">

@@ -42,7 +42,7 @@ const BANNERS: BannerData[] = [
     title: "XTRFY M8 WIRELESS",
     subtitle: "Ultra-low front. Unique shape. Top-tier performance.",
     ctaText: "DISCOVER M8",
-    ctaLink: "/product/m8-wireless",
+    ctaLink: "/shop/product/m8-wireless",
     theme: "dark",
     position: "left",
   },

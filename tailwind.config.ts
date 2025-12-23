@@ -1,6 +1,7 @@
-import { text } from "stream/consumers";
 import type { Config } from "tailwindcss";
 import typography from "@tailwindcss/typography";
+
+import defaultTheme from "tailwindcss/defaultTheme";
 
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
@@ -14,11 +15,18 @@ export default {
         },
       },
       fontFamily: {
-        // 1. Set font mặc định (sans) là Inter (cho dễ đọc văn bản)
-        sans: ["var(--font-inter)", "ui-sans-serif", "system-ui"],
+        sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],
 
-        // 2. Định nghĩa font Oswald (để dùng cho tiêu đề hoặc layout cũ)
         oswald: ["var(--font-oswald)", "sans-serif"],
+      },
+      keyframes: {
+        "sound-wave": {
+          "0%, 100%": { height: "20%" },
+          "50%": { height: "100%" },
+        },
+      },
+      animation: {
+        "sound-wave": "sound-wave 1.2s ease-in-out infinite",
       },
     },
   },

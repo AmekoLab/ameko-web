@@ -59,14 +59,14 @@ export const CreatePost: FC = () => {
           {/* Nút đăng ảnh */}
           <button
             onClick={handleImageUpload}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-gray-50 text-gray-500 hover:text-[#ce2a32] transition-colors text-xs font-bold uppercase tracking-wide"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-gray-50 text-gray-500 hover:text-[#ce2a32] transition-colors text-xs  tracking-wide"
           >
             <ImageIcon className="w-4 h-4" />
             Photo/Video
           </button>
 
           {/* Nút cảm xúc */}
-          <button className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-gray-50 text-gray-500 hover:text-[#ce2a32] transition-colors text-xs font-bold uppercase tracking-wide">
+          <button className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-gray-50 text-gray-500 hover:text-[#ce2a32] transition-colors text-xs   tracking-wide">
             {/* TODO: [FEATURE] Tích hợp Emoji Picker khi click vào đây */}
             <Smile className="w-4 h-4" />
             Feeling/Activity
