@@ -15,10 +15,12 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+// 1. SEO Metadata
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const product = await ProductService.getBySlug(slug);
   if (!product) return { title: "Product Not Found" };
+
   return {
     title: `${product.name} | Ameko Store`,
     description: product.shortDesc,
@@ -26,6 +28,7 @@ export async function generateMetadata({ params }: PageProps) {
   };
 }
 
+// 2. Skeleton Loading cho phần Reviews
 const ReviewsSkeleton = () => (
   <div className="mt-16 pt-8 border-t border-gray-100 animate-pulse">
     <div className="h-6 w-32 bg-gray-200 rounded mb-6"></div>
@@ -39,9 +42,11 @@ const ReviewsSkeleton = () => (
   </div>
 );
 
+// 3. Main Page Component
 export default async function ProductDetailPage({ params }: PageProps) {
   const { slug } = await params;
 
+  // Fetch dữ liệu song song (Parallel Data Fetching) giúp load trang nhanh hơn
   const [product, relatedProducts] = await Promise.all([
     ProductService.getBySlug(slug),
     ProductService.getRelated(slug),
@@ -50,11 +55,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
   if (!product) notFound();
 
   return (
-    // 🔥 FIX: Thêm "overflow-x-hidden" vào đây để chặn scroll ngang
-    // "w-full" để đảm bảo nó chiếm đúng chiều rộng có sẵn
-    <div className="bg-white min-h-screen pb-16 overflow-x-hidden w-full">
+    <div className="bg-white min-h-screen pb-16 overflow-x-hidden w-full font-sans text-slate-900">
       <div className="max-w-[1080px] mx-auto px-4 lg:px-6">
-        {/* Breadcrumb: Thêm w-full để tránh text bị đẩy quá khổ */}
+        {/* --- BREADCRUMB --- */}
         <nav className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 py-6 overflow-hidden whitespace-nowrap w-full">
           <Link href="/" className="hover:text-black transition-colors">
             Home
@@ -64,23 +67,25 @@ export default async function ProductDetailPage({ params }: PageProps) {
             Shop
           </Link>
           <ChevronRight className="w-3 h-3 shrink-0" />
-          {/* Thêm min-w-0 để truncate hoạt động tốt trong flex */}
           <span className="text-black truncate min-w-0">{product.name}</span>
         </nav>
 
-        {/* --- MAIN LAYOUT --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          <div className="lg:col-span-7">
+        {/* MAIN SECTION */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-20">
+          {/*  Gallery ) */}
+          <div className="lg:col-span-7 w-full">
             <ProductGallery images={product.images} />
           </div>
 
-          <div className="lg:col-span-5 pt-1">
+          {/* Thông tin mua hàng */}
+          <div className="lg:col-span-5 pt-1 sticky top-6">
             <ProductInfo product={product} relatedProducts={relatedProducts} />
           </div>
         </div>
 
+        {/* --- SOUND TEST --- */}
         {product.soundTest && (
-          <div className="mt-16">
+          <div className="mt-16 mb-24">
             <SoundTestSection
               videoUrl={product.soundTest.videoUrl}
               description={product.soundTest.description}
@@ -88,19 +93,20 @@ export default async function ProductDetailPage({ params }: PageProps) {
           </div>
         )}
 
-        {/* --- DESCRIPTION & SPECS SECTION --- */}
-        <div className="mt-24 border-t border-gray-100 pt-16">
-          <div className="max-w-3xl mb-16">
+        {/* --- DESCRIPTION & SPECS --- */}
+        <div className="border-t border-gray-100 pt-16 grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
+          <div className="lg:col-span-7">
             <h3 className="text-xl font-black uppercase tracking-tight mb-6 font-oswald">
               Product Description
             </h3>
-            <div className="prose prose-sm text-gray-600 leading-relaxed text-sm">
+            <div className="prose prose-sm text-gray-600 leading-relaxed">
               <p>{product.shortDesc}</p>
               <p>
                 Designed for enthusiasts, gamers, and professionals alike, the{" "}
-                {product.name} offers unparalleled customization and
-                performance. With its gasket-mounted structure and tri-mode
-                connectivity, it adapts seamlessly to any setup.
+                <strong className="text-slate-900">{product.name}</strong>{" "}
+                offers unparalleled customization and performance. With its
+                gasket-mounted structure and tri-mode connectivity, it adapts
+                seamlessly to any setup.
               </p>
               <p>
                 The premium build quality ensures durability, while the
@@ -110,18 +116,22 @@ export default async function ProductDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          <div className="w-full">
+          <div className="lg:col-span-5">
+            <h3 className="text-xl font-black uppercase tracking-tight mb-6 font-oswald">
+              Technical Specs
+            </h3>
             <ProductSpecs specs={product.specs} />
           </div>
         </div>
 
-        {/* --- COMPLETE SETUP --- */}
+        {/* --- COMPLETE SETUP (Cross-sell) --- */}
         {relatedProducts.length > 0 && (
           <div className="mb-20 pt-16 border-t border-gray-100">
             <CompleteSetup products={relatedProducts.slice(0, 3)} />
           </div>
         )}
 
+        {/* --- REVIEWS --- */}
         <Suspense fallback={<ReviewsSkeleton />}>
           <ReviewsContainer slug={slug} />
         </Suspense>

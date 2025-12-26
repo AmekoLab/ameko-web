@@ -45,7 +45,7 @@ const Visualizer = memo(({ images }: { images: Product[] }) => {
     return map;
   }, [images]);
 
-  // 2. Logic Masking 
+  // 2. Logic Masking
   // Tính toán trước xem có Keycap không?
   const hasKeycap = !!layerMap["keycap"];
 
@@ -63,7 +63,6 @@ const Visualizer = memo(({ images }: { images: Product[] }) => {
       {LAYER_ORDER.map((slug) => {
         const product = layerMap[slug];
 
-       
         // Nếu đang vẽ lớp 'switch' MÀ đã có 'keycap' -> Ẩn Switch đi (Opacity 0)
         // Lưu ý: Ta dùng Opacity chứ không dùng unmount (null) để giữ ổn định DOM
         const isHidden = slug === "switch" && hasKeycap;
@@ -73,11 +72,11 @@ const Visualizer = memo(({ images }: { images: Product[] }) => {
 
         return (
           <div
-            key={slug} 
+            key={slug}
             className="absolute inset-0 pointer-events-none transition-opacity duration-300 ease-in-out"
             style={{
               zIndex: getZIndex(slug),
-              opacity: isHidden ? 0 : 1, 
+              opacity: isHidden ? 0 : 1,
             }}
           >
             <Image
@@ -85,7 +84,6 @@ const Visualizer = memo(({ images }: { images: Product[] }) => {
               alt={product.name}
               fill
               className="object-contain"
-             
               priority={slug === "case"}
               sizes="(max-width: 768px) 100vw, 75vw"
             />
@@ -97,7 +95,7 @@ const Visualizer = memo(({ images }: { images: Product[] }) => {
 });
 Visualizer.displayName = "Visualizer";
 
-// 2. Component Product Item 
+// 2. Component Product Item
 const ProductItem = memo(
   ({
     product,
@@ -205,17 +203,16 @@ const NoneItem = memo(
       w-16 h-16 rounded-lg flex items-center justify-center border shrink-0 transition-colors relative overflow-hidden
       ${
         isSelected
-          ? "border-yellow-300 bg-gray-900" 
-          : "border-gray-100 bg-gray-50 group-hover:bg-red-50" 
+          ? "border-yellow-300 bg-gray-900"
+          : "border-gray-100 bg-gray-50 group-hover:bg-red-50"
       }
     `}
       >
-       
         <Image
           src="https://res.cloudinary.com/doezwafgz/image/upload/v1766678625/None-removebg-preview_bnlaih.png"
           alt="None"
           fill
-          className="object-contain p-3" 
+          className="object-contain p-3"
           sizes="64px"
         />
       </div>
@@ -308,19 +305,17 @@ export default function BuilderPage() {
     init();
   }, []);
 
-  /
   // Khi danh sách sản phẩm (currentProducts) thay đổi, ta ngầm tải trước ảnh layer của chúng
   useEffect(() => {
     if (currentProducts.length > 0) {
       currentProducts.forEach((product) => {
         const img = new window.Image();
-        img.src = product.layerImageUrl; 
+        img.src = product.layerImageUrl;
       });
     }
   }, [currentProducts]);
 
   const fetchStepData = async (slug: string) => {
-    
     if (slug === activeSlug) return;
 
     setProcessing(true);
@@ -355,7 +350,7 @@ export default function BuilderPage() {
     } else {
       delete newSelection[activeSlug];
     }
-   
+
     setSession({ ...session, selection: newSelection });
 
     // 3. Gọi API Background
@@ -366,7 +361,7 @@ export default function BuilderPage() {
         activeSlug,
         productIdToSend
       );
-      setSession(data.session); 
+      setSession(data.session);
     } catch (error) {
       console.error("Lỗi lưu sản phẩm", error);
     }
@@ -467,7 +462,7 @@ export default function BuilderPage() {
           style={{
             backgroundImage:
               "url('https://res.cloudinary.com/doezwafgz/image/upload/v1766677524/background_teui0y.png')",
-            backgroundColor: "#1a1a1a", 
+            backgroundColor: "#1a1a1a",
           }}
         >
           <div className="absolute inset-0 bg-black/30 pointer-events-none z-0"></div>
@@ -476,7 +471,6 @@ export default function BuilderPage() {
             Visualizer Preview
           </div>
 
-          
           <Visualizer images={selectedImages} />
         </div>
 
@@ -532,14 +526,13 @@ export default function BuilderPage() {
                 const currIdx = steps.findIndex((s) => s.slug === activeSlug);
                 if (currIdx > 0) fetchStepData(steps[currIdx - 1].slug);
               }}
-              
               disabled={steps.findIndex((s) => s.slug === activeSlug) === 0}
               className={`
                 flex-1 py-3.5 font-bold uppercase text-sm rounded-lg transition-all shadow-lg active:translate-y-[1px] border
                 ${
                   steps.findIndex((s) => s.slug === activeSlug) === 0
-                    ? "bg-black text-gray-600 border-gray-800 cursor-not-allowed" 
-                    : "bg-black text-white border-gray-600 hover:bg-gray-800 hover:border-gray-500" 
+                    ? "bg-black text-gray-600 border-gray-800 cursor-not-allowed"
+                    : "bg-black text-white border-gray-600 hover:bg-gray-800 hover:border-gray-500"
                 }
               `}
             >
@@ -556,7 +549,6 @@ export default function BuilderPage() {
               }}
               className="flex-1 py-3.5 bg-yellow-400 text-black font-bold uppercase text-sm rounded-lg hover:bg-yellow-300 transition-all shadow-lg active:translate-y-[1px]"
             >
-              
               {steps.findIndex((s) => s.slug === activeSlug) ===
               steps.length - 1
                 ? "Finish"
