@@ -6,87 +6,13 @@ import { Navigation, Autoplay } from "swiper/modules";
 import { Swiper as SwiperType } from "swiper";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { ProductCard, Product } from "../Product/ProductCard";
+import { ProductCard } from "../Product/ProductCard";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import { ProductSkeleton } from "../Product/ProductSkeleton";
-
-const MOCK_PRODUCTS: Product[] = [
-  {
-    id: 1,
-    name: "CHERRY XTRFY K5V2 + GP6 NORTHERN LIGHT BUNDLE",
-    price: 159.0,
-    image:
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548984/M64-Prow-White-Wireless-Gaming-Mouse_Category-1_qfbdhu.png",
-    tag: "NEW",
-    category: "Bundles",
-    slug: "k5v2-bundle",
-    features: [
-      "Limited-edition keyboard and mousepad bundle",
-      "K5V2 Compact keyboard with CHERRY MX Northern Light switches",
-      "GP6 Northern Light XL mousepad",
-    ],
-  },
-  {
-    id: 2,
-    name: "CHERRY XTRFY H3 WIRELESS",
-    price: 99.0,
-    image:
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/CHERRY-XTRFY-H3-WIRELESS_category_nmdupa.png",
-    tag: "NEW",
-    category: "Audio",
-    slug: "h3-wireless",
-    features: [
-      "Multi-platform wireless headset",
-      "Closed over-ear design",
-      "53 mm speaker drivers",
-      "Esports-optimized sound",
-    ],
-  },
-  {
-    id: 3,
-    name: "CHERRY XTRFY K4V2 TKL BLACK",
-    price: 119.0,
-    image:
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/produc1_jc0ojq.png",
-    category: "Keyboards",
-    slug: "k4v2-tkl",
-    features: [
-      "Tenkeyless design",
-      "Customizable RGB illumination",
-      "Mechanical CHERRY MX2A Red switches",
-    ],
-  },
-  {
-    id: 4,
-    name: "CHERRY XTRFY M64 PRO 8K WIRELESS BLACK",
-    price: 139.0,
-    image:
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/456_qcrwfk.png",
-    category: "Mice",
-    slug: "m64-pro-8k",
-    features: [
-      "Ultra-fast 8K mouse",
-      "Ergonomic shape with ultra-low front",
-      "55 grams Lightweight with a solid shell",
-    ],
-  },
-  {
-    id: 5,
-    name: "K5V2 COMPACT TRANSPARENT WHITE",
-    price: 149.0,
-    image:
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548984/cat3_ky7ssk.png",
-    category: "Keyboards",
-    slug: "k5v2-white",
-    features: [
-      "65% size",
-      "Ultra-customizable",
-      "Hot-swappable CHERRY MX2A Red switches",
-    ],
-  },
-];
+import { MOCK_PRODUCTS } from "@/src/data/product";
+import { Product } from "@/src/types/product";
 
 export const BrandNew: FC = () => {
   const swiperRef = useRef<SwiperType>(null);

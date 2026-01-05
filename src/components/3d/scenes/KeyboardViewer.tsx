@@ -1,3 +1,5 @@
+// src/components/3d/scenes/KeyboardViewer.tsx
+
 "use client";
 
 import {
@@ -9,6 +11,8 @@ import {
   Component,
   ErrorInfo,
   ReactNode,
+  useEffect,
+  useMemo,
 } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
@@ -18,68 +22,91 @@ import {
   Html,
   useProgress,
 } from "@react-three/drei";
-import { Camera, Download, Activity, RefreshCw } from "lucide-react";
+import {
+  Camera,
+  Download,
+  Activity,
+  RefreshCw,
+  AlertCircle,
+} from "lucide-react";
 import { KeyboardModel } from "../models/KeyboardModel";
+import { Model3DConfig, EnvironmentPreset } from "@/src/types/model.types";
+import { VIEWER_DEFAULTS, FEATURE_FLAGS } from "@/src/config/models.config";
+import { validateModelUrl } from "@/src/lib/validations/modelValidation";
 
-// ==================== CONSTANTS ====================
-const CAMERA_CONFIG = {
-  position: [0, 15, 30] as [number, number, number],
-  fov: 40,
-} as const;
+/**
+ * ============================================================
+ * TYPES
+ * ============================================================
+ */
 
-const ORBIT_CONFIG = {
-  autoRotateSpeed: 0.8,
-  minDistance: 10,
-  maxDistance: 60,
-  minPolarAngle: 0,
-  maxPolarAngle: Math.PI,
-} as const;
-
-const SHADOW_CONFIG = {
-  position: [0, -2.05, 0] as [number, number, number],
-  opacity: 0.4,
-  scale: 40,
-  blur: 2.5,
-  far: 4,
-  resolution: 256,
-  color: "#000000",
-} as const;
-
-const MODEL_CONFIGS = {
-  keyboard: {
-    path: "/gaming_keyboard.glb",
-    position: [0, -2, 0] as [number, number, number],
-  },
-  // thêm các mô hình khác nếu cần
-  // mouse: { path: "/gaming_mouse.glb", position: [0, -1, 0] },
-} as const;
-
-// ==================== TYPES ====================
 interface ViewerProps {
+  /**
+   * Model configuration from API or hardcoded
+   */
+  modelConfig: Model3DConfig;
+
+  /**
+   * Additional CSS classes
+   */
   className?: string;
+
+  /**
+   * Enable automatic rotation
+   * @default true
+   */
   autoRotate?: boolean;
+
+  /**
+   * Enable zoom controls
+   * @default false
+   */
   enableZoom?: boolean;
+
+  /**
+   * Enable screenshot functionality
+   * @default false
+   */
   enableScreenshot?: boolean;
+
+  /**
+   * Show FPS counter
+   * @default false
+   */
   enableFPS?: boolean;
+
+  /**
+   * Enable mobile gesture controls
+   * @default true
+   */
   enableGestures?: boolean;
-  modelType?: keyof typeof MODEL_CONFIGS;
-  environmentPreset?:
-    | "city"
-    | "sunset"
-    | "dawn"
-    | "night"
-    | "warehouse"
-    | "forest"
-    | "apartment"
-    | "studio"
-    | "park"
-    | "lobby";
+
+  /**
+   * Environment lighting preset
+   * @default "city"
+   */
+  environmentPreset?: EnvironmentPreset;
+
+  /**
+   * Callback when screenshot is taken
+   */
   onScreenshot?: (dataUrl: string) => void;
+
+  /**
+   * Callback when error occurs
+   */
+  onError?: (error: Error) => void;
+
+  /**
+   * Callback when model loads successfully
+   */
+  onLoad?: () => void;
 }
 
 interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
+  onError?: (error: Error) => void;
 }
 
 interface ErrorBoundaryState {
@@ -87,7 +114,12 @@ interface ErrorBoundaryState {
   error?: Error;
 }
 
-// ==================== ERROR BOUNDARY ====================
+/**
+ * ============================================================
+ * ERROR BOUNDARY
+ * ============================================================
+ */
+
 class ViewerErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
@@ -102,7 +134,8 @@ class ViewerErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("3D Viewer Error:", error, errorInfo);
+    console.error("[3D Viewer] Error:", error, errorInfo);
+    this.props.onError?.(error);
   }
 
   render() {
@@ -111,24 +144,11 @@ class ViewerErrorBoundary extends Component<
         this.props.fallback || (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gray-900 text-white p-8">
             <div className="text-red-400 mb-4">
-              <svg
-                className="w-16 h-16"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
+              <AlertCircle className="w-16 h-16" />
             </div>
             <h3 className="text-xl font-bold mb-2">Failed to Load 3D Model</h3>
             <p className="text-gray-400 text-sm mb-4 text-center max-w-md">
-              {this.state.error?.message ||
-                "An error occurred while loading the 3D viewer"}
+              {this.state.error?.message || "An unexpected error occurred"}
             </p>
             <button
               onClick={() => this.setState({ hasError: false })}
@@ -146,12 +166,16 @@ class ViewerErrorBoundary extends Component<
   }
 }
 
-// ==================== LOADING SKELETON ====================
+/**
+ * ============================================================
+ * LOADING SKELETON
+ * ============================================================
+ */
+
 const LoadingSkeleton = memo(() => {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 animate-pulse">
       <div className="relative">
-        {/* Pulsing circles */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-32 h-32 rounded-full bg-white/5 animate-ping" />
         </div>
@@ -159,7 +183,6 @@ const LoadingSkeleton = memo(() => {
           <div className="w-24 h-24 rounded-full bg-white/10 animate-pulse" />
         </div>
 
-        {/* Center icon */}
         <div className="relative z-10 w-32 h-32 flex items-center justify-center">
           <div className="w-16 h-16 text-white/30">
             <svg
@@ -184,14 +207,20 @@ const LoadingSkeleton = memo(() => {
 
 LoadingSkeleton.displayName = "LoadingSkeleton";
 
-// ==================== FPS COUNTER ====================
+/**
+ * ============================================================
+ * FPS COUNTER
+ * ============================================================
+ */
+
 const FPSCounter = memo(() => {
   const [fps, setFps] = useState(60);
 
   useFrame((state) => {
-    setFps(
-      Math.round(state.clock.elapsedTime > 0 ? 1 / state.clock.getDelta() : 60)
+    const newFps = Math.round(
+      state.clock.elapsedTime > 0 ? 1 / state.clock.getDelta() : 60
     );
+    setFps(newFps);
   });
 
   return (
@@ -210,7 +239,12 @@ const FPSCounter = memo(() => {
 
 FPSCounter.displayName = "FPSCounter";
 
-// ==================== LOADER ====================
+/**
+ * ============================================================
+ * PROGRESS LOADER
+ * ============================================================
+ */
+
 const Loader = memo(() => {
   const { progress } = useProgress();
 
@@ -221,7 +255,6 @@ const Loader = memo(() => {
         role="status"
         aria-live="polite"
       >
-        {/* Progress Ring */}
         <div className="relative w-20 h-20">
           <svg className="w-20 h-20 -rotate-90">
             <circle
@@ -263,77 +296,101 @@ const Loader = memo(() => {
 
 Loader.displayName = "Loader";
 
-// ==================== SCREENSHOT HANDLER ====================
-// const useScreenshot = (onScreenshot?: (dataUrl: string) => void) => {
-//   const { gl, scene, camera } = useThree();
+/**
+ * ============================================================
+ * SCREENSHOT UTILITIES
+ * ============================================================
+ */
 
-//   const takeScreenshot = useCallback(() => {
-//     try {
-//       gl.render(scene, camera);
-//       const dataUrl = gl.domElement.toDataURL("image/png");
+const useScreenshot = (onScreenshot?: (dataUrl: string) => void) => {
+  const { gl, scene, camera } = useThree();
 
-//       if (onScreenshot) {
-//         onScreenshot(dataUrl);
-//       } else {
-//         // Auto download
-//         const link = document.createElement("a");
-//         link.download = `3d-keyboard-${Date.now()}.png`;
-//         link.href = dataUrl;
-//         link.click();
-//       }
-//     } catch (error) {
-//       console.error("Screenshot failed:", error);
-//     }
-//   }, [gl, scene, camera, onScreenshot]);
+  const takeScreenshot = useCallback(() => {
+    try {
+      gl.render(scene, camera);
+      const dataUrl = gl.domElement.toDataURL("image/png");
 
-//   return takeScreenshot;
-// };
+      if (onScreenshot) {
+        onScreenshot(dataUrl);
+      } else {
+        const link = document.createElement("a");
+        link.download = `3d-model-${Date.now()}.png`;
+        link.href = dataUrl;
+        link.click();
+      }
 
-// ==================== SCENE ====================
+      if (FEATURE_FLAGS.DEBUG_MODE) {
+        console.log("[Screenshot] Captured successfully");
+      }
+    } catch (error) {
+      console.error("[Screenshot] Failed:", error);
+    }
+  }, [gl, scene, camera, onScreenshot]);
+
+  return takeScreenshot;
+};
+
+/**
+ * ============================================================
+ * 3D SCENE
+ * ============================================================
+ */
+
 const Scene = memo<{
+  modelConfig: Model3DConfig;
   autoRotate: boolean;
   enableZoom: boolean;
   isInteracting: boolean;
-  environmentPreset: ViewerProps["environmentPreset"];
-  modelConfig: (typeof MODEL_CONFIGS)[keyof typeof MODEL_CONFIGS];
+  environmentPreset: EnvironmentPreset;
   enableFPS: boolean;
   enableGestures: boolean;
+  onLoad?: () => void;
+  onError?: (error: Error) => void;
 }>(
   ({
+    modelConfig,
     autoRotate,
     enableZoom,
     isInteracting,
     environmentPreset,
-    modelConfig,
     enableFPS,
     enableGestures,
+    onLoad,
+    onError,
   }) => {
     return (
       <>
-        <Environment preset={environmentPreset || "city"} />
+        <Environment preset={environmentPreset} />
 
-        <KeyboardModel position={modelConfig.position} />
+        <KeyboardModel
+          modelUrl={modelConfig.modelUrl}
+          position={modelConfig.position || [0, -2, 0]}
+          scale={modelConfig.scale || 1}
+          rotation={modelConfig.rotation}
+          onLoad={onLoad}
+          onError={onError}
+        />
 
         <ContactShadows
-          position={SHADOW_CONFIG.position}
-          opacity={SHADOW_CONFIG.opacity}
-          scale={SHADOW_CONFIG.scale}
-          blur={SHADOW_CONFIG.blur}
-          far={SHADOW_CONFIG.far}
-          resolution={SHADOW_CONFIG.resolution}
-          color={SHADOW_CONFIG.color}
+          position={VIEWER_DEFAULTS.SHADOW.position}
+          opacity={VIEWER_DEFAULTS.SHADOW.opacity}
+          scale={VIEWER_DEFAULTS.SHADOW.scale}
+          blur={VIEWER_DEFAULTS.SHADOW.blur}
+          far={VIEWER_DEFAULTS.SHADOW.far}
+          resolution={VIEWER_DEFAULTS.SHADOW.resolution}
+          color={VIEWER_DEFAULTS.SHADOW.color}
         />
 
         <OrbitControls
           makeDefault
           autoRotate={autoRotate && !isInteracting}
-          autoRotateSpeed={ORBIT_CONFIG.autoRotateSpeed}
+          autoRotateSpeed={VIEWER_DEFAULTS.ORBIT.autoRotateSpeed}
           enableZoom={enableZoom}
-          minDistance={ORBIT_CONFIG.minDistance}
-          maxDistance={ORBIT_CONFIG.maxDistance}
+          minDistance={VIEWER_DEFAULTS.ORBIT.minDistance}
+          maxDistance={VIEWER_DEFAULTS.ORBIT.maxDistance}
           enablePan={false}
-          minPolarAngle={ORBIT_CONFIG.minPolarAngle}
-          maxPolarAngle={ORBIT_CONFIG.maxPolarAngle}
+          minPolarAngle={VIEWER_DEFAULTS.ORBIT.minPolarAngle}
+          maxPolarAngle={VIEWER_DEFAULTS.ORBIT.maxPolarAngle}
           touches={enableGestures ? { ONE: 2, TWO: 0 } : undefined}
         />
 
@@ -345,8 +402,13 @@ const Scene = memo<{
 
 Scene.displayName = "Scene";
 
-// ==================== SCREENSHOT BUTTON ====================
-const ScreenshotButton = ({ onClick }: { onClick: () => void }) => {
+/**
+ * ============================================================
+ * SCREENSHOT BUTTON
+ * ============================================================
+ */
+
+const ScreenshotButton = memo<{ onClick: () => void }>(({ onClick }) => {
   const [isCapturing, setIsCapturing] = useState(false);
 
   const handleClick = useCallback(() => {
@@ -370,26 +432,46 @@ const ScreenshotButton = ({ onClick }: { onClick: () => void }) => {
       )}
     </button>
   );
-};
+});
 
-// ==================== MAIN COMPONENT ====================
+ScreenshotButton.displayName = "ScreenshotButton";
+
+/**
+ * ============================================================
+ * MAIN COMPONENT
+ * ============================================================
+ */
+
 export default function KeyboardViewer({
+  modelConfig,
   className = "h-[500px]",
   autoRotate = true,
   enableZoom = false,
   enableScreenshot = false,
   enableFPS = false,
   enableGestures = true,
-  modelType = "keyboard",
   environmentPreset = "city",
   onScreenshot,
+  onError,
+  onLoad,
 }: ViewerProps) {
   const [isInteracting, setIsInteracting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const canvasRef = useRef<HTMLDivElement>(null);
-  //   const screenshotTriggerRef = useRef<() => void>();
+  const screenshotTriggerRef = useRef<(() => void) | undefined>(undefined);
 
-  const modelConfig = MODEL_CONFIGS[modelType] || MODEL_CONFIGS.keyboard;
+  // Validate model config - useMemo instead of useEffect to avoid cascading renders
+  const isValidConfig = useMemo(() => {
+    const isValid = validateModelUrl(modelConfig.modelUrl);
+
+    if (!isValid) {
+      const error = new Error("Invalid model URL");
+      console.error("[Viewer] Invalid config:", modelConfig);
+      onError?.(error);
+    }
+
+    return isValid;
+  }, [modelConfig.modelUrl, modelConfig, onError]);
 
   const handlePointerDown = useCallback(() => {
     setIsInteracting(true);
@@ -399,39 +481,52 @@ export default function KeyboardViewer({
     setIsInteracting(false);
   }, []);
 
-  //   const handleScreenshot = useCallback(() => {
-  //     if (screenshotTriggerRef.current) {
-  //       screenshotTriggerRef.current();
-  //     }
-  //   }, []);
+  const handleScreenshot = useCallback(() => {
+    screenshotTriggerRef.current?.();
+  }, []);
+
+  const handleModelLoad = useCallback(() => {
+    if (FEATURE_FLAGS.DEBUG_MODE) {
+      console.log("[Viewer] Model loaded");
+    }
+    onLoad?.();
+  }, [onLoad]);
+
+  if (!isValidConfig) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gray-900 text-white">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-400" />
+          <p className="text-sm text-gray-400">Invalid model configuration</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <ViewerErrorBoundary>
+    <ViewerErrorBoundary onError={onError}>
       <div
         ref={canvasRef}
         className={`w-full relative bg-transparent ${className}`}
         role="img"
-        aria-label="Interactive 3D keyboard model"
+        aria-label={`Interactive 3D model: ${modelConfig.name}`}
       >
-        {/* Loading Skeleton */}
         {isLoading && (
           <div className="absolute inset-0 z-10">
             <LoadingSkeleton />
           </div>
         )}
 
-        {/* Screenshot Button */}
-        {/* {enableScreenshot && !isLoading && (
+        {enableScreenshot && !isLoading && (
           <div className="absolute top-4 right-4 z-20">
             <ScreenshotButton onClick={handleScreenshot} />
           </div>
-        )} */}
+        )}
 
-        {/* Canvas */}
         <Canvas
           shadows
           dpr={[1, 2]}
-          camera={CAMERA_CONFIG}
+          camera={VIEWER_DEFAULTS.CAMERA}
           onPointerDown={handlePointerDown}
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerUp}
@@ -440,26 +535,26 @@ export default function KeyboardViewer({
         >
           <Suspense fallback={<Loader />}>
             <Scene
+              modelConfig={modelConfig}
               autoRotate={autoRotate}
               enableZoom={enableZoom}
               isInteracting={isInteracting}
               environmentPreset={environmentPreset}
-              modelConfig={modelConfig}
               enableFPS={enableFPS}
               enableGestures={enableGestures}
+              onLoad={handleModelLoad}
+              onError={onError}
             />
 
-            {/* Xử lí screenshot */}
-            {/* {enableScreenshot && (
+            {enableScreenshot && (
               <ScreenshotHandler
                 onScreenshot={onScreenshot}
                 triggerRef={screenshotTriggerRef}
               />
-            )} */}
+            )}
           </Suspense>
         </Canvas>
 
-        {/* Gợi ý cử chỉ chạm */}
         {enableGestures && !isLoading && (
           <div className="absolute bottom-4 left-4 text-white/30 text-xs pointer-events-none">
             <p>👆 One finger to rotate</p>
@@ -471,17 +566,22 @@ export default function KeyboardViewer({
   );
 }
 
-// Screenshot handler component
-// function ScreenshotHandler({
-//   onScreenshot,
-//   triggerRef,
-// }: {
-//   onScreenshot?: (dataUrl: string) => void;
-//   triggerRef: React.MutableRefObject<(() => void) | undefined>;
-// }) {
-//   const takeScreenshot = useScreenshot(onScreenshot);
+/**
+ * Screenshot handler component
+ */
+function ScreenshotHandler({
+  onScreenshot,
+  triggerRef,
+}: {
+  onScreenshot?: (dataUrl: string) => void;
+  triggerRef: React.MutableRefObject<(() => void) | undefined>;
+}) {
+  const takeScreenshot = useScreenshot(onScreenshot);
 
-//   triggerRef.current = takeScreenshot;
+  // Update ref in useEffect to avoid updating during render
+  useEffect(() => {
+    triggerRef.current = takeScreenshot;
+  }, [takeScreenshot, triggerRef]);
 
-//   return null;
-// }
+  return null;
+}

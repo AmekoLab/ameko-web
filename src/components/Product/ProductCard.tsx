@@ -4,28 +4,23 @@ import { FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
-
-export interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  tag?: "NEW" | "HOT" | "SALE";
-  category: string;
-  slug: string;
-  features: string[];
-}
+import { Product } from "@/src/types/product";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export const ProductCard: FC<ProductCardProps> = ({ product }) => {
+  const thumbnail =
+    product.images && product.images.length > 0
+      ? product.images[0]
+      : "/images/placeholder.png";
+
   return (
     <div className="group/card relative bg-white flex flex-col h-full w-full overflow-hidden transition-all duration-300 hover:shadow-2xl border border-transparent hover:border-gray-100 rounded-sm">
       {/* 2. IMAGE AREA */}
       <Link
-        href={`/product/${product.slug}`}
+        href={`/shop/product/${product.slug}`}
         className="relative block w-full aspect-square bg-[#f9f9f9] overflow-hidden shrink-0"
       >
         {/* Tag */}
@@ -40,9 +35,8 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
         )}
 
         {/* Product Image */}
-
         <Image
-          src={product.image}
+          src={thumbnail}
           alt={product.name}
           fill
           className="object-contain p-8 transition-transform duration-500 group-hover/card:scale-110"
@@ -50,7 +44,6 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
         />
 
         {/* Action Button (Hover) */}
-
         <div className="absolute inset-x-4 bottom-4 translate-y-full opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100 transition-all duration-300 z-20">
           <button
             className="w-full flex items-center justify-center gap-2 bg-black text-white py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#ce2a32] transition-colors shadow-lg"
@@ -72,19 +65,18 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
         </p>
 
         {/* Name */}
-
         <h3 className="text-sm font-black text-black uppercase leading-tight mb-2 group-hover/card:text-[#ce2a32] transition-colors min-h-[40px] line-clamp-2">
-          <Link href={`/product/${product.slug}`}>{product.name}</Link>
+          <Link href={`/shop/product/${product.slug}`}>{product.name}</Link>
         </h3>
 
         <p className="text-sm font-bold text-gray-900 mb-4">
-          ${product.price.toFixed(2)} (USD)
+          ${product.basePrice.toFixed(2)} (USD)
         </p>
 
         {/* Features */}
 
         <ul className="space-y-1 mt-auto pt-4 border-t border-transparent group-hover/card:border-gray-100 transition-colors">
-          {product.features.map((feature, index) => (
+          {(product.features || []).slice(0, 3).map((feature, index) => (
             <li
               key={index}
               className="flex items-start gap-2 text-[11px] text-gray-500 leading-relaxed"

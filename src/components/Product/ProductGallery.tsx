@@ -3,9 +3,25 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { Box, X, Rotate3D, ZoomIn, Camera, Activity } from "lucide-react";
+import {
+  Box,
+  X,
+  Rotate3D,
+  ZoomIn,
+  Camera,
+  Activity,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
+import { use3DModel } from "@/src/hooks/3d/use3DModel";
+import { EnvironmentPreset } from "@/src/types/model.types";
 
-// ==================== CONSTANTS ====================
+/**
+ * ============================================================
+ * CONSTANTS
+ * ============================================================
+ */
+
 const MODAL_TYPES = {
   NONE: "NONE",
   IMAGE: "IMAGE",
@@ -14,7 +30,12 @@ const MODAL_TYPES = {
 
 type ModalType = (typeof MODAL_TYPES)[keyof typeof MODAL_TYPES];
 
-// ==================== DYNAMIC IMPORT ====================
+/**
+ * ============================================================
+ * DYNAMIC IMPORT
+ * ============================================================
+ */
+
 const KeyboardViewer = dynamic(
   () => import("@/src/components/3d/scenes/KeyboardViewer"),
   {
@@ -23,56 +44,120 @@ const KeyboardViewer = dynamic(
       <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 animate-pulse">
         <Box className="w-12 h-12 animate-bounce mb-4 text-white" />
         <span className="text-xs font-bold uppercase tracking-widest text-white">
-          Loading 3D Model...
+          Loading 3D Viewer...
         </span>
       </div>
     ),
   }
 );
 
-// ==================== TYPES ====================
+/**
+ * ============================================================
+ * TYPES
+ * ============================================================
+ */
+
 interface ProductGalleryProps {
+  /**
+   * Product image URLs
+   */
   images: string[];
+
+  /**
+   * Product name for accessibility
+   */
   productName?: string;
-  // New 3D Viewer Options
+
+  /**
+   * Product ID for fetching 3D model
+   * TODO: When backend is ready, this will be used to fetch from API
+   * Currently uses hardcoded model from config
+   */
+  productId: string;
+
+  /**
+   * Enable screenshot functionality in 3D viewer
+   * @default true
+   */
   enable3DScreenshot?: boolean;
+
+  /**
+   * Show FPS counter in 3D viewer
+   * @default false (set to true for development)
+   */
   enable3DFPS?: boolean;
+
+  /**
+   * Enable mobile gesture controls
+   * @default true
+   */
   enable3DGestures?: boolean;
-  modelType?: "keyboard"; // khả năng mở rộng sau này
-  environmentPreset?:
-    | "city"
-    | "sunset"
-    | "dawn"
-    | "night"
-    | "warehouse"
-    | "forest"
-    | "apartment"
-    | "studio"
-    | "park"
-    | "lobby";
+
+  /**
+   * Environment lighting preset
+   * @default "city"
+   */
+  environmentPreset?: EnvironmentPreset;
+
+  /**
+   * Callback when 3D screenshot is taken
+   */
+  on3DScreenshot?: (dataUrl: string) => void;
 }
 
-// ==================== COMPONENT ====================
+/**
+ * ============================================================
+ * COMPONENT
+ * ============================================================
+ */
+
 export const ProductGallery = ({
   images,
   productName = "Product",
+  productId,
   enable3DScreenshot = true,
   enable3DFPS = false,
   enable3DGestures = true,
-  modelType = "keyboard",
   environmentPreset = "city",
+  on3DScreenshot,
 }: ProductGalleryProps) => {
   const [selectedImage, setSelectedImage] = useState(images[0]);
   const [activeModal, setActiveModal] = useState<ModalType>(MODAL_TYPES.NONE);
   const [screenshotNotification, setScreenshotNotification] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // đóng modal
+  /**
+   * Fetch 3D model configuration
+   * TODO: This will automatically use API when FEATURE_FLAGS.USE_API = true
+   */
+  const {
+    modelConfig,
+    isLoading: isLoadingModel,
+    error: modelError,
+    refetch: refetchModel,
+  } = use3DModel(productId, {
+    enabled: true, // Auto-fetch on mount
+    onSuccess: (config) => {
+      console.log("✅ 3D Model loaded:", config);
+    },
+    onError: (error) => {
+      console.error("❌ 3D Model failed:", error);
+    },
+  });
+
+  // Check if 3D is available
+  const is3DAvailable = modelConfig && !modelError;
+
+  /**
+   * Close modal handler
+   */
   const closeModal = useCallback(() => {
     setActiveModal(MODAL_TYPES.NONE);
   }, []);
 
-  // Quản lý focus và scroll khi modal mở
+  /**
+   * Body scroll lock & keyboard handling
+   */
   useEffect(() => {
     if (activeModal !== MODAL_TYPES.NONE) {
       document.body.style.overflow = "hidden";
@@ -86,7 +171,9 @@ export const ProductGallery = ({
     };
   }, [activeModal]);
 
-  // Đóng modal khi nhấn ESC
+  /**
+   * Keyboard shortcuts
+   */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -98,28 +185,46 @@ export const ProductGallery = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [closeModal]);
 
-  // xử lý screenshot từ 3D viewer
-  // const handle3DScreenshot = useCallback((dataUrl: string) => {
-  // Show notification
-  // setScreenshotNotification(true);
-  // setTimeout(() => setScreenshotNotification(false), 2000);
+  /**
+   * Screenshot handler
+   */
+  const handle3DScreenshot = useCallback(
+    (dataUrl: string) => {
+      setScreenshotNotification(true);
+      setTimeout(() => setScreenshotNotification(false), 2000);
 
-  // Auto download is handled by KeyboardViewer
-  // You can add custom logic here if needed
-  //   console.log("3D Screenshot captured:", dataUrl.substring(0, 50) + "...");
-  // }, []);
+      // Custom callback
+      on3DScreenshot?.(dataUrl);
+
+      console.log("📸 Screenshot captured:", dataUrl.substring(0, 50) + "...");
+    },
+    [on3DScreenshot]
+  );
+
+  /**
+   * 3D Error handler
+   */
+  const handle3DError = useCallback((error: Error) => {
+    console.error("❌ 3D Viewer Error:", error);
+    // TODO: Show toast notification
+  }, []);
+
+  /**
+   * 3D Load handler
+   */
+  const handle3DLoad = useCallback(() => {
+    console.log("✅ 3D Model rendered successfully");
+  }, []);
 
   return (
     <>
       {/* Screenshot Notification */}
-      {/* {screenshotNotification && (
-        <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[10000] bg-emerald-500 text-white px-6 py-3 rounded-full shadow-2xl animate-in slide-in-from-top-4 fade-in duration-300 flex items-center gap-3 border border-emerald-400/50 backdrop-blur-md">
-          <Camera className="w-5 h-5" />
-          <span className="text-sm font-bold tracking-wide">
-            Screenshot Saved!
-          </span>
+      {screenshotNotification && (
+        <div className="fixed top-4 right-4 z-[10000] bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-in slide-in-from-top flex items-center gap-2">
+          <Camera className="w-4 h-4" />
+          <span className="text-sm font-medium">Screenshot saved!</span>
         </div>
-      )} */}
+      )}
 
       {/* MAIN GALLERY */}
       <div className="flex flex-col-reverse lg:flex-row gap-3 w-full h-full select-none">
@@ -131,13 +236,57 @@ export const ProductGallery = ({
         >
           {/* 3D View Button */}
           <button
-            onClick={() => setActiveModal(MODAL_TYPES.THREE_D)}
-            className="relative w-16 h-16 shrink-0 rounded-lg overflow-hidden transition-all border flex flex-col items-center justify-center gap-1 bg-slate-900 text-white hover:bg-slate-800 border-transparent shadow-md group"
-            aria-label="Open 3D view"
+            onClick={() => {
+              if (is3DAvailable) {
+                setActiveModal(MODAL_TYPES.THREE_D);
+              } else if (modelError) {
+                // Retry on click
+                refetchModel();
+              }
+            }}
+            disabled={isLoadingModel}
+            className={`
+              relative w-16 h-16 shrink-0 rounded-lg overflow-hidden transition-all border flex flex-col items-center justify-center gap-1 shadow-md group
+              ${
+                is3DAvailable
+                  ? "bg-slate-900 text-white hover:bg-slate-800 border-transparent cursor-pointer"
+                  : modelError
+                  ? "bg-red-900/30 text-red-400 border-red-600 cursor-pointer hover:bg-red-900/50"
+                  : "bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed"
+              }
+            `}
+            aria-label={
+              is3DAvailable
+                ? "Open 3D view"
+                : modelError
+                ? "Retry loading 3D model"
+                : "Loading 3D model"
+            }
             type="button"
+            title={
+              modelError
+                ? "Click to retry"
+                : isLoadingModel
+                ? "Loading..."
+                : undefined
+            }
           >
-            <Box className="w-6 h-6 group-hover:scale-110 transition-transform" />
-            <span className="text-[9px] font-bold uppercase">3D View</span>
+            {isLoadingModel ? (
+              <Loader2 className="w-6 h-6 animate-spin" />
+            ) : modelError ? (
+              <AlertCircle className="w-6 h-6" />
+            ) : (
+              <Box className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            )}
+            <span className="text-[9px] font-bold uppercase">
+              {isLoadingModel
+                ? "Loading"
+                : modelError
+                ? "Retry"
+                : is3DAvailable
+                ? "3D View"
+                : "No 3D"}
+            </span>
           </button>
 
           {/* Image Thumbnails */}
@@ -193,20 +342,22 @@ export const ProductGallery = ({
           />
 
           {/* 3D Button Overlay */}
-          <div className="absolute top-4 right-4 z-10">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveModal(MODAL_TYPES.THREE_D);
-              }}
-              className="flex items-center gap-2 bg-white/90 backdrop-blur shadow-sm border border-gray-200 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider text-slate-900 hover:bg-slate-900 hover:text-white transition-all transform hover:-translate-y-0.5"
-              aria-label="Open 360° 3D view"
-              type="button"
-            >
-              <Rotate3D className="w-4 h-4" />
-              <span>360° View</span>
-            </button>
-          </div>
+          {is3DAvailable && (
+            <div className="absolute top-4 right-4 z-10">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveModal(MODAL_TYPES.THREE_D);
+                }}
+                className="flex items-center gap-2 bg-white/90 backdrop-blur shadow-sm border border-gray-200 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider text-slate-900 hover:bg-slate-900 hover:text-white transition-all transform hover:-translate-y-0.5"
+                aria-label="Open 360° 3D view"
+                type="button"
+              >
+                <Rotate3D className="w-4 h-4" />
+                <span>360° View</span>
+              </button>
+            </div>
+          )}
 
           {/* Zoom Hint */}
           <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
@@ -242,18 +393,18 @@ export const ProductGallery = ({
 
           {/* Modal Content */}
           <div className="w-full h-full relative flex items-center justify-center p-4">
-            {/* 3D VIEW WITH ALL NEW FEATURES */}
-            {activeModal === MODAL_TYPES.THREE_D && (
+            {/* 3D VIEW */}
+            {activeModal === MODAL_TYPES.THREE_D && modelConfig && (
               <>
-                {/* Header with Title */}
-                <div className="absolute bottom-8 right-8 z-50 flex flex-col gap-3 items-end pointer-events-none">
+                {/* Header */}
+                <div className="absolute top-6 left-6 z-40 text-white pointer-events-none select-none">
                   <h3 className="text-xl font-bold font-oswald uppercase tracking-widest">
-                    3D Inspection
+                    {modelConfig.name}
                   </h3>
                   <p className="text-white/50 text-xs">
                     Drag to rotate • Scroll to zoom
                   </p>
-                  {/* {enable3DScreenshot && (
+                  {enable3DScreenshot && (
                     <p className="text-white/30 text-[10px] mt-1 flex items-center gap-1">
                       <Camera className="w-3 h-3" />
                       Click camera icon to capture
@@ -264,20 +415,22 @@ export const ProductGallery = ({
                       <Activity className="w-3 h-3" />
                       Performance monitor active
                     </p>
-                  )} */}
+                  )}
                 </div>
 
-                {/* Trình xem 3D nâng cao với tất cả tính năng*/}
+                {/* 3D Viewer */}
                 <KeyboardViewer
+                  modelConfig={modelConfig}
                   className="w-full h-full"
-                  autoRotate={false}
+                  // autoRotate={false}
                   enableZoom={true}
                   enableScreenshot={enable3DScreenshot}
                   enableFPS={enable3DFPS}
                   enableGestures={enable3DGestures}
-                  modelType={modelType}
                   environmentPreset={environmentPreset}
-                  // onScreenshot={handle3DScreenshot}
+                  onScreenshot={handle3DScreenshot}
+                  onError={handle3DError}
+                  onLoad={handle3DLoad}
                 />
               </>
             )}

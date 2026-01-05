@@ -74,7 +74,13 @@ export default async function ProductDetailPage({ params }: PageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-20">
           {/*  Gallery ) */}
           <div className="lg:col-span-7 w-full">
-            <ProductGallery images={product.images} />
+            <ProductGallery
+              images={product.images}
+              productName={product.name}
+              productId={product.model3dId || "keyboard-gaming-pro"}
+              enable3DScreenshot={false}
+              enable3DFPS={false}
+            />
           </div>
 
           {/* Thông tin mua hàng */}

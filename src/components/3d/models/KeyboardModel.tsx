@@ -1,52 +1,122 @@
+// src/components/3d/models/KeyboardModel.tsx
+
 "use client";
 
 import React from "react";
 import * as THREE from "three";
 import { useGLTF } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
-import { ThreeElements } from "@react-three/fiber";
+import { FEATURE_FLAGS } from "@/src/config/models.config";
 
-type GLTFResult = GLTF & {
-  nodes: {
-    ["Plane004_13_-_Default_0"]: THREE.Mesh;
-  };
-  materials: {
-    ["13_-_Default"]: THREE.MeshStandardMaterial;
-  };
-};
+/**
+ * ============================================================
+ * TYPES
+ * ============================================================
+ */
 
-export function KeyboardModel(props: ThreeElements["group"]) {
-  const { nodes, materials } = useGLTF(
-    "/gaming_keyboard.glb"
-  ) as unknown as GLTFResult;
+interface KeyboardModelProps {
+  /**
+   * Model URL from Cloudinary or API
+   */
+  modelUrl: string;
 
-  return (
-    <group {...props} dispose={null}>
-      <group name="Sketchfab_Scene">
-        <group name="Sketchfab_model" rotation={[-Math.PI / 2, 0, 0]}>
-          <group name="keyboardFBX" rotation={[Math.PI / 2, 0, 0]}>
-            <group name="RootNode">
-              <group
-                name="Plane004"
-                rotation={[-Math.PI / 2, 0, 0]}
-                scale={0.085}
-              >
-                <group name="Object_4" position={[7.95, 2.951, 2.749]}>
-                  <mesh
-                    name="Plane004_13_-_Default_0"
-                    castShadow
-                    receiveShadow
-                    geometry={nodes["Plane004_13_-_Default_0"].geometry}
-                    material={materials["13_-_Default"]}
-                  />
-                </group>
-              </group>
-            </group>
-          </group>
-        </group>
-      </group>
-    </group>
-  );
+  /**
+   * Position in 3D space [x, y, z]
+   * @default [0, 0, 0]
+   */
+  position?: [number, number, number];
+
+  /**
+   * Scale factor
+   * @default 1
+   */
+  scale?: number;
+
+  /**
+   * Rotation in radians [x, y, z]
+   * @default [0, 0, 0]
+   */
+  rotation?: [number, number, number];
+
+  /**
+   * Callback when model loads successfully
+   */
+  onLoad?: () => void;
+
+  /**
+   * Callback when model fails to load
+   */
+  onError?: (error: Error) => void;
 }
 
-useGLTF.preload("/gaming_keyboard.glb");
+/**
+ * ============================================================
+ * COMPONENT: KeyboardModel
+ * ============================================================
+ * Renders a 3D keyboard model from dynamic URL
+ *
+ * @example
+ * <KeyboardModel
+ *   modelUrl="https://res.cloudinary.com/.../keyboard.glb"
+ *   position={[0, -2, 0]}
+ *   scale={1}
+ * />
+ */
+
+export const KeyboardModel = React.memo<KeyboardModelProps>(
+  ({
+    modelUrl,
+    position = [0, 0, 0],
+    scale = 1,
+    rotation = [0, 0, 0],
+    onLoad,
+    onError,
+  }) => {
+    // Load 3D model
+    const { scene } = useGLTF(modelUrl, true, true, (loader) => {
+      // Configure loader
+      loader.manager.onLoad = () => {
+        if (FEATURE_FLAGS.DEBUG_MODE) {
+          console.log("[Model] Loaded successfully:", modelUrl);
+        }
+        onLoad?.();
+      };
+
+      loader.manager.onError = (url) => {
+        const error = new Error(`Failed to load model: ${url}`);
+        console.error("[Model] Load error:", error);
+        onError?.(error);
+      };
+    });
+
+    return (
+      <group
+        position={position}
+        scale={scale}
+        rotation={rotation}
+        dispose={null}
+      >
+        <primitive object={scene} />
+      </group>
+    );
+  }
+);
+
+KeyboardModel.displayName = "KeyboardModel";
+
+/**
+ * ============================================================
+ * PRELOAD UTILITY
+ * ============================================================
+ * Manually preload a model
+ *
+ * @example
+ * preloadKeyboardModel('https://cloudinary.com/.../keyboard.glb');
+ */
+export const preloadKeyboardModel = (modelUrl: string): void => {
+  useGLTF.preload(modelUrl);
+
+  if (FEATURE_FLAGS.DEBUG_MODE) {
+    console.log("[Model] Preloading:", modelUrl);
+  }
+};
