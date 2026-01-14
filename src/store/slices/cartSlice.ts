@@ -16,6 +16,7 @@ interface CartState {
   totalQuantity: number;
   totalAmount: number;
   isCartOpen: boolean;
+  note: string;
 }
 
 // Load cart from localStorage
@@ -49,6 +50,7 @@ const initialState: CartState = {
   totalQuantity,
   totalAmount,
   isCartOpen: false,
+  note: "",
 };
 
 const cartSlice = createSlice({
@@ -57,6 +59,10 @@ const cartSlice = createSlice({
   reducers: {
     setCartOpen(state, action: PayloadAction<boolean>) {
       state.isCartOpen = action.payload;
+    },
+
+    setOrderNote(state, action: PayloadAction<string>) {
+      state.note = action.payload;
     },
 
     addToCart(
@@ -130,6 +136,7 @@ export const {
   updateQuantity,
   clearCart,
   recalculateTotals,
+  setOrderNote,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

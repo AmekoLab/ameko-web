@@ -12,6 +12,7 @@ import {
   CartItem,
 } from "@/src/store/slices/cartSlice";
 import { nav } from "framer-motion/client";
+import { useRouter } from "next/navigation";
 
 // Separate CartItem component for better performance
 interface CartItemProps {
@@ -101,11 +102,17 @@ CartItemComponent.displayName = "CartItemComponent";
 
 // Main CartSidebar component
 export const CartSidebar: FC = memo(() => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { isCartOpen, items, totalAmount } = useAppSelector(
     (state) => state.cart
   );
   const sidebarRef = useRef<HTMLDivElement>(null);
+
+  const handleCheckout = useCallback(() => {
+    dispatch(setCartOpen(false)); // Đóng sidebar trước
+    router.push("/checkout"); // Chuyển sang trang checkout
+  }, [dispatch, router]);
 
   // Memoized callbacks
   const handleClose = useCallback(() => {
@@ -283,13 +290,19 @@ export const CartSidebar: FC = memo(() => {
 
             <div className="space-y-3">
               {/* Checkout Button */}
-              <button className="w-full bg-[#1a1a1a] hover:bg-black text-white py-3.5 px-4 flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest transition-colors">
+              <button
+                onClick={handleCheckout}
+                className="w-full bg-[#1a1a1a] hover:bg-black text-white py-3.5 px-4 flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest transition-colors"
+              >
                 <ShoppingBag className="w-4 h-4" />
                 Checkout • ${totalAmount.toFixed(2)} USD
               </button>
 
               {/* PayPal Button */}
-              <button className="w-full bg-[#ffc439] hover:bg-[#f4bb34] text-black py-3.5 px-4 flex items-center justify-center text-sm font-bold uppercase tracking-widest transition-colors italic">
+              <button
+                onClick={handleCheckout}
+                className="w-full bg-[#ffc439] hover:bg-[#f4bb34] text-black py-3.5 px-4 flex items-center justify-center text-sm font-bold uppercase tracking-widest transition-colors italic"
+              >
                 <span className="font-sans not-italic font-bold text-[#003087]">
                   Pay
                 </span>

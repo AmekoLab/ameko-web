@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, ShoppingCart, Check, XCircle } from "lucide-react"; // Import thêm icon
+import { Minus, Plus, ShoppingCart, Check, XCircle } from "lucide-react";
 import { Product } from "@/src/types/product";
 import { useAppDispatch } from "@/src/store/hook";
 import { addToCart, setCartOpen } from "@/src/store/slices/cartSlice";
+import { toast } from "react-toastify";
 
 interface ProductInfoProps {
   product: Product;
@@ -51,11 +52,15 @@ export const ProductInfo = ({
         image: product.images?.[0] || "/placeholder.png",
         slug: product.slug,
         quantity: quantity,
-        variant: "Default", // Bạn có thể thêm logic chọn Option tại đây sau này
+        variant: "Default",
       })
     );
     // Mở Sidebar ngay sau khi thêm
-    dispatch(setCartOpen(true));
+    // dispatch(setCartOpen(true));
+    toast.success(`${product.name} added to cart!`, {
+      position: "top-right",
+      theme: "dark",
+    });
   };
 
   return (

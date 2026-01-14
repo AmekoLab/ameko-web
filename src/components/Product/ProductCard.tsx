@@ -5,22 +5,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { Product } from "@/src/types/product";
-import { useAppDispatch } from "@/src/store/hook"; // 👇 Import Hook
-import { addToCart, setCartOpen } from "@/src/store/slices/cartSlice"; // 👇 Import Actions
+import { useAppDispatch } from "@/src/store/hook";
+import { addToCart, setCartOpen } from "@/src/store/slices/cartSlice";
+import { toast } from "react-toastify";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export const ProductCard: FC<ProductCardProps> = ({ product }) => {
-  const dispatch = useAppDispatch(); // 👇 Khởi tạo dispatch
+  const dispatch = useAppDispatch();
 
   const thumbnail =
     product.images && product.images.length > 0
       ? product.images[0]
       : "/images/placeholder.png";
 
-  // 👇 Hàm xử lý thêm vào giỏ
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); // Chặn việc nhảy trang khi bấm vào nút (vì nút nằm trong thẻ Link)
     e.stopPropagation();
@@ -35,12 +35,16 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
         image: thumbnail,
         slug: product.slug,
         quantity: 1,
-        variant: "Default", // Tạm thời để Default vì ở Card chưa chọn được biến thể
+        variant: "Default",
       })
     );
 
     // 2. Mở Sidebar giỏ hàng
-    dispatch(setCartOpen(true));
+    // dispatch(setCartOpen(true));
+    toast.success(`${product.name} added to cart!`, {
+      position: "top-right",
+      theme: "dark",
+    });
   };
 
   return (
@@ -74,7 +78,7 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
         <div className="absolute inset-x-4 bottom-4 translate-y-full opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100 transition-all duration-300 z-20">
           <button
             className="w-full flex items-center justify-center gap-2 bg-black text-white py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#ce2a32] transition-colors shadow-lg cursor-pointer"
-            onClick={handleAddToCart} // 👇 Gắn hàm xử lý vào đây
+            onClick={handleAddToCart}
           >
             <ShoppingCart className="w-4 h-4" />
             <span>Add to Cart</span>

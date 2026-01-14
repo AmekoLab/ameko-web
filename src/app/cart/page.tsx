@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Minus, Plus, Trash2, ArrowLeft, ShoppingBag } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { removeFromCart, updateQuantity } from "@/src/store/slices/cartSlice";
+import { useRouter } from "next/navigation";
 
 // Constants
 const ROUTES = {
@@ -240,6 +241,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
 // Main Component
 export default function CartPage() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const { items, totalAmount } = useAppSelector((state) => state.cart);
   const [orderNote, setOrderNote] = useState("");
 
@@ -259,18 +261,18 @@ export default function CartPage() {
   );
 
   const handleCheckout = useCallback(() => {
-    // Implement checkout logic
-    console.log("Proceeding to checkout", { items, totalAmount, orderNote });
-  }, [items, totalAmount, orderNote]);
+    // Nếu bạn muốn lưu note vào Redux thì dispatch ở đây (cần update slice trước)
+    // dispatch(updateOrderNote(orderNote));
+
+    // Chuyển hướng sang trang Checkout
+    router.push("/checkout");
+  }, [router]);
 
   const handlePayPalCheckout = useCallback(() => {
-    // Implement PayPal checkout logic
-    console.log("Proceeding to PayPal checkout", {
-      items,
-      totalAmount,
-      orderNote,
-    });
-  }, [items, totalAmount, orderNote]);
+    // Thường PayPal sẽ mở popup hoặc cũng chuyển qua trang checkout có tích hợp sẵn
+    // Tạm thời cho nó qua checkout luôn
+    router.push("/checkout");
+  }, [router]);
 
   // Empty cart state
   if (items.length === 0) {
