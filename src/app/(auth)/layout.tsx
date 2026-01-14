@@ -12,7 +12,7 @@ const font = Oswald({
 });
 
 export const metadata = {
-  title: "Cherry Xtrfy - Community",
+  title: "AMEKO - Community",
   description: "Cộng đồng bàn phím cơ Việt Nam",
 };
 

@@ -19,7 +19,7 @@ export const ProfileService = {
         "https://res.cloudinary.com/doezwafgz/image/upload/v1765602783/a0a1d1831b40575009c07fad4634ef52_y23lze.jpg",
       coverImage:
         "https://res.cloudinary.com/doezwafgz/image/upload/v1765551038/CHERRY-XTRFY_-MX-101_frontpage-1_hwu37j.jpg",
-      bio: "Chuyên Build phím cơ custom, nhận lube switch, rã hàn, mod stab tại Hà Nội. Đại lý chính hãng Cherry Xtrfy.",
+      bio: "Chuyên Build phím cơ custom, nhận lube switch, rã hàn, mod stab tại Hà Nội. Đại lý chính hãng AMEKO.",
       location: "Hà Nội, Việt Nam",
       joinDate: "October 2023",
       role: "Verified Shop",

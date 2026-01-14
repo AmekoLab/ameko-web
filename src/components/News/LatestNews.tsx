@@ -9,9 +9,9 @@ const NEWS_DATA: NewsItem[] = [
   {
     id: 1,
     title:
-      "CHERRY XTRFY LAUNCHES ULTRA-FAST LOW-PROFILE MECHANICAL GAMING KEYBOARD WITH ALUMINUM FRAME AND DISPLAY",
+      "AMEKO LAUNCHES ULTRA-FAST LOW-PROFILE MECHANICAL GAMING KEYBOARD WITH ALUMINUM FRAME AND DISPLAY",
     excerpt:
-      "First revealed at CES 2025, the CHERRY XTRFY MX 10.1 Wireless mechanical gaming keyboard is now ready for launch.",
+      "First revealed at CES 2025, the AMEKO MX 10.1 Wireless mechanical gaming keyboard is now ready for launch.",
     image:
       "https://res.cloudinary.com/doezwafgz/image/upload/v1765554094/G8A-25100-2_image017-1_acu2rz.png",
     link: "/news/mx-10-1-launch",
@@ -19,9 +19,9 @@ const NEWS_DATA: NewsItem[] = [
   {
     id: 2,
     title:
-      "CHERRY XTRFY LAUNCHES HIGH-END GAMING GEAR FOR ENTHUSIASTS AND SERIOUS GAMERS",
+      "AMEKO LAUNCHES HIGH-END GAMING GEAR FOR ENTHUSIASTS AND SERIOUS GAMERS",
     excerpt:
-      "First unveiled at CES 2025, the CHERRY XTRFY MX 8.3 TKL Wireless keyboard and the innovative GP6 and GP7 mousepads are now here.",
+      "First unveiled at CES 2025, the AMEKO MX 8.3 TKL Wireless keyboard and the innovative GP6 and GP7 mousepads are now here.",
     image:
       "https://res.cloudinary.com/doezwafgz/image/upload/v1765554095/Blossom-Honey-IK-Falcon-1_egmmas.png",
     link: "/news/high-end-launch",

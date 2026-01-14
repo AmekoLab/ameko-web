@@ -20,7 +20,7 @@ export async function generateMetadata({
   if (!profile) return { title: "Profile Not Found" };
 
   return {
-    title: "Cherry Xtrfy - " + profile.displayName,
+    title: "AMEKO - " + profile.displayName,
     description: profile.bio,
     openGraph: {
       images: [profile.coverImage],

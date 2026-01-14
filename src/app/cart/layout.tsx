@@ -3,6 +3,7 @@ import "../globals.css";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 
 import { Inter, Oswald } from "next/font/google";
+import { Footer } from "@/src/components/Footer/Footer";
 
 const oswald = Oswald({
   subsets: ["latin", "vietnamese"],
@@ -22,14 +23,14 @@ export const metadata = {
   description: "Cộng đồng bàn phím cơ Việt Nam",
 };
 
-export default function SocialLayout({
+export default function CartLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <div
-      className={`flex flex-col min-h-screen bg-[#f0f2f5] ${inter.className} ${oswald.variable}`}
+      className={`flex flex-col min-h-screen bg-white ${inter.className} ${oswald.variable}`}
     >
       <LayoutWrapper>
         <div className={`${oswald.className} sticky top-0 z-40`}>
@@ -37,6 +38,7 @@ export default function SocialLayout({
         </div>
 
         <main className="flex-grow">{children}</main>
+        <Footer />
       </LayoutWrapper>
     </div>
   );

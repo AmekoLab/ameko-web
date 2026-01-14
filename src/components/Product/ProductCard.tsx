@@ -5,16 +5,43 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { Product } from "@/src/types/product";
+import { useAppDispatch } from "@/src/store/hook"; // 👇 Import Hook
+import { addToCart, setCartOpen } from "@/src/store/slices/cartSlice"; // 👇 Import Actions
 
 interface ProductCardProps {
   product: Product;
 }
 
 export const ProductCard: FC<ProductCardProps> = ({ product }) => {
+  const dispatch = useAppDispatch(); // 👇 Khởi tạo dispatch
+
   const thumbnail =
     product.images && product.images.length > 0
       ? product.images[0]
       : "/images/placeholder.png";
+
+  // 👇 Hàm xử lý thêm vào giỏ
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault(); // Chặn việc nhảy trang khi bấm vào nút (vì nút nằm trong thẻ Link)
+    e.stopPropagation();
+
+    // 1. Bắn action thêm sản phẩm
+    dispatch(
+      addToCart({
+        id: product.id, // ID duy nhất của dòng item trong giỏ
+        productId: product.id,
+        name: product.name,
+        price: product.basePrice,
+        image: thumbnail,
+        slug: product.slug,
+        quantity: 1,
+        variant: "Default", // Tạm thời để Default vì ở Card chưa chọn được biến thể
+      })
+    );
+
+    // 2. Mở Sidebar giỏ hàng
+    dispatch(setCartOpen(true));
+  };
 
   return (
     <div className="group/card relative bg-white flex flex-col h-full w-full overflow-hidden transition-all duration-300 hover:shadow-2xl border border-transparent hover:border-gray-100 rounded-sm">
@@ -39,18 +66,15 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
           src={thumbnail}
           alt={product.name}
           fill
-          className="object-contain p-8 transition-transform duration-500 group-hover/card:scale-110"
+          className="object-contain p-8 transition-transform duration-500 group-hover/card:scale-110 mix-blend-multiply"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
         />
 
         {/* Action Button (Hover) */}
         <div className="absolute inset-x-4 bottom-4 translate-y-full opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100 transition-all duration-300 z-20">
           <button
-            className="w-full flex items-center justify-center gap-2 bg-black text-white py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#ce2a32] transition-colors shadow-lg"
-            onClick={(e) => {
-              e.preventDefault();
-              console.log("Add to cart:", product.id);
-            }}
+            className="w-full flex items-center justify-center gap-2 bg-black text-white py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#ce2a32] transition-colors shadow-lg cursor-pointer"
+            onClick={handleAddToCart} // 👇 Gắn hàm xử lý vào đây
           >
             <ShoppingCart className="w-4 h-4" />
             <span>Add to Cart</span>
@@ -74,7 +98,6 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
         </p>
 
         {/* Features */}
-
         <ul className="space-y-1 mt-auto pt-4 border-t border-transparent group-hover/card:border-gray-100 transition-colors">
           {(product.features || []).slice(0, 3).map((feature, index) => (
             <li

@@ -14,7 +14,7 @@ const font = Oswald({
 });
 
 export const metadata = {
-  title: "Cherry Xtrfy - Gaming Gear",
+  title: "AMEKO - Gaming Gear",
   description: "Bàn phím, chuột và phụ kiện gaming cao cấp",
   icons: { icon: "/logo.png" },
 };

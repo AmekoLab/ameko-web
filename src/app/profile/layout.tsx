@@ -17,7 +17,7 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Cherry Xtrfy - Profile",
+  title: "AMEKO - Profile",
   description: "Cộng đồng bàn phím cơ Việt Nam",
 };
 

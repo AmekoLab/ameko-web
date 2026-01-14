@@ -24,8 +24,8 @@ export const Footer: FC = () => {
               <Logo />
             </div>
             <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
-              CHERRY XTRFY - German engineering meets Swedish design.
-              Professional gaming gear for esports athletes.
+              AMEKO - German engineering meets Swedish design. Professional
+              gaming gear for esports athletes.
             </p>
 
             {/* Social Icons */}
@@ -93,7 +93,7 @@ export const Footer: FC = () => {
 
         {/* --- BOTTOM BAR --- */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-          <p>© 2025 Cherry Xtrfy. All rights reserved.</p>
+          <p>© 2025 AMEKO. All rights reserved.</p>
 
           <div className="flex gap-6">
             <Link href="/terms" className="hover:text-white transition-colors">

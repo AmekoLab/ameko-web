@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { logout as logoutAction } from "@/src/store/slices/authSlice";
 import { logout as logoutService } from "@/src/services/authServices";
 import Image from "next/image";
+import { setCartOpen } from "@/src/store/slices/cartSlice";
 
 const MenuIcon = () => (
   <svg
@@ -60,6 +61,7 @@ const CartIcon = () => (
 export const Header: FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const { totalQuantity } = useAppSelector((state) => state.cart);
   // 1. Kết nối Redux để lấy thông tin User
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
@@ -68,6 +70,11 @@ export const Header: FC = () => {
   const handleLogout = () => {
     logoutService(); // Xóa token
     dispatch(logoutAction()); // Clear Redux
+  };
+
+  const handleOpenCart = () => {
+    setMobileOpen(false); // Đóng mobile menu
+    dispatch(setCartOpen(true)); // Mở cart sidebar
   };
 
   return (
@@ -110,17 +117,12 @@ export const Header: FC = () => {
             </Link>
           )}
 
-          <Link
-            href="/cart"
-            title="Cart"
-            className="text-gray-700 hover:text-primary-600 flex items-center gap-1"
+          <button
+            onClick={handleOpenCart}
+            className="flex items-center gap-2 text-gray-800 font-medium"
           >
-            <CartIcon />
-            {/* Badge số lượng (Hardcode tạm, sau này lấy từ Redux Cart) */}
-            <span className="bg-red-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
-              0
-            </span>
-          </Link>
+            <CartIcon /> Cart ({totalQuantity})
+          </button>
 
           <CountrySelector />
         </div>
@@ -170,13 +172,9 @@ export const Header: FC = () => {
 
               {/* Mobile Footer Links */}
               <div className="pt-4 border-t border-gray-100 flex flex-col gap-4">
-                <Link
-                  href="/cart"
-                  className="flex items-center gap-2 text-gray-800 font-medium"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <CartIcon /> Cart (0)
-                </Link>
+                <button onClick={handleOpenCart}>
+                  <CartIcon /> Cart ({totalQuantity})
+                </button>
 
                 {!isAuthenticated && (
                   <Link

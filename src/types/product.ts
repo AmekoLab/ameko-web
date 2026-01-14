@@ -66,7 +66,7 @@ export interface Product {
 
   // --- Categorization ---
   category: string; // VD: "Keyboards", "Custom Kits", "Mice"
-  brand?: string; // VD: "Cherry Xtrfy", "GMMK"
+  brand?: string; // VD: "AMEKO", "GMMK"
   tag?: ProductTag; // Badge hiển thị trên Card (NEW, HOT...)
 
   // --- Status & Social Proof ---

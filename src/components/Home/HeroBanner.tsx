@@ -32,7 +32,7 @@ const BANNERS: BannerData[] = [
     title: "FIND YOUR PERFECT\nTYPING FEEL.",
     subtitle: "New CHERRY MX switches available.",
     ctaText: "ORDER NOW",
-    ctaLink: "/shop",
+    ctaLink: "/shop/all-products",
     theme: "light",
     position: "left",
   },
