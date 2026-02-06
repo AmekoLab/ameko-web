@@ -5,7 +5,9 @@ import { loginSchema, LoginSchemaType } from "../schemas/login.schema";
 import { useAppSelector } from "@/src/store/hook";
 
 export const useLoginForm = () => {
-  const { isLoading, error: authError } = useAppSelector((state) => state.auth);
+  const { loading: isLoading, error: authError } = useAppSelector(
+    (state) => state.auth,
+  );
 
   const {
     register,

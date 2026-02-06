@@ -1,22 +1,20 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserProfile } from "@/src/types/user.types";
+import { UserData } from "@/src/types/auth.types";
 
 interface AuthState {
-  user: UserProfile | null;
-  role: string | null;
-  isLoading: boolean;
-  error: string | null;
   isAuthenticated: boolean;
+  user: UserData | null;
+  loading: boolean;
+  error: string | null;
   isInitialized: boolean;
 }
 
 const initialState: AuthState = {
-  user: null,
-  role: null,
-  isLoading: false,
-  error: null,
   isAuthenticated: false,
-  isInitialized: false,
+  user: null,
+  loading: false,
+  error: null,
+  isInitialized: false, //Mặc định là false (Chưa check xong)
 };
 
 const authSlice = createSlice({
@@ -24,40 +22,50 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     loginStart: (state) => {
-      state.isLoading = true;
+      state.loading = true;
       state.error = null;
     },
-    loginSuccess: (state, action: PayloadAction<UserProfile>) => {
-      state.isLoading = false;
-      state.user = action.payload;
-      state.role = action.payload?.role || null;
-      state.error = null;
+    loginSuccess: (state, action: PayloadAction<UserData>) => {
+      state.loading = false;
       state.isAuthenticated = true;
-
-      state.isInitialized = true;
+      state.user = action.payload;
+      state.error = null;
     },
     loginFailure: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
+      state.loading = false;
       state.error = action.payload;
-      state.isAuthenticated = false;
-      state.user = null;
-      state.role = null;
-
-      state.isInitialized = true;
     },
     logout: (state) => {
-      state.user = null;
-      state.role = null;
-      state.isLoading = false;
-      state.error = null;
       state.isAuthenticated = false;
+      state.user = null;
+      state.loading = false;
+      state.error = null;
+    },
 
+    updateProfileStart: (state) => {
+      state.loading = true;
+    },
+    updateProfileSuccess: (state, action: PayloadAction<Partial<UserData>>) => {
+      state.loading = false;
+      state.error = null;
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
+    },
+    // THÊM ACTION NÀY ĐỂ BÁO ĐÃ CHECK TOKEN XONG
+    setInitialized: (state) => {
       state.isInitialized = true;
     },
   },
 });
 
-export const { loginStart, loginSuccess, loginFailure, logout } =
-  authSlice.actions;
-
+export const {
+  loginStart,
+  loginSuccess,
+  loginFailure,
+  logout,
+  setInitialized,
+  updateProfileStart,
+  updateProfileSuccess,
+} = authSlice.actions;
 export default authSlice.reducer;

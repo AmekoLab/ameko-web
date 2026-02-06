@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useLoginForm } from "@/src/features/auth/hooks/useLoginForm";
 import { useRouter } from "next/navigation";
-import { getRedirectPath } from "@/src/services/authServices";
 import { loginAndFetchProfile } from "@/src/store/action/authActions";
 import { useAppDispatch } from "@/src/store/hook";
 import { LoginSchemaType } from "@/src/features/auth/schemas/login.schema";
@@ -19,20 +18,24 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginSchemaType) => {
     try {
+      // Gọi Action Thunk (Logic gọi API + Lưu Token + Lấy Profile)
       const profile = await dispatch(
         loginAndFetchProfile({
-          username: data.username,
+          email: data.username,
           password: data.password,
-          remember: data.remember,
-        })
+        }),
       );
 
+      // Nếu trả về profile tức là thành công (Thunk sẽ throw error nếu thất bại)
       if (profile) {
-        const path = getRedirectPath(profile.role);
-        router.push(path);
+        // TODO: Nếu có logic phân quyền (Admin -> /admin, User -> /), bạn có thể thêm check role ở đây
+        // const path = profile.role === 'Admin' ? '/admin' : '/';
+
+        router.push("/"); // Chuyển về trang chủ
       }
     } catch (error) {
       console.error("Login thất bại", error);
+      // Lỗi đã được dispatch vào Redux store và hiển thị qua biến authError
     }
   };
 
@@ -57,17 +60,17 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Error Message */}
+          {/* Error Message (Lấy từ Redux Store thông qua hook useLoginForm) */}
           {authError && (
-            <div className="p-3 bg-red-50 text-[#ce2a32] text-sm rounded-sm border-l-4 border-[#ce2a32] font-medium animate-pulse">
-              ⚠️ {authError}
+            <div className="p-3 bg-red-50 text-[#ce2a32] text-sm rounded-sm border-l-4 border-[#ce2a32] font-medium animate-pulse flex items-center gap-2">
+              ⚠️ <span>{authError}</span>
             </div>
           )}
 
-          {/* Form */}
+          {/* Form - Đã gắn sự kiện onSubmit */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <InputField
-              label="Email or Username"
+              label="Email"
               placeholder="name@example.com"
               registration={register("username")}
               error={errors.username?.message}
@@ -137,7 +140,6 @@ export default function LoginPage() {
       </div>
 
       {/* --- RIGHT SIDE: VISUAL BANNER --- */}
-
       <div className="hidden lg:block relative h-full w-full overflow-hidden bg-black">
         <Image
           src="https://res.cloudinary.com/doezwafgz/image/upload/v1765551038/CHERRY-XTRFY_-MX-101_frontpage-1_hwu37j.jpg"

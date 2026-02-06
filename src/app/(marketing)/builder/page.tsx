@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, memo } from "react";
 import Image from "next/image";
 import { BuilderService } from "@/src/services/builder.service";
 import { BuilderSession, Category, Product } from "@/src/types/builder";
+import { Link } from "lucide-react";
 
 // --- HELPERS ---
 const getZIndex = (categorySlug?: string) => {
@@ -150,7 +151,7 @@ const ProductItem = memo(
                     >
                       {String(v)}
                     </span>
-                  )
+                  ),
               )}
         </div>
       </div>
@@ -179,7 +180,7 @@ const ProductItem = memo(
         )}
       </div>
     </div>
-  )
+  ),
 );
 ProductItem.displayName = "ProductItem";
 
@@ -254,7 +255,7 @@ const NoneItem = memo(
         )}
       </div>
     </div>
-  )
+  ),
 );
 NoneItem.displayName = "NoneItem";
 
@@ -287,7 +288,7 @@ export default function BuilderPage() {
             (p: Product) => ({
               ...p,
               _tempSlug: p.category ? p.category.slug : "unknown",
-            })
+            }),
           );
           setSelectedImages(imagesWithSlug);
         }
@@ -359,7 +360,7 @@ export default function BuilderPage() {
       const data = await BuilderService.selectProduct(
         session.id,
         activeSlug,
-        productIdToSend
+        productIdToSend,
       );
       setSession(data.session);
     } catch (error) {
@@ -374,6 +375,10 @@ export default function BuilderPage() {
     }
   };
 
+  const handleLogoClick = () => {
+    window.location.href = "/";
+  };
+
   // Tính toán Nav Items để tránh render lại trong vòng lặp
   const navItems = useMemo(
     () =>
@@ -385,7 +390,7 @@ export default function BuilderPage() {
           ? !!session.selection[step.slug]
           : false,
       })),
-    [steps, activeSlug, session?.selection]
+    [steps, activeSlug, session?.selection],
   );
 
   if (loading)
@@ -399,7 +404,10 @@ export default function BuilderPage() {
     <div className="h-screen flex flex-col font-sans bg-gray-50 overflow-hidden text-slate-800">
       {/* HEADER */}
       <div className="h-16 bg-black flex items-center justify-between px-4 lg:px-8 shadow-lg z-50 shrink-0 text-white">
-        <div className="font-black text-xl tracking-tighter uppercase mr-4 lg:mr-10 flex items-center gap-2">
+        <div
+          onClick={handleLogoClick}
+          className="font-black text-xl tracking-tighter uppercase mr-4 lg:mr-10 flex items-center gap-2 cursor-pointer select-none"
+        >
           <span>Ameko</span>
           <span className="text-blue-500">Lab</span>
         </div>

@@ -1,16 +1,28 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { useRouter } from "next/navigation";
-import { logout } from "@/src/services/authServices"; // Hàm logout service bạn đã viết
-import { logout as logoutAction } from "@/src/store/slices/authSlice";
+import Image from "next/image";
+import { logoutUser } from "@/src/store/action/authActions";
+import { EditProfileModal } from "@/src/components/Profile/EditProfileModal";
+import { ChangePasswordModal } from "@/src/components/Profile/ChangePasswordModal";
 
 export default function ProfilePage() {
   const { user, isInitialized } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  // 1. Loading State (Skeleton): Hiện khung xương khi đang tải dữ liệu
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (isInitialized && !user) {
+      router.replace("/login");
+    }
+  }, [isInitialized, user, router]);
+
+  // 1. Loading State (Skeleton)
   if (!isInitialized || !user) {
     return (
       <div className="max-w-4xl mx-auto mt-8 p-6 animate-pulse">
@@ -27,117 +39,162 @@ export default function ProfilePage() {
     );
   }
 
-  // 2. Fallback Avatar: Nếu không có avatar, dùng API tạo ảnh theo tên
-  const avatarSrc = user.avatar
-    ? user.avatar
-    : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-        user.name
-      )}&background=random`;
+  // 2. Logic hiển thị dữ liệu (Mapping field đúng với API)
+  const fullName =
+    user.firstName && user.lastName
+      ? `${user.firstName} ${user.lastName}`
+      : user.firstName || user.username;
 
-  const handleLogout = () => {
-    // Gọi service logout (để xóa storage)
-    logout();
-    // Dispatch action để clear Redux (để UI cập nhật ngay)
-    dispatch(logoutAction());
+  // URL Avatar: Ưu tiên ảnh user -> Ảnh UI Avatar theo tên
+  const avatarSrc = user.image
+    ? user.image
+    : `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random&size=256`;
+
+  // 3. Xử lý Logout
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    router.replace("/login");
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-8 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-primary-800">
-        Hồ sơ cá nhân
+    <div className="max-w-4xl mx-auto mt-8 px-4 pb-12">
+      <h1 className="text-3xl font-black uppercase tracking-tight mb-8 font-oswald text-black">
+        My Profile
       </h1>
 
-      <div className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-100">
-        {/* Header Background (Trang trí) */}
-        <div className="h-32 bg-gradient-to-r from-blue-500 to-primary-600"></div>
+      <div className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-100 relative">
+        {/* Header Background */}
+        <div className="h-32 bg-gradient-to-r from-gray-900 to-gray-700"></div>
 
         <div className="px-8 pb-8">
           <div className="relative flex justify-between items-end -mt-12 mb-6">
             {/* Avatar */}
-            <img
-              src={avatarSrc}
-              alt={user.name}
-              className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md bg-white"
-              onError={(e) => {
-                // Xử lý nếu ảnh avatar bị lỗi link -> chuyển về ảnh mặc định
-                e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  user.name
-                )}&background=random`;
-              }}
-            />
+            <div className="relative w-32 h-32 rounded-full border-4 border-white shadow-md bg-white overflow-hidden">
+              <img
+                src={avatarSrc}
+                alt="avatar"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random`;
+                }}
+              />
+            </div>
 
             {/* Edit Button */}
-            <button className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition shadow-sm font-medium">
-              Chỉnh sửa
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-black hover:text-white transition shadow-sm font-medium text-sm flex items-center gap-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                />
+              </svg>
+              Edit Profile
             </button>
           </div>
 
           {/* User Info */}
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
-            <p className="text-gray-500 font-medium">{user.role}</p>
+            <h2 className="text-2xl font-bold text-gray-900">{fullName}</h2>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-bold uppercase rounded">
+                {user.role}
+              </span>
+              <span
+                className={`px-2 py-0.5 text-xs font-bold uppercase rounded ${user.emailConfirmed ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}
+              >
+                {user.emailConfirmed ? "Verified" : "Unverified"}
+              </span>
+            </div>
           </div>
 
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Card thông tin chi tiết */}
-            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-3">
-                Thông tin liên hệ
+            {/* Contact Info */}
+            <div className="p-5 bg-gray-50 rounded-xl border border-gray-100">
+              <h3 className="font-bold text-gray-900 mb-4 uppercase text-sm tracking-wide">
+                Contact Information
               </h3>
-              <div className="space-y-2 text-sm">
-                <p className="flex justify-between">
-                  <span className="text-gray-500">Email:</span>
-                  <span className="font-medium text-gray-900">
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between border-b border-gray-200 pb-2">
+                  <span className="text-gray-500">Email</span>
+                  <span className="font-medium text-gray-900 break-all">
                     {user.email}
                   </span>
-                </p>
-                <p className="flex justify-between">
-                  <span className="text-gray-500">Số điện thoại:</span>
+                </div>
+                <div className="flex justify-between border-b border-gray-200 pb-2">
+                  <span className="text-gray-500">Phone</span>
                   <span className="font-medium text-gray-900">
-                    {user.phone || "Chưa cập nhật"}
+                    {user.phoneNumber || "Not updated"}
                   </span>
-                </p>
+                </div>
+                <div className="flex justify-between pt-1">
+                  <span className="text-gray-500">Username</span>
+                  <span className="font-medium text-gray-900">
+                    @{user.username}
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Card Điểm thưởng (Nếu user có trường points) */}
-            <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-              <h3 className="font-semibold text-blue-900 mb-3">
-                Điểm tích lũy
+            {/* Store Info (Nếu có) */}
+            <div className="p-5 bg-gray-50 rounded-xl border border-gray-100">
+              <h3 className="font-bold text-gray-900 mb-4 uppercase text-sm tracking-wide">
+                Store Details
               </h3>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-200 rounded-full text-blue-700">
-                  {/* Icon Cup/Star */}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <span className="text-2xl font-bold text-blue-700">
-                    {user.points || 0}
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between border-b border-gray-200 pb-2">
+                  <span className="text-gray-500">Address</span>
+                  <span className="font-medium text-gray-900 text-right max-w-[60%] truncate">
+                    {user.storeAddress || "No address provided"}
                   </span>
-                  <span className="text-blue-600 text-sm ml-1">điểm</span>
+                </div>
+                <div className="flex flex-col gap-1 pt-1">
+                  <span className="text-gray-500">Description</span>
+                  <p className="font-medium text-gray-900 italic text-xs">
+                    "{user.storeDescription || "No description available."}"
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Logout Button */}
-          <div className="mt-8 pt-6 border-t border-gray-100">
+          <div className="mt-8 pt-6 border-t border-gray-100 flex justify-end">
+            {/* Nút Change Password */}
+            <button
+              onClick={() => setIsPasswordModalOpen(true)}
+              className="text-gray-600 font-bold hover:text-black hover:bg-gray-100 px-4 py-2 rounded transition flex items-center gap-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+              Change Password
+            </button>
+
             <button
               onClick={handleLogout}
-              className="text-red-600 font-medium hover:text-red-700 flex items-center gap-2"
+              className="text-red-600 font-bold hover:bg-red-50 px-4 py-2 rounded transition flex items-center gap-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -153,11 +210,24 @@ export default function ProfilePage() {
                   d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                 />
               </svg>
-              Đăng xuất
+              Sign Out
             </button>
           </div>
         </div>
       </div>
+      {isEditModalOpen && (
+        <EditProfileModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+        />
+      )}
+
+      {isPasswordModalOpen && (
+        <ChangePasswordModal
+          isOpen={isPasswordModalOpen}
+          onClose={() => setIsPasswordModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
