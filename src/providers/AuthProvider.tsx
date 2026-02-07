@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { checkTokenAndFetchProfile } from "@/src/store/action/authActions";
+import { fetchCurrentShop } from "@/src/store/slices/shopSlice";
 
 export default function AuthProvider({
   children,
@@ -11,17 +12,22 @@ export default function AuthProvider({
 }) {
   const dispatch = useAppDispatch();
 
-  // Lấy trạng thái isInitialized từ Redux
   const { isInitialized } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    // Nếu chưa khởi tạo thì gọi API check token ngay
     if (!isInitialized) {
+      // 1. Gọi API lấy User Profile (như cũ)
       dispatch(checkTokenAndFetchProfile());
+
+      // Việc này giúp 2 API chạy song song, không phải chờ User xong mới gọi Shop
+      const token = localStorage.getItem("token"); // Hoặc lấy từ nơi bạn lưu token
+      if (token) {
+        dispatch(fetchCurrentShop());
+      }
     }
   }, [dispatch, isInitialized]);
 
-  // Hiện ra khi mới F5 trang web
+  // Hiện ra khi mới F5 trang web (Loading Screen)
   if (!isInitialized) {
     return (
       <div className="h-screen w-screen flex flex-col justify-center items-center bg-white fixed inset-0 z-50">

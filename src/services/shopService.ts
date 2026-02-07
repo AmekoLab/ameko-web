@@ -1,0 +1,42 @@
+import api from "@/src/utils/api";
+import { ApiResponse } from "@/src/types/auth.types";
+import {
+  AdminShopListResponse,
+  ApproveShopPayload,
+  ShopResponse,
+} from "@/src/types/shop.types";
+
+export const shopService = {
+  registerShop: async (formData: FormData) => {
+    return api.post<any, ApiResponse<ShopResponse>>(
+      "/shops/register",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+  },
+
+  getMyShop: async () => {
+    return api.get<any, ApiResponse<ShopResponse>>("/shops/my-shop");
+  },
+
+  approveShop: async (data: ApproveShopPayload) => {
+    return api.post<any, ApiResponse<any>>(
+      `/shops/admin/${data.shopId}/approve`,
+      {
+        status: data.status,
+        adminNote: data.adminNote,
+      },
+    );
+  },
+
+  getAdminShopList: async (page = 1, size = 20) => {
+    // Truyền query params page và size
+    return api.get<any, ApiResponse<AdminShopListResponse>>(
+      `/shops/admin/list?page=${page}&size=${size}`,
+    );
+  },
+};

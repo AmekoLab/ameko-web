@@ -11,6 +11,8 @@ import { CountrySelector } from "./CountrySelector";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { logoutUser } from "@/src/store/action/authActions";
 import { setCartOpen } from "@/src/store/slices/cartSlice";
+import { ShopStatus } from "@/src/types/shop.types";
+import { Store, Clock, AlertCircle, ShieldCheck } from "lucide-react";
 
 const MenuIcon = () => (
   <svg
@@ -61,14 +63,13 @@ const CartIcon = () => (
 export const Header: FC = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-
   const { totalQuantity } = useAppSelector((state) => state.cart);
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-
+  const { currentShop } = useAppSelector((state) => state.shop);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -82,7 +83,6 @@ export const Header: FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // --- HANDLERS ---
   const handleLogout = async () => {
     await dispatch(logoutUser());
     setUserDropdownOpen(false);
@@ -94,20 +94,93 @@ export const Header: FC = () => {
     dispatch(setCartOpen(true));
   };
 
+  // --- HÀM RENDER NÚT BẤM  ---
+  // const renderDashboardButton = () => {
+  //   // 1. NẾU LÀ ADMIN -> HIỆN NÚT ADMIN DASHBOARD
+  //   if (isAuthenticated && user?.role === "Admin") {
+  //     return (
+  //       <Link
+  //         href="/admin/dashboard"
+  //         className="hidden md:flex items-center gap-2 px-3 py-1 bg-black text-white rounded-full text-[10px] font-bold uppercase tracking-wider hover:bg-[#ce2a32] transition-colors"
+  //       >
+  //         <ShieldCheck className="w-3 h-3" />
+  //         <span>Admin Panel</span>
+  //       </Link>
+  //     );
+  //   }
+
+  //   // 2. NẾU KHÔNG PHẢI ADMIN -> XỬ LÝ SHOP NHƯ CŨ
+  //   if (!isAuthenticated || !user) {
+  //     return (
+  //       <Link
+  //         href="/shop/register"
+  //         className="hidden md:flex items-center gap-1 hover:text-[#ce2a32] transition-colors"
+  //       >
+  //         Become a Seller
+  //       </Link>
+  //     );
+  //   }
+
+  //   if (!currentShop) {
+  //     return (
+  //       <Link
+  //         href="/shop/register"
+  //         className="hidden md:flex items-center gap-1 font-bold hover:text-[#ce2a32] transition-colors"
+  //       >
+  //         Become a Seller
+  //       </Link>
+  //     );
+  //   }
+
+  //   switch (currentShop.status) {
+  //     case ShopStatus.PendingApproval:
+  //       return (
+  //         <div
+  //           className="hidden md:flex items-center gap-2 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-[10px] font-bold uppercase tracking-wider cursor-help"
+  //           title="Hồ sơ đang chờ duyệt"
+  //         >
+  //           <Clock className="w-3 h-3" />
+  //           <span>Pending</span>
+  //         </div>
+  //       );
+  //     case ShopStatus.Active:
+  //       return (
+  //         <Link
+  //           href="/shop/dashboard"
+  //           className="hidden md:flex items-center gap-2 px-3 py-1 bg-black text-white rounded-full text-[10px] font-bold uppercase tracking-wider hover:bg-[#ce2a32] transition-colors"
+  //         >
+  //           <Store className="w-3 h-3" />
+  //           <span>My Shop</span>
+  //         </Link>
+  //       );
+  //     case ShopStatus.Rejected:
+  //       return (
+  //         <Link
+  //           href="/shop/register"
+  //           className="hidden md:flex items-center gap-1 text-red-600 font-bold text-xs hover:underline"
+  //         >
+  //           <AlertCircle className="w-3 h-3" /> Re-apply
+  //         </Link>
+  //       );
+  //     default:
+  //       return null;
+  //   }
+  // };
+
   return (
     <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-200 shadow-sm">
       <div className="w-full max-w-[1920px] mx-auto">
-        {/* --- TOP BAR --- */}
         <div className="flex justify-end items-center h-10 space-x-6 pr-4 bg-white text-xs font-medium border-b border-gray-100 lg:border-none">
-          {/* LOGIC AUTH: Dropdown User */}
+          {/* 4. GỌI HÀM RENDER */}
+          {/* {renderDashboardButton()} */}
+
+          {/* User Dropdown */}
           {isAuthenticated && user ? (
             <div className="relative" ref={dropdownRef}>
-              {/* Nút bấm mở menu */}
               <button
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 className="flex items-center gap-2 hover:text-[#ce2a32] transition-colors focus:outline-none"
               >
-                {/* Check user.image (API trả về image chứ không phải avatar) */}
                 {user.image ? (
                   <div className="relative w-6 h-6">
                     <Image
@@ -120,13 +193,11 @@ export const Header: FC = () => {
                 ) : (
                   <span className="text-lg">👤</span>
                 )}
-                {/* API trả về firstName */}
                 <span className="font-bold truncate max-w-[100px]">
                   Hi, {user.firstName || user.username}
                 </span>
               </button>
 
-              {/* DROPDOWN MENU */}
               {userDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
                   <div className="px-4 py-2 border-b border-gray-100">
@@ -146,6 +217,29 @@ export const Header: FC = () => {
                     My Profile
                   </Link>
 
+                  {/* Nếu là Admin */}
+                  {user.role === "Admin" && (
+                    <Link
+                      href="/admin/dashboard"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32] font-bold"
+                      onClick={() => setUserDropdownOpen(false)}
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+
+                  {/* Nếu là Shop Active (và không phải Admin) */}
+                  {currentShop?.status === ShopStatus.Active &&
+                    user.role !== "Admin" && (
+                      <Link
+                        href="/shop/dashboard"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
+                        onClick={() => setUserDropdownOpen(false)}
+                      >
+                        Shop Dashboard
+                      </Link>
+                    )}
+
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
@@ -156,7 +250,6 @@ export const Header: FC = () => {
               )}
             </div>
           ) : (
-            // Chưa Login
             <Link
               href="/login"
               className="text-gray-600 hover:text-black uppercase tracking-wider"
@@ -171,29 +264,21 @@ export const Header: FC = () => {
           >
             <CartIcon /> Cart ({totalQuantity})
           </button>
-
           <CountrySelector />
         </div>
 
-        {/* --- MAIN BAR (Navigation) --- */}
+        {/* --- MAIN BAR --- */}
         <div className="flex h-16 items-center justify-between px-4 lg:px-8">
-          {/* Left: Logo */}
           <div className="flex-shrink-0">
             <Logo />
           </div>
-
-          {/* Center: Nav (Desktop only) */}
           <div className="hidden lg:flex justify-center flex-1 mx-8">
             <Nav />
           </div>
-
-          {/* Right: Search & Mobile Toggle */}
           <div className="flex items-center gap-4 justify-end">
             <div className="hidden lg:block w-64">
               <SearchBar />
             </div>
-
-            {/* Mobile Menu Button */}
             <button
               className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-md"
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -207,65 +292,11 @@ export const Header: FC = () => {
         {mobileOpen && (
           <div className="lg:hidden border-t border-gray-100 bg-white absolute w-full left-0 shadow-lg h-[calc(100vh-64px)] overflow-y-auto z-50">
             <div className="p-4 space-y-6">
-              {/* Search Mobile */}
-              <div>
-                <SearchBar />
-              </div>
-
-              {/* Nav Mobile */}
+              <SearchBar />
               <Nav
                 orientation="vertical"
                 onNavigate={() => setMobileOpen(false)}
               />
-
-              {/* Mobile Footer Links */}
-              <div className="pt-4 border-t border-gray-100 flex flex-col gap-4">
-                {isAuthenticated && user && (
-                  <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
-                    {user.image ? (
-                      <Image
-                        src={user.image}
-                        width={32}
-                        height={32}
-                        alt="avt"
-                        className="rounded-full"
-                      />
-                    ) : (
-                      <span>👤</span>
-                    )}
-                    <div>
-                      <p className="font-bold text-sm">
-                        {user.firstName} {user.lastName}
-                      </p>
-                      <p className="text-xs text-gray-500">{user.email}</p>
-                    </div>
-                  </div>
-                )}
-
-                <button
-                  onClick={handleOpenCart}
-                  className="flex items-center gap-2 font-medium"
-                >
-                  <CartIcon /> Cart ({totalQuantity})
-                </button>
-
-                {isAuthenticated ? (
-                  <button
-                    onClick={handleLogout}
-                    className="text-left text-red-600 font-medium"
-                  >
-                    Logout
-                  </button>
-                ) : (
-                  <Link
-                    href="/login"
-                    className="text-gray-800 font-medium"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    Login / Register
-                  </Link>
-                )}
-              </div>
             </div>
           </div>
         )}
