@@ -14,10 +14,13 @@ import {
   Clock,
   AlertCircle,
   Eye,
+  Ban,
 } from "lucide-react";
 import Link from "next/link";
 import { ShopStatus } from "@/src/types/shop.types";
 import { ShopApplicationModal } from "@/src/components/Profile/ShopApplicationModal";
+import { UpdateShopApplicationModal } from "@/src/components/Profile/UpdateShopApplicationModal";
+import { fetchCurrentShop } from "@/src/store/slices/shopSlice";
 
 export default function ProfilePage() {
   const { user, isInitialized } = useAppSelector((state) => state.auth);
@@ -29,12 +32,21 @@ export default function ProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
+  const [isUpdateShopModalOpen, setIsUpdateShopModalOpen] = useState(false);
 
   useEffect(() => {
     if (isInitialized && !user) {
       router.replace("/login");
     }
   }, [isInitialized, user, router]);
+
+  useEffect(() => {
+    // Gọi fetchCurrentShop cho mọi user (trừ Admin) khi chưa có dữ liệu
+    // "User" role cũng cần fetch vì có thể đã nộp đơn đăng ký Shop (PendingApproval/Rejected)
+    if (user && user.role !== "Admin" && !currentShop) {
+      dispatch(fetchCurrentShop());
+    }
+  }, [user, currentShop, dispatch]);
 
   // 1. Loading State
   if (!isInitialized || !user) {
@@ -161,50 +173,65 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-              {/* TRƯỜNG HỢP 2: CHƯA CÓ SHOP HOẶC REJECTED */}
-              {(!currentShop || currentShop.status === ShopStatus.Rejected) && (
+              {/* TRƯỜNG HỢP 2: CHƯA CÓ SHOP */}
+              {!currentShop && (
                 <div className="bg-gradient-to-r from-gray-50 to-white border border-gray-200 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 group hover:border-black/30 transition-all shadow-sm">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-700 group-hover:bg-[#ce2a32] group-hover:text-white group-hover:border-[#ce2a32] transition-colors shadow-sm shrink-0">
-                      {currentShop?.status === ShopStatus.Rejected ? (
-                        <AlertCircle className="w-6 h-6 text-red-500 group-hover:text-white" />
-                      ) : (
-                        <Store className="w-6 h-6" />
-                      )}
+                      <Store className="w-6 h-6" />
                     </div>
                     <div>
                       <h3 className="font-bold text-lg text-gray-900 group-hover:text-[#ce2a32] transition-colors">
-                        {currentShop?.status === ShopStatus.Rejected
-                          ? "Đăng ký lại Shop"
-                          : "Bạn muốn bán hàng trên Ameko?"}
+                        Bạn muốn bán hàng trên Ameko?
                       </h3>
                       <p className="text-sm text-gray-500">
-                        {currentShop?.status === ShopStatus.Rejected
-                          ? "Hồ sơ trước đó đã bị từ chối. Vui lòng kiểm tra lại thông tin và nộp lại."
-                          : "Nâng cấp tài khoản để mở Shop và bắt đầu kinh doanh ngay hôm nay."}
+                        Nâng cấp tài khoản để mở Shop và bắt đầu kinh doanh ngay
+                        hôm nay.
+                      </p>
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/shop/register"
+                    className="px-5 py-2.5 bg-black text-white text-sm font-bold uppercase tracking-wider rounded-lg hover:bg-[#ce2a32] transition-colors flex items-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
+                  >
+                    Đăng ký Shop <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              )}
+
+              {/* TRƯỜNG HỢP 2B: REJECTED → CẬP NHẬT LẠI HỒ SƠ */}
+              {currentShop && currentShop.status === ShopStatus.Rejected && (
+                <div className="bg-gradient-to-r from-red-50 to-white border border-red-200 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 group hover:border-red-300 transition-all shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+                      <AlertCircle className="w-6 h-6 text-red-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-gray-900">
+                        Your application was rejected
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {currentShop.adminNote
+                          ? `Reason: ${currentShop.adminNote}`
+                          : "Please review your information and resubmit."}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {/* NÚT VIEW CHỈ HIỆN KHI CÓ SHOP (BỊ REJECT) */}
-                    {currentShop && (
-                      <button
-                        onClick={() => setIsApplicationModalOpen(true)}
-                        className="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap"
-                      >
-                        <Eye className="w-4 h-4" /> View Application
-                      </button>
-                    )}
-                    <Link
-                      href="/shop/register"
+                    <button
+                      onClick={() => setIsApplicationModalOpen(true)}
+                      className="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap"
+                    >
+                      <Eye className="w-4 h-4" /> View Application
+                    </button>
+                    <button
+                      onClick={() => setIsUpdateShopModalOpen(true)}
                       className="px-5 py-2.5 bg-black text-white text-sm font-bold uppercase tracking-wider rounded-lg hover:bg-[#ce2a32] transition-colors flex items-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
                     >
-                      {currentShop?.status === ShopStatus.Rejected
-                        ? "Nộp lại hồ sơ"
-                        : "Đăng ký Shop"}{" "}
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
+                      Update & Resubmit <ArrowRight className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               )}
@@ -232,6 +259,30 @@ export default function ProfilePage() {
                   >
                     Vào Dashboard <ArrowRight className="w-4 h-4" />
                   </Link>
+                </div>
+              )}
+
+              {/* TRƯỜNG HỢP 4: BANNED */}
+              {currentShop && currentShop.status === ShopStatus.Banned && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-4 shadow-sm">
+                  <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center shrink-0">
+                    <Ban className="w-6 h-6" />
+                  </div>
+                  <div className="text-center sm:text-left">
+                    <h3 className="font-bold text-lg text-red-800">
+                      Your shop has been banned
+                    </h3>
+                    <p className="text-sm text-red-600">
+                      Your shop has been suspended due to a policy violation.
+                      Please contact support for more information.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setIsApplicationModalOpen(true)}
+                    className="px-4 py-2 text-red-600 font-bold hover:text-red-800 hover:bg-red-100 text-sm rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <Eye className="w-4 h-4" /> View Details
+                  </button>
                 </div>
               )}
             </div>
@@ -354,6 +405,13 @@ export default function ProfilePage() {
       <ShopApplicationModal
         isOpen={isApplicationModalOpen}
         onClose={() => setIsApplicationModalOpen(false)}
+        shopData={currentShop}
+      />
+
+      {/* Modal Update Shop Application (for rejected) */}
+      <UpdateShopApplicationModal
+        isOpen={isUpdateShopModalOpen}
+        onClose={() => setIsUpdateShopModalOpen(false)}
         shopData={currentShop}
       />
     </div>

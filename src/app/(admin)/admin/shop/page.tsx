@@ -4,10 +4,21 @@ import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
   adminApproveShop,
+  adminBanShop,
+  adminUnbanShop,
   fetchAdminShopList,
 } from "@/src/store/slices/shopSlice";
 import { ShopStatus } from "@/src/types/shop.types";
-import { Check, X, Calendar, CreditCard, Search, Eye } from "lucide-react";
+import {
+  Check,
+  X,
+  Calendar,
+  CreditCard,
+  Search,
+  Eye,
+  Ban,
+  ShieldOff,
+} from "lucide-react";
 import { toast } from "react-toastify";
 import { ShopApplicationModal } from "@/src/components/Profile/ShopApplicationModal";
 
@@ -19,9 +30,9 @@ export default function AdminShopRequestsPage() {
 
   // State cho Modal Duyệt/Từ chối
   const [selectedShop, setSelectedShop] = useState<any | null>(null);
-  const [actionType, setActionType] = useState<"approve" | "reject" | null>(
-    null,
-  );
+  const [actionType, setActionType] = useState<
+    "approve" | "reject" | "ban" | "unban" | null
+  >(null);
   const [adminNote, setAdminNote] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -39,33 +50,53 @@ export default function AdminShopRequestsPage() {
     setIsViewModalOpen(true);
   };
 
-  // Hàm mở Modal Duyệt/Từ chối
-  const openActionModal = (shop: any, type: "approve" | "reject") => {
+  // Hàm mở Modal Duyệt/Từ chối/Ban/Unban
+  const openActionModal = (
+    shop: any,
+    type: "approve" | "reject" | "ban" | "unban",
+  ) => {
     setSelectedShop(shop);
     setActionType(type);
-    setAdminNote(
-      type === "approve"
-        ? "Đủ điều kiện kinh doanh."
-        : "Thông tin chưa chính xác.",
-    );
+    switch (type) {
+      case "approve":
+        setAdminNote("Đủ điều kiện kinh doanh.");
+        break;
+      case "reject":
+        setAdminNote("Thông tin chưa chính xác.");
+        break;
+      case "ban":
+        setAdminNote("Vi phạm chính sách.");
+        break;
+      case "unban":
+        setAdminNote("");
+        break;
+    }
   };
 
   const handleSubmit = async () => {
     if (!selectedShop || !actionType) return;
     setIsProcessing(true);
     try {
-      const statusToSend =
-        actionType === "approve" ? ShopStatus.Active : ShopStatus.Rejected;
-      await dispatch(
-        adminApproveShop({
-          shopId: selectedShop.id,
-          status: statusToSend,
-          adminNote: adminNote,
-        }),
-      ).unwrap();
-      toast.success(
-        `Đã ${actionType === "approve" ? "duyệt" : "từ chối"} shop thành công!`,
-      );
+      if (actionType === "ban") {
+        await dispatch(adminBanShop(selectedShop.id)).unwrap();
+        toast.success(`Shop "${selectedShop.shopName}" has been banned!`);
+      } else if (actionType === "unban") {
+        await dispatch(adminUnbanShop(selectedShop.id)).unwrap();
+        toast.success(`Shop "${selectedShop.shopName}" has been unbanned!`);
+      } else {
+        const statusToSend =
+          actionType === "approve" ? ShopStatus.Active : ShopStatus.Rejected;
+        await dispatch(
+          adminApproveShop({
+            shopId: selectedShop.id,
+            status: statusToSend,
+            adminNote: adminNote,
+          }),
+        ).unwrap();
+        toast.success(
+          `Đã ${actionType === "approve" ? "duyệt" : "từ chối"} shop thành công!`,
+        );
+      }
       setSelectedShop(null);
       setActionType(null);
     } catch (error: any) {
@@ -94,6 +125,18 @@ export default function AdminShopRequestsPage() {
         return (
           <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold uppercase">
             Rejected
+          </span>
+        );
+      case ShopStatus.Inactive:
+        return (
+          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-bold uppercase">
+            Inactive
+          </span>
+        );
+      case ShopStatus.Banned:
+        return (
+          <span className="text-xs bg-red-200 text-red-800 px-2 py-0.5 rounded font-bold uppercase">
+            Banned
           </span>
         );
       default:
@@ -214,7 +257,7 @@ export default function AdminShopRequestsPage() {
                       </button>
                     </td>
 
-                    {/*  CỘT 6: NÚT DUYỆT/TỪ CHỐI  */}
+                    {/*  CỘT 6: NÚT DUYỆT/TỪ CHỐI/BAN/UNBAN  */}
                     <td className="p-4 text-right">
                       {shop.status === ShopStatus.PendingApproval ? (
                         <div className="flex justify-end gap-2">
@@ -233,8 +276,23 @@ export default function AdminShopRequestsPage() {
                             <X className="w-5 h-5" />
                           </button>
                         </div>
+                      ) : shop.status === ShopStatus.Active ? (
+                        <button
+                          onClick={() => openActionModal(shop, "ban")}
+                          className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition tooltip shadow-sm"
+                          title="Ban shop"
+                        >
+                          <Ban className="w-5 h-5" />
+                        </button>
+                      ) : shop.status === ShopStatus.Banned ? (
+                        <button
+                          onClick={() => openActionModal(shop, "unban")}
+                          className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition tooltip shadow-sm"
+                          title="Unban shop"
+                        >
+                          <ShieldOff className="w-5 h-5" />
+                        </button>
                       ) : (
-                        // Nếu đã Active/Rejected thì hiện dấu gạch ngang hoặc text mờ
                         <span className="text-gray-300 text-xs italic pr-2">
                           Done
                         </span>
@@ -248,40 +306,59 @@ export default function AdminShopRequestsPage() {
         </div>
       </div>
 
-      {/* --- MODAL DUYỆT/TỪ CHỐI ) --- */}
+      {/* --- MODAL DUYỆT/TỪ CHỐI/BAN/UNBAN ) --- */}
       {selectedShop && actionType && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95">
             <div
-              className={`p-6 border-b ${actionType === "approve" ? "bg-green-50 border-green-100" : "bg-red-50 border-red-100"}`}
+              className={`p-6 border-b ${
+                actionType === "approve"
+                  ? "bg-green-50 border-green-100"
+                  : actionType === "unban"
+                    ? "bg-emerald-50 border-emerald-100"
+                    : "bg-red-50 border-red-100"
+              }`}
             >
               <h3
-                className={`text-xl font-bold uppercase flex items-center gap-2 ${actionType === "approve" ? "text-green-700" : "text-red-700"}`}
+                className={`text-xl font-bold uppercase flex items-center gap-2 ${
+                  actionType === "approve"
+                    ? "text-green-700"
+                    : actionType === "unban"
+                      ? "text-emerald-700"
+                      : "text-red-700"
+                }`}
               >
-                {actionType === "approve" ? (
-                  <Check className="w-6 h-6" />
-                ) : (
-                  <X className="w-6 h-6" />
-                )}
-                {actionType === "approve"
-                  ? "Phê duyệt cửa hàng"
-                  : "Từ chối yêu cầu"}
+                {actionType === "approve" && <Check className="w-6 h-6" />}
+                {actionType === "reject" && <X className="w-6 h-6" />}
+                {actionType === "ban" && <Ban className="w-6 h-6" />}
+                {actionType === "unban" && <ShieldOff className="w-6 h-6" />}
+                {actionType === "approve" && "Phê duyệt cửa hàng"}
+                {actionType === "reject" && "Từ chối yêu cầu"}
+                {actionType === "ban" && "Ban cửa hàng"}
+                {actionType === "unban" && "Unban cửa hàng"}
               </h3>
               <p className="text-sm text-gray-600 mt-1">
                 Shop: <span className="font-bold">{selectedShop.shopName}</span>
               </p>
             </div>
             <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">
-                  Ghi chú của Admin
-                </label>
-                <textarea
-                  value={adminNote}
-                  onChange={(e) => setAdminNote(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-black focus:outline-none min-h-[100px]"
-                />
-              </div>
+              {actionType === "unban" ? (
+                <p className="text-sm text-gray-600">
+                  After unbanning, the shop owner will need to manually
+                  reactivate their shop. Are you sure you want to proceed?
+                </p>
+              ) : (
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Ghi chú của Admin
+                  </label>
+                  <textarea
+                    value={adminNote}
+                    onChange={(e) => setAdminNote(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-black focus:outline-none min-h-[100px]"
+                  />
+                </div>
+              )}
             </div>
             <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
               <button
@@ -293,7 +370,13 @@ export default function AdminShopRequestsPage() {
               <button
                 onClick={handleSubmit}
                 disabled={isProcessing}
-                className={`px-4 py-2 text-white rounded-lg font-bold ${actionType === "approve" ? "bg-green-600" : "bg-red-600"}`}
+                className={`px-4 py-2 text-white rounded-lg font-bold ${
+                  actionType === "approve"
+                    ? "bg-green-600 hover:bg-green-700"
+                    : actionType === "unban"
+                      ? "bg-emerald-600 hover:bg-emerald-700"
+                      : "bg-red-600 hover:bg-red-700"
+                }`}
               >
                 {isProcessing ? "..." : "Xác nhận"}
               </button>

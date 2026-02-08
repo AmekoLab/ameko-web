@@ -62,4 +62,17 @@ export interface AdminShopListResponse {
   pagination: PaginationParams;
 }
 
+export interface UpdateShopFormValues {
+  shopName: string;
+  bankName: string;
+  bio?: string;
+  address: string;
+  phoneNumber: string;
+  bankAccountNumber: string;
+  bankAccountName: string;
+  contactEmail: string;
+  bannerImage?: FileList;
+  logoImage?: FileList;
+}
+
 export type ShopState = ShopResponse;

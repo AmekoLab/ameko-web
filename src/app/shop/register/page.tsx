@@ -145,7 +145,7 @@ export default function RegisterShopPage() {
 
         // 2. Chờ 2 giây rồi mới chuyển trang
         setTimeout(() => {
-          router.push("/profile"); // Chuyển về Profile thay vì Home
+          router.push("/profile");
         }, 2000);
       }
     } catch (error: any) {
@@ -167,7 +167,7 @@ export default function RegisterShopPage() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          {/* --- SECTION 1: VISUAL IDENTITY (BANNER & LOGO) --- */}
+          {/* --- SECTION 1: VISUAL IDENTITY  --- */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
             {/* 1. Banner Area */}
             <div className="relative">
@@ -181,7 +181,7 @@ export default function RegisterShopPage() {
                 error={errors.bannerImage?.message as string}
               />
 
-              {/* 2. Logo Area (Overlapping) */}
+              {/* 2. Logo Area  */}
               <div className="absolute -bottom-16 left-6 md:left-10 z-30">
                 <ImageUpload
                   name="logoImage"

@@ -39,4 +39,20 @@ export const shopService = {
       `/shops/admin/list?page=${page}&size=${size}`,
     );
   },
+
+  updateShopProfile: async (formData: FormData) => {
+    return api.put<any, ApiResponse<null>>("/shops/profile", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
+
+  banShop: async (shopId: string) => {
+    return api.post<any, ApiResponse<null>>(`/shops/admin/${shopId}/ban`);
+  },
+
+  unbanShop: async (shopId: string) => {
+    return api.patch<any, ApiResponse<null>>(`/shops/admin/${shopId}/unban`);
+  },
 };

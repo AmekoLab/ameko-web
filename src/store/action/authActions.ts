@@ -18,6 +18,9 @@ import {
 } from "@/src/types/auth.types";
 
 // --- THUNK 1: LOGIN & FETCH PROFILE ---
+
+import { fetchCurrentShop } from "../slices/shopSlice";
+
 export const loginAndFetchProfile =
   (credentials: LoginPayload) => async (dispatch: AppDispatch) => {
     dispatch(loginStart());
@@ -48,15 +51,18 @@ export const loginAndFetchProfile =
         throw new Error("Failed to fetch user profile");
       }
 
-      // BƯỚC 3: Ghép dữ liệu
+      // BƯỚC 3: Ghép dữ liệu User
       const fullUserData = {
         ...profileRes.data,
         role: role, // Ghép role từ Login
         token: token,
       };
 
-      // Lưu thông tin cơ bản (ID & Role) để dùng cho Auto Login
+      // Lưu thông tin cơ bản
       localStorage.setItem("user", JSON.stringify({ id, role }));
+
+      await dispatch(fetchCurrentShop());
+      // ============================================================
 
       dispatch(loginSuccess(fullUserData));
       return fullUserData;
@@ -96,11 +102,23 @@ export const checkTokenAndFetchProfile =
       const profileRes = await authService.getProfile(userObj.id);
 
       if (profileRes.success && profileRes.data) {
+        // Ưu tiên role từ API (luôn mới nhất), fallback sang localStorage nếu API không trả
+        const latestRole = profileRes.data.role || userObj.role;
+
         const fullUserData = {
           ...profileRes.data,
-          role: userObj.role,
+          role: latestRole,
           token: token,
         };
+
+        // Cập nhật localStorage nếu role đã thay đổi (VD: Customer → Shop sau khi được duyệt)
+        if (latestRole !== userObj.role) {
+          localStorage.setItem(
+            "user",
+            JSON.stringify({ ...userObj, role: latestRole }),
+          );
+        }
+
         dispatch(loginSuccess(fullUserData));
       } else {
         throw new Error("Invalid");
@@ -177,8 +195,6 @@ export const changeUserPassword =
         throw new Error(res.message || "Password change failed");
       }
     } catch (error: any) {
-      // Nếu muốn handle loading global thì dispatch action loadingStart/End ở đây
-      // Nhưng với modal nhỏ thì handle local loading ở component tiện hơn
       throw error;
     }
   };
