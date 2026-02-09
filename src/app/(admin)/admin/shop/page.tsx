@@ -158,7 +158,7 @@ export default function AdminShopRequestsPage() {
               Shop Management
             </h1>
             <p className="text-gray-500">
-              Quản lý danh sách đối tác và duyệt đơn đăng ký.
+              Review and manage shop applications from users.
             </p>
           </div>
           <div className="text-sm text-gray-500">
