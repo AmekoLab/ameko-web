@@ -25,9 +25,16 @@ export const ProductInfo = ({
   const discountPercentage = product.originalPrice
     ? Math.round(
         ((product.originalPrice - product.basePrice) / product.originalPrice) *
-          100
+          100,
       )
     : 0;
+
+  // Format price with thousand separators (USD)
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(price);
 
   // 2. Kiểm tra tồn kho
   const isOutOfStock = product.status === "OUT_OF_STOCK";
@@ -53,7 +60,7 @@ export const ProductInfo = ({
         slug: product.slug,
         quantity: quantity,
         variant: "Default",
-      })
+      }),
     );
     // Mở Sidebar ngay sau khi thêm
     // dispatch(setCartOpen(true));
@@ -109,12 +116,12 @@ export const ProductInfo = ({
       {/* --- PRICE AREA --- */}
       <div className="mt-1 pt-3 flex items-baseline gap-3 border-t border-gray-50">
         <span className="text-2xl font-bold font-oswald block text-[#ce2a32]">
-          ${product.basePrice.toFixed(2)}
+          {formatPrice(product.basePrice)}
         </span>
         {product.originalPrice && (
           <>
             <span className="text-sm text-gray-400 line-through decoration-1">
-              ${product.originalPrice.toFixed(2)}
+              {formatPrice(product.originalPrice)}
             </span>
             <span className="text-[10px] font-bold text-white bg-[#ce2a32] px-1.5 py-0.5 rounded-sm">
               -{discountPercentage}%

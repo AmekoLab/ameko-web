@@ -5,6 +5,7 @@ import shopReducer from "./slices/shopSlice";
 import adminUsersReducer from "./slices/adminUsersSlice";
 import categoriesReducer from "./slices/categoriesSlice";
 import partsReducer from "./slices/partsSlice";
+import assembledProductsReducer from "./slices/assembledProductsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     adminUsers: adminUsersReducer,
     categories: categoriesReducer,
     parts: partsReducer,
+    assembledProducts: assembledProductsReducer,
   },
 });
 export type RootState = ReturnType<typeof store.getState>;

@@ -6,18 +6,22 @@ interface ProductSpecsProps {
 }
 
 export const ProductSpecs = ({ specs }: ProductSpecsProps) => {
-  const rows = [
+  const allRows = [
     { label: "Layout Size", value: specs.layout },
     { label: "Mounting Style", value: specs.mounting },
     { label: "PCB Tech", value: specs.pcb },
     { label: "Connection", value: specs.connection },
     { label: "Battery Capacity", value: specs.battery },
-    // Dữ liệu mẫu thêm vào để bảng trông dài và đẹp giống ảnh
-    { label: "Polling Rate", value: "1000 Hz (Wired) / 1000 Hz (2.4GHz)" },
-    { label: "Anti-Ghosting", value: "100% NKRO" },
-    { label: "Case Material", value: "CNC Aluminum / Polycarbonate" },
-    { label: "Warranty", value: "12 Months Limited" },
+    { label: "Polling Rate", value: specs.pollingRate },
+    { label: "Anti-Ghosting", value: specs.antiGhosting },
+    { label: "Case Material", value: specs.caseMaterial },
+    { label: "Plate Material", value: specs.plateMaterial },
+    { label: "Weight", value: specs.weight },
+    { label: "Warranty", value: specs.warranty },
   ];
+
+  // Only show rows that have a value
+  const rows = allRows.filter((row) => row.value);
 
   return (
     <div className="w-full">

@@ -7,7 +7,7 @@ export default function Sidebar({ role = "staff" }) {
   const [active, setActive] = useState("home");
 
   const commonMenu = [
-    { name: "Home", path: "/home" },
+    { name: "Home", path: "/" },
     // { name: "Profile", path: "/profile" },
   ];
 
@@ -27,6 +27,7 @@ export default function Sidebar({ role = "staff" }) {
     { name: "Dashboard", path: "/shop/dashboard" },
     { name: "Categories", path: "/shop/categories" },
     { name: "Parts", path: "/shop/parts" },
+    { name: "Assembled Products", path: "/shop/assembled-products" },
   ];
 
   let menu = [...commonMenu];
