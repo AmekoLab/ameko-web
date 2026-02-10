@@ -21,9 +21,9 @@ const createUserSchema = z.object({
   email: z.string().email("Invalid email address"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  role: z.coerce.number().min(0).max(2),
-  status: z.coerce.number().min(0).max(1),
-  gender: z.coerce.number().min(0).max(2),
+  role: z.string(),
+  status: z.string(),
+  gender: z.string(),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
   phoneNumber: z
     .string()
@@ -62,9 +62,9 @@ export default function CreateUserModal({
       email: "",
       firstName: "",
       lastName: "",
-      role: 0,
-      status: 0,
-      gender: 0,
+      role: "0",
+      status: "0",
+      gender: "0",
       dateOfBirth: "",
       phoneNumber: "",
     },
@@ -216,34 +216,25 @@ export default function CreateUserModal({
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className={labelClass}>Role</label>
-              <select
-                {...register("role", { valueAsNumber: true })}
-                className={inputClass}
-              >
-                <option value={0}>Admin</option>
-                <option value={1}>Customer</option>
-                <option value={2}>Shop</option>
+              <select {...register("role")} className={inputClass}>
+                <option value="0">Admin</option>
+                <option value="1">Customer</option>
+                <option value="2">Shop</option>
               </select>
             </div>
             <div>
               <label className={labelClass}>Status</label>
-              <select
-                {...register("status", { valueAsNumber: true })}
-                className={inputClass}
-              >
-                <option value={0}>Active</option>
-                <option value={1}>Banned</option>
+              <select {...register("status")} className={inputClass}>
+                <option value="0">Active</option>
+                <option value="1">Banned</option>
               </select>
             </div>
             <div>
               <label className={labelClass}>Gender</label>
-              <select
-                {...register("gender", { valueAsNumber: true })}
-                className={inputClass}
-              >
-                <option value={0}>Male</option>
-                <option value={1}>Female</option>
-                <option value={2}>Other</option>
+              <select {...register("gender")} className={inputClass}>
+                <option value="0">Male</option>
+                <option value="1">Female</option>
+                <option value="2">Other</option>
               </select>
             </div>
           </div>

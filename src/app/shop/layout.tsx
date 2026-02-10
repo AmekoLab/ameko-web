@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import { Footer } from "@/src/components/Footer/Footer";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 import { Inter, Oswald } from "next/font/google";
+import Sidebar from "@/src/components/Sidebar";
 
 const oswald = Oswald({
   subsets: ["latin", "vietnamese"],
@@ -20,18 +21,14 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "AMEKO - Profile",
+  title: "AMEKO - Shop Dashboard",
   description: "Cộng đồng bàn phím cơ Việt Nam",
 };
 
-export default function RegisterShopLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function ShopLayout({ children }: { children: ReactNode }) {
   return (
     <LayoutWrapper>
-      <AuthWrapper allowedRoles={["Customer"]}>
+      <AuthWrapper allowedRoles={["Customer", "Shop"]}>
         <div
           className={`flex flex-col min-h-screen bg-[#f0f2f5] ${inter.className} ${oswald.variable}`}
         >
@@ -40,8 +37,7 @@ export default function RegisterShopLayout({
           </div>
 
           <div className="flex flex-1 min-h-0">
-            {/* Main Content */}
-
+            <Sidebar role="shop" />
             <main className="flex-1 p-6 bg-gray-100 overflow-auto">
               {children}
             </main>

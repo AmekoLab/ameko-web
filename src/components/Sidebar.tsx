@@ -8,13 +8,13 @@ export default function Sidebar({ role = "staff" }) {
 
   const commonMenu = [
     { name: "Home", path: "/home" },
-    { name: "Profile", path: "/profile" },
+    // { name: "Profile", path: "/profile" },
   ];
 
   const adminMenu = [
     { name: "Users", path: "/admin/users" },
     { name: "Shops", path: "/admin/shop" },
-
+    { name: "Categories", path: "/admin/categories" },
     { name: "Settings", path: "/admin/settings" },
   ];
 
@@ -23,9 +23,16 @@ export default function Sidebar({ role = "staff" }) {
     { name: "Reports", path: "/staff/reports" },
   ];
 
+  const shopMenu = [
+    { name: "Dashboard", path: "/shop/dashboard" },
+    { name: "Categories", path: "/shop/categories" },
+    { name: "Parts", path: "/shop/parts" },
+  ];
+
   let menu = [...commonMenu];
   if (role === "admin") menu = [...menu, ...adminMenu];
   if (role === "staff") menu = [...menu, ...staffMenu];
+  if (role === "shop") menu = [...menu, ...shopMenu];
 
   return (
     <aside className="bg-white w-64 h-[calc(100vh-64px)] shadow-md sticky top-16 overflow-auto">
