@@ -1,37 +1,82 @@
-export interface Category {
-  id: number;
+// ============================================================
+// Builder Types — Server-Driven UI Model
+// ============================================================
+
+// --- Step info returned by `/Builder/start` and `/Builder/select` ---
+export interface BuilderStep {
   name: string;
   slug: string;
-  stepOrder?: number;
+  stepOrder: number;
 }
 
-export interface Product {
-  id: number;
+// --- Product option available for selection at each step ---
+export interface BuilderProduct {
+  optionId: string;
+  partId: string;
   name: string;
-  price: string;
+  price: number;
   thumbnailUrl: string;
   layerImageUrl: string;
-
-  attributes: Record<string, string | number | boolean>;
-  categoryId: number;
-  category?: Category;
-
-  _tempSlug?: string;
+  isDefault: boolean;
+  status: number;
+  tags: string | null;
+  nextStepFilterRule: string | null;
 }
 
+// --- A part that has been selected (stored in session.selection) ---
+export interface SelectedPart {
+  id: string;
+  name: string;
+  price: number;
+  thumbnailUrl: string;
+  quantity: number;
+  kitDesignOptionId: string;
+  layerImageUrl: string;
+  nextStepFilterRule: string;
+}
+
+// --- The next step bundle ---
+export interface BuilderNextStep {
+  step: BuilderStep;
+  products: BuilderProduct[];
+}
+
+// --- Session state from the server ---
 export interface BuilderSession {
   id: string;
-  selection: Record<string, number>;
-  totalPrice: string;
+  selection: Record<string, SelectedPart>;
+  totalPrice: number;
+  updatedAt: string;
+  isComplete: boolean;
+  currentPreviewImage: string | null;
 }
 
-export interface NextStep {
-  step: Category;
-  products: Product[];
-}
-
-export interface BuilderResponse {
+// --- Inner `data.data` payload from `/Builder/start` and `/Builder/select` ---
+export interface BuilderPayload {
   session: BuilderSession;
-  nextStep: NextStep | null;
-  selectedDetails?: Product[];
+  nextStep: BuilderNextStep | null;
+  workflowSteps: string[];
+}
+
+// --- Full API envelope (outer wrapper) ---
+export interface BuilderApiResponse {
+  success: boolean;
+  message: string;
+  data: {
+    message: string;
+    data: BuilderPayload;
+  };
+  errors: string | null;
+}
+
+// --- Payload for POST /Builder/start ---
+export interface StartBuilderPayload {
+  baseKitId: string;
+}
+
+// --- Payload for POST /Builder/select ---
+export interface SelectComponentPayload {
+  sessionId: string;
+  selectedPartId: string;
+  stepName: string;
 }

@@ -9,10 +9,14 @@ import {
   Settings,
   Wrench,
 } from "lucide-react";
+import Link from "next/link";
 import { UserProfile } from "@/src/types/profile";
 import { ImageModal } from "../Community/ImageModal";
 
-export const ProfileHeader: FC<{ profile: UserProfile }> = ({ profile }) => {
+export const ProfileHeader: FC<{
+  profile: UserProfile;
+  kitCategoryId?: string;
+}> = ({ profile, kitCategoryId }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   return (
     <div className="bg-white rounded-b-md shadow-sm border-b border-gray-200 mb-6">
@@ -123,11 +127,13 @@ export const ProfileHeader: FC<{ profile: UserProfile }> = ({ profile }) => {
               <>
                 <button className="flex items-center gap-2 px-6 py-2 bg-black text-white hover:bg-[#ce2a32] font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm">
                   <UserPlus className="w-4 h-4" /> Follow
-                  {/* TODO: [API] Gọi API Follow user */}
                 </button>
-                <button className="flex items-center gap-2 px-6 py-2 bg-[#ce2a32] text-white hover:bg-[#b02028] font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm">
+                <Link
+                  href={`/builder?shopId=${profile.id}${kitCategoryId ? `&categoryId=${kitCategoryId}` : ""}`}
+                  className="flex items-center gap-2 px-6 py-2 bg-[#ce2a32] text-white hover:bg-[#b02028] font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm"
+                >
                   <Wrench className="w-4 h-4" /> Customize
-                </button>
+                </Link>
                 <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-black font-bold text-sm rounded-sm transition-colors">
                   <MessageCircle className="w-4 h-4" /> Chat
                   {/* TODO: [ROUTING] Link tới trang chat /messages/{id} */}

@@ -1,10 +1,17 @@
 "use client";
 
-import { useEffect, useState, useMemo, memo } from "react";
+import { useEffect, useMemo, memo, Suspense } from "react";
 import Image from "next/image";
-import { BuilderService } from "@/src/services/builder.service";
-import { BuilderSession, Category, Product } from "@/src/types/builder";
-import { Link } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/src/store/hook";
+import {
+  fetchBaseKits,
+  startBuilderSession,
+  selectBuilderComponent,
+  resetBuilder,
+} from "@/src/store/slices/builderSlice";
+import { BuilderProduct, SelectedPart } from "@/src/types/builder";
+import { PartItem } from "@/src/types/part.types";
 
 // --- HELPERS ---
 const getZIndex = (categorySlug?: string) => {
@@ -19,93 +26,68 @@ const getZIndex = (categorySlug?: string) => {
   return map[categorySlug] || 5;
 };
 
-// --- SUB-COMPONENTS (Tách nhỏ để tối ưu hiệu năng render) ---
-
-// --- CẤU HÌNH QUY TẮC ẨN LỚP (SMART MASKING) ---
-// Định nghĩa: Nếu có [KEY] thì ẩn [VALUE]
-// Ví dụ: Nếu có 'keycap' thì ẩn luôn 'switch' cho đỡ rối mắt
-const HIDE_RULES: Record<string, string[]> = {
-  keycap: ["switch"],
-  // Bạn có thể thêm rule khác: ví dụ có 'case' kín thì ẩn 'pcb' nếu muốn
-  // 'case': ['pcb'],
-};
-
-// --- CẤU HÌNH LAYER CỐ ĐỊNH (Quan trọng) ---
-// Định nghĩa thứ tự vẽ: Từ dưới lên trên
+// --- LAYER ORDER (bottom → top) ---
 const LAYER_ORDER = ["case", "pcb", "plate", "switch", "keycap"];
 
-// Component Visualizer (Phiên bản Fixed Slots - Không bao giờ chớp giật)
-const Visualizer = memo(({ images }: { images: Product[] }) => {
-  // 1. Chuyển đổi mảng images thành Object để dễ truy xuất theo slug
-  // Ví dụ: { case: ProductA, switch: ProductB, ... }
-  const layerMap = useMemo(() => {
-    const map: Record<string, Product> = {};
-    images.forEach((img) => {
-      if (img._tempSlug) map[img._tempSlug] = img;
-    });
-    return map;
-  }, [images]);
+// --- Visualizer (layer stacking from session.selection) ---
+const Visualizer = memo(
+  ({ selection }: { selection: Record<string, SelectedPart> }) => {
+    const hasKeycap = !!selection["keycap"];
+    const hasAnySelection = Object.keys(selection).length > 0;
 
-  // 2. Logic Masking
-  // Tính toán trước xem có Keycap không?
-  const hasKeycap = !!layerMap["keycap"];
-
-  return (
-    <div className="relative w-full max-w-[1000px] aspect-[4/3] lg:aspect-video">
-      {/* Placeholder khi trống */}
-      {images.length === 0 && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 z-0">
-          <span className="text-4xl opacity-20 mb-2">⌨️</span>
-          <p className="text-sm font-medium opacity-50">Chưa có linh kiện</p>
-        </div>
-      )}
-
-      {/* VẼ TỪNG LỚP THEO THỨ TỰ CỐ ĐỊNH */}
-      {LAYER_ORDER.map((slug) => {
-        const product = layerMap[slug];
-
-        // Nếu đang vẽ lớp 'switch' MÀ đã có 'keycap' -> Ẩn Switch đi (Opacity 0)
-        // Lưu ý: Ta dùng Opacity chứ không dùng unmount (null) để giữ ổn định DOM
-        const isHidden = slug === "switch" && hasKeycap;
-
-        // Nếu không có sản phẩm ở lớp này thì bỏ qua
-        if (!product) return null;
-
-        return (
-          <div
-            key={slug}
-            className="absolute inset-0 pointer-events-none transition-opacity duration-300 ease-in-out"
-            style={{
-              zIndex: getZIndex(slug),
-              opacity: isHidden ? 0 : 1,
-            }}
-          >
-            <Image
-              src={product.layerImageUrl}
-              alt={product.name}
-              fill
-              className="object-contain"
-              priority={slug === "case"}
-              sizes="(max-width: 768px) 100vw, 75vw"
-            />
+    return (
+      <div className="relative w-full max-w-[1000px] aspect-[4/3] lg:aspect-video">
+        {/* Placeholder khi trống */}
+        {!hasAnySelection && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 z-0">
+            <span className="text-4xl opacity-20 mb-2">⌨️</span>
+            <p className="text-sm font-medium opacity-50">Chưa có linh kiện</p>
           </div>
-        );
-      })}
-    </div>
-  );
-});
+        )}
+
+        {/* VẼ TỪNG LỚP THEO THỨ TỰ CỐ ĐỊNH */}
+        {LAYER_ORDER.map((slug) => {
+          const part = selection[slug];
+          if (!part) return null;
+
+          const isHidden = slug === "switch" && hasKeycap;
+
+          return (
+            <div
+              key={slug}
+              className="absolute inset-0 pointer-events-none transition-opacity duration-300 ease-in-out"
+              style={{
+                zIndex: getZIndex(slug),
+                opacity: isHidden ? 0 : 1,
+              }}
+            >
+              <Image
+                src={part.layerImageUrl}
+                alt={part.name}
+                fill
+                className="object-contain"
+                priority={slug === "case"}
+                sizes="(max-width: 768px) 100vw, 75vw"
+              />
+            </div>
+          );
+        })}
+      </div>
+    );
+  },
+);
 Visualizer.displayName = "Visualizer";
 
-// 2. Component Product Item
+// --- ProductItem (adapted for BuilderProduct) ---
 const ProductItem = memo(
   ({
     product,
     isSelected,
     onClick,
   }: {
-    product: Product;
+    product: BuilderProduct;
     isSelected: boolean;
-    onClick: (p: Product) => void;
+    onClick: (p: BuilderProduct) => void;
   }) => (
     <div
       onClick={() => onClick(product)}
@@ -118,7 +100,7 @@ const ProductItem = memo(
       }
     `}
     >
-      <div className="w-22 h-22 bg-black rounded-lg  relative shrink-0 overflow-hidden">
+      <div className="w-22 h-22 bg-black rounded-lg relative shrink-0 overflow-hidden">
         <Image
           src={product.thumbnailUrl}
           alt={product.name}
@@ -138,21 +120,16 @@ const ProductItem = memo(
           {product.name}
         </h4>
         <div className="flex items-center gap-2 mt-1">
-          <span className="font-bold text-sm text-white">${product.price}</span>
-          {product.attributes &&
-            Object.entries(product.attributes)
-              .slice(0, 1)
-              .map(
-                ([k, v]) =>
-                  k !== "categoryId" && (
-                    <span
-                      key={k}
-                      className="text-[9px] uppercase font-bold bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded border border-gray-200"
-                    >
-                      {String(v)}
-                    </span>
-                  ),
-              )}
+          <span className="font-bold text-sm text-white">
+            {product.price > 0
+              ? `+${product.price.toLocaleString()}₫`
+              : "Included"}
+          </span>
+          {product.tags && (
+            <span className="text-[9px] uppercase font-bold bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded border border-gray-200">
+              {product.tags}
+            </span>
+          )}
         </div>
       </div>
 
@@ -184,129 +161,84 @@ const ProductItem = memo(
 );
 ProductItem.displayName = "ProductItem";
 
-// 3. Component None Item
-const NoneItem = memo(
-  ({ isSelected, onClick }: { isSelected: boolean; onClick: () => void }) => (
-    <div
-      onClick={onClick}
-      className={`
-    group cursor-pointer border-2 rounded-xl p-3 flex items-center gap-4 transition-all duration-200 select-none
-    ${
-      isSelected
-        ? "border-yellow-300 bg-black shadow-sm"
-        : "border-gray-200 hover:border-red-300 bg-black hover:shadow-md"
-    }
-  `}
-    >
-      {/* Container của ảnh */}
-      <div
-        className={`
-      w-16 h-16 rounded-lg flex items-center justify-center border shrink-0 transition-colors relative overflow-hidden
-      ${
-        isSelected
-          ? "border-yellow-300 bg-gray-900"
-          : "border-gray-100 bg-gray-50 group-hover:bg-red-50"
-      }
-    `}
-      >
-        <Image
-          src="https://res.cloudinary.com/doezwafgz/image/upload/v1766678625/None-removebg-preview_bnlaih.png"
-          alt="None"
-          fill
-          className="object-contain p-3"
-          sizes="64px"
-        />
-      </div>
+// --- KitCard (State 0 — Base Kit selection grid) ---
+const KitCard = memo(
+  ({ kit, onClick }: { kit: PartItem; onClick: (kit: PartItem) => void }) => {
+    const specs = kit.specifications ? JSON.parse(kit.specifications) : null;
 
-      <div className="flex-1">
-        <h4
-          className={`font-bold text-sm uppercase ${
-            isSelected ? "text-white" : "text-white"
-          }`}
-        >
-          None (Skip)
-        </h4>
-        <div className="text-[10px] text-gray-400 mt-1">
-          Không sử dụng linh kiện này
+    return (
+      <div
+        onClick={() => onClick(kit)}
+        className="group cursor-pointer border-2 border-gray-700 rounded-2xl bg-black/50 p-4 hover:border-yellow-400 transition-all duration-200 hover:shadow-xl hover:shadow-yellow-400/10"
+      >
+        <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-gray-900 mb-4">
+          {kit.thumbnailUrl ? (
+            <Image
+              src={kit.thumbnailUrl}
+              alt={kit.name}
+              fill
+              className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 50vw, 25vw"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-600">
+              <span className="text-5xl">⌨️</span>
+            </div>
+          )}
+        </div>
+        <h3 className="text-white font-bold text-lg uppercase tracking-tight truncate">
+          {kit.name}
+        </h3>
+        {kit.description && (
+          <p className="text-gray-400 text-xs mt-1 line-clamp-2">
+            {kit.description}
+          </p>
+        )}
+        <div className="flex items-center justify-between mt-3">
+          <span className="text-yellow-400 font-bold text-lg">
+            {kit.price.toLocaleString()}₫
+          </span>
+          {specs?.workflow && (
+            <span className="text-[10px] text-gray-500 uppercase font-medium">
+              {specs.workflow.length} steps
+            </span>
+          )}
         </div>
       </div>
-
-      <div
-        className={`w-5 h-5 rounded-full flex items-center justify-center border transition-all ${
-          isSelected
-            ? "bg-red-500 border-red-500 text-white"
-            : "border-gray-300"
-        }`}
-      >
-        {isSelected && (
-          <svg
-            className="w-3 h-3"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="3"
-              d="M5 13l4 4L19 7"
-            ></path>
-          </svg>
-        )}
-      </div>
-    </div>
-  ),
+    );
+  },
 );
-NoneItem.displayName = "NoneItem";
+KitCard.displayName = "KitCard";
 
-// --- MAIN PAGE ---
-export default function BuilderPage() {
-  const [loading, setLoading] = useState(true);
-  const [processing, setProcessing] = useState(false);
+// ============================================================
+// MAIN BUILDER CONTENT (Server-Driven UI)
+// ============================================================
+function BuilderContent() {
+  const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
 
-  const [session, setSession] = useState<BuilderSession | null>(null);
-  const [steps, setSteps] = useState<Category[]>([]);
-  const [activeSlug, setActiveSlug] = useState<string>("");
-  const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
-  const [selectedImages, setSelectedImages] = useState<Product[]>([]);
+  const {
+    loadingKits,
+    processing,
+    error,
+    baseKits,
+    session,
+    workflowSteps,
+    currentStepName,
+    currentProducts,
+  } = useAppSelector((state) => state.builder);
 
-  // Init Data
+  const shopId = searchParams.get("shopId");
+  const categoryId = searchParams.get("categoryId");
+
+  // State 0: Fetch kits on mount when no session exists
   useEffect(() => {
-    const init = async () => {
-      try {
-        const savedId = localStorage.getItem("builderSessionId") || undefined;
-        const [sessionData, stepsData] = await Promise.all([
-          BuilderService.initSession(savedId),
-          BuilderService.getAllSteps(),
-        ]);
+    if (!session && shopId && categoryId) {
+      dispatch(fetchBaseKits({ shopId, categoryId }));
+    }
+  }, [dispatch, session, shopId, categoryId]);
 
-        localStorage.setItem("builderSessionId", sessionData.session.id);
-        setSession(sessionData.session);
-
-        if (sessionData.selectedDetails) {
-          const imagesWithSlug = sessionData.selectedDetails.map(
-            (p: Product) => ({
-              ...p,
-              _tempSlug: p.category ? p.category.slug : "unknown",
-            }),
-          );
-          setSelectedImages(imagesWithSlug);
-        }
-
-        setSteps(stepsData);
-        if (stepsData.length > 0) {
-          fetchStepData(stepsData[0].slug);
-        }
-      } catch (error) {
-        console.error("Init Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
-  }, []);
-
-  // Khi danh sách sản phẩm (currentProducts) thay đổi, ta ngầm tải trước ảnh layer của chúng
+  // Preload layer images when currentProducts change
   useEffect(() => {
     if (currentProducts.length > 0) {
       currentProducts.forEach((product) => {
@@ -316,62 +248,25 @@ export default function BuilderPage() {
     }
   }, [currentProducts]);
 
-  const fetchStepData = async (slug: string) => {
-    if (slug === activeSlug) return;
-
-    setProcessing(true);
-    setActiveSlug(slug);
-    try {
-      const data = await BuilderService.getStepProducts(slug);
-      setCurrentProducts(data.products);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setProcessing(false);
-    }
+  // --- Handlers ---
+  const handleSelectKit = (kit: PartItem) => {
+    dispatch(startBuilderSession(kit.id));
   };
 
-  const handleSelect = async (product: Product | null) => {
-    if (!session) return;
-
-    // 1. Optimistic Update (Cập nhật UI ngay lập tức)
-    setSelectedImages((prev) => {
-      const others = prev.filter((img) => img._tempSlug !== activeSlug);
-      if (product) {
-        return [...others, { ...product, _tempSlug: activeSlug }];
-      } else {
-        return others;
-      }
-    });
-
-    // 2. Cập nhật Session State tạm thời (để hiện tick xanh ngay)
-    const newSelection = { ...session.selection };
-    if (product) {
-      newSelection[activeSlug] = product.id;
-    } else {
-      delete newSelection[activeSlug];
-    }
-
-    setSession({ ...session, selection: newSelection });
-
-    // 3. Gọi API Background
-    try {
-      const productIdToSend = product ? product.id : -1;
-      const data = await BuilderService.selectProduct(
-        session.id,
-        activeSlug,
-        productIdToSend,
-      );
-      setSession(data.session);
-    } catch (error) {
-      console.error("Lỗi lưu sản phẩm", error);
-    }
+  const handleSelectComponent = (product: BuilderProduct) => {
+    if (!session || !currentStepName) return;
+    dispatch(
+      selectBuilderComponent({
+        sessionId: session.id,
+        selectedPartId: product.partId,
+        stepName: currentStepName,
+      }),
+    );
   };
 
   const handleReset = () => {
     if (confirm("Reset toàn bộ cấu hình?")) {
-      localStorage.removeItem("builderSessionId");
-      window.location.reload();
+      dispatch(resetBuilder());
     }
   };
 
@@ -379,27 +274,198 @@ export default function BuilderPage() {
     window.location.href = "/";
   };
 
-  // Tính toán Nav Items để tránh render lại trong vòng lặp
+  // Navigation items for progress bar
   const navItems = useMemo(
     () =>
-      steps.map((step, index) => ({
-        ...step,
+      workflowSteps.map((stepName, index) => ({
+        name: stepName,
+        slug: stepName,
         index: index + 1,
-        isActive: activeSlug === step.slug,
-        isCompleted: session?.selection
-          ? !!session.selection[step.slug]
-          : false,
+        isActive: currentStepName === stepName,
+        isCompleted: session?.selection ? !!session.selection[stepName] : false,
       })),
-    [steps, activeSlug, session?.selection],
+    [workflowSteps, currentStepName, session],
   );
 
-  if (loading)
+  const currentStepIndex = workflowSteps.findIndex(
+    (s) => s === currentStepName,
+  );
+
+  // =============================================
+  // 🅰️ STATE 0: Kit Selection (no session)
+  // =============================================
+  if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-spin w-10 h-10 border-4 border-gray-200 border-t-black rounded-full"></div>
+      <div className="h-screen flex flex-col font-sans bg-gray-50 overflow-hidden text-slate-800">
+        {/* HEADER */}
+        <div className="h-16 bg-black flex items-center justify-between px-4 lg:px-8 shadow-lg z-50 shrink-0 text-white">
+          <div
+            onClick={handleLogoClick}
+            className="font-black text-xl tracking-tighter uppercase flex items-center gap-2 cursor-pointer select-none"
+          >
+            <span>Ameko</span>
+            <span className="text-blue-500">Lab</span>
+          </div>
+          <h1 className="text-sm font-bold uppercase tracking-wider text-gray-400">
+            Select Your Base Kit
+          </h1>
+          <div />
+        </div>
+
+        {/* KIT GRID */}
+        <div className="flex-1 overflow-y-auto bg-[#1a1a1a] p-6 lg:p-10">
+          {loadingKits ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="animate-spin w-10 h-10 border-4 border-gray-600 border-t-yellow-400 rounded-full"></div>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <p className="text-red-400 font-medium">{error}</p>
+              <button
+                onClick={() =>
+                  shopId &&
+                  categoryId &&
+                  dispatch(fetchBaseKits({ shopId, categoryId }))
+                }
+                className="px-4 py-2 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-300 transition-all"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-black text-white uppercase tracking-tight">
+                  Choose Your Kit
+                </h2>
+                <p className="text-gray-500 mt-2 text-sm">
+                  Select a base kit to start building your custom keyboard
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {baseKits.map((kit) => (
+                  <KitCard key={kit.id} kit={kit} onClick={handleSelectKit} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
+  }
 
+  // =============================================
+  // STATE 2: Summary (isComplete === true)
+  // =============================================
+  if (session.isComplete) {
+    const selectionEntries = Object.entries(session.selection);
+
+    return (
+      <div className="h-screen flex flex-col font-sans bg-gray-50 overflow-hidden text-slate-800">
+        {/* HEADER */}
+        <div className="h-16 bg-black flex items-center justify-between px-4 lg:px-8 shadow-lg z-50 shrink-0 text-white">
+          <div
+            onClick={handleLogoClick}
+            className="font-black text-xl tracking-tighter uppercase flex items-center gap-2 cursor-pointer select-none"
+          >
+            <span>Ameko</span>
+            <span className="text-blue-500">Lab</span>
+          </div>
+          <h1 className="text-sm font-bold uppercase tracking-wider text-green-400">
+            ✓ Build Complete
+          </h1>
+          <div />
+        </div>
+
+        {/* SUMMARY CONTENT */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* LEFT: Final Preview */}
+          <div
+            className="w-full lg:w-2/3 bg-cover bg-center bg-no-repeat relative flex items-center justify-center p-4"
+            style={{
+              backgroundImage:
+                "url('https://res.cloudinary.com/doezwafgz/image/upload/v1766677524/background_teui0y.png')",
+              backgroundColor: "#1a1a1a",
+            }}
+          >
+            <div className="absolute inset-0 bg-black/30 pointer-events-none z-0"></div>
+            <Visualizer selection={session.selection} />
+          </div>
+
+          {/* RIGHT: BOM + Actions */}
+          <div className="hidden lg:flex w-1/3 bg-black flex-col z-10 shadow-2xl">
+            <div className="p-6 shrink-0 border-b border-gray-800">
+              <h2 className="text-2xl font-black uppercase text-white tracking-tight">
+                Your Build
+              </h2>
+              <p className="text-gray-500 text-xs mt-1">Bill of Materials</p>
+            </div>
+
+            {/* BOM List */}
+            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+              <div className="space-y-3">
+                {selectionEntries.map(([stepName, part]) => (
+                  <div
+                    key={stepName}
+                    className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-xl border border-gray-800"
+                  >
+                    <div className="w-14 h-14 bg-black rounded-lg relative shrink-0 overflow-hidden">
+                      <Image
+                        src={part.thumbnailUrl}
+                        alt={part.name}
+                        fill
+                        className="object-contain p-1"
+                        sizes="56px"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[10px] text-gray-500 uppercase font-bold">
+                        {stepName}
+                      </div>
+                      <h4 className="text-white font-bold text-sm truncate">
+                        {part.name}
+                      </h4>
+                      <div className="text-gray-400 text-xs">
+                        ×{part.quantity} —{" "}
+                        {part.price > 0
+                          ? `+${(part.price * part.quantity).toLocaleString()}₫`
+                          : "Included"}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Total + Add to Cart */}
+            <div className="p-4 bg-black shrink-0 border-t border-gray-800">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-gray-400 font-bold uppercase text-sm">
+                  Total
+                </span>
+                <span className="text-yellow-400 font-black text-2xl">
+                  {session.totalPrice.toLocaleString()}₫
+                </span>
+              </div>
+              <button className="w-full py-3.5 bg-yellow-400 text-black font-bold uppercase text-sm rounded-lg hover:bg-yellow-300 transition-all shadow-lg active:translate-y-[1px]">
+                Add to Cart
+              </button>
+              <button
+                onClick={handleReset}
+                className="w-full mt-2 py-2.5 text-gray-400 font-bold uppercase text-xs border border-gray-700 rounded-lg hover:text-white hover:border-gray-500 transition-all"
+              >
+                Build Another
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =============================================
+  // 🅱️ STATE 1: Builder Workspace (session exists, not complete)
+  // =============================================
   return (
     <div className="h-screen flex flex-col font-sans bg-gray-50 overflow-hidden text-slate-800">
       {/* HEADER */}
@@ -412,18 +478,18 @@ export default function BuilderPage() {
           <span className="text-blue-500">Lab</span>
         </div>
 
-        {/* Navigation Bar */}
+        {/* Navigation Bar (Progress Steps) */}
         <div className="flex-1 flex items-center justify-start lg:justify-center gap-0 h-full overflow-x-auto custom-scrollbar">
           {navItems.map((step) => (
             <button
-              key={step.id}
-              onClick={() => fetchStepData(step.slug)}
+              key={step.slug}
+              disabled
               className={`
-                    relative h-full px-4 lg:px-6 flex items-center justify-center gap-2 uppercase font-bold text-[10px] lg:text-xs tracking-wider transition-all whitespace-nowrap
+                    relative h-full px-4 lg:px-6 flex items-center justify-center gap-2 uppercase font-bold text-[10px] lg:text-xs tracking-wider transition-all whitespace-nowrap cursor-default
                     ${
                       step.isActive
                         ? "text-yellow-400 border-b-4 border-yellow-400 bg-white/5"
-                        : "text-gray-400 hover:text-white hover:bg-white/5 border-b-4 border-transparent"
+                        : "text-gray-400 border-b-4 border-transparent"
                     }
                   `}
             >
@@ -431,15 +497,14 @@ export default function BuilderPage() {
                 className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] border ${
                   step.isActive
                     ? "border-yellow-400 text-yellow-400"
-                    : "border-gray-500 text-gray-500"
+                    : step.isCompleted
+                      ? "border-green-500 text-green-500"
+                      : "border-gray-500 text-gray-500"
                 }`}
               >
-                {step.index}
+                {step.isCompleted && !step.isActive ? "✓" : step.index}
               </span>
               {step.name}
-              {step.isCompleted && !step.isActive && (
-                <span className="text-green-500 font-bold">✓</span>
-              )}
             </button>
           ))}
         </div>
@@ -450,7 +515,7 @@ export default function BuilderPage() {
               Total Est.
             </div>
             <div className="text-white font-bold text-lg leading-none">
-              ${session?.totalPrice || 0}
+              {session.totalPrice.toLocaleString()}₫
             </div>
           </div>
           <button
@@ -479,20 +544,19 @@ export default function BuilderPage() {
             Visualizer Preview
           </div>
 
-          <Visualizer images={selectedImages} />
+          <Visualizer selection={session.selection} />
         </div>
 
         {/* RIGHT COLUMN: CONFIGURATOR */}
-        <div className="hidden lg:flex w-1/3 bg-black  flex-col z-10 shadow-2xl">
-          <div className="p-6  shrink-0">
+        <div className="hidden lg:flex w-1/3 bg-black flex-col z-10 shadow-2xl">
+          <div className="p-6 shrink-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-bold text-white bg-black px-2 py-0.5 rounded uppercase">
-                Step {steps.findIndex((s) => s.slug === activeSlug) + 1}
+                Step {currentStepIndex + 1}
               </span>
             </div>
-            <h2 className="text-2xl font-black uppercase text-slate-800 tracking-tight">
-              {steps.find((s) => s.slug === activeSlug)?.name ||
-                "Select Component"}
+            <h2 className="text-2xl font-black uppercase text-white tracking-tight">
+              {currentStepName || "Select Component"}
             </h2>
           </div>
 
@@ -507,65 +571,37 @@ export default function BuilderPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-3">
-                {/* None Item */}
-                <NoneItem
-                  isSelected={!session?.selection[activeSlug]}
-                  onClick={() => handleSelect(null)}
-                />
-
-                {/* Product Items */}
                 {currentProducts.map((product) => (
                   <ProductItem
-                    key={product.id}
+                    key={product.optionId}
                     product={product}
-                    isSelected={session?.selection[activeSlug] === product.id}
-                    onClick={handleSelect}
+                    isSelected={
+                      session.selection[currentStepName || ""]?.id ===
+                      product.partId
+                    }
+                    onClick={handleSelectComponent}
                   />
                 ))}
               </div>
             )}
           </div>
-
-          {/* FOOTER NAVIGATION */}
-          <div className="p-4 bg-black shrink-0 border-t border-gray-800 flex items-center gap-3">
-            {/* NÚT BACK */}
-            <button
-              onClick={() => {
-                const currIdx = steps.findIndex((s) => s.slug === activeSlug);
-                if (currIdx > 0) fetchStepData(steps[currIdx - 1].slug);
-              }}
-              disabled={steps.findIndex((s) => s.slug === activeSlug) === 0}
-              className={`
-                flex-1 py-3.5 font-bold uppercase text-sm rounded-lg transition-all shadow-lg active:translate-y-[1px] border
-                ${
-                  steps.findIndex((s) => s.slug === activeSlug) === 0
-                    ? "bg-black text-gray-600 border-gray-800 cursor-not-allowed"
-                    : "bg-black text-white border-gray-600 hover:bg-gray-800 hover:border-gray-500"
-                }
-              `}
-            >
-              &larr; Back
-            </button>
-
-            {/* NÚT NEXT */}
-            <button
-              onClick={() => {
-                const currIdx = steps.findIndex((s) => s.slug === activeSlug);
-                if (currIdx < steps.length - 1)
-                  fetchStepData(steps[currIdx + 1].slug);
-                else alert("Hoàn tất! Bạn có thể thêm vào giỏ hàng ngay.");
-              }}
-              className="flex-1 py-3.5 bg-yellow-400 text-black font-bold uppercase text-sm rounded-lg hover:bg-yellow-300 transition-all shadow-lg active:translate-y-[1px]"
-            >
-              {steps.findIndex((s) => s.slug === activeSlug) ===
-              steps.length - 1
-                ? "Finish"
-                : "Next Step"}{" "}
-              &rarr;
-            </button>
-          </div>
         </div>
       </div>
     </div>
+  );
+}
+
+// --- MAIN EXPORT (Suspense boundary for useSearchParams) ---
+export default function BuilderPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="animate-spin w-10 h-10 border-4 border-gray-200 border-t-black rounded-full"></div>
+        </div>
+      }
+    >
+      <BuilderContent />
+    </Suspense>
   );
 }

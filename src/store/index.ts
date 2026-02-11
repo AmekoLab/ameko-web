@@ -6,6 +6,7 @@ import adminUsersReducer from "./slices/adminUsersSlice";
 import categoriesReducer from "./slices/categoriesSlice";
 import partsReducer from "./slices/partsSlice";
 import assembledProductsReducer from "./slices/assembledProductsSlice";
+import builderReducer from "./slices/builderSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     categories: categoriesReducer,
     parts: partsReducer,
     assembledProducts: assembledProductsReducer,
+    builder: builderReducer,
   },
 });
 export type RootState = ReturnType<typeof store.getState>;
