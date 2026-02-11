@@ -7,32 +7,32 @@ import { ProfileService } from "@/src/services/profile.service";
 import { CommunityService } from "@/src/services/community.service";
 
 interface PageProps {
-  params: Promise<{ username: string }>;
+  params: Promise<{ id: string }>;
 }
 
 // TODO: [SEO] Tạo metadata động theo tên Shop/User
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { username } = await params;
+  const { id } = await params;
 
-  const profile = await ProfileService.getProfile(username);
+  const profile = await ProfileService.getProfile(id);
   if (!profile) return { title: "Profile Not Found" };
 
   return {
     title: "AMEKO - " + profile.displayName,
-    description: profile.bio,
+    description: profile.bio || "Shop profile on AMEKO",
     openGraph: {
-      images: [profile.coverImage],
+      images: profile.coverImage ? [profile.coverImage] : [],
     },
   };
 }
 
 export default async function ProfilePage({ params }: PageProps) {
-  const { username } = await params;
+  const { id } = await params;
 
   // 1. Fetch dữ liệu Profile trên Server
-  const profileData = ProfileService.getProfile(username);
+  const profileData = ProfileService.getProfile(id);
   const postsData = CommunityService.getPosts(1);
 
   const [profile, posts] = await Promise.all([profileData, postsData]);

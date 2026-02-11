@@ -22,7 +22,7 @@ export interface UserProfile {
 }
 
 export interface Product {
-  id: number;
+  id: string;
   name: string;
   price: string;
   image: string;

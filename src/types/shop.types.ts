@@ -45,6 +45,18 @@ export interface ShopResponse {
   createdAt: string;
 }
 
+// Public shop profile (from GET /shops/{id}) — lighter than ShopResponse
+export interface ShopPublicProfile {
+  id: string;
+  shopName: string;
+  bio: string;
+  logoUrl: string;
+  bannerUrl: string;
+  rating: number;
+  totalSales: number;
+  createdAt: string;
+}
+
 export interface ApproveShopPayload {
   shopId: string;
   status: ShopStatus;

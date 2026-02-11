@@ -1,62 +1,89 @@
 import { UserProfile, Product, ReviewStats, Review } from "@/src/types/profile";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://localhost:5001/api/v1";
+
 export const ProfileService = {
   /**
-   * Lấy thông tin chi tiết Profile theo username
+   * Lấy thông tin chi tiết Profile theo username (shop ID)
+   * Calls GET /api/v1/shops/{id}
    */
   getProfile: async (username: string): Promise<UserProfile | null> => {
-    // TODO: [API] GET /api/users/{username}
-    // const res = await fetch(`${API_URL}/users/${username}`);
+    try {
+      const res = await fetch(`${API_URL}/shops/${username}`, {
+        next: { revalidate: 60 },
+      });
 
-    await new Promise((resolve) => setTimeout(resolve, 500)); // Mock delay
+      if (!res.ok) return null;
 
-    // Mock Data
-    return {
-      id: "u1",
-      username: username,
-      displayName: "Tín Dev Keycaps",
-      avatar:
-        "https://res.cloudinary.com/doezwafgz/image/upload/v1765602783/a0a1d1831b40575009c07fad4634ef52_y23lze.jpg",
-      coverImage:
-        "https://res.cloudinary.com/doezwafgz/image/upload/v1765551038/CHERRY-XTRFY_-MX-101_frontpage-1_hwu37j.jpg",
-      bio: "Chuyên Build phím cơ custom, nhận lube switch, rã hàn, mod stab tại Hà Nội. Đại lý chính hãng AMEKO.",
-      location: "Hà Nội, Việt Nam",
-      joinDate: "October 2023",
-      role: "Verified Shop",
-      reputation: 4.9,
-      followers: 1250,
-      following: 45,
-      skills: ["Lubing", "Soldering", "Modding", "Assembly"],
-      socials: [
-        { platform: "facebook", url: "#" },
-        { platform: "shopee", url: "#" },
-        { platform: "website", url: "#" },
-      ],
-      isMe: false, // TODO: [AUTH] So sánh id của profile với id user đang login
-    };
+      const json = await res.json();
+      if (!json.success || !json.data) return null;
+
+      const shop = json.data;
+
+      return {
+        id: shop.id,
+        username: shop.shopName?.toLowerCase().replace(/\s+/g, "-") || shop.id,
+        displayName: shop.shopName,
+        avatar: shop.logoUrl || "",
+        coverImage: shop.bannerUrl || "",
+        bio: shop.bio || "",
+        location: "", // Not available from API yet
+        joinDate: shop.createdAt
+          ? new Date(shop.createdAt).toLocaleDateString("en-US", {
+              month: "long",
+              year: "numeric",
+            })
+          : "",
+        role: "Verified Shop",
+        reputation: shop.rating ?? 0,
+        followers: 0, // TODO: [API] Follow API not ready
+        following: 0, // TODO: [API] Follow API not ready
+        skills: [], // TODO: [API] Not available from API yet
+        socials: [], // TODO: [API] Not available from API yet
+        isMe: false, // TODO: [AUTH] Compare with current user
+      };
+    } catch (error) {
+      console.error("Failed to fetch shop profile:", error);
+      return null;
+    }
   },
 
   /**
    * Lấy danh sách sản phẩm của Shop
+   * Calls GET /api/v1/AssembledProduct/shop/{shopId}
    */
-  getShopProducts: async (userId: string): Promise<Product[]> => {
-    // TODO: [API] GET /api/users/{userId}/products
+  getShopProducts: async (shopId: string): Promise<Product[]> => {
+    try {
+      const res = await fetch(
+        `${API_URL}/AssembledProduct/shop/${shopId}?CurrentPage=1&PageSize=50`,
+      );
 
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    return Array.from({ length: 8 }).map((_, i) => ({
-      id: i,
-      name:
-        i % 2 === 0
-          ? "GMK Red Samurai Base Kit"
-          : "Gateron Oil King Switch (Pack 10)",
-      price: i % 2 === 0 ? "3.200.000₫" : "150.000₫",
-      image:
-        i % 2 === 0
-          ? "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/456_qcrwfk.png"
-          : "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/produc1_jc0ojq.png",
-      category: i % 2 === 0 ? "Keycap" : "Switch",
-      status: i === 0 ? "Group Buy" : "In Stock",
-    }));
+      if (!res.ok) return [];
+
+      const json = await res.json();
+      if (!json.success || !json.data) return [];
+
+      // API returns flat array: data: [...]
+      const items = Array.isArray(json.data)
+        ? json.data
+        : json.data.items || [];
+
+      return items.map((item: any, i: number) => ({
+        id: item.id || i,
+        name: item.name || "Untitled Product",
+        price: item.price
+          ? `${item.price.toLocaleString("vi-VN")}₫`
+          : "Contact",
+        image: item.image1 || item.image2 || item.image3 || "",
+        category: item.layout || "Keyboard",
+        status:
+          item.quantity != null && item.quantity > 0 ? "In Stock" : "Sold Out",
+      }));
+    } catch (error) {
+      console.error("Failed to fetch shop products:", error);
+      return [];
+    }
   },
 
   getReviewStats: async (userId: string): Promise<ReviewStats> => {

@@ -7,8 +7,10 @@ import { Post } from "@/src/types/community";
 import { ProfileSidebar } from "./ProfileSidebar";
 import FeedClient from "../Community/FeedClient";
 import { ProfileService } from "@/src/services/profile.service";
+import { assembledProductService } from "@/src/services/assembledProduct.service";
 import { ProductCard } from "./ProductCard";
 import { Review, ReviewStats as IReviewStats } from "@/src/types/profile";
+import { AssembledProductItem } from "@/src/types/assembledProduct.types";
 import {
   List,
   Image as ImageIcon,
@@ -46,7 +48,7 @@ export const ProfileView: FC<{
       // scroll: false để không bị nhảy trang lên đầu
       router.replace(`?tab=${tab}`, { scroll: false });
     },
-    [router]
+    [router],
   );
 
   // Lazy load products
@@ -60,10 +62,27 @@ export const ProfileView: FC<{
         setLoadingShop(true);
 
         try {
-          const data = await ProfileService.getShopProducts(profile.id);
+          const res = await assembledProductService.getAssembledProductsByShop(
+            profile.id,
+          );
+          const items: AssembledProductItem[] = Array.isArray(res.data)
+            ? res.data
+            : [];
+          const mapped = items.map((item) => ({
+            id: item.id,
+            name: item.name || "Untitled Product",
+            price: item.price
+              ? `${item.price.toLocaleString("vi-VN")}₫`
+              : "Contact",
+            image: item.image1 || item.image2 || item.image3 || "",
+            category: item.layout || "Keyboard",
+            status: (item.quantity != null && item.quantity > 0
+              ? "In Stock"
+              : "Sold Out") as Product["status"],
+          }));
           // Chỉ update state nếu component còn mounted và chưa bị hủy
           if (!ignore) {
-            setProducts(data);
+            setProducts(mapped);
             setHasFetchedShop(true);
           }
         } catch (error) {
@@ -161,7 +180,7 @@ export const ProfileView: FC<{
                   "flex items-center gap-2 px-6 py-4 text-sm font-bold uppercase tracking-wide whitespace-nowrap border-b-2 transition-colors outline-none",
                   currentTab === tab.id
                     ? "border-[#ce2a32] text-[#ce2a32]"
-                    : "border-transparent text-gray-500 hover:text-black hover:bg-gray-50"
+                    : "border-transparent text-gray-500 hover:text-black hover:bg-gray-50",
                 )}
               >
                 <tab.icon className="w-4 h-4" />

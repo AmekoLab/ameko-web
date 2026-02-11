@@ -25,6 +25,7 @@ export default function Sidebar({ role = "staff" }) {
 
   const shopMenu = [
     { name: "Dashboard", path: "/shop/dashboard" },
+    { name: "Shop Profile", path: "/shop/profile" },
     { name: "Categories", path: "/shop/categories" },
     { name: "Parts", path: "/shop/parts" },
     { name: "Assembled Products", path: "/shop/assembled-products" },

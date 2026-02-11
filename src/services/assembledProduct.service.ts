@@ -68,4 +68,19 @@ export const assembledProductService = {
       `/AssembledProduct/restore/${id}`,
     );
   },
+
+  /**
+   * Get assembled products by shop ID (public).
+   * GET /AssembledProduct/shop/{shopId}
+   * Returns a flat array, not paginated.
+   */
+  getAssembledProductsByShop: async (
+    shopId: string,
+    page: number = 1,
+    pageSize: number = 50,
+  ) => {
+    return api.get<unknown, ApiResponse<AssembledProductItem[]>>(
+      `/AssembledProduct/shop/${shopId}?CurrentPage=${page}&PageSize=${pageSize}`,
+    );
+  },
 };

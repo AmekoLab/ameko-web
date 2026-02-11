@@ -7,6 +7,7 @@ import {
   MessageCircle,
   UserPlus,
   Settings,
+  Wrench,
 } from "lucide-react";
 import { UserProfile } from "@/src/types/profile";
 import { ImageModal } from "../Community/ImageModal";
@@ -123,6 +124,9 @@ export const ProfileHeader: FC<{ profile: UserProfile }> = ({ profile }) => {
                 <button className="flex items-center gap-2 px-6 py-2 bg-black text-white hover:bg-[#ce2a32] font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm">
                   <UserPlus className="w-4 h-4" /> Follow
                   {/* TODO: [API] Gọi API Follow user */}
+                </button>
+                <button className="flex items-center gap-2 px-6 py-2 bg-[#ce2a32] text-white hover:bg-[#b02028] font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm">
+                  <Wrench className="w-4 h-4" /> Customize
                 </button>
                 <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-black font-bold text-sm rounded-sm transition-colors">
                   <MessageCircle className="w-4 h-4" /> Chat

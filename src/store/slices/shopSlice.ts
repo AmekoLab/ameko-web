@@ -133,6 +133,41 @@ export const updateShopProfile = createAsyncThunk(
   },
 );
 
+// --- 5b. THUNK: PATCH SHOP PROFILE (dùng cho trang Shop Dashboard) ---
+export const patchShopProfile = createAsyncThunk(
+  "shop/patchProfile",
+  async (data: UpdateShopFormValues, { rejectWithValue, dispatch }) => {
+    try {
+      const formData = new FormData();
+      formData.append("ShopName", data.shopName);
+      formData.append("BankName", data.bankName);
+      formData.append("Bio", data.bio || "");
+      formData.append("Address", data.address);
+      formData.append("PhoneNumber", data.phoneNumber);
+      formData.append("BankAccountNumber", data.bankAccountNumber);
+      formData.append("BankAccountName", data.bankAccountName);
+      formData.append("ContactEmail", data.contactEmail);
+
+      if (data.bannerImage && data.bannerImage.length > 0) {
+        formData.append("BannerImage", data.bannerImage[0]);
+      }
+      if (data.logoImage && data.logoImage.length > 0) {
+        formData.append("LogoImage", data.logoImage[0]);
+      }
+
+      const response = await shopService.patchShopProfile(formData);
+
+      await dispatch(fetchCurrentShop());
+
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data || { message: error.message },
+      );
+    }
+  },
+);
+
 // --- 6. THUNK: BAN SHOP ---
 export const adminBanShop = createAsyncThunk(
   "shop/adminBan",
@@ -271,6 +306,22 @@ const shopSlice = createSlice({
       })
       .addCase(
         updateShopProfile.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.loading = false;
+          state.error = action.payload?.message || "Cập nhật Shop thất bại";
+        },
+      )
+
+      // 5b. Patch Shop Profile
+      .addCase(patchShopProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(patchShopProfile.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(
+        patchShopProfile.rejected,
         (state, action: PayloadAction<any>) => {
           state.loading = false;
           state.error = action.payload?.message || "Cập nhật Shop thất bại";

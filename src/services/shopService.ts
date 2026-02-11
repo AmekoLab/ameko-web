@@ -3,6 +3,7 @@ import { ApiResponse } from "@/src/types/auth.types";
 import {
   AdminShopListResponse,
   ApproveShopPayload,
+  ShopPublicProfile,
   ShopResponse,
 } from "@/src/types/shop.types";
 
@@ -46,6 +47,18 @@ export const shopService = {
         "Content-Type": "multipart/form-data",
       },
     });
+  },
+
+  patchShopProfile: async (formData: FormData) => {
+    return api.patch<any, ApiResponse<null>>("/shops/profile", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
+
+  getShopById: async (shopId: string) => {
+    return api.get<any, ApiResponse<ShopPublicProfile>>(`/shops/${shopId}`);
   },
 
   banShop: async (shopId: string) => {
