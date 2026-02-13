@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, memo, Suspense } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  memo,
+  Suspense,
+} from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
@@ -8,7 +15,11 @@ import {
   fetchBaseKits,
   startBuilderSession,
   selectBuilderComponent,
+  removeBuilderComponent,
   resetBuilder,
+  setActiveStep,
+  optimisticSelect,
+  optimisticRemove,
 } from "@/src/store/slices/builderSlice";
 import { BuilderProduct, SelectedPart } from "@/src/types/builder";
 import { PartItem } from "@/src/types/part.types";
@@ -29,15 +40,62 @@ const getZIndex = (categorySlug?: string) => {
 // --- LAYER ORDER (bottom → top) ---
 const LAYER_ORDER = ["case", "pcb", "plate", "switch", "keycap"];
 
-// --- Visualizer (layer stacking from session.selection) ---
+// --- Visualizer (layer stacking with silent preload + crossfade) ---
 const Visualizer = memo(
   ({ selection }: { selection: Record<string, SelectedPart> }) => {
-    const hasKeycap = !!selection["keycap"];
     const hasAnySelection = Object.keys(selection).length > 0;
+
+    // For each layer slot, keep the *displayed* image URL in local state.
+    // When selection changes we preload silently, then swap — old image stays
+    // visible the entire time, preventing flashes / blank frames.
+    const [displayed, setDisplayed] = useState<
+      Record<string, { url: string; name: string }>
+    >({});
+
+    useEffect(() => {
+      let cancelled = false;
+
+      LAYER_ORDER.forEach((slug) => {
+        const part = selection[slug];
+
+        if (!part) {
+          // Part removed — clear immediately
+          setDisplayed((prev) => {
+            if (!prev[slug]) return prev;
+            const next = { ...prev };
+            delete next[slug];
+            return next;
+          });
+          return;
+        }
+
+        // Already showing this exact URL — nothing to do
+        setDisplayed((prev) => {
+          if (prev[slug]?.url === part.layerImageUrl) return prev;
+          // Silently preload in the background
+          const img = new window.Image();
+          img.src = part.layerImageUrl;
+          img.onload = () => {
+            if (cancelled) return;
+            setDisplayed((p) => ({
+              ...p,
+              [slug]: { url: part.layerImageUrl, name: part.name },
+            }));
+          };
+          return prev; // keep old image visible while loading
+        });
+      });
+
+      return () => {
+        cancelled = true;
+      };
+    }, [selection]);
+
+    const hasKeycap = !!displayed["keycap"];
 
     return (
       <div className="relative w-full max-w-[1000px] aspect-[4/3] lg:aspect-video">
-        {/* Placeholder khi trống */}
+        {/* Placeholder when empty */}
         {!hasAnySelection && (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 z-0">
             <span className="text-4xl opacity-20 mb-2">⌨️</span>
@@ -45,10 +103,10 @@ const Visualizer = memo(
           </div>
         )}
 
-        {/* VẼ TỪNG LỚP THEO THỨ TỰ CỐ ĐỊNH */}
+        {/* Layer stack — each slot always mounted, src swaps on preload complete */}
         {LAYER_ORDER.map((slug) => {
-          const part = selection[slug];
-          if (!part) return null;
+          const layer = displayed[slug];
+          if (!layer) return null;
 
           const isHidden = slug === "switch" && hasKeycap;
 
@@ -62,10 +120,10 @@ const Visualizer = memo(
               }}
             >
               <Image
-                src={part.layerImageUrl}
-                alt={part.name}
+                src={layer.url}
+                alt={layer.name}
                 fill
-                className="object-contain"
+                className="object-contain transition-opacity duration-300 ease-in-out"
                 priority={slug === "case"}
                 sizes="(max-width: 768px) 100vw, 75vw"
               />
@@ -78,27 +136,31 @@ const Visualizer = memo(
 );
 Visualizer.displayName = "Visualizer";
 
-// --- ProductItem (adapted for BuilderProduct) ---
+// --- ProductItem (with hover preload + animated selection) ---
 const ProductItem = memo(
   ({
     product,
     isSelected,
     onClick,
+    onHover,
   }: {
     product: BuilderProduct;
     isSelected: boolean;
     onClick: (p: BuilderProduct) => void;
+    onHover?: (p: BuilderProduct) => void;
   }) => (
     <div
       onClick={() => onClick(product)}
+      onMouseEnter={() => onHover?.(product)}
       className={`
-      group cursor-pointer border-2 rounded-xl p-3 flex items-center gap-4 transition-all duration-200 select-none
-      ${
-        isSelected
-          ? "border-yellow-300 bg-black-50/50 shadow-sm"
-          : " bg-black-50/50 shadow-sm hover:shadow-md"
-      }
-    `}
+        group cursor-pointer border-2 rounded-xl p-3 flex items-center gap-4 select-none
+        transition-all duration-300 ease-out
+        ${
+          isSelected
+            ? "border-yellow-400 bg-yellow-400/5 shadow-md shadow-yellow-400/10 scale-[1.01]"
+            : "border-gray-700/50 bg-black/30 shadow-sm hover:shadow-md hover:border-gray-500 hover:scale-[1.005]"
+        }
+      `}
     >
       <div className="w-22 h-22 bg-black rounded-lg relative shrink-0 overflow-hidden">
         <Image
@@ -113,8 +175,8 @@ const ProductItem = memo(
 
       <div className="flex-1 min-w-0">
         <h4
-          className={`font-bold text-sm truncate ${
-            isSelected ? "text-white" : "text-white"
+          className={`font-bold text-sm truncate transition-colors duration-200 ${
+            isSelected ? "text-yellow-400" : "text-white"
           }`}
         >
           {product.name}
@@ -134,10 +196,10 @@ const ProductItem = memo(
       </div>
 
       <div
-        className={`w-5 h-5 rounded-full flex items-center justify-center border transition-all ${
+        className={`w-5 h-5 rounded-full flex items-center justify-center border transition-all duration-300 ${
           isSelected
-            ? "bg-blue-600 border-blue-600 text-white"
-            : "border-gray-300 group-hover:border-slate-400"
+            ? "bg-yellow-400 border-yellow-400 text-black scale-110"
+            : "border-gray-600 group-hover:border-gray-400 scale-100"
         }`}
       >
         {isSelected && (
@@ -160,6 +222,74 @@ const ProductItem = memo(
   ),
 );
 ProductItem.displayName = "ProductItem";
+
+// --- NoneCard (Deselect card — animated styling) ---
+const NoneCard = memo(
+  ({ isSelected, onClick }: { isSelected: boolean; onClick: () => void }) => (
+    <div
+      onClick={onClick}
+      className={`
+        group cursor-pointer border-2 rounded-xl p-3 flex items-center gap-4 select-none
+        transition-all duration-300 ease-out
+        ${
+          isSelected
+            ? "border-yellow-400 bg-yellow-400/5 shadow-md shadow-yellow-400/10 scale-[1.01]"
+            : "border-gray-700/50 bg-black/30 shadow-sm hover:shadow-md hover:border-gray-500 hover:scale-[1.005]"
+        }
+      `}
+    >
+      <div className="w-22 h-22 bg-gray-900 rounded-lg flex items-center justify-center shrink-0">
+        <svg
+          className="w-8 h-8 text-gray-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+          />
+        </svg>
+      </div>
+      <div className="flex-1 min-w-0">
+        <h4
+          className={`font-bold text-sm ${
+            isSelected ? "text-yellow-400" : "text-white"
+          }`}
+        >
+          None
+        </h4>
+        <span className="text-xs text-gray-500">Deselect this step</span>
+      </div>
+      <div
+        className={`w-5 h-5 rounded-full flex items-center justify-center border transition-all duration-300 ${
+          isSelected
+            ? "bg-yellow-400 border-yellow-400 text-black scale-110"
+            : "border-gray-600 group-hover:border-gray-400 scale-100"
+        }`}
+      >
+        {isSelected && (
+          <svg
+            className="w-3 h-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="3"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        )}
+      </div>
+    </div>
+  ),
+);
+NoneCard.displayName = "NoneCard";
 
 // --- KitCard (State 0 — Base Kit selection grid) ---
 const KitCard = memo(
@@ -226,19 +356,19 @@ function BuilderContent() {
     workflowSteps,
     currentStepName,
     currentProducts,
+    stepProducts,
   } = useAppSelector((state) => state.builder);
 
   const shopId = searchParams.get("shopId");
-  const categoryId = searchParams.get("categoryId");
 
   // State 0: Fetch kits on mount when no session exists
   useEffect(() => {
-    if (!session && shopId && categoryId) {
-      dispatch(fetchBaseKits({ shopId, categoryId }));
+    if (!session && shopId) {
+      dispatch(fetchBaseKits(shopId));
     }
-  }, [dispatch, session, shopId, categoryId]);
+  }, [dispatch, session, shopId]);
 
-  // Preload layer images when currentProducts change
+  // Preload current step's layer images
   useEffect(() => {
     if (currentProducts.length > 0) {
       currentProducts.forEach((product) => {
@@ -248,44 +378,118 @@ function BuilderContent() {
     }
   }, [currentProducts]);
 
+  // Preload NEXT step's thumbnails in the background
+  useEffect(() => {
+    if (!currentStepName || currentStepName === "summary") return;
+    const idx = workflowSteps.indexOf(currentStepName);
+    if (idx < 0 || idx >= workflowSteps.length - 1) return;
+    const nextStepName = workflowSteps[idx + 1];
+    const nextProducts = stepProducts[nextStepName];
+    if (nextProducts) {
+      nextProducts.forEach((p) => {
+        const img = new window.Image();
+        img.src = p.thumbnailUrl;
+      });
+    }
+  }, [currentStepName, workflowSteps, stepProducts]);
+
   // --- Handlers ---
-  const handleSelectKit = (kit: PartItem) => {
-    dispatch(startBuilderSession(kit.id));
-  };
+  const handleSelectKit = useCallback(
+    (kit: PartItem) => {
+      dispatch(startBuilderSession(kit.id));
+    },
+    [dispatch],
+  );
 
-  const handleSelectComponent = (product: BuilderProduct) => {
-    if (!session || !currentStepName) return;
-    dispatch(
-      selectBuilderComponent({
-        sessionId: session.id,
-        selectedPartId: product.partId,
-        stepName: currentStepName,
-      }),
-    );
-  };
+  const handleSelectComponent = useCallback(
+    (product: BuilderProduct) => {
+      if (!session || !currentStepName || processing) return;
+      if (session.selection[currentStepName]?.id === product.partId) return;
 
-  const handleReset = () => {
+      // Optimistic: apply instantly
+      dispatch(optimisticSelect({ stepName: currentStepName, product }));
+
+      // Fire API
+      dispatch(
+        selectBuilderComponent({
+          sessionId: session.id,
+          selectedPartId: product.partId,
+          stepName: currentStepName,
+        }),
+      );
+    },
+    [dispatch, session, currentStepName, processing],
+  );
+
+  const handleRemoveComponent = useCallback(
+    (stepName: string) => {
+      if (!session || processing) return;
+
+      // Optimistic: clear instantly
+      dispatch(optimisticRemove(stepName));
+
+      // Fire API
+      dispatch(
+        removeBuilderComponent({
+          sessionId: session.id,
+          stepName,
+        }),
+      );
+    },
+    [dispatch, session, processing],
+  );
+
+  // Hover preload: preload layerImageUrl so visualizer updates instantly on click
+  const handleProductHover = useCallback((product: BuilderProduct) => {
+    const img = new window.Image();
+    img.src = product.layerImageUrl;
+  }, []);
+
+  const handleStepClick = useCallback(
+    (stepSlug: string) => {
+      if (processing || stepSlug === currentStepName) return;
+      dispatch(setActiveStep(stepSlug));
+    },
+    [dispatch, processing, currentStepName],
+  );
+
+  const handleAddToCart = useCallback(() => {
+    if (!session) return;
+    // TODO: Integrate with cart/checkout API using session.id
+    console.log("Add to cart — session:", session.id);
+  }, [session]);
+
+  const handleReset = useCallback(() => {
     if (confirm("Reset toàn bộ cấu hình?")) {
       dispatch(resetBuilder());
     }
-  };
+  }, [dispatch]);
 
-  const handleLogoClick = () => {
+  const handleLogoClick = useCallback(() => {
     window.location.href = "/";
-  };
+  }, []);
 
-  // Navigation items for progress bar
-  const navItems = useMemo(
-    () =>
-      workflowSteps.map((stepName, index) => ({
-        name: stepName,
-        slug: stepName,
-        index: index + 1,
-        isActive: currentStepName === stepName,
-        isCompleted: session?.selection ? !!session.selection[stepName] : false,
-      })),
-    [workflowSteps, currentStepName, session],
-  );
+  // Navigation items for progress bar (+ virtual Summary step)
+  const navItems = useMemo(() => {
+    const steps = workflowSteps.map((stepName, index) => ({
+      name: stepName,
+      slug: stepName,
+      index: index + 1,
+      isActive: currentStepName === stepName,
+      isCompleted: session?.selection ? !!session.selection[stepName] : false,
+    }));
+
+    // Virtual Summary step — appears at the end of the nav bar
+    steps.push({
+      name: "Summary",
+      slug: "summary",
+      index: workflowSteps.length + 1,
+      isActive: currentStepName === "summary",
+      isCompleted: false,
+    });
+
+    return steps;
+  }, [workflowSteps, currentStepName, session]);
 
   const currentStepIndex = workflowSteps.findIndex(
     (s) => s === currentStepName,
@@ -322,11 +526,7 @@ function BuilderContent() {
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <p className="text-red-400 font-medium">{error}</p>
               <button
-                onClick={() =>
-                  shopId &&
-                  categoryId &&
-                  dispatch(fetchBaseKits({ shopId, categoryId }))
-                }
+                onClick={() => shopId && dispatch(fetchBaseKits(shopId))}
                 className="px-4 py-2 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-300 transition-all"
               >
                 Retry
@@ -355,116 +555,7 @@ function BuilderContent() {
   }
 
   // =============================================
-  // STATE 2: Summary (isComplete === true)
-  // =============================================
-  if (session.isComplete) {
-    const selectionEntries = Object.entries(session.selection);
-
-    return (
-      <div className="h-screen flex flex-col font-sans bg-gray-50 overflow-hidden text-slate-800">
-        {/* HEADER */}
-        <div className="h-16 bg-black flex items-center justify-between px-4 lg:px-8 shadow-lg z-50 shrink-0 text-white">
-          <div
-            onClick={handleLogoClick}
-            className="font-black text-xl tracking-tighter uppercase flex items-center gap-2 cursor-pointer select-none"
-          >
-            <span>Ameko</span>
-            <span className="text-blue-500">Lab</span>
-          </div>
-          <h1 className="text-sm font-bold uppercase tracking-wider text-green-400">
-            ✓ Build Complete
-          </h1>
-          <div />
-        </div>
-
-        {/* SUMMARY CONTENT */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* LEFT: Final Preview */}
-          <div
-            className="w-full lg:w-2/3 bg-cover bg-center bg-no-repeat relative flex items-center justify-center p-4"
-            style={{
-              backgroundImage:
-                "url('https://res.cloudinary.com/doezwafgz/image/upload/v1766677524/background_teui0y.png')",
-              backgroundColor: "#1a1a1a",
-            }}
-          >
-            <div className="absolute inset-0 bg-black/30 pointer-events-none z-0"></div>
-            <Visualizer selection={session.selection} />
-          </div>
-
-          {/* RIGHT: BOM + Actions */}
-          <div className="hidden lg:flex w-1/3 bg-black flex-col z-10 shadow-2xl">
-            <div className="p-6 shrink-0 border-b border-gray-800">
-              <h2 className="text-2xl font-black uppercase text-white tracking-tight">
-                Your Build
-              </h2>
-              <p className="text-gray-500 text-xs mt-1">Bill of Materials</p>
-            </div>
-
-            {/* BOM List */}
-            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-              <div className="space-y-3">
-                {selectionEntries.map(([stepName, part]) => (
-                  <div
-                    key={stepName}
-                    className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-xl border border-gray-800"
-                  >
-                    <div className="w-14 h-14 bg-black rounded-lg relative shrink-0 overflow-hidden">
-                      <Image
-                        src={part.thumbnailUrl}
-                        alt={part.name}
-                        fill
-                        className="object-contain p-1"
-                        sizes="56px"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[10px] text-gray-500 uppercase font-bold">
-                        {stepName}
-                      </div>
-                      <h4 className="text-white font-bold text-sm truncate">
-                        {part.name}
-                      </h4>
-                      <div className="text-gray-400 text-xs">
-                        ×{part.quantity} —{" "}
-                        {part.price > 0
-                          ? `+${(part.price * part.quantity).toLocaleString()}₫`
-                          : "Included"}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Total + Add to Cart */}
-            <div className="p-4 bg-black shrink-0 border-t border-gray-800">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-gray-400 font-bold uppercase text-sm">
-                  Total
-                </span>
-                <span className="text-yellow-400 font-black text-2xl">
-                  {session.totalPrice.toLocaleString()}₫
-                </span>
-              </div>
-              <button className="w-full py-3.5 bg-yellow-400 text-black font-bold uppercase text-sm rounded-lg hover:bg-yellow-300 transition-all shadow-lg active:translate-y-[1px]">
-                Add to Cart
-              </button>
-              <button
-                onClick={handleReset}
-                className="w-full mt-2 py-2.5 text-gray-400 font-bold uppercase text-xs border border-gray-700 rounded-lg hover:text-white hover:border-gray-500 transition-all"
-              >
-                Build Another
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // =============================================
-  // 🅱️ STATE 1: Builder Workspace (session exists, not complete)
+  // 🅱️ STATE 1: Builder Workspace
   // =============================================
   return (
     <div className="h-screen flex flex-col font-sans bg-gray-50 overflow-hidden text-slate-800">
@@ -478,35 +569,48 @@ function BuilderContent() {
           <span className="text-blue-500">Lab</span>
         </div>
 
-        {/* Navigation Bar (Progress Steps) */}
+        {/* Navigation Bar (Progress Steps + Summary) */}
         <div className="flex-1 flex items-center justify-start lg:justify-center gap-0 h-full overflow-x-auto custom-scrollbar">
-          {navItems.map((step) => (
-            <button
-              key={step.slug}
-              disabled
-              className={`
-                    relative h-full px-4 lg:px-6 flex items-center justify-center gap-2 uppercase font-bold text-[10px] lg:text-xs tracking-wider transition-all whitespace-nowrap cursor-default
-                    ${
-                      step.isActive
-                        ? "text-yellow-400 border-b-4 border-yellow-400 bg-white/5"
-                        : "text-gray-400 border-b-4 border-transparent"
-                    }
-                  `}
-            >
-              <span
-                className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] border ${
-                  step.isActive
-                    ? "border-yellow-400 text-yellow-400"
-                    : step.isCompleted
-                      ? "border-green-500 text-green-500"
-                      : "border-gray-500 text-gray-500"
-                }`}
+          {navItems.map((step) => {
+            const isSummary = step.slug === "summary";
+            const isClickable =
+              !step.isActive &&
+              !processing &&
+              (step.isCompleted || (isSummary && !!session?.isComplete));
+            return (
+              <button
+                key={step.slug}
+                onClick={() => isClickable && handleStepClick(step.slug)}
+                className={`
+                  relative h-full px-4 lg:px-6 flex items-center justify-center gap-2 uppercase font-bold text-[10px] lg:text-xs tracking-wider transition-all whitespace-nowrap
+                  ${
+                    step.isActive
+                      ? "text-yellow-400 border-b-4 border-yellow-400 bg-white/5 cursor-default"
+                      : isClickable
+                        ? "text-gray-300 border-b-4 border-green-500/40 cursor-pointer hover:text-white hover:bg-white/5"
+                        : "text-gray-600 border-b-4 border-transparent cursor-not-allowed"
+                  }
+                `}
               >
-                {step.isCompleted && !step.isActive ? "✓" : step.index}
-              </span>
-              {step.name}
-            </button>
-          ))}
+                <span
+                  className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] border ${
+                    step.isActive
+                      ? "border-yellow-400 text-yellow-400"
+                      : step.isCompleted || (isSummary && session?.isComplete)
+                        ? "border-green-500 bg-green-500/20 text-green-400"
+                        : "border-gray-500 text-gray-500"
+                  }`}
+                >
+                  {isSummary
+                    ? "★"
+                    : step.isCompleted && !step.isActive
+                      ? "✓"
+                      : step.index}
+                </span>
+                {step.name}
+              </button>
+            );
+          })}
         </div>
 
         <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-700 shrink-0">
@@ -547,44 +651,144 @@ function BuilderContent() {
           <Visualizer selection={session.selection} />
         </div>
 
-        {/* RIGHT COLUMN: CONFIGURATOR */}
+        {/* RIGHT COLUMN: CONFIGURATOR / SUMMARY */}
         <div className="hidden lg:flex w-1/3 bg-black flex-col z-10 shadow-2xl">
-          <div className="p-6 shrink-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-bold text-white bg-black px-2 py-0.5 rounded uppercase">
-                Step {currentStepIndex + 1}
-              </span>
-            </div>
-            <h2 className="text-2xl font-black uppercase text-white tracking-tight">
-              {currentStepName || "Select Component"}
-            </h2>
-          </div>
+          {currentStepName === "summary" ? (
+            <>
+              {/* Summary Header */}
+              <div className="p-6 shrink-0 border-b border-gray-800">
+                <h2 className="text-2xl font-black uppercase text-white tracking-tight">
+                  Your Build
+                </h2>
+                <p className="text-gray-500 text-xs mt-1">
+                  Review your selections before adding to cart
+                </p>
+              </div>
 
-          {/* Grid Products */}
-          <div className="flex-1 overflow-y-auto p-6 scroll-smooth custom-scrollbar bg-black">
-            {processing ? (
-              <div className="flex flex-col items-center justify-center h-40 gap-3">
-                <div className="animate-spin w-6 h-6 border-2 border-slate-800 border-t-transparent rounded-full" />
-                <span className="text-xs text-gray-400 font-medium">
-                  Đang tải dữ liệu...
-                </span>
+              {/* BOM List */}
+              <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                <div className="space-y-3">
+                  {Object.entries(session.selection).map(([stepName, part]) => (
+                    <div
+                      key={stepName}
+                      className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-xl border border-gray-800 cursor-pointer hover:border-gray-600 transition-all group/bom"
+                      onClick={() => handleStepClick(stepName)}
+                      title={`Edit ${stepName}`}
+                    >
+                      <div className="w-14 h-14 bg-black rounded-lg relative shrink-0 overflow-hidden">
+                        <Image
+                          src={part.thumbnailUrl}
+                          alt={part.name}
+                          fill
+                          className="object-contain p-1"
+                          sizes="56px"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[10px] text-gray-500 uppercase font-bold">
+                          {stepName}
+                        </div>
+                        <h4 className="text-white font-bold text-sm truncate">
+                          {part.name}
+                        </h4>
+                        <div className="text-gray-400 text-xs">
+                          ×{part.quantity} —{" "}
+                          {part.price > 0
+                            ? `+${(part.price * part.quantity).toLocaleString()}₫`
+                            : "Included"}
+                        </div>
+                      </div>
+                      <svg
+                        className="w-4 h-4 text-gray-600 shrink-0 group-hover/bom:text-gray-400 transition-colors"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        />
+                      </svg>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-3">
-                {currentProducts.map((product) => (
-                  <ProductItem
-                    key={product.optionId}
-                    product={product}
-                    isSelected={
-                      session.selection[currentStepName || ""]?.id ===
-                      product.partId
-                    }
-                    onClick={handleSelectComponent}
+
+              {/* Total + CTA */}
+              <div className="p-4 bg-black shrink-0 border-t border-gray-800">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-gray-400 font-bold uppercase text-sm">
+                    Total
+                  </span>
+                  <span className="text-yellow-400 font-black text-2xl">
+                    {session.totalPrice.toLocaleString()}₫
+                  </span>
+                </div>
+                <button
+                  onClick={handleAddToCart}
+                  className="w-full py-3.5 bg-yellow-400 text-black font-bold uppercase text-sm rounded-lg hover:bg-yellow-300 transition-all shadow-lg active:translate-y-[1px]"
+                >
+                  Add to Cart
+                </button>
+                <button
+                  onClick={handleReset}
+                  className="w-full mt-2 py-2.5 text-gray-400 font-bold uppercase text-xs border border-gray-700 rounded-lg hover:text-white hover:border-gray-500 transition-all"
+                >
+                  Start Over
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Step Header */}
+              <div className="p-6 shrink-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-bold text-white bg-black px-2 py-0.5 rounded uppercase">
+                    Step {currentStepIndex + 1}
+                  </span>
+                </div>
+                <h2 className="text-2xl font-black uppercase text-white tracking-tight">
+                  {currentStepName || "Select Component"}
+                </h2>
+              </div>
+
+              {/* Grid Products */}
+              <div className="flex-1 overflow-y-auto p-6 scroll-smooth custom-scrollbar bg-black">
+                <div
+                  key={currentStepName}
+                  className="grid grid-cols-1 gap-3 animate-fadeIn"
+                >
+                  {/* None / Deselect Card (Index 0) */}
+                  <NoneCard
+                    isSelected={!session.selection[currentStepName || ""]}
+                    onClick={() => {
+                      if (
+                        currentStepName &&
+                        session.selection[currentStepName]
+                      ) {
+                        handleRemoveComponent(currentStepName);
+                      }
+                    }}
                   />
-                ))}
+
+                  {currentProducts.map((product) => (
+                    <ProductItem
+                      key={product.optionId}
+                      product={product}
+                      isSelected={
+                        session.selection[currentStepName || ""]?.id ===
+                        product.partId
+                      }
+                      onClick={handleSelectComponent}
+                      onHover={handleProductHover}
+                    />
+                  ))}
+                </div>
               </div>
-            )}
-          </div>
+            </>
+          )}
         </div>
       </div>
     </div>

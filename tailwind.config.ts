@@ -24,9 +24,14 @@ export default {
           "0%, 100%": { height: "20%" },
           "50%": { height: "100%" },
         },
+        fadeIn: {
+          "0%": { opacity: "0", transform: "translateY(6px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         "sound-wave": "sound-wave 1.2s ease-in-out infinite",
+        fadeIn: "fadeIn 250ms ease-out forwards",
       },
     },
   },

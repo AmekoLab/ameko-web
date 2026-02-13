@@ -16,11 +16,11 @@ interface ApiResponse<T> {
 export const builderService = {
   /**
    * Fetch Base Kits for a shop.
-   * GET /parts?ShopId={shopId}&CategoryId={categoryId}
+   * GET /parts?ShopId={shopId}&PartType=kit
    */
-  getBaseKits: async (shopId: string, categoryId: string) => {
+  getBaseKits: async (shopId: string) => {
     return api.get<unknown, ApiResponse<PartListData>>(
-      `/parts?ShopId=${shopId}&CategoryId=${categoryId}`,
+      `/parts?ShopId=${shopId}&PartType=kit`,
     );
   },
 
@@ -48,6 +48,20 @@ export const builderService = {
       unknown,
       ApiResponse<{ message: string; data: BuilderPayload }>
     >(`/Builder/select`, payload);
+    // Unwrap double-nested
+    return res.data.data;
+  },
+
+  /**
+   * Remove a selected component from a step.
+   * DELETE /Builder/session/{sessionId}/part/{stepName}
+   * Returns: { success, message, data: { message, data: BuilderPayload } }
+   */
+  removeComponent: async (sessionId: string, stepName: string) => {
+    const res = await api.delete<
+      unknown,
+      ApiResponse<{ message: string; data: BuilderPayload }>
+    >(`/Builder/session/${sessionId}/part/${stepName}`);
     // Unwrap double-nested
     return res.data.data;
   },

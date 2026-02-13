@@ -13,10 +13,7 @@ import Link from "next/link";
 import { UserProfile } from "@/src/types/profile";
 import { ImageModal } from "../Community/ImageModal";
 
-export const ProfileHeader: FC<{
-  profile: UserProfile;
-  kitCategoryId?: string;
-}> = ({ profile, kitCategoryId }) => {
+export const ProfileHeader: FC<{ profile: UserProfile }> = ({ profile }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   return (
     <div className="bg-white rounded-b-md shadow-sm border-b border-gray-200 mb-6">
@@ -129,7 +126,7 @@ export const ProfileHeader: FC<{
                   <UserPlus className="w-4 h-4" /> Follow
                 </button>
                 <Link
-                  href={`/builder?shopId=${profile.id}${kitCategoryId ? `&categoryId=${kitCategoryId}` : ""}`}
+                  href={`/builder?shopId=${profile.id}`}
                   className="flex items-center gap-2 px-6 py-2 bg-[#ce2a32] text-white hover:bg-[#b02028] font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm"
                 >
                   <Wrench className="w-4 h-4" /> Customize

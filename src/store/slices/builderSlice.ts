@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { builderService } from "@/src/services/builder.service";
 import {
   BuilderSession,
@@ -14,12 +14,9 @@ import { PartItem } from "@/src/types/part.types";
 /** State 0 — Fetch base kits list */
 export const fetchBaseKits = createAsyncThunk(
   "builder/fetchBaseKits",
-  async (
-    { shopId, categoryId }: { shopId: string; categoryId: string },
-    { rejectWithValue },
-  ) => {
+  async (shopId: string, { rejectWithValue }) => {
     try {
-      const response = await builderService.getBaseKits(shopId, categoryId);
+      const response = await builderService.getBaseKits(shopId);
       return response.data; // { data: PartItem[], total: number }
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
@@ -73,6 +70,25 @@ export const selectBuilderComponent = createAsyncThunk(
   },
 );
 
+/** Remove — User removes a selected component → DELETE /Builder/session/{id}/part/{step} */
+export const removeBuilderComponent = createAsyncThunk(
+  "builder/removeComponent",
+  async (
+    { sessionId, stepName }: { sessionId: string; stepName: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      const payload = await builderService.removeComponent(sessionId, stepName);
+      return payload; // BuilderPayload
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to remove component",
+      );
+    }
+  },
+);
+
 // ============================================================
 // State Shape
 // ============================================================
@@ -91,6 +107,7 @@ interface BuilderState {
   workflowSteps: string[];
   currentStepName: string | null;
   currentProducts: BuilderProduct[];
+  stepProducts: Record<string, BuilderProduct[]>;
 }
 
 const initialState: BuilderState = {
@@ -102,6 +119,7 @@ const initialState: BuilderState = {
   workflowSteps: [],
   currentStepName: null,
   currentProducts: [],
+  stepProducts: {},
 };
 
 // ============================================================
@@ -111,12 +129,18 @@ function applyBuilderPayload(state: BuilderState, payload: BuilderPayload) {
   state.session = payload.session;
   state.workflowSteps = payload.workflowSteps;
 
-  if (payload.nextStep) {
+  if (payload.session.isComplete) {
+    // Build complete — auto-navigate to virtual Summary step
+    state.currentStepName = "summary";
+    state.currentProducts = [];
+  } else if (payload.nextStep) {
     state.currentStepName = payload.nextStep.step.name;
     state.currentProducts = payload.nextStep.products;
+    // Cache products per step for free-flow navigation
+    state.stepProducts[payload.nextStep.step.name] = payload.nextStep.products;
   } else {
-    // Complete — no next step
-    state.currentStepName = null;
+    // Fallback — no next step and not complete
+    state.currentStepName = "summary";
     state.currentProducts = [];
   }
 }
@@ -135,6 +159,50 @@ const builderSlice = createSlice({
     /** Clear error */
     clearBuilderError: (state) => {
       state.error = null;
+    },
+
+    /** Free-flow navigation — switch visible step without API call */
+    setActiveStep: (state, action: PayloadAction<string>) => {
+      const stepName = action.payload;
+      state.currentStepName = stepName;
+      state.currentProducts =
+        stepName === "summary" ? [] : state.stepProducts[stepName] || [];
+    },
+
+    /** Optimistic select — instantly update selection before API resolves */
+    optimisticSelect: (
+      state,
+      action: PayloadAction<{
+        stepName: string;
+        product: BuilderProduct;
+      }>,
+    ) => {
+      const { stepName, product } = action.payload;
+      if (!state.session) return;
+      state.session.selection[stepName] = {
+        id: product.partId,
+        name: product.name,
+        price: product.price,
+        thumbnailUrl: product.thumbnailUrl,
+        quantity: 1,
+        kitDesignOptionId: product.optionId,
+        layerImageUrl: product.layerImageUrl,
+        nextStepFilterRule: product.nextStepFilterRule || "",
+      };
+    },
+
+    /** Optimistic remove — instantly clear selection before API resolves */
+    optimisticRemove: (state, action: PayloadAction<string>) => {
+      if (!state.session) return;
+      const stepName = action.payload;
+      // Remove this step and all subsequent steps from selection
+      const stepIdx = state.workflowSteps.indexOf(stepName);
+      if (stepIdx >= 0) {
+        for (let i = stepIdx; i < state.workflowSteps.length; i++) {
+          delete state.session.selection[state.workflowSteps[i]];
+        }
+      }
+      state.session.isComplete = false;
     },
   },
   extraReducers: (builder) => {
@@ -179,9 +247,29 @@ const builderSlice = createSlice({
       .addCase(selectBuilderComponent.rejected, (state, action) => {
         state.processing = false;
         state.error = action.payload as string;
+      })
+
+      // --- REMOVE COMPONENT ---
+      .addCase(removeBuilderComponent.pending, (state) => {
+        state.processing = true;
+        state.error = null;
+      })
+      .addCase(removeBuilderComponent.fulfilled, (state, action) => {
+        state.processing = false;
+        applyBuilderPayload(state, action.payload);
+      })
+      .addCase(removeBuilderComponent.rejected, (state, action) => {
+        state.processing = false;
+        state.error = action.payload as string;
       });
   },
 });
 
-export const { resetBuilder, clearBuilderError } = builderSlice.actions;
+export const {
+  resetBuilder,
+  clearBuilderError,
+  setActiveStep,
+  optimisticSelect,
+  optimisticRemove,
+} = builderSlice.actions;
 export default builderSlice.reducer;
