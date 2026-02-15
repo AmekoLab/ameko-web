@@ -10,7 +10,7 @@ import { SearchBar } from "./SearchBar";
 import { CountrySelector } from "./CountrySelector";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { logoutUser } from "@/src/store/action/authActions";
-import { setCartOpen } from "@/src/store/slices/cartSlice";
+import { setCartOpen, fetchServerCart } from "@/src/store/slices/cartSlice";
 import { ShopStatus } from "@/src/types/shop.types";
 import { Store, Clock, AlertCircle, ShieldCheck } from "lucide-react";
 
@@ -65,10 +65,22 @@ export const Header: FC = () => {
   const dispatch = useAppDispatch();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const { totalQuantity } = useAppSelector((state) => state.cart);
+  const { serverCart } = useAppSelector((state) => state.cart);
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const { currentShop } = useAppSelector((state) => state.shop);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Compute cart item count from server cart
+  const cartItemCount = serverCart?.orderItems
+    ? serverCart.orderItems.reduce((sum, item) => sum + item.quantity, 0)
+    : 0;
+
+  // Fetch server cart on mount and when auth changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchServerCart());
+    }
+  }, [dispatch, isAuthenticated]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -262,7 +274,7 @@ export const Header: FC = () => {
             onClick={handleOpenCart}
             className="flex items-center gap-2 text-gray-800 font-medium hover:text-[#ce2a32] transition-colors"
           >
-            <CartIcon /> Cart ({totalQuantity})
+            <CartIcon /> Cart ({cartItemCount})
           </button>
           <CountrySelector />
         </div>

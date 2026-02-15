@@ -47,35 +47,17 @@ const PART_TYPE_CONFIG: Record<
     bgColor: "bg-purple-100",
     icon: Keyboard,
   },
-  case: {
-    label: "Case",
+  component: {
+    label: "Component",
     color: "text-blue-700",
     bgColor: "bg-blue-100",
     icon: Box,
   },
-  plate: {
-    label: "Plate",
-    color: "text-cyan-700",
-    bgColor: "bg-cyan-100",
-    icon: Layers,
-  },
-  switch: {
-    label: "Switch",
+  accessory: {
+    label: "Accessory",
     color: "text-green-700",
     bgColor: "bg-green-100",
-    icon: ToggleLeft,
-  },
-  keycap: {
-    label: "Keycap",
-    color: "text-amber-700",
-    bgColor: "bg-amber-100",
-    icon: CircleDot,
-  },
-  stabilizer: {
-    label: "Stabilizer",
-    color: "text-rose-700",
-    bgColor: "bg-rose-100",
-    icon: Grip,
+    icon: Layers,
   },
 };
 
@@ -203,11 +185,8 @@ export default function ShopPartsPage() {
   const typeFilters: (PartType | "all")[] = [
     "all",
     "kit",
-    "case",
-    "plate",
-    "switch",
-    "keycap",
-    "stabilizer",
+    "component",
+    "accessory",
   ];
 
   return (

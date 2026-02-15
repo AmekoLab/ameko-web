@@ -32,14 +32,11 @@ const PART_TYPE_STYLES: Record<
   { label: string; color: string; bg: string }
 > = {
   kit: { label: "Kit", color: "text-purple-700", bg: "bg-purple-100" },
-  case: { label: "Case", color: "text-blue-700", bg: "bg-blue-100" },
-  plate: { label: "Plate", color: "text-cyan-700", bg: "bg-cyan-100" },
-  switch: { label: "Switch", color: "text-green-700", bg: "bg-green-100" },
-  keycap: { label: "Keycap", color: "text-amber-700", bg: "bg-amber-100" },
-  stabilizer: {
-    label: "Stabilizer",
-    color: "text-rose-700",
-    bg: "bg-rose-100",
+  component: { label: "Component", color: "text-blue-700", bg: "bg-blue-100" },
+  accessory: {
+    label: "Accessory",
+    color: "text-green-700",
+    bg: "bg-green-100",
   },
 };
 

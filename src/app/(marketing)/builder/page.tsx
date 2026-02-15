@@ -9,7 +9,7 @@ import {
   Suspense,
 } from "react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
   fetchBaseKits,
@@ -23,6 +23,8 @@ import {
 } from "@/src/store/slices/builderSlice";
 import { BuilderProduct, SelectedPart } from "@/src/types/builder";
 import { PartItem } from "@/src/types/part.types";
+import { orderService } from "@/src/services/order.service";
+import { toast } from "react-toastify";
 
 // --- HELPERS ---
 const getZIndex = (categorySlug?: string) => {
@@ -346,6 +348,8 @@ KitCard.displayName = "KitCard";
 function BuilderContent() {
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const [addingToCart, setAddingToCart] = useState(false);
 
   const {
     loadingKits,
@@ -453,11 +457,28 @@ function BuilderContent() {
     [dispatch, processing, currentStepName],
   );
 
-  const handleAddToCart = useCallback(() => {
-    if (!session) return;
-    // TODO: Integrate with cart/checkout API using session.id
-    console.log("Add to cart — session:", session.id);
-  }, [session]);
+  const handleAddToCart = useCallback(async () => {
+    if (!session || addingToCart) return;
+    setAddingToCart(true);
+    try {
+      const res = await orderService.addToCart({
+        quantity: 1,
+        isCustom: true,
+        builderSessionId: session.id,
+      });
+      if (res.success) {
+        toast.success(res.message || "Item added to cart successfully!");
+        router.push("/cart");
+      } else {
+        toast.error(res.message || "Failed to add to cart");
+      }
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      toast.error(err.message || "Failed to add to cart");
+    } finally {
+      setAddingToCart(false);
+    }
+  }, [session, addingToCart, router]);
 
   const handleReset = useCallback(() => {
     if (confirm("Reset toàn bộ cấu hình?")) {
@@ -728,9 +749,17 @@ function BuilderContent() {
                 </div>
                 <button
                   onClick={handleAddToCart}
-                  className="w-full py-3.5 bg-yellow-400 text-black font-bold uppercase text-sm rounded-lg hover:bg-yellow-300 transition-all shadow-lg active:translate-y-[1px]"
+                  disabled={addingToCart}
+                  className="w-full py-3.5 bg-yellow-400 text-black font-bold uppercase text-sm rounded-lg hover:bg-yellow-300 transition-all shadow-lg active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Add to Cart
+                  {addingToCart ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    "Add to Cart"
+                  )}
                 </button>
                 <button
                   onClick={handleReset}

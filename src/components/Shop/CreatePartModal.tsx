@@ -197,11 +197,8 @@ export default function CreatePartModal({
 
   const PART_TYPES: { value: PartType; label: string }[] = [
     { value: "kit", label: "Kit" },
-    { value: "case", label: "Case" },
-    { value: "plate", label: "Plate" },
-    { value: "switch", label: "Switch" },
-    { value: "keycap", label: "Keycap" },
-    { value: "stabilizer", label: "Stabilizer" },
+    { value: "component", label: "Component" },
+    { value: "accessory", label: "Accessory" },
   ];
 
   return (

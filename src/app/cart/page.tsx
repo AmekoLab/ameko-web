@@ -1,27 +1,59 @@
 "use client";
 
-import { FC, useState, useCallback, useMemo } from "react";
+import { FC, useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, Trash2, ArrowLeft, ShoppingBag } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "@/src/store/hook";
-import { removeFromCart, updateQuantity } from "@/src/store/slices/cartSlice";
+import {
+  ArrowLeft,
+  ShoppingBag,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  Trash2,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
+import { orderService } from "@/src/services/order.service";
+import { toast } from "react-toastify";
+import {
+  CartData,
+  OrderItem,
+  OrderItemComponent,
+} from "@/src/types/order.types";
 
 // Constants
 const ROUTES = {
   SHOP: "/shop/all-products",
-  PRODUCT: (slug: string) => `/shop/product/${slug}`,
+  CHECKOUT: "/checkout",
 } as const;
 
-const STYLES = {
-  PRIMARY_COLOR: "#ce2a32",
-  PAYPAL_BLUE: "#003087",
-  PAYPAL_LIGHT_BLUE: "#009cde",
-  PAYPAL_YELLOW: "#ffc439",
-} as const;
+// ─── Loading Skeleton ──────────────────────────────────────
+const CartSkeleton: FC = () => (
+  <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-12 lg:py-20 animate-pulse">
+    <div className="h-10 w-48 bg-gray-200 rounded mb-12" />
+    <div className="flex flex-col lg:flex-row gap-12">
+      <div className="flex-1 space-y-6">
+        {[1, 2].map((i) => (
+          <div key={i} className="flex gap-4 py-6 border-b border-gray-100">
+            <div className="w-24 h-24 bg-gray-200 rounded" />
+            <div className="flex-1 space-y-3">
+              <div className="h-5 w-3/4 bg-gray-200 rounded" />
+              <div className="h-4 w-1/2 bg-gray-200 rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="w-full lg:w-[350px] shrink-0">
+        <div className="bg-gray-100 p-8 rounded space-y-4">
+          <div className="h-6 w-40 bg-gray-200 rounded" />
+          <div className="h-10 w-full bg-gray-200 rounded" />
+          <div className="h-12 w-full bg-gray-200 rounded" />
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
-// Extracted Components
+// ─── Empty Cart ────────────────────────────────────────────
 const EmptyCart: FC = () => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
     <ShoppingBag className="w-16 h-16 text-gray-200 mb-6" />
@@ -29,8 +61,8 @@ const EmptyCart: FC = () => (
       Your Cart is Empty
     </h1>
     <p className="text-gray-500 mb-8 max-w-md">
-      Looks like you haven't added anything yet. Browse our collection to find
-      your perfect keyboard setup.
+      Looks like you haven&apos;t added anything yet. Browse our collection to
+      find your perfect keyboard setup.
     </p>
     <Link
       href={ROUTES.SHOP}
@@ -41,141 +73,161 @@ const EmptyCart: FC = () => (
   </div>
 );
 
-interface CartItemProps {
-  item: {
-    id: string;
-    name: string;
-    slug: string;
-    image: string;
-    price: number;
-    quantity: number;
-    variant?: string;
-  };
-  onUpdateQuantity: (id: string, quantity: number) => void;
+// ─── Component Row (inside accordion) ──────────────────────
+const ComponentRow: FC<{ component: OrderItemComponent }> = ({ component }) => (
+  <div className="flex items-center gap-3 py-3 pl-4 border-l-2 border-gray-200">
+    {/* Part image */}
+    <div className="relative w-12 h-12 bg-gray-50 shrink-0 border border-gray-100 rounded overflow-hidden">
+      {component.partImageUrl ? (
+        <Image
+          src={component.partImageUrl}
+          alt={component.partName}
+          fill
+          sizes="48px"
+          className="object-contain p-1"
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">
+          N/A
+        </div>
+      )}
+    </div>
+
+    {/* Part info */}
+    <div className="flex-1 min-w-0">
+      <p className="text-sm font-medium text-gray-800 truncate capitalize">
+        {component.partName}
+      </p>
+      <p className="text-xs text-gray-400">Qty: {component.quantity}</p>
+    </div>
+
+    {/* Part price */}
+    <span className="text-sm text-gray-600 tabular-nums shrink-0">
+      {component.partPriceSnapshot > 0
+        ? `${component.partPriceSnapshot.toLocaleString()}₫`
+        : "Included"}
+    </span>
+  </div>
+);
+
+// ─── Cart Item (with accordion for custom builds) ──────────
+interface CartItemCardProps {
+  item: OrderItem;
   onRemove: (id: string) => void;
+  removing: boolean;
 }
 
-const CartItem: FC<CartItemProps> = ({ item, onUpdateQuantity, onRemove }) => {
-  const itemTotal = useMemo(
-    () => item.price * item.quantity,
-    [item.price, item.quantity]
-  );
+const CartItemCard: FC<CartItemCardProps> = ({ item, onRemove, removing }) => {
+  const [expanded, setExpanded] = useState(false);
+  const isCustom = item.isCustom && item.orderItemComponents.length > 0;
 
-  const handleIncrement = useCallback(
-    () => onUpdateQuantity(item.id, item.quantity + 1),
-    [item.id, item.quantity, onUpdateQuantity]
-  );
-
-  const handleDecrement = useCallback(
-    () => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1)),
-    [item.id, item.quantity, onUpdateQuantity]
-  );
-
-  const handleRemove = useCallback(
-    () => onRemove(item.id),
-    [item.id, onRemove]
-  );
+  // Determine the first component image as fallback for custom items
+  const displayImage =
+    item.productImage ||
+    (isCustom ? item.orderItemComponents[0]?.partImageUrl : null);
 
   return (
-    <div className="group py-6 border-b border-gray-100 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-      {/* Product Info */}
-      <div className="md:col-span-6 flex gap-4">
-        <Link
-          href={ROUTES.PRODUCT(item.slug)}
-          className="relative w-24 h-24 bg-gray-50 shrink-0 border border-gray-100 rounded-sm overflow-hidden hover:border-gray-300 transition-colors"
-          aria-label={`View ${item.name}`}
-        >
-          <Image
-            src={item.image}
-            alt={item.name}
-            fill
-            sizes="96px"
-            className="object-contain p-2"
-          />
-        </Link>
-        <div className="flex flex-col justify-center min-w-0">
-          <Link
-            href={ROUTES.PRODUCT(item.slug)}
-            className="font-bold text-black text-lg hover:text-[#ce2a32] transition-colors leading-tight mb-1 truncate"
-          >
-            {item.name}
-          </Link>
-          {item.variant && (
-            <p className="text-sm text-gray-500 truncate">{item.variant}</p>
-          )}
-          <p className="md:hidden text-sm font-medium text-gray-700 mt-1">
-            ${item.price.toFixed(2)}
-          </p>
-        </div>
-      </div>
+    <div className="py-6 border-b border-gray-100">
+      {/* Main row */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+        {/* Product Info */}
+        <div className="md:col-span-7 flex gap-4">
+          {/* Image */}
+          <div className="relative w-24 h-24 bg-gray-50 shrink-0 border border-gray-100 rounded-sm overflow-hidden">
+            {displayImage ? (
+              <Image
+                src={displayImage}
+                alt={item.productName}
+                fill
+                sizes="96px"
+                className="object-contain p-2"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <ShoppingBag className="w-8 h-8 text-gray-200" />
+              </div>
+            )}
+          </div>
 
-      {/* Quantity Controls */}
-      <div className="md:col-span-3 flex items-center justify-between md:justify-center">
-        <div className="flex items-center border border-gray-300 rounded-sm h-10 w-32 overflow-hidden">
-          <button
-            onClick={handleDecrement}
-            disabled={item.quantity <= 1}
-            className="w-10 h-full flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Decrease quantity"
-          >
-            <Minus className="w-3 h-3 text-gray-600" />
-          </button>
-          <span className="flex-1 flex items-center justify-center text-sm font-bold">
-            {item.quantity}
+          {/* Text */}
+          <div className="flex flex-col justify-center min-w-0">
+            <h3 className="font-bold text-black text-lg leading-tight mb-1 truncate capitalize">
+              {item.productName}
+            </h3>
+
+            {isCustom && (
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="flex items-center gap-1 text-xs text-[#ce2a32] hover:underline mt-1 w-fit"
+              >
+                {expanded ? (
+                  <>
+                    Hide components <ChevronUp className="w-3 h-3" />
+                  </>
+                ) : (
+                  <>
+                    View {item.orderItemComponents.length} components{" "}
+                    <ChevronDown className="w-3 h-3" />
+                  </>
+                )}
+              </button>
+            )}
+
+            <p className="md:hidden text-sm font-medium text-gray-700 mt-1">
+              {item.unitPrice.toLocaleString()}₫
+            </p>
+          </div>
+        </div>
+
+        {/* Quantity */}
+        <div className="md:col-span-2 flex items-center justify-center">
+          <span className="text-sm font-bold text-gray-700 bg-gray-100 px-4 py-2 rounded">
+            ×{item.quantity}
+          </span>
+        </div>
+
+        {/* Total Price & Remove */}
+        <div className="md:col-span-3 flex items-center justify-end gap-4">
+          <span className="font-bold text-lg">
+            {item.totalPrice.toLocaleString()}₫
           </span>
           <button
-            onClick={handleIncrement}
-            className="w-10 h-full flex items-center justify-center hover:bg-gray-50 transition-colors"
-            aria-label="Increase quantity"
+            onClick={() => onRemove(item.id)}
+            disabled={removing}
+            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors disabled:opacity-40"
+            aria-label={`Remove ${item.productName}`}
           >
-            <Plus className="w-3 h-3 text-gray-600" />
+            {removing ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Trash2 className="w-4 h-4" />
+            )}
           </button>
         </div>
-
-        {/* Mobile Remove Button */}
-        <button
-          onClick={handleRemove}
-          className="md:hidden p-2 text-gray-400 hover:text-red-600 transition-colors"
-          aria-label={`Remove ${item.name}`}
-        >
-          <Trash2 className="w-5 h-5" />
-        </button>
       </div>
 
-      {/* Total Price */}
-      <div className="md:col-span-3 flex items-center justify-end gap-4">
-        <span className="font-bold text-lg hidden md:block">
-          ${itemTotal.toFixed(2)}
-        </span>
-
-        {/* Desktop Remove Button */}
-        <button
-          onClick={handleRemove}
-          className="hidden md:block p-2 text-gray-300 hover:text-[#ce2a32] transition-colors"
-          aria-label={`Remove ${item.name}`}
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
-      </div>
+      {/* Accordion: Component list for custom builds */}
+      {isCustom && expanded && (
+        <div className="mt-4 ml-0 md:ml-28 space-y-0 bg-gray-50/50 rounded-lg p-3">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+            Build Components
+          </p>
+          {item.orderItemComponents.map((comp) => (
+            <ComponentRow key={comp.partId} component={comp} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
+// ─── Order Summary Sidebar ─────────────────────────────────
 interface OrderSummaryProps {
-  totalAmount: number;
-  orderNote: string;
-  onNoteChange: (note: string) => void;
+  cart: CartData;
   onCheckout: () => void;
-  onPayPalCheckout: () => void;
 }
 
-const OrderSummary: FC<OrderSummaryProps> = ({
-  totalAmount,
-  orderNote,
-  onNoteChange,
-  onCheckout,
-  onPayPalCheckout,
-}) => (
+const OrderSummary: FC<OrderSummaryProps> = ({ cart, onCheckout }) => (
   <div className="w-full lg:w-[350px] shrink-0">
     <div className="bg-gray-50 p-6 md:p-8 rounded-sm sticky top-28">
       <h3 className="font-oswald font-bold text-lg uppercase mb-4 border-b border-gray-200 pb-2">
@@ -183,36 +235,46 @@ const OrderSummary: FC<OrderSummaryProps> = ({
       </h3>
 
       {/* Subtotal */}
-      <div className="flex justify-between items-end mb-2">
+      {cart.subTotal > 0 && (
+        <div className="flex justify-between items-center mb-2 text-sm">
+          <span className="text-gray-600">Subtotal</span>
+          <span className="font-medium">{cart.subTotal.toLocaleString()}₫</span>
+        </div>
+      )}
+
+      {/* Shipping */}
+      {cart.shippingFee > 0 && (
+        <div className="flex justify-between items-center mb-2 text-sm">
+          <span className="text-gray-600">Shipping</span>
+          <span className="font-medium">
+            {cart.shippingFee.toLocaleString()}₫
+          </span>
+        </div>
+      )}
+
+      {/* Discount */}
+      {cart.discountAmount > 0 && (
+        <div className="flex justify-between items-center mb-2 text-sm">
+          <span className="text-gray-600">Discount</span>
+          <span className="font-medium text-green-600">
+            -{cart.discountAmount.toLocaleString()}₫
+          </span>
+        </div>
+      )}
+
+      {/* Total */}
+      <div className="flex justify-between items-end mb-2 mt-4 pt-3 border-t border-gray-200">
         <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">
-          Subtotal
+          Total
         </span>
         <span className="text-xl font-black text-black">
-          ${totalAmount.toFixed(2)} USD
+          {cart.totalAmount.toLocaleString()}₫
         </span>
       </div>
+
       <p className="text-xs text-gray-400 mb-6 text-right">
         Taxes and shipping calculated at checkout
       </p>
-
-      {/* Order Note */}
-      <div className="mb-6">
-        <label
-          htmlFor="order-note"
-          className="text-xs font-bold text-gray-500 uppercase block mb-2"
-        >
-          Add order note
-        </label>
-        <textarea
-          id="order-note"
-          rows={3}
-          value={orderNote}
-          onChange={(e) => onNoteChange(e.target.value)}
-          className="w-full text-sm p-3 border border-gray-200 bg-white rounded-sm focus:outline-none focus:border-black transition-colors resize-none"
-          placeholder="Special instructions for seller..."
-          maxLength={500}
-        />
-      </div>
 
       {/* Action Buttons */}
       <div className="space-y-3">
@@ -220,62 +282,92 @@ const OrderSummary: FC<OrderSummaryProps> = ({
           onClick={onCheckout}
           className="w-full bg-black text-white h-12 text-sm font-bold uppercase tracking-widest hover:bg-[#ce2a32] transition-colors duration-200 rounded-sm"
         >
-          Check out
-        </button>
-
-        <button
-          onClick={onPayPalCheckout}
-          className="w-full bg-[#ffc439] text-black h-12 flex items-center justify-center hover:bg-[#f4bb34] transition-colors duration-200 rounded-sm"
-          aria-label="Checkout with PayPal"
-        >
-          <span className="italic font-bold text-[#003087] text-lg mr-1">
-            Pay
-          </span>
-          <span className="italic font-bold text-[#009cde] text-lg">Pal</span>
+          Proceed to Checkout
         </button>
       </div>
     </div>
   </div>
 );
 
-// Main Component
+// ═════════════════════════════════════════════════════════════
+// Main Cart Page
+// ═════════════════════════════════════════════════════════════
 export default function CartPage() {
-  const dispatch = useAppDispatch();
   const router = useRouter();
-  const { items, totalAmount } = useAppSelector((state) => state.cart);
-  const [orderNote, setOrderNote] = useState("");
+  const [cart, setCart] = useState<CartData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
-  // Memoized handlers
-  const handleUpdateQuantity = useCallback(
-    (id: string, quantity: number) => {
-      dispatch(updateQuantity({ id, quantity }));
-    },
-    [dispatch]
-  );
-
-  const handleRemoveItem = useCallback(
-    (id: string) => {
-      dispatch(removeFromCart(id));
-    },
-    [dispatch]
-  );
+  // Fetch cart from API
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await orderService.getCart();
+        if (res.success) {
+          setCart(res.data);
+        } else {
+          setError(res.message || "Failed to load cart");
+        }
+      } catch (err: unknown) {
+        const e = err as { message?: string };
+        setError(e.message || "Failed to load cart");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCart();
+  }, []);
 
   const handleCheckout = useCallback(() => {
-    // Nếu bạn muốn lưu note vào Redux thì dispatch ở đây (cần update slice trước)
-    // dispatch(updateOrderNote(orderNote));
-
-    // Chuyển hướng sang trang Checkout
-    router.push("/checkout");
+    router.push(ROUTES.CHECKOUT);
   }, [router]);
 
-  const handlePayPalCheckout = useCallback(() => {
-    // Thường PayPal sẽ mở popup hoặc cũng chuyển qua trang checkout có tích hợp sẵn
-    // Tạm thời cho nó qua checkout luôn
-    router.push("/checkout");
-  }, [router]);
+  const handleRemoveItem = useCallback(async (orderItemId: string) => {
+    setRemovingId(orderItemId);
+    try {
+      const res = await orderService.deleteCartItem(orderItemId);
+      if (res.success) {
+        toast.success("Item removed from cart");
+        // Re-fetch cart to get updated totals
+        const cartRes = await orderService.getCart();
+        if (cartRes.success) {
+          setCart(cartRes.data);
+        }
+      } else {
+        toast.error(res.message || "Failed to remove item");
+      }
+    } catch {
+      toast.error("Failed to remove item");
+    } finally {
+      setRemovingId(null);
+    }
+  }, []);
 
-  // Empty cart state
-  if (items.length === 0) {
+  // Loading state
+  if (loading) {
+    return <CartSkeleton />;
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
+        <p className="text-red-500 mb-4">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="bg-black text-white px-6 py-2 text-sm font-bold uppercase hover:bg-gray-900 transition-colors"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
+  // Empty cart
+  if (!cart || cart.orderItems.length === 0) {
     return <EmptyCart />;
   }
 
@@ -283,7 +375,7 @@ export default function CartPage() {
   return (
     <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-12 lg:py-20">
       {/* Header */}
-      <header className="flex items-center justify-between mb-8 md:mb-12  pb-4">
+      <header className="flex items-center justify-between mb-8 md:mb-12 pb-4">
         <h1 className="text-3xl md:text-4xl font-oswald font-bold uppercase tracking-wide">
           Your Cart
         </h1>
@@ -300,32 +392,26 @@ export default function CartPage() {
         <div className="flex-1">
           {/* Table Header (Desktop) */}
           <div className="hidden md:grid grid-cols-12 gap-4 pb-4 border-b border-gray-200 text-xs font-bold text-gray-400 uppercase tracking-widest">
-            <div className="col-span-6">Product</div>
-            <div className="col-span-3 text-center">Quantity</div>
+            <div className="col-span-7">Product</div>
+            <div className="col-span-2 text-center">Quantity</div>
             <div className="col-span-3 text-right">Total</div>
           </div>
 
           {/* Cart Items */}
           <div className="flex flex-col">
-            {items.map((item) => (
-              <CartItem
+            {cart.orderItems.map((item) => (
+              <CartItemCard
                 key={item.id}
                 item={item}
-                onUpdateQuantity={handleUpdateQuantity}
                 onRemove={handleRemoveItem}
+                removing={removingId === item.id}
               />
             ))}
           </div>
         </div>
 
         {/* Order Summary */}
-        <OrderSummary
-          totalAmount={totalAmount}
-          orderNote={orderNote}
-          onNoteChange={setOrderNote}
-          onCheckout={handleCheckout}
-          onPayPalCheckout={handlePayPalCheckout}
-        />
+        <OrderSummary cart={cart} onCheckout={handleCheckout} />
       </div>
     </div>
   );

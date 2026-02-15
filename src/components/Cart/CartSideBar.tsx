@@ -1,162 +1,212 @@
 "use client";
 
-import { FC, useEffect, useRef, useCallback, memo, use } from "react";
+import { FC, useEffect, useRef, useCallback, useState, memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { X, Trash2, Plus, Minus, ShoppingBag, Navigation } from "lucide-react";
+import {
+  X,
+  ShoppingBag,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  Trash2,
+} from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
   setCartOpen,
-  removeFromCart,
-  updateQuantity,
-  CartItem,
+  fetchServerCart,
+  removeServerCartItem,
 } from "@/src/store/slices/cartSlice";
-import { nav } from "framer-motion/client";
+import { OrderItem, OrderItemComponent } from "@/src/types/order.types";
 import { useRouter } from "next/navigation";
 
-// Separate CartItem component for better performance
-interface CartItemProps {
-  item: CartItem;
-  onUpdateQuantity: (id: string, quantity: number) => void;
-  onRemove: (id: string) => void;
-  onClose: () => void;
-}
-
-const CartItemComponent: FC<CartItemProps> = memo(
-  ({ item, onUpdateQuantity, onRemove, onClose }) => {
-    return (
-      <div className="flex gap-4">
-        {/* Image */}
-        <div className="relative w-20 h-20 shrink-0 border border-gray-100 rounded-sm bg-[#f9f9f9]">
-          <Image
-            src={item.image}
-            alt={item.name}
-            fill
-            className="object-contain p-2"
-          />
-        </div>
-
-        {/* Info */}
-        <div className="flex-1 flex flex-col">
-          <div className="flex justify-between items-start mb-1">
-            <Link
-              href={`/shop/product/${item.slug}`}
-              className="text-sm font-bold text-black hover:text-[#ce2a32] line-clamp-2 pr-4 leading-tight transition-colors"
-              onClick={onClose}
-            >
-              {item.name}
-            </Link>
-            <span className="text-sm font-bold text-gray-900">
-              ${(item.price * item.quantity).toFixed(2)}
-            </span>
-          </div>
-
-          {/* Variant Info */}
-          {item.variant && (
-            <div className="text-xs text-gray-500 mb-3 space-y-0.5">
-              <p>{item.variant}</p>
-            </div>
-          )}
-
-          {/* Controls: Quantity & Remove */}
-          <div className="flex items-center justify-between mt-auto">
-            <div className="flex items-center border border-gray-300 rounded-sm h-8">
-              <button
-                onClick={() =>
-                  onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))
-                }
-                className="w-8 h-full flex items-center justify-center hover:bg-gray-50 text-gray-600 transition-colors"
-                aria-label="Decrease quantity"
-              >
-                <Minus className="w-3 h-3" />
-              </button>
-              <span className="w-8 flex items-center justify-center text-xs font-bold">
-                {item.quantity}
-              </span>
-              <button
-                onClick={() =>
-                  onUpdateQuantity(item.id, Math.min(99, item.quantity + 1))
-                }
-                className="w-8 h-full flex items-center justify-center hover:bg-gray-50 text-gray-600 transition-colors"
-                aria-label="Increase quantity"
-              >
-                <Plus className="w-3 h-3" />
-              </button>
-            </div>
-
-            <button
-              onClick={() => onRemove(item.id)}
-              className="text-gray-400 hover:text-[#ce2a32] transition-colors p-1"
-              aria-label="Remove item"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+// ─── Component Row (part inside a custom build) ────────────
+const SidebarComponentRow: FC<{ component: OrderItemComponent }> = ({
+  component,
+}) => (
+  <div className="flex items-center gap-2 py-1.5">
+    <div className="relative w-8 h-8 bg-gray-50 shrink-0 rounded overflow-hidden border border-gray-100">
+      {component.partImageUrl ? (
+        <Image
+          src={component.partImageUrl}
+          alt={component.partName}
+          fill
+          sizes="32px"
+          className="object-contain p-0.5"
+        />
+      ) : (
+        <div className="w-full h-full bg-gray-100" />
+      )}
+    </div>
+    <span className="text-xs text-gray-600 capitalize truncate flex-1">
+      {component.partName}
+    </span>
+    <span className="text-[10px] text-gray-400 shrink-0">
+      ×{component.quantity}
+    </span>
+  </div>
 );
 
-CartItemComponent.displayName = "CartItemComponent";
+// ─── Cart Item in Sidebar ──────────────────────────────────
+interface SidebarItemProps {
+  item: OrderItem;
+  onRemove: (id: string) => void;
+  removing: boolean;
+}
 
+const SidebarCartItem: FC<SidebarItemProps> = memo(
+  ({ item, onRemove, removing }) => {
+    const [expanded, setExpanded] = useState(false);
+    const isCustom = item.isCustom && item.orderItemComponents.length > 0;
+
+    const displayImage =
+      item.productImage ||
+      (isCustom ? item.orderItemComponents[0]?.partImageUrl : null);
+
+    return (
+      <div className="flex flex-col gap-1">
+        <div className="flex gap-4">
+          {/* Image */}
+          <div className="relative w-20 h-20 shrink-0 border border-gray-100 rounded-sm bg-[#f9f9f9]">
+            {displayImage ? (
+              <Image
+                src={displayImage}
+                alt={item.productName}
+                fill
+                className="object-contain p-2"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <ShoppingBag className="w-6 h-6 text-gray-200" />
+              </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 flex flex-col min-w-0">
+            <div className="flex justify-between items-start mb-1">
+              <span className="text-sm font-bold text-black line-clamp-2 pr-4 leading-tight capitalize">
+                {item.productName}
+              </span>
+              <span className="text-sm font-bold text-gray-900 shrink-0">
+                {item.totalPrice.toLocaleString()}₫
+              </span>
+            </div>
+
+            {/* Quantity & Remove */}
+            <div className="flex items-center gap-3 mb-1">
+              <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+              <button
+                onClick={() => onRemove(item.id)}
+                disabled={removing}
+                className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-40"
+                aria-label={`Remove ${item.productName}`}
+              >
+                {removing ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Trash2 className="w-3.5 h-3.5" />
+                )}
+              </button>
+            </div>
+
+            {/* Custom build toggle */}
+            {isCustom && (
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="flex items-center gap-1 text-[11px] text-[#ce2a32] hover:underline w-fit mt-auto"
+              >
+                {expanded ? (
+                  <>
+                    Hide components <ChevronUp className="w-3 h-3" />
+                  </>
+                ) : (
+                  <>
+                    {item.orderItemComponents.length} components{" "}
+                    <ChevronDown className="w-3 h-3" />
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Expanded component list */}
+        {isCustom && expanded && (
+          <div className="ml-6 pl-3 border-l-2 border-gray-100 mt-1 space-y-0">
+            {item.orderItemComponents.map((comp) => (
+              <SidebarComponentRow key={comp.partId} component={comp} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  },
+);
+
+SidebarCartItem.displayName = "SidebarCartItem";
+
+// ═════════════════════════════════════════════════════════════
 // Main CartSidebar component
+// ═════════════════════════════════════════════════════════════
 export const CartSidebar: FC = memo(() => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isCartOpen, items, totalAmount } = useAppSelector(
-    (state) => state.cart
+  const { isCartOpen, serverCart, serverCartLoading } = useAppSelector(
+    (state) => state.cart,
   );
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
+  const items = serverCart?.orderItems ?? [];
+  const totalAmount = serverCart?.totalAmount ?? 0;
+  const [removingId, setRemovingId] = useState<string | null>(null);
+
+  const handleRemoveItem = useCallback(
+    async (orderItemId: string) => {
+      setRemovingId(orderItemId);
+      await dispatch(removeServerCartItem(orderItemId));
+      setRemovingId(null);
+    },
+    [dispatch],
+  );
+
+  // Fetch cart when sidebar opens
+  useEffect(() => {
+    if (isCartOpen && isAuthenticated) {
+      dispatch(fetchServerCart());
+    }
+  }, [isCartOpen, isAuthenticated, dispatch]);
+
   const handleCheckout = useCallback(() => {
-    dispatch(setCartOpen(false)); // Đóng sidebar trước
-    router.push("/checkout"); // Chuyển sang trang checkout
+    dispatch(setCartOpen(false));
+    router.push("/checkout");
   }, [dispatch, router]);
 
-  // Memoized callbacks
   const handleClose = useCallback(() => {
     dispatch(setCartOpen(false));
   }, [dispatch]);
 
-  const handleUpdateQuantity = useCallback(
-    (id: string, quantity: number) => {
-      dispatch(updateQuantity({ id, quantity }));
-    },
-    [dispatch]
-  );
-
-  const handleRemove = useCallback(
-    (id: string) => {
-      dispatch(removeFromCart(id));
-    },
-    [dispatch]
-  );
-
   // Lock body scroll WITHOUT layout shift
   useEffect(() => {
     if (isCartOpen) {
-      // Tính scrollbar width
       const scrollbarWidth =
         window.innerWidth - document.documentElement.clientWidth;
 
-      // Lock scroll và thêm padding để compensate scrollbar
       document.body.style.overflow = "hidden";
       document.body.style.paddingRight = `${scrollbarWidth}px`;
 
-      // Nếu có header fixed/sticky, cũng cần thêm padding
       const header = document.querySelector("header");
       if (header) {
-        header.style.paddingRight = `${scrollbarWidth}px`;
+        (header as HTMLElement).style.paddingRight = `${scrollbarWidth}px`;
       }
     } else {
-      // Restore
       document.body.style.overflow = "";
       document.body.style.paddingRight = "";
 
       const header = document.querySelector("header");
       if (header) {
-        header.style.paddingRight = "";
+        (header as HTMLElement).style.paddingRight = "";
       }
     }
 
@@ -166,7 +216,7 @@ export const CartSidebar: FC = memo(() => {
 
       const header = document.querySelector("header");
       if (header) {
-        header.style.paddingRight = "";
+        (header as HTMLElement).style.paddingRight = "";
       }
     };
   }, [isCartOpen]);
@@ -251,7 +301,12 @@ export const CartSidebar: FC = memo(() => {
 
         {/* BODY (Scrollable) */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {items.length === 0 ? (
+          {serverCartLoading ? (
+            <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-3">
+              <Loader2 className="w-8 h-8 animate-spin" />
+              <p className="text-sm">Loading cart...</p>
+            </div>
+          ) : items.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-4">
               <ShoppingBag className="w-12 h-12 opacity-20" />
               <p>Your cart is currently empty.</p>
@@ -265,12 +320,11 @@ export const CartSidebar: FC = memo(() => {
             </div>
           ) : (
             items.map((item) => (
-              <CartItemComponent
+              <SidebarCartItem
                 key={item.id}
                 item={item}
-                onUpdateQuantity={handleUpdateQuantity}
-                onRemove={handleRemove}
-                onClose={handleClose}
+                onRemove={handleRemoveItem}
+                removing={removingId === item.id}
               />
             ))
           )}
@@ -280,9 +334,6 @@ export const CartSidebar: FC = memo(() => {
         {items.length > 0 && (
           <div className="border-t border-gray-100 p-6 space-y-4 bg-white">
             <div className="flex justify-between items-center text-sm">
-              <button className="underline text-gray-500 hover:text-black transition-colors">
-                Add order note
-              </button>
               <p className="text-gray-400 text-xs">
                 Shipping & taxes calculated at checkout
               </p>
@@ -295,20 +346,7 @@ export const CartSidebar: FC = memo(() => {
                 className="w-full bg-[#1a1a1a] hover:bg-black text-white py-3.5 px-4 flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest transition-colors"
               >
                 <ShoppingBag className="w-4 h-4" />
-                Checkout • ${totalAmount.toFixed(2)} USD
-              </button>
-
-              {/* PayPal Button */}
-              <button
-                onClick={handleCheckout}
-                className="w-full bg-[#ffc439] hover:bg-[#f4bb34] text-black py-3.5 px-4 flex items-center justify-center text-sm font-bold uppercase tracking-widest transition-colors italic"
-              >
-                <span className="font-sans not-italic font-bold text-[#003087]">
-                  Pay
-                </span>
-                <span className="font-sans not-italic font-bold text-[#009cde]">
-                  Pal
-                </span>
+                Checkout • {totalAmount.toLocaleString()}₫
               </button>
             </div>
           </div>

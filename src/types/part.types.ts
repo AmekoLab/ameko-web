@@ -1,10 +1,4 @@
-export type PartType =
-  | "kit"
-  | "case"
-  | "plate"
-  | "switch"
-  | "keycap"
-  | "stabilizer";
+export type PartType = "kit" | "accessory" | "component";
 
 /** Status mapping: 1 = Active, 0 = Inactive (adjust as needed) */
 export type PartStatus = 0 | 1;

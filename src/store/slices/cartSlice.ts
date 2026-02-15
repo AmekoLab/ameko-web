@@ -1,4 +1,6 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { orderService } from "@/src/services/order.service";
+import { CartData } from "@/src/types/order.types";
 
 export interface CartItem {
   id: string;
@@ -11,12 +13,52 @@ export interface CartItem {
   variant?: string;
 }
 
+// ─── Async Thunk: Fetch cart from server ─────────────────
+export const fetchServerCart = createAsyncThunk(
+  "cart/fetchServerCart",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await orderService.getCart();
+      if (res.success) {
+        return res.data;
+      }
+      return rejectWithValue(res.message || "Failed to fetch cart");
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      return rejectWithValue(err.message || "Failed to fetch cart");
+    }
+  },
+);
+
+// ─── Async Thunk: Remove item from server cart ───────────
+export const removeServerCartItem = createAsyncThunk(
+  "cart/removeServerCartItem",
+  async (orderItemId: string, { dispatch, rejectWithValue }) => {
+    try {
+      const res = await orderService.deleteCartItem(orderItemId);
+      if (res.success) {
+        // Re-fetch cart to get updated data
+        dispatch(fetchServerCart());
+        return orderItemId;
+      }
+      return rejectWithValue(res.message || "Failed to remove item");
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      return rejectWithValue(err.message || "Failed to remove item");
+    }
+  },
+);
+
 interface CartState {
   items: CartItem[];
   totalQuantity: number;
   totalAmount: number;
   isCartOpen: boolean;
   note: string;
+  // Server-side cart
+  serverCart: CartData | null;
+  serverCartLoading: boolean;
+  serverCartError: string | null;
 }
 
 // Load cart from localStorage
@@ -36,7 +78,7 @@ const calculateTotals = (items: CartItem[]) => {
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalAmount = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
-    0
+    0,
   );
   return { totalQuantity, totalAmount };
 };
@@ -51,6 +93,9 @@ const initialState: CartState = {
   totalAmount,
   isCartOpen: false,
   note: "",
+  serverCart: null,
+  serverCartLoading: false,
+  serverCartError: null,
 };
 
 const cartSlice = createSlice({
@@ -67,7 +112,7 @@ const cartSlice = createSlice({
 
     addToCart(
       state,
-      action: PayloadAction<Omit<CartItem, "quantity"> & { quantity?: number }>
+      action: PayloadAction<Omit<CartItem, "quantity"> & { quantity?: number }>,
     ) {
       const newItem = action.payload;
       const existingItem = state.items.find((item) => item.id === newItem.id);
@@ -99,7 +144,7 @@ const cartSlice = createSlice({
 
     updateQuantity(
       state,
-      action: PayloadAction<{ id: string; quantity: number }>
+      action: PayloadAction<{ id: string; quantity: number }>,
     ) {
       const { id, quantity } = action.payload;
 
@@ -126,6 +171,32 @@ const cartSlice = createSlice({
       state.totalQuantity = totalQuantity;
       state.totalAmount = totalAmount;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchServerCart.pending, (state) => {
+        state.serverCartLoading = true;
+        state.serverCartError = null;
+      })
+      .addCase(fetchServerCart.fulfilled, (state, action) => {
+        state.serverCartLoading = false;
+        state.serverCart = action.payload;
+      })
+      .addCase(fetchServerCart.rejected, (state, action) => {
+        state.serverCartLoading = false;
+        state.serverCartError = action.payload as string;
+      })
+      // removeServerCartItem: optimistically remove item from UI
+      .addCase(removeServerCartItem.pending, (state, action) => {
+        if (state.serverCart) {
+          state.serverCart.orderItems = state.serverCart.orderItems.filter(
+            (item) => item.id !== action.meta.arg,
+          );
+        }
+      })
+      .addCase(removeServerCartItem.rejected, (state, action) => {
+        state.serverCartError = action.payload as string;
+      });
   },
 });
 
