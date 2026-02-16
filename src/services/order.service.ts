@@ -33,6 +33,25 @@ export const orderService = {
   },
 
   /**
+   * Fetch user's orders (excluding InCart).
+   * GET /orders/my-orders
+   */
+  getMyOrders: async (): Promise<ApiResponse<CartData[]>> => {
+    return api.get("/orders/my-orders");
+  },
+
+  /**
+   * Update the quantity of a cart item.
+   * PUT /orders/cart/:orderItemId
+   */
+  updateCartItemQuantity: async (
+    orderItemId: string,
+    quantity: number,
+  ): Promise<ApiResponse<null>> => {
+    return api.put(`/orders/cart/${orderItemId}`, { quantity });
+  },
+
+  /**
    * Submit checkout — collects shipping info and initiates Stripe payment.
    * POST /orders/checkout
    */
@@ -40,5 +59,15 @@ export const orderService = {
     payload: CheckoutPayload,
   ): Promise<ApiResponse<CheckoutResponseData>> => {
     return api.post("/orders/checkout", payload);
+  },
+
+  /**
+   * Generate a new Stripe payment link for an order.
+   * POST /orders/repay/{orderGroupId}
+   */
+  repayOrder: async (
+    orderGroupId: string,
+  ): Promise<ApiResponse<{ paymentUrl: string }>> => {
+    return api.post(`/orders/repay/${orderGroupId}`);
   },
 };

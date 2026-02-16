@@ -10,6 +10,8 @@ import {
   ChevronUp,
   Loader2,
   Trash2,
+  Minus,
+  Plus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { orderService } from "@/src/services/order.service";
@@ -115,9 +117,21 @@ interface CartItemCardProps {
   item: OrderItem;
   onRemove: (id: string) => void;
   removing: boolean;
+  selected: boolean;
+  onToggleSelect: (id: string) => void;
+  onUpdateQuantity: (id: string, quantity: number) => void;
+  updatingQuantity: boolean;
 }
 
-const CartItemCard: FC<CartItemCardProps> = ({ item, onRemove, removing }) => {
+const CartItemCard: FC<CartItemCardProps> = ({
+  item,
+  onRemove,
+  removing,
+  selected,
+  onToggleSelect,
+  onUpdateQuantity,
+  updatingQuantity,
+}) => {
   const [expanded, setExpanded] = useState(false);
   const isCustom = item.isCustom && item.orderItemComponents.length > 0;
 
@@ -127,11 +141,23 @@ const CartItemCard: FC<CartItemCardProps> = ({ item, onRemove, removing }) => {
     (isCustom ? item.orderItemComponents[0]?.partImageUrl : null);
 
   return (
-    <div className="py-6 border-b border-gray-100">
+    <div
+      className={`py-6 border-b border-gray-100 transition-colors ${selected ? "bg-red-50/30" : ""}`}
+    >
       {/* Main row */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
         {/* Product Info */}
         <div className="md:col-span-7 flex gap-4">
+          {/* Checkbox */}
+          <div className="flex items-center shrink-0">
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={() => onToggleSelect(item.id)}
+              className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
+              aria-label={`Select ${item.productName}`}
+            />
+          </div>
           {/* Image */}
           <div className="relative w-24 h-24 bg-gray-50 shrink-0 border border-gray-100 rounded-sm overflow-hidden">
             {displayImage ? (
@@ -181,9 +207,31 @@ const CartItemCard: FC<CartItemCardProps> = ({ item, onRemove, removing }) => {
 
         {/* Quantity */}
         <div className="md:col-span-2 flex items-center justify-center">
-          <span className="text-sm font-bold text-gray-700 bg-gray-100 px-4 py-2 rounded">
-            ×{item.quantity}
-          </span>
+          <div className="flex items-center gap-0 border border-gray-200 rounded">
+            <button
+              onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+              disabled={item.quantity <= 1 || updatingQuantity}
+              className="w-8 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Decrease quantity"
+            >
+              <Minus className="w-3.5 h-3.5" />
+            </button>
+            <span className="w-10 h-9 flex items-center justify-center text-sm font-bold text-gray-700 border-x border-gray-200 tabular-nums">
+              {updatingQuantity ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400" />
+              ) : (
+                item.quantity
+              )}
+            </span>
+            <button
+              onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+              disabled={item.quantity >= 99 || updatingQuantity}
+              className="w-8 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Increase quantity"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
         {/* Total Price & Remove */}
@@ -224,70 +272,109 @@ const CartItemCard: FC<CartItemCardProps> = ({ item, onRemove, removing }) => {
 // ─── Order Summary Sidebar ─────────────────────────────────
 interface OrderSummaryProps {
   cart: CartData;
+  selectedItemIds: Set<string>;
   onCheckout: () => void;
 }
 
-const OrderSummary: FC<OrderSummaryProps> = ({ cart, onCheckout }) => (
-  <div className="w-full lg:w-[350px] shrink-0">
-    <div className="bg-gray-50 p-6 md:p-8 rounded-sm sticky top-28">
-      <h3 className="font-oswald font-bold text-lg uppercase mb-4 border-b border-gray-200 pb-2">
-        Order Summary
-      </h3>
+const OrderSummary: FC<OrderSummaryProps> = ({
+  cart,
+  selectedItemIds,
+  onCheckout,
+}) => {
+  // Calculate totals based on selected items only
+  const selectedItems = cart.orderItems.filter((item) =>
+    selectedItemIds.has(item.id),
+  );
+  const selectedTotal = selectedItems.reduce(
+    (sum, item) => sum + item.totalPrice,
+    0,
+  );
+  const selectedCount = selectedItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0,
+  );
+  const hasSelection = selectedItemIds.size > 0;
 
-      {/* Subtotal */}
-      {cart.subTotal > 0 && (
-        <div className="flex justify-between items-center mb-2 text-sm">
-          <span className="text-gray-600">Subtotal</span>
-          <span className="font-medium">{cart.subTotal.toLocaleString()}₫</span>
-        </div>
-      )}
+  return (
+    <div className="w-full lg:w-[350px] shrink-0">
+      <div className="bg-gray-50 p-6 md:p-8 rounded-sm sticky top-28">
+        <h3 className="font-oswald font-bold text-lg uppercase mb-4 border-b border-gray-200 pb-2">
+          Order Summary
+        </h3>
 
-      {/* Shipping */}
-      {cart.shippingFee > 0 && (
+        {/* Selected items info */}
         <div className="flex justify-between items-center mb-2 text-sm">
-          <span className="text-gray-600">Shipping</span>
+          <span className="text-gray-600">Selected items</span>
           <span className="font-medium">
-            {cart.shippingFee.toLocaleString()}₫
+            {selectedItemIds.size} item{selectedItemIds.size !== 1 ? "s" : ""} (
+            {selectedCount} qty)
           </span>
         </div>
-      )}
 
-      {/* Discount */}
-      {cart.discountAmount > 0 && (
-        <div className="flex justify-between items-center mb-2 text-sm">
-          <span className="text-gray-600">Discount</span>
-          <span className="font-medium text-green-600">
-            -{cart.discountAmount.toLocaleString()}₫
+        {/* Subtotal */}
+        {cart.subTotal > 0 && (
+          <div className="flex justify-between items-center mb-2 text-sm">
+            <span className="text-gray-600">Subtotal</span>
+            <span className="font-medium">
+              {cart.subTotal.toLocaleString()}₫
+            </span>
+          </div>
+        )}
+
+        {/* Shipping */}
+        {cart.shippingFee > 0 && (
+          <div className="flex justify-between items-center mb-2 text-sm">
+            <span className="text-gray-600">Shipping</span>
+            <span className="font-medium">
+              {cart.shippingFee.toLocaleString()}₫
+            </span>
+          </div>
+        )}
+
+        {/* Discount */}
+        {cart.discountAmount > 0 && (
+          <div className="flex justify-between items-center mb-2 text-sm">
+            <span className="text-gray-600">Discount</span>
+            <span className="font-medium text-green-600">
+              -{cart.discountAmount.toLocaleString()}₫
+            </span>
+          </div>
+        )}
+
+        {/* Total */}
+        <div className="flex justify-between items-end mb-2 mt-4 pt-3 border-t border-gray-200">
+          <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">
+            Estimated Total
+          </span>
+          <span className="text-xl font-black text-black">
+            {selectedTotal.toLocaleString()}₫
           </span>
         </div>
-      )}
 
-      {/* Total */}
-      <div className="flex justify-between items-end mb-2 mt-4 pt-3 border-t border-gray-200">
-        <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">
-          Total
-        </span>
-        <span className="text-xl font-black text-black">
-          {cart.totalAmount.toLocaleString()}₫
-        </span>
-      </div>
+        <p className="text-xs text-gray-400 mb-6 text-right">
+          Taxes and shipping calculated at checkout
+        </p>
 
-      <p className="text-xs text-gray-400 mb-6 text-right">
-        Taxes and shipping calculated at checkout
-      </p>
-
-      {/* Action Buttons */}
-      <div className="space-y-3">
-        <button
-          onClick={onCheckout}
-          className="w-full bg-black text-white h-12 text-sm font-bold uppercase tracking-widest hover:bg-[#ce2a32] transition-colors duration-200 rounded-sm"
-        >
-          Proceed to Checkout
-        </button>
+        {/* Action Buttons */}
+        <div className="space-y-3">
+          <button
+            onClick={onCheckout}
+            disabled={!hasSelection}
+            className={`w-full h-12 text-sm font-bold uppercase tracking-widest transition-colors duration-200 rounded-sm ${
+              hasSelection
+                ? "bg-black text-white hover:bg-[#ce2a32]"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+          >
+            {hasSelection
+              ? `Proceed to Checkout (${selectedItemIds.size})`
+              : "Select Items to Checkout"}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ═════════════════════════════════════════════════════════════
 // Main Cart Page
@@ -298,6 +385,36 @@ export default function CartPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [updatingQuantityId, setUpdatingQuantityId] = useState<string | null>(
+    null,
+  );
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(
+    new Set(),
+  );
+
+  // Toggle selection for a single item
+  const handleToggleSelect = useCallback((id: string) => {
+    setSelectedItemIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  // Select / deselect all
+  const handleToggleSelectAll = useCallback(() => {
+    if (!cart) return;
+    setSelectedItemIds((prev) => {
+      if (prev.size === cart.orderItems.length) {
+        return new Set();
+      }
+      return new Set(cart.orderItems.map((item) => item.id));
+    });
+  }, [cart]);
 
   // Fetch cart from API
   useEffect(() => {
@@ -308,6 +425,10 @@ export default function CartPage() {
         const res = await orderService.getCart();
         if (res.success) {
           setCart(res.data);
+          // Auto-select all items on load
+          setSelectedItemIds(
+            new Set(res.data.orderItems.map((item) => item.id)),
+          );
         } else {
           setError(res.message || "Failed to load cart");
         }
@@ -322,8 +443,12 @@ export default function CartPage() {
   }, []);
 
   const handleCheckout = useCallback(() => {
-    router.push(ROUTES.CHECKOUT);
-  }, [router]);
+    if (selectedItemIds.size === 0) return;
+    // Pass selected item IDs via URL search params
+    const params = new URLSearchParams();
+    selectedItemIds.forEach((id) => params.append("items", id));
+    router.push(`${ROUTES.CHECKOUT}?${params.toString()}`);
+  }, [router, selectedItemIds]);
 
   const handleRemoveItem = useCallback(async (orderItemId: string) => {
     setRemovingId(orderItemId);
@@ -331,6 +456,12 @@ export default function CartPage() {
       const res = await orderService.deleteCartItem(orderItemId);
       if (res.success) {
         toast.success("Item removed from cart");
+        // Remove from selection
+        setSelectedItemIds((prev) => {
+          const next = new Set(prev);
+          next.delete(orderItemId);
+          return next;
+        });
         // Re-fetch cart to get updated totals
         const cartRes = await orderService.getCart();
         if (cartRes.success) {
@@ -345,6 +476,67 @@ export default function CartPage() {
       setRemovingId(null);
     }
   }, []);
+
+  // Update item quantity with optimistic UI
+  const handleUpdateQuantity = useCallback(
+    async (orderItemId: string, newQuantity: number) => {
+      // Validate
+      if (!Number.isInteger(newQuantity) || newQuantity < 1 || newQuantity > 99)
+        return;
+      if (!cart) return;
+
+      // Save previous state for rollback
+      const previousCart = cart;
+
+      // Optimistic update
+      setCart((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          orderItems: prev.orderItems.map((item) => {
+            if (item.id !== orderItemId) return item;
+            return {
+              ...item,
+              quantity: newQuantity,
+              totalPrice: item.unitPrice * newQuantity,
+            };
+          }),
+          totalAmount: prev.orderItems.reduce((sum, item) => {
+            if (item.id === orderItemId) {
+              return sum + item.unitPrice * newQuantity;
+            }
+            return sum + item.totalPrice;
+          }, 0),
+        };
+      });
+
+      setUpdatingQuantityId(orderItemId);
+      try {
+        const res = await orderService.updateCartItemQuantity(
+          orderItemId,
+          newQuantity,
+        );
+        if (res.success) {
+          // Re-fetch to sync with server
+          const cartRes = await orderService.getCart();
+          if (cartRes.success) {
+            setCart(cartRes.data);
+          }
+        } else {
+          // Revert on error
+          setCart(previousCart);
+          toast.error(res.message || "Failed to update quantity");
+        }
+      } catch {
+        // Revert on error
+        setCart(previousCart);
+        toast.error("Failed to update quantity");
+      } finally {
+        setUpdatingQuantityId(null);
+      }
+    },
+    [cart],
+  );
 
   // Loading state
   if (loading) {
@@ -392,9 +584,38 @@ export default function CartPage() {
         <div className="flex-1">
           {/* Table Header (Desktop) */}
           <div className="hidden md:grid grid-cols-12 gap-4 pb-4 border-b border-gray-200 text-xs font-bold text-gray-400 uppercase tracking-widest">
-            <div className="col-span-7">Product</div>
+            <div className="col-span-7 flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={
+                  selectedItemIds.size === cart.orderItems.length &&
+                  cart.orderItems.length > 0
+                }
+                onChange={handleToggleSelectAll}
+                className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
+                aria-label="Select all items"
+              />
+              Product
+            </div>
             <div className="col-span-2 text-center">Quantity</div>
             <div className="col-span-3 text-right">Total</div>
+          </div>
+
+          {/* Mobile: Select All */}
+          <div className="md:hidden flex items-center gap-2 py-3 border-b border-gray-200">
+            <input
+              type="checkbox"
+              checked={
+                selectedItemIds.size === cart.orderItems.length &&
+                cart.orderItems.length > 0
+              }
+              onChange={handleToggleSelectAll}
+              className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
+              aria-label="Select all items"
+            />
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+              Select All ({cart.orderItems.length})
+            </span>
           </div>
 
           {/* Cart Items */}
@@ -405,13 +626,21 @@ export default function CartPage() {
                 item={item}
                 onRemove={handleRemoveItem}
                 removing={removingId === item.id}
+                selected={selectedItemIds.has(item.id)}
+                onToggleSelect={handleToggleSelect}
+                onUpdateQuantity={handleUpdateQuantity}
+                updatingQuantity={updatingQuantityId === item.id}
               />
             ))}
           </div>
         </div>
 
         {/* Order Summary */}
-        <OrderSummary cart={cart} onCheckout={handleCheckout} />
+        <OrderSummary
+          cart={cart}
+          selectedItemIds={selectedItemIds}
+          onCheckout={handleCheckout}
+        />
       </div>
     </div>
   );

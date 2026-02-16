@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { logoutUser } from "@/src/store/action/authActions";
 import { setCartOpen, fetchServerCart } from "@/src/store/slices/cartSlice";
 import { ShopStatus } from "@/src/types/shop.types";
-import { Store, Clock, AlertCircle, ShieldCheck } from "lucide-react";
+import { Store, Clock, AlertCircle, ShieldCheck, Package } from "lucide-react";
 
 const MenuIcon = () => (
   <svg
@@ -227,6 +227,15 @@ export const Header: FC = () => {
                     onClick={() => setUserDropdownOpen(false)}
                   >
                     My Profile
+                  </Link>
+
+                  <Link
+                    href="/orders"
+                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
+                    onClick={() => setUserDropdownOpen(false)}
+                  >
+                    {/* <Package className="w-4 h-4" /> */}
+                    My Orders
                   </Link>
 
                   {/* Nếu là Admin */}

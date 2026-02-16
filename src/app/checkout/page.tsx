@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, FormEvent } from "react";
+import { useState, useEffect, useCallback, FormEvent, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -14,6 +14,7 @@ import {
 import { orderService } from "@/src/services/order.service";
 import { CartData, OrderItem } from "@/src/types/order.types";
 import { toast } from "react-toastify";
+import { useSearchParams } from "next/navigation";
 
 // ─── Form State ────────────────────────────────────────────
 interface CheckoutForm {
@@ -145,7 +146,10 @@ const CheckoutItemRow = ({ item }: { item: OrderItem }) => {
 // ═════════════════════════════════════════════════════════════
 // Main Checkout Page
 // ═════════════════════════════════════════════════════════════
-export default function CheckoutPage() {
+function CheckoutContent() {
+  const searchParams = useSearchParams();
+  const selectedOrderItemIds = searchParams.getAll("items");
+
   const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -159,13 +163,29 @@ export default function CheckoutPage() {
   });
   const [errors, setErrors] = useState<FormErrors>({});
 
-  // Fetch cart data
+  // Fetch cart data and pre-fill form if available
   useEffect(() => {
     const fetchCart = async () => {
       try {
         const res = await orderService.getCart();
         if (res.success) {
           setCart(res.data);
+
+          // Pre-fill form with saved shipping info from cart
+          const cartData = res.data;
+          if (
+            cartData.receiverName ||
+            cartData.receiverPhone ||
+            cartData.shippingAddress
+          ) {
+            setForm((prev) => ({
+              ...prev,
+              receiverName: cartData.receiverName || prev.receiverName,
+              receiverPhone: cartData.receiverPhone || prev.receiverPhone,
+              shippingAddress: cartData.shippingAddress || prev.shippingAddress,
+              note: cartData.note || prev.note,
+            }));
+          }
         }
       } catch {
         // Cart fetch failed — will show empty state
@@ -210,6 +230,7 @@ export default function CheckoutPage() {
           note: form.note.trim(),
           successUrl: `${origin}/payment-success`,
           cancelUrl: `${origin}/payment-fail`,
+          selectedOrderItemIds,
         });
 
         if (res.success && res.data?.paymentUrl) {
@@ -225,7 +246,7 @@ export default function CheckoutPage() {
         setSubmitting(false);
       }
     },
-    [form],
+    [form, selectedOrderItemIds],
   );
 
   // ─── Loading ─────────────────────────────────────────────
@@ -253,7 +274,34 @@ export default function CheckoutPage() {
       </div>
     );
   }
+  // Filter to only selected items
+  const selectedItems =
+    selectedOrderItemIds.length > 0
+      ? cart.orderItems.filter((item) => selectedOrderItemIds.includes(item.id))
+      : cart.orderItems;
+  const selectedTotal = selectedItems.reduce(
+    (sum, item) => sum + item.totalPrice,
+    0,
+  );
 
+  // No selected items found
+  if (selectedItems.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-4">
+        <ShoppingBag className="w-16 h-16 text-gray-300 mb-4" />
+        <h2 className="text-2xl font-bold mb-2">No items selected</h2>
+        <p className="text-gray-500 mb-6">
+          Please go back to your cart and select items to checkout.
+        </p>
+        <Link
+          href="/cart"
+          className="bg-black text-white px-6 py-3 rounded text-sm font-bold uppercase hover:bg-[#ce2a32] transition-colors"
+        >
+          Return to Cart
+        </Link>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen flex flex-col lg:flex-row font-sans text-[#333]">
       {/* ═══════════════════════════════════════════════════════
@@ -412,7 +460,7 @@ export default function CheckoutPage() {
             />
           </div>
           <span className="font-bold text-lg text-black">
-            {cart.totalAmount.toLocaleString()}₫
+            {selectedTotal.toLocaleString()}₫
           </span>
         </button>
 
@@ -424,7 +472,7 @@ export default function CheckoutPage() {
         >
           {/* Product List */}
           <div className="space-y-4 mb-6">
-            {cart.orderItems.map((item) => (
+            {selectedItems.map((item) => (
               <CheckoutItemRow key={item.id} item={item} />
             ))}
           </div>
@@ -463,12 +511,26 @@ export default function CheckoutPage() {
             <div className="flex items-baseline gap-2">
               <span className="text-xs text-gray-500 font-medium">VND</span>
               <span className="text-2xl font-bold text-black tracking-tight">
-                {cart.totalAmount.toLocaleString()}₫
+                {selectedTotal.toLocaleString()}₫
               </span>
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+        </div>
+      }
+    >
+      <CheckoutContent />
+    </Suspense>
   );
 }

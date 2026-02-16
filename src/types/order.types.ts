@@ -19,6 +19,8 @@ export interface OrderItem {
   assembledProductId: string | null;
   productName: string;
   productImage: string | null;
+  shopId: string;
+  shopName: string | null;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
@@ -31,12 +33,21 @@ export interface OrderItem {
 /** Cart data returned by GET /orders/cart */
 export interface CartData {
   id: string;
+  orderGroupId: string;
+  shopId: string;
   shopName: string;
+  shopAvatar: string | null;
   orderStatus: string;
+  paymentStatus: string;
   subTotal: number;
   shippingFee: number;
   discountAmount: number;
   totalAmount: number;
+  receiverName: string;
+  receiverPhone: string;
+  shippingAddress: string;
+  note: string | null;
+  createdAt: string;
   orderItems: OrderItem[];
 }
 
@@ -55,6 +66,7 @@ export interface CheckoutPayload {
   note: string;
   successUrl: string;
   cancelUrl: string;
+  selectedOrderItemIds: string[];
 }
 
 /** Response data from POST /orders/checkout */

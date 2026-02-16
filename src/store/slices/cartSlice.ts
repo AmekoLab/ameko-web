@@ -49,6 +49,30 @@ export const removeServerCartItem = createAsyncThunk(
   },
 );
 
+// ─── Async Thunk: Update cart item quantity on server ────
+export const updateServerCartItemQuantity = createAsyncThunk(
+  "cart/updateServerCartItemQuantity",
+  async (
+    { orderItemId, quantity }: { orderItemId: string; quantity: number },
+    { dispatch, rejectWithValue },
+  ) => {
+    try {
+      const res = await orderService.updateCartItemQuantity(
+        orderItemId,
+        quantity,
+      );
+      if (res.success) {
+        dispatch(fetchServerCart());
+        return { orderItemId, quantity };
+      }
+      return rejectWithValue(res.message || "Failed to update quantity");
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      return rejectWithValue(err.message || "Failed to update quantity");
+    }
+  },
+);
+
 interface CartState {
   items: CartItem[];
   totalQuantity: number;
