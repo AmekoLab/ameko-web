@@ -2,7 +2,8 @@
 
 import { FC, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { UserProfile, Product } from "@/src/types/profile";
+import { Product } from "@/src/types/profile";
+import { ShopPublicProfile } from "@/src/types/shop.types";
 import { Post } from "@/src/types/community";
 import { ProfileSidebar } from "./ProfileSidebar";
 import FeedClient from "../Community/FeedClient";
@@ -25,7 +26,7 @@ import { ReviewItem } from "../Review/ReviewItem";
 type TabType = "posts" | "shop" | "showcase" | "reviews";
 
 export const ProfileView: FC<{
-  profile: UserProfile;
+  profile: ShopPublicProfile;
   initialPosts: Post[];
 }> = ({ profile, initialPosts }) => {
   const router = useRouter();
@@ -35,7 +36,7 @@ export const ProfileView: FC<{
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingShop, setLoadingShop] = useState(false);
-  const [hasFetchedShop, setHasFetchedShop] = useState(false); // Đánh dấu đã fetch chưa để không fetch lại thừa
+  const [hasFetchedShop, setHasFetchedShop] = useState(false);
 
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewStats, setReviewStats] = useState<IReviewStats | null>(null);
@@ -44,8 +45,6 @@ export const ProfileView: FC<{
 
   const handleChangeTab = useCallback(
     (tab: TabType) => {
-      // Dùng router.replace để đổi URL mà không reload trang (shallow routing)
-      // scroll: false để không bị nhảy trang lên đầu
       router.replace(`?tab=${tab}`, { scroll: false });
     },
     [router],
@@ -53,11 +52,9 @@ export const ProfileView: FC<{
 
   // Lazy load products
   useEffect(() => {
-    // Biến cờ để ngăn chặn Race Condition (khi user bấm chuyển tab liên tục)
     let ignore = false;
 
     const fetchShopData = async () => {
-      // Chỉ fetch nếu tab là shop và chưa từng fetch trước đó
       if (currentTab === "shop" && !hasFetchedShop) {
         setLoadingShop(true);
 
@@ -80,7 +77,7 @@ export const ProfileView: FC<{
               ? "In Stock"
               : "Sold Out") as Product["status"],
           }));
-          // Chỉ update state nếu component còn mounted và chưa bị hủy
+
           if (!ignore) {
             setProducts(mapped);
             setHasFetchedShop(true);
@@ -95,7 +92,6 @@ export const ProfileView: FC<{
 
     fetchShopData();
 
-    // Cleanup function: Chạy khi component unmount hoặc dependency thay đổi
     return () => {
       ignore = true;
     };
@@ -115,7 +111,6 @@ export const ProfileView: FC<{
       if (currentTab === "reviews" && !hasFetchedReviews) {
         setLoadingReviews(true);
         try {
-          // Gọi song song cả stats và list review
           const [statsData, listData] = await Promise.all([
             ProfileService.getReviewStats(profile.id),
             ProfileService.getReviews(profile.id),
@@ -139,7 +134,6 @@ export const ProfileView: FC<{
     };
   }, [currentTab, profile.id, hasFetchedReviews]);
 
-  // Skeleton Reviews
   const ReviewSkeleton = () => (
     <div className="bg-white p-6 rounded-sm border border-gray-100 mb-4 animate-pulse">
       <div className="flex gap-4">
@@ -235,23 +229,17 @@ export const ProfileView: FC<{
               {loadingReviews ? (
                 <>
                   <div className="h-32 bg-white mb-6 rounded-sm border border-gray-100 animate-pulse" />{" "}
-                  {/* Stats Skeleton */}
                   <ReviewSkeleton />
                   <ReviewSkeleton />
                 </>
               ) : reviewStats ? (
                 <>
-                  {/* 1. Bảng thống kê */}
                   <ReviewStats stats={reviewStats} />
-
-                  {/* 2. Danh sách review */}
                   <div className="space-y-4">
                     {reviews.map((review) => (
                       <ReviewItem key={review.id} review={review} />
                     ))}
                   </div>
-
-                  {/* Empty State */}
                   {reviews.length === 0 && (
                     <div className="bg-white p-16 text-center rounded-sm border border-dashed border-gray-300">
                       <Star className="w-10 h-10 text-gray-300 mx-auto mb-3" />

@@ -6,6 +6,7 @@ import {
   ShopPublicProfile,
   ShopResponse,
 } from "@/src/types/shop.types";
+import { deactivateShop } from "../store/slices/shopSlice";
 
 export const shopService = {
   registerShop: async (formData: FormData) => {
@@ -67,5 +68,13 @@ export const shopService = {
 
   unbanShop: async (shopId: string) => {
     return api.patch<any, ApiResponse<null>>(`/shops/admin/${shopId}/unban`);
+  },
+
+  deactivate: async () => {
+    return api.put<any, ApiResponse<null>>("/shops/deactivate");
+  },
+
+  reactivate: async () => {
+    return api.put<any, ApiResponse<null>>("/shops/reactivate");
   },
 };

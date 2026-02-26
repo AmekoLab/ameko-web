@@ -7,6 +7,8 @@ import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
   fetchCurrentShop,
   patchShopProfile,
+  deactivateShop,
+  reactivateShop,
 } from "@/src/store/slices/shopSlice";
 import {
   UpdateShopSchema,
@@ -22,6 +24,8 @@ import {
   UploadCloud,
   Store,
   Loader2,
+  Power,
+  PowerOff,
 } from "lucide-react";
 
 // ==================== IMAGE UPLOAD COMPONENT ====================
@@ -150,6 +154,10 @@ export default function ShopProfilePage() {
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // State quản lý Modal Xác nhận và Trạng thái loading
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -160,12 +168,10 @@ export default function ShopProfilePage() {
     resolver: zodResolver(UpdateShopSchema),
   });
 
-  // Fetch shop data on mount
   useEffect(() => {
     dispatch(fetchCurrentShop());
   }, [dispatch]);
 
-  // Populate form when shop data loads
   useEffect(() => {
     if (currentShop) {
       reset({
@@ -202,7 +208,33 @@ export default function ShopProfilePage() {
     }
   };
 
-  // Loading state
+  // --- HÀM THỰC THI BẬT/TẮT SAU KHI XÁC NHẬN ---
+  const executeToggleStatus = async () => {
+    if (!currentShop) return;
+
+    // Sử dụng trường isActive từ Backend trả về
+    const isCurrentlyActive = currentShop.isActive;
+    setIsToggling(true);
+
+    try {
+      if (isCurrentlyActive) {
+        await dispatch(deactivateShop()).unwrap();
+        toast.success("Gian hàng đã tạm nghỉ bán.");
+      } else {
+        await dispatch(reactivateShop()).unwrap();
+        toast.success("Gian hàng đã mở bán trở lại.");
+      }
+      // Gọi API tải lại thông tin shop để nhận biến isActive mới nhất
+      dispatch(fetchCurrentShop());
+      setIsConfirmModalOpen(false); // Đóng Modal khi thành công
+    } catch (error: any) {
+      toast.error(error || "Thao tác thất bại. Vui lòng thử lại.");
+    } finally {
+      setIsToggling(false);
+    }
+  };
+
+  // Loading state (Toàn trang)
   if (loading && !currentShop) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -232,10 +264,70 @@ export default function ShopProfilePage() {
   }
 
   return (
-    <div className="py-6 px-2 md:px-0">
+    <div className="py-6 px-2 md:px-0 relative">
+      {/* ==================== CUSTOM CONFIRM MODAL ==================== */}
+      {isConfirmModalOpen && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm transition-opacity">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
+            {/* Icon Trạng Thái */}
+            <div
+              className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+                currentShop?.isActive
+                  ? "bg-red-50 text-red-500"
+                  : "bg-green-50 text-green-500"
+              }`}
+            >
+              {currentShop?.isActive ? (
+                <PowerOff className="w-8 h-8" />
+              ) : (
+                <Power className="w-8 h-8" />
+              )}
+            </div>
+
+            {/* Tiêu đề & Nội dung */}
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              {currentShop?.isActive ? "Tạm nghỉ bán?" : "Mở cửa trở lại?"}
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">
+              {currentShop?.isActive
+                ? "Gian hàng của bạn sẽ bị ẩn. Khách hàng không thể xem hoặc mua sản phẩm từ bạn cho đến khi mở lại."
+                : "Gian hàng của bạn sẽ hiển thị trở lại. Khách hàng có thể tiếp tục xem và mua sắm bình thường."}
+            </p>
+
+            {/* Cụm Nút Hành Động */}
+            <div className="flex w-full gap-3">
+              <button
+                type="button"
+                onClick={() => setIsConfirmModalOpen(false)}
+                disabled={isToggling}
+                className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors disabled:opacity-70"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                type="button"
+                onClick={executeToggleStatus}
+                disabled={isToggling}
+                className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-white font-bold rounded-xl transition-colors shadow-sm disabled:opacity-70 ${
+                  currentShop?.isActive
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
+              >
+                {isToggling ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  "Xác nhận"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-5xl mx-auto">
         {/* HEADER */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-black font-oswald uppercase text-gray-900">
               Shop Profile
@@ -244,31 +336,60 @@ export default function ShopProfilePage() {
               Update your shop&apos;s information and settings.
             </p>
           </div>
-          {currentShop && (
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
-                currentShop.status === 1
-                  ? "bg-green-100 text-green-700"
-                  : currentShop.status === 0
-                    ? "bg-yellow-100 text-yellow-700"
-                    : currentShop.status === 3
-                      ? "bg-red-100 text-red-700"
-                      : currentShop.status === 4
-                        ? "bg-gray-200 text-gray-600"
-                        : "bg-gray-100 text-gray-500"
-              }`}
-            >
-              {currentShop.status === 1
-                ? "Active"
-                : currentShop.status === 0
-                  ? "Pending"
-                  : currentShop.status === 3
-                    ? "Rejected"
-                    : currentShop.status === 4
-                      ? "Banned"
-                      : "Inactive"}
-            </span>
-          )}
+
+          <div className="flex flex-wrap items-center gap-3">
+            {/* --- NHÃN TRẠNG THÁI HIỂN THỊ DỰA VÀO isActive --- */}
+            {currentShop && (
+              <span
+                className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${
+                  currentShop.status === 1 && currentShop.isActive
+                    ? "bg-green-100 text-green-700"
+                    : currentShop.status === 1 && !currentShop.isActive
+                      ? "bg-gray-100 text-gray-500" // Trạng thái Inactive
+                      : currentShop.status === 0
+                        ? "bg-yellow-100 text-yellow-700"
+                        : currentShop.status === 3
+                          ? "bg-red-100 text-red-700"
+                          : currentShop.status === 4
+                            ? "bg-gray-200 text-gray-600"
+                            : "bg-gray-100 text-gray-500"
+                }`}
+              >
+                {currentShop.status === 1 && currentShop.isActive
+                  ? "Active"
+                  : currentShop.status === 1 && !currentShop.isActive
+                    ? "Inactive (Nghỉ Bán)"
+                    : currentShop.status === 0
+                      ? "Pending"
+                      : currentShop.status === 3
+                        ? "Rejected"
+                        : currentShop.status === 4
+                          ? "Banned"
+                          : "Unknown"}
+              </span>
+            )}
+
+            {/* --- NÚT GỌI POPUP BẬT / TẮT --- */}
+            {/* Nút chỉ được hiện nếu Shop đã được duyệt (status = 1) */}
+            {currentShop?.status === 1 && (
+              <button
+                type="button"
+                onClick={() => setIsConfirmModalOpen(true)}
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-colors border shadow-sm ${
+                  currentShop.isActive
+                    ? "bg-white border-red-500 text-red-600 hover:bg-red-50"
+                    : "bg-green-600 border-green-600 text-white hover:bg-green-700"
+                }`}
+              >
+                {currentShop.isActive ? (
+                  <PowerOff className="w-3.5 h-3.5" />
+                ) : (
+                  <Power className="w-3.5 h-3.5" />
+                )}
+                {currentShop.isActive ? "Deactivate" : "Reactivate"}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Admin note (if rejected) */}
@@ -384,50 +505,44 @@ export default function ShopProfilePage() {
             </div>
           </div>
 
-          {/* --- SECTION 3: BANKING INFORMATION --- */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
+          {/* --- SECTION 3: BANKING INFORMATION (Read-only) --- */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 opacity-80">
             <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
               <CreditCard className="text-[#ce2a32]" />
               <h3 className="text-lg font-bold text-gray-800 uppercase">
                 Banking Information
               </h3>
+              <span className="ml-auto text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                Locked
+              </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <InputLabel
-                  label="Bank Name"
-                  error={errors.bankName?.message}
-                  required
-                />
+                <InputLabel label="Bank Name" />
                 <input
                   {...register("bankName")}
-                  className="form-input"
+                  className="form-input bg-gray-100 text-gray-500 cursor-not-allowed"
                   placeholder="Bank Name"
+                  disabled
                 />
               </div>
               <div>
-                <InputLabel
-                  label="Account Number"
-                  error={errors.bankAccountNumber?.message}
-                  required
-                />
+                <InputLabel label="Account Number" />
                 <input
                   {...register("bankAccountNumber")}
-                  className="form-input font-mono"
+                  className="form-input font-mono bg-gray-100 text-gray-500 cursor-not-allowed"
                   placeholder="Account Number"
+                  disabled
                 />
               </div>
               <div className="md:col-span-2">
-                <InputLabel
-                  label="Account Holder Name"
-                  error={errors.bankAccountName?.message}
-                  required
-                />
+                <InputLabel label="Account Holder Name" />
                 <input
                   {...register("bankAccountName")}
-                  className="form-input uppercase"
+                  className="form-input uppercase bg-gray-100 text-gray-500 cursor-not-allowed"
                   placeholder="Account Holder Name"
+                  disabled
                 />
               </div>
             </div>

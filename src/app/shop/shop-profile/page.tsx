@@ -7,6 +7,8 @@ import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
   fetchCurrentShop,
   patchShopProfile,
+  deactivateShop, // Đã thêm import
+  reactivateShop, // Đã thêm import
 } from "@/src/store/slices/shopSlice";
 import {
   UpdateShopSchema,
@@ -22,6 +24,8 @@ import {
   UploadCloud,
   Store,
   Loader2,
+  Power, // Icon cho mở lại shop
+  PowerOff, // Icon cho tắt shop
 } from "lucide-react";
 
 // ==================== IMAGE UPLOAD COMPONENT ====================
@@ -150,6 +154,9 @@ export default function ShopProfilePage() {
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // State quản lý việc loading của riêng nút Bật/Tắt
+  const [isToggling, setIsToggling] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -202,7 +209,41 @@ export default function ShopProfilePage() {
     }
   };
 
-  // Loading state
+  // --- HÀM XỬ LÝ CLICK BẬT/TẮT SHOP ---
+  const handleToggleStatus = async () => {
+    if (!currentShop) return;
+
+    const isActive = currentShop.status === 1; // 1: Active
+    const actionName = isActive ? "tạm đóng cửa" : "mở cửa lại";
+
+    // Hộp thoại xác nhận
+    if (
+      !window.confirm(
+        `Bạn có chắc chắn muốn ${actionName} gian hàng này không?`,
+      )
+    ) {
+      return;
+    }
+
+    setIsToggling(true);
+    try {
+      if (isActive) {
+        await dispatch(deactivateShop()).unwrap();
+        toast.success("Gian hàng đã tạm nghỉ bán.");
+      } else {
+        await dispatch(reactivateShop()).unwrap();
+        toast.success("Gian hàng đã mở bán trở lại.");
+      }
+      // Load lại thông tin shop để Badge cập nhật status mới nhất
+      dispatch(fetchCurrentShop());
+    } catch (error: any) {
+      toast.error(error || `Lỗi khi ${actionName} gian hàng.`);
+    } finally {
+      setIsToggling(false);
+    }
+  };
+
+  // Loading state (Toàn trang)
   if (loading && !currentShop) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -231,11 +272,14 @@ export default function ShopProfilePage() {
     );
   }
 
+  // Cờ kiểm tra: Nút chỉ hiện nếu shop đang Active (1) HOẶC Inactive (2). Các trạng thái khác (Ban, Pending) sẽ ẩn nút.
+  const canToggle = currentShop?.status === 1 || currentShop?.status === 2;
+
   return (
     <div className="py-6 px-2 md:px-0">
       <div className="max-w-5xl mx-auto">
         {/* HEADER */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-black font-oswald uppercase text-gray-900">
               Shop Profile
@@ -244,31 +288,56 @@ export default function ShopProfilePage() {
               Update your shop&apos;s information and settings.
             </p>
           </div>
-          {currentShop && (
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
-                currentShop.status === 1
-                  ? "bg-green-100 text-green-700"
+
+          <div className="flex flex-wrap items-center gap-3">
+            {currentShop && (
+              <span
+                className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${
+                  currentShop.status === 1
+                    ? "bg-green-100 text-green-700"
+                    : currentShop.status === 0
+                      ? "bg-yellow-100 text-yellow-700"
+                      : currentShop.status === 3
+                        ? "bg-red-100 text-red-700"
+                        : currentShop.status === 4
+                          ? "bg-gray-200 text-gray-600"
+                          : "bg-gray-100 text-gray-500" // Inactive
+                }`}
+              >
+                {currentShop.status === 1
+                  ? "Active"
                   : currentShop.status === 0
-                    ? "bg-yellow-100 text-yellow-700"
+                    ? "Pending"
                     : currentShop.status === 3
-                      ? "bg-red-100 text-red-700"
+                      ? "Rejected"
                       : currentShop.status === 4
-                        ? "bg-gray-200 text-gray-600"
-                        : "bg-gray-100 text-gray-500"
-              }`}
-            >
-              {currentShop.status === 1
-                ? "Active"
-                : currentShop.status === 0
-                  ? "Pending"
-                  : currentShop.status === 3
-                    ? "Rejected"
-                    : currentShop.status === 4
-                      ? "Banned"
-                      : "Inactive"}
-            </span>
-          )}
+                        ? "Banned"
+                        : "Inactive"}
+              </span>
+            )}
+
+            {/* --- NÚT BẬT / TẮT SHOP --- */}
+            {canToggle && (
+              <button
+                onClick={handleToggleStatus}
+                disabled={isToggling}
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-colors border shadow-sm disabled:opacity-70 ${
+                  currentShop.status === 1
+                    ? "bg-white border-red-500 text-red-600 hover:bg-red-50" // Đang Active -> Bấm để Deactivate
+                    : "bg-green-600 border-green-600 text-white hover:bg-green-700" // Đang Inactive -> Bấm để Reactivate
+                }`}
+              >
+                {isToggling ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : currentShop.status === 1 ? (
+                  <PowerOff className="w-3.5 h-3.5" />
+                ) : (
+                  <Power className="w-3.5 h-3.5" />
+                )}
+                {currentShop.status === 1 ? "Deactivate" : "Reactivate"}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Admin note (if rejected) */}

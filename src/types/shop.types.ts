@@ -55,6 +55,9 @@ export interface ShopPublicProfile {
   rating: number;
   totalSales: number;
   createdAt: string;
+  userId: string;
+  followersCount: number;
+  followingCount: number;
 }
 
 export interface ApproveShopPayload {

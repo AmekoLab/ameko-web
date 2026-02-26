@@ -7,6 +7,7 @@ import categoriesReducer from "./slices/categoriesSlice";
 import partsReducer from "./slices/partsSlice";
 import assembledProductsReducer from "./slices/assembledProductsSlice";
 import builderReducer from "./slices/builderSlice";
+import followsReducer from "./slices/followsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     parts: partsReducer,
     assembledProducts: assembledProductsReducer,
     builder: builderReducer,
+    follows: followsReducer,
   },
 });
 export type RootState = ReturnType<typeof store.getState>;

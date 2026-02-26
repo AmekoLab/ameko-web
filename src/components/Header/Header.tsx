@@ -226,7 +226,7 @@ export const Header: FC = () => {
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
                     onClick={() => setUserDropdownOpen(false)}
                   >
-                    My Profile
+                    Account Settings
                   </Link>
 
                   <Link
@@ -258,6 +258,17 @@ export const Header: FC = () => {
                         onClick={() => setUserDropdownOpen(false)}
                       >
                         Shop Dashboard
+                      </Link>
+                    )}
+
+                  {currentShop?.status === ShopStatus.Active &&
+                    user.role !== "Admin" && (
+                      <Link
+                        href={`/profile/shop/${currentShop.id}`}
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
+                        onClick={() => setUserDropdownOpen(false)}
+                      >
+                        View My Store
                       </Link>
                     )}
 

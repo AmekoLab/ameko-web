@@ -7,6 +7,7 @@ import {
   ShopResponse,
   AdminShopListResponse,
   UpdateShopFormValues,
+  ShopPublicProfile,
 } from "@/src/types/shop.types";
 
 // --- 1. THUNK: LẤY SHOP HIỆN TẠI
@@ -198,6 +199,55 @@ export const adminUnbanShop = createAsyncThunk(
   },
 );
 
+// --- 8. THUNK: LẤY PUBLIC PROFILE CỦA SHOP (Dùng cho trang Shop Profile) ---
+export const fetchShopById = createAsyncThunk(
+  "shop/fetchShopById",
+  async (shopId: string, { rejectWithValue }) => {
+    try {
+      const response = await shopService.getShopById(shopId);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      return rejectWithValue(
+        response.message || "Không thể tải thông tin shop",
+      );
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Lỗi kết nối");
+    }
+  },
+);
+
+// Thêm vào src/store/slices/shopSlice.ts
+export const deactivateShop = createAsyncThunk(
+  "shop/deactivate",
+  async (_, { rejectWithValue }) => {
+    try {
+      // Nhớ cập nhật shopService.ts có hàm deactivate: () => api.put("/shops/deactivate")
+      const response = await shopService.deactivate();
+      return response.message;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi tắt shop",
+      );
+    }
+  },
+);
+
+export const reactivateShop = createAsyncThunk(
+  "shop/reactivate",
+  async (_, { rejectWithValue }) => {
+    try {
+      // Nhớ cập nhật shopService.ts có hàm reactivate: () => api.put("/shops/reactivate")
+      const response = await shopService.reactivate();
+      return response.message;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi mở lại shop",
+      );
+    }
+  },
+);
+
 // --- STATE ---
 interface ShopState {
   loading: boolean;
@@ -205,6 +255,7 @@ interface ShopState {
   currentShop: ShopResponse | null;
   adminShopList: ShopResponse[];
   adminPagination: PaginationParams | null;
+  viewedShop: ShopPublicProfile | null; // Dùng cho trang Shop Profile công khai (không phải của mình)
 }
 
 const initialState: ShopState = {
@@ -213,6 +264,7 @@ const initialState: ShopState = {
   currentShop: null,
   adminShopList: [],
   adminPagination: null,
+  viewedShop: null,
 };
 
 // --- SLICE ---
@@ -226,6 +278,16 @@ const shopSlice = createSlice({
       state.error = null;
       state.adminShopList = [];
       state.adminPagination = null;
+      state.viewedShop = null;
+    },
+    setInitialViewedShop: (state, action: PayloadAction<ShopPublicProfile>) => {
+      state.viewedShop = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    // Dọn dẹp profile khi user rời khỏi trang
+    clearViewedShop: (state) => {
+      state.viewedShop = null;
     },
   },
   extraReducers: (builder) => {
@@ -362,9 +424,51 @@ const shopSlice = createSlice({
       .addCase(adminUnbanShop.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload?.message || "Unban shop thất bại";
+      })
+
+      .addCase(fetchShopById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchShopById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.viewedShop = action.payload;
+      })
+      .addCase(fetchShopById.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.viewedShop = null;
+        state.error = action.payload || "Lỗi lấy thông tin shop";
+      })
+      // 9. Deactivate Shop
+      .addCase(deactivateShop.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deactivateShop.fulfilled, (state) => {
+        state.loading = false;
+        // Chúng ta không cần gán lại state.currentShop.status ở đây
+        // vì trong ShopProfilePage đã gọi dispatch(fetchCurrentShop()) để lấy data mới nhất rồi.
+      })
+      .addCase(deactivateShop.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload || "Tắt shop thất bại";
+      })
+
+      // 10. Reactivate Shop
+      .addCase(reactivateShop.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(reactivateShop.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(reactivateShop.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload || "Mở lại shop thất bại";
       });
   },
 });
 
-export const { resetShopState } = shopSlice.actions;
+export const { resetShopState, setInitialViewedShop, clearViewedShop } =
+  shopSlice.actions;
 export default shopSlice.reducer;
