@@ -24,9 +24,9 @@ export const MOCK_PRODUCTS: Product[] = [
     model3dId: "keyboard-gaming-pro",
 
     images: [
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765554095/Blossom-Honey-IK-Falcon-1_egmmas.png",
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548984/cat3_ky7ssk.png",
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/produc1_jc0ojq.png",
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548984/03_Xtrfy-K4V2-TKL-Category_gbwuve.png",
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548984/03_Xtrfy-K4V2-TKL-Category_gbwuve.png",
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548984/03_Xtrfy-K4V2-TKL-Category_gbwuve.png",
     ],
     features: [
       "Modular LCD Screen / Badge System",
@@ -104,7 +104,7 @@ export const MOCK_PRODUCTS: Product[] = [
     model3dId: "keyboard-gaming-vip",
 
     images: [
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548984/cat3_ky7ssk.png",
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548984/03_Xtrfy-K4V2-TKL-Category_gbwuve.png",
     ],
     features: [
       "Tri-mode Connection (2.4 GHz / Bluetooth / Wired)",
@@ -139,7 +139,7 @@ export const MOCK_PRODUCTS: Product[] = [
     tag: "NEW",
     shortDesc: "Budget king 75% keyboard with rotary knob and mini screen.",
     images: [
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548984/cat3_ky7ssk.png",
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/456_qcrwfk.png",
     ],
     features: [
       "Integrated Rotary Knob & Screen",
@@ -192,7 +192,7 @@ export const MOCK_PRODUCTS: Product[] = [
     brand: "AMEKO",
     shortDesc: "The world's most customizable 65% gaming keyboard.",
     images: [
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548984/cat3_ky7ssk.png",
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/456_qcrwfk.png",
     ],
     features: [
       "65% Compact Form Factor",
@@ -228,7 +228,7 @@ export const MOCK_PRODUCTS: Product[] = [
     tag: "SALE",
     shortDesc: "Pro-level mechanical gaming keyboard used by esports legends.",
     images: [
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/produc1_jc0ojq.png",
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/456_qcrwfk.png",
     ],
     features: [
       "Tenkeyless (TKL) Design",
@@ -303,7 +303,7 @@ export const MOCK_PRODUCTS: Product[] = [
     brand: "AMEKO",
     shortDesc: "Esports-optimized wireless gaming headset with 53mm drivers.",
     images: [
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/CHERRY-XTRFY-H3-WIRELESS_category_nmdupa.png",
+      "https://res.cloudinary.com/doezwafgz/image/upload/v1765548985/456_qcrwfk.png",
     ],
     features: [
       "Lag-free 2.4GHz Wireless",

@@ -6,14 +6,16 @@ import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { Product } from "@/src/types/product";
 import { useAppDispatch } from "@/src/store/hook";
-import { addToCart, setCartOpen } from "@/src/store/slices/cartSlice";
+import { addToCart } from "@/src/store/slices/cartSlice";
 import { toast } from "react-toastify";
 
 interface ProductCardProps {
   product: Product;
+  /** Override the default product link path */
+  href?: string;
 }
 
-export const ProductCard: FC<ProductCardProps> = ({ product }) => {
+export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
   const dispatch = useAppDispatch();
 
   const thumbnail =
@@ -36,7 +38,7 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
         slug: product.slug,
         quantity: 1,
         variant: "Default",
-      })
+      }),
     );
 
     // 2. Mở Sidebar giỏ hàng
@@ -51,7 +53,7 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
     <div className="group/card relative bg-white flex flex-col h-full w-full overflow-hidden transition-all duration-300 hover:shadow-2xl border border-transparent hover:border-gray-100 rounded-sm">
       {/* 2. IMAGE AREA */}
       <Link
-        href={`/shop/product/${product.slug}`}
+        href={href || `/shop/product/${product.slug}`}
         className="relative block w-full aspect-square bg-[#f9f9f9] overflow-hidden shrink-0"
       >
         {/* Tag */}
@@ -94,11 +96,16 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
 
         {/* Name */}
         <h3 className="text-sm font-black text-black uppercase leading-tight mb-2 group-hover/card:text-[#ce2a32] transition-colors min-h-[40px] line-clamp-2">
-          <Link href={`/shop/product/${product.slug}`}>{product.name}</Link>
+          <Link href={href || `/shop/product/${product.slug}`}>
+            {product.name}
+          </Link>
         </h3>
 
         <p className="text-sm font-bold text-gray-900 mb-4">
-          ${product.basePrice.toFixed(2)} (USD)
+          {new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+          }).format(product.basePrice)}
         </p>
 
         {/* Features */}

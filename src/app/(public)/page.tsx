@@ -1,3 +1,4 @@
+import { BecomeSellerSection } from "@/src/components/Home/BecomeSellerSection";
 import { BrandNew } from "@/src/components/Home/BrandNew";
 import { BuilderCTA } from "@/src/components/Home/BuilderCTA";
 import { CategoryGrid } from "@/src/components/Home/CategoryGrid";
@@ -20,6 +21,7 @@ export default function Home() {
         <PromoList />
         <CategoryGrid />
         <LatestNews />
+        <BecomeSellerSection />
         <TopCreators />
       </div>
     </div>

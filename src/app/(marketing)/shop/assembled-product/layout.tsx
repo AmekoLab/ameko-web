@@ -1,0 +1,47 @@
+import { Header } from "@/src/components/Header/Header";
+import "../../../globals.css";
+import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
+import { Footer } from "@/src/components/Footer/Footer";
+import { Oswald, Inter } from "next/font/google";
+
+// 1. Cấu hình Font Oswald (Cho Header)
+const oswald = Oswald({
+  subsets: ["latin", "vietnamese"],
+  weight: ["300", "400", "500", "700"],
+  display: "swap",
+  variable: "--font-oswald",
+});
+
+// 2. Cấu hình Font Inter (Cho nội dung trang)
+const inter = Inter({
+  subsets: ["latin", "vietnamese"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+export const metadata = {
+  title: "AMEKO - Community",
+  description: "Cộng đồng bàn phím cơ Việt Nam",
+};
+
+export default function AssembledProductLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`flex flex-col min-h-screen bg-[#f0f2f5] ${inter.className} ${oswald.variable}`}
+    >
+      <LayoutWrapper>
+        <div className={`${oswald.className} sticky top-0 z-40`}>
+          <Header />
+        </div>
+
+        <main className="flex-grow">{children}</main>
+
+        <Footer />
+      </LayoutWrapper>
+    </div>
+  );
+}

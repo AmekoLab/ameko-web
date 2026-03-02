@@ -6,16 +6,7 @@ import { ChevronDown, ChevronUp, X } from "lucide-react";
 // Constants
 const AVAILABILITY_STATUS = {
   IN_STOCK: "IN_STOCK",
-  PRE_ORDER: "PRE_ORDER",
   OUT_OF_STOCK: "OUT_OF_STOCK",
-} as const;
-
-const PRODUCT_CATEGORIES = {
-  CUSTOM_KITS: "Custom Kits",
-  KEYBOARDS: "Keyboards",
-  MICE: "Mice",
-  AUDIO: "Audio",
-  KEYCAPS: "Keycaps",
 } as const;
 
 // Types
@@ -129,7 +120,7 @@ const FilterGroup: FC<FilterGroupProps> = memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 FilterGroup.displayName = "FilterGroup";
@@ -145,6 +136,8 @@ interface ShopSidebarProps {
   productCounts?: {
     [key: string]: number;
   };
+  /** Dynamic category list derived from actual products */
+  categoryList?: string[];
 }
 
 export const ShopSidebar: FC<ShopSidebarProps> = ({
@@ -152,16 +145,17 @@ export const ShopSidebar: FC<ShopSidebarProps> = ({
   onFilterChange,
   onClearAll,
   productCounts = {},
+  categoryList = [],
 }) => {
   // Memoized callbacks
   const handleCategoryChange = useCallback(
     (value: string) => onFilterChange("categories", value),
-    [onFilterChange]
+    [onFilterChange],
   );
 
   const handleAvailabilityChange = useCallback(
     (value: string) => onFilterChange("availability", value),
-    [onFilterChange]
+    [onFilterChange],
   );
 
   // Memoized options with counts
@@ -173,48 +167,22 @@ export const ShopSidebar: FC<ShopSidebarProps> = ({
         count: productCounts[AVAILABILITY_STATUS.IN_STOCK],
       },
       {
-        label: "Pre Order",
-        value: AVAILABILITY_STATUS.PRE_ORDER,
-        count: productCounts[AVAILABILITY_STATUS.PRE_ORDER],
-      },
-      {
         label: "Out of Stock",
         value: AVAILABILITY_STATUS.OUT_OF_STOCK,
         count: productCounts[AVAILABILITY_STATUS.OUT_OF_STOCK],
       },
     ],
-    [productCounts]
+    [productCounts],
   );
 
   const categoryOptions = useMemo<FilterOption[]>(
-    () => [
-      {
-        label: "Custom Kits",
-        value: PRODUCT_CATEGORIES.CUSTOM_KITS,
-        count: productCounts[PRODUCT_CATEGORIES.CUSTOM_KITS],
-      },
-      {
-        label: "Keyboards",
-        value: PRODUCT_CATEGORIES.KEYBOARDS,
-        count: productCounts[PRODUCT_CATEGORIES.KEYBOARDS],
-      },
-      {
-        label: "Mice",
-        value: PRODUCT_CATEGORIES.MICE,
-        count: productCounts[PRODUCT_CATEGORIES.MICE],
-      },
-      {
-        label: "Audio",
-        value: PRODUCT_CATEGORIES.AUDIO,
-        count: productCounts[PRODUCT_CATEGORIES.AUDIO],
-      },
-      {
-        label: "Keycaps",
-        value: PRODUCT_CATEGORIES.KEYCAPS,
-        count: productCounts[PRODUCT_CATEGORIES.KEYCAPS],
-      },
-    ],
-    [productCounts]
+    () =>
+      categoryList.map((cat) => ({
+        label: cat,
+        value: cat,
+        count: productCounts[cat],
+      })),
+    [categoryList, productCounts],
   );
 
   // Check if any filters are active

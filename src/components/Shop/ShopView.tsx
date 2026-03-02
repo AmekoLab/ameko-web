@@ -9,7 +9,6 @@ import {
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ProductCard } from "@/src/components/Product/ProductCard";
-import { MOCK_PRODUCTS } from "@/src/data/product";
 import { ShopSidebar } from "./ShopSidebar";
 import {
   SlidersHorizontal,
@@ -18,6 +17,9 @@ import {
   ChevronRight,
   Loader2,
 } from "lucide-react";
+import { assembledProductService } from "@/src/services/assembledProduct.service";
+import type { AssembledProductItem } from "@/src/types/assembledProduct.types";
+import type { Product, ProductSpecs } from "@/src/types/product";
 
 /*
   CONSTANTS
@@ -27,14 +29,6 @@ const MAX_VISIBLE_PAGES = 5;
 const SCROLL_OFFSET = 100; // Offset from top when scrolling
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "newest";
-
-/*
-  TYPES
- */
-interface Filters {
-  categories: string[];
-  availability: string[];
-}
 
 /*
  HELPER FUNCTIONS
@@ -60,7 +54,7 @@ const buildSearchParams = (
   categories: string[],
   availability: string[],
   sort: SortOption,
-  page: number
+  page: number,
 ) => {
   const params = new URLSearchParams();
   if (categories.length > 0) params.set("categories", categories.join(","));
@@ -71,6 +65,45 @@ const buildSearchParams = (
   return params.toString();
 };
 
+/**
+ * Map AssembledProductItem from API → Product type for reuse in ProductCard
+ */
+function mapToProduct(ap: AssembledProductItem): Product {
+  const images = [ap.image1, ap.image2, ap.image3].filter(
+    (img): img is string => Boolean(img),
+  );
+
+  const specs: ProductSpecs = {
+    layout: ap.layout || "N/A",
+    mounting: ap.mounting || "N/A",
+    pcb: ap.pcb || "N/A",
+    connection: ap.connection || "N/A",
+    battery: ap.battery || undefined,
+  };
+
+  return {
+    id: ap.id,
+    slug: ap.id,
+    name: ap.name,
+    basePrice: ap.price,
+    category: "Assembled Keyboard",
+    status: (ap.quantity ?? 0) > 0 ? "IN_STOCK" : "OUT_OF_STOCK",
+    rating: 0,
+    reviewsCount: 0,
+    shortDesc: ap.description || "Custom assembled mechanical keyboard.",
+    description: ap.description || undefined,
+    features: [
+      ap.layout ? `Layout: ${ap.layout}` : "",
+      ap.mounting ? `Mounting: ${ap.mounting}` : "",
+      ap.connection ? `Connection: ${ap.connection}` : "",
+    ].filter(Boolean),
+    images: images.length > 0 ? images : ["/placeholder.png"],
+    model3dId: ap.id,
+    specs,
+    stockQuantity: ap.quantity ?? 0,
+  };
+}
+
 /*
   MAIN COMPONENT
  */
@@ -79,17 +112,69 @@ export default function ShopView() {
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
+  // API data
+  const [apiProducts, setApiProducts] = useState<AssembledProductItem[]>([]);
+  const [apiLoading, setApiLoading] = useState(true);
+
+  // Fetch assembled products from API
+  useEffect(() => {
+    let cancelled = false;
+    const fetchProducts = async () => {
+      setApiLoading(true);
+      try {
+        const response = await assembledProductService.getAssembledProducts(
+          1,
+          50,
+        );
+        if (!cancelled) {
+          setApiProducts(response.data?.items ?? []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch assembled products:", err);
+      } finally {
+        if (!cancelled) setApiLoading(false);
+      }
+    };
+    fetchProducts();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Map API items to Product type
+  const allProducts = useMemo(
+    () => apiProducts.map(mapToProduct),
+    [apiProducts],
+  );
+
+  // Compute dynamic category list & product counts from actual data
+  const categoryList = useMemo(
+    () => [...new Set(allProducts.map((p) => p.category))],
+    [allProducts],
+  );
+
+  const productCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allProducts.forEach((p) => {
+      // Category counts
+      counts[p.category] = (counts[p.category] || 0) + 1;
+      // Availability counts
+      counts[p.status] = (counts[p.status] || 0) + 1;
+    });
+    return counts;
+  }, [allProducts]);
+
   // Initialize state from URL
   const initialState = useMemo(
     () => parseSearchParams(searchParams),
-    [searchParams]
+    [searchParams],
   );
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    initialState.categories
+    initialState.categories,
   );
   const [selectedAvailability, setSelectedAvailability] = useState<string[]>(
-    initialState.availability
+    initialState.availability,
   );
   const [sortBy, setSortBy] = useState<SortOption>(initialState.sort);
   const [currentPage, setCurrentPage] = useState(initialState.page);
@@ -103,7 +188,7 @@ export default function ShopView() {
       selectedCategories,
       selectedAvailability,
       sortBy,
-      currentPage
+      currentPage,
     );
     const baseUrl = "/shop/all-products";
 
@@ -118,7 +203,7 @@ export default function ShopView() {
     Filter & Sort Products
    */
   const filteredProducts = useMemo(() => {
-    let result = [...MOCK_PRODUCTS];
+    let result = [...allProducts];
 
     // Filter by categories
     if (selectedCategories.length > 0) {
@@ -140,7 +225,7 @@ export default function ShopView() {
         break;
       case "newest":
         result.sort(
-          (a, b) => (b.tag === "NEW" ? 1 : 0) - (a.tag === "NEW" ? 1 : 0)
+          (a, b) => (b.tag === "NEW" ? 1 : 0) - (a.tag === "NEW" ? 1 : 0),
         );
         break;
       default:
@@ -148,7 +233,7 @@ export default function ShopView() {
     }
 
     return result;
-  }, [selectedCategories, selectedAvailability, sortBy]);
+  }, [allProducts, selectedCategories, selectedAvailability, sortBy]);
 
   /*
     Pagination calculations
@@ -159,9 +244,9 @@ export default function ShopView() {
     () =>
       filteredProducts.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        currentPage * ITEMS_PER_PAGE,
       ),
-    [filteredProducts, currentPage]
+    [filteredProducts, currentPage],
   );
 
   /*
@@ -185,17 +270,17 @@ export default function ShopView() {
         setSelectedCategories((prev) =>
           prev.includes(value)
             ? prev.filter((c) => c !== value)
-            : [...prev, value]
+            : [...prev, value],
         );
       } else {
         setSelectedAvailability((prev) =>
           prev.includes(value)
             ? prev.filter((a) => a !== value)
-            : [...prev, value]
+            : [...prev, value],
         );
       }
     },
-    []
+    [],
   );
 
   /*
@@ -214,7 +299,7 @@ export default function ShopView() {
       setCurrentPage(newPage);
       scrollToTop();
     },
-    [scrollToTop]
+    [scrollToTop],
   );
 
   /*
@@ -341,12 +426,29 @@ export default function ShopView() {
               availability: selectedAvailability,
             }}
             onFilterChange={handleFilterChange}
+            onClearAll={handleClearFilters}
+            productCounts={productCounts}
+            categoryList={categoryList}
           />
         </aside>
 
         {/* RIGHT PRODUCT GRID */}
         <main className="flex-1">
-          {filteredProducts.length > 0 ? (
+          {apiLoading ? (
+            /* Loading Skeleton */
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 min-h-[600px] animate-pulse">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex flex-col h-full">
+                  <div className="aspect-square bg-gray-200 rounded-sm" />
+                  <div className="p-6 space-y-3">
+                    <div className="h-3 w-20 bg-gray-200 rounded" />
+                    <div className="h-4 w-full bg-gray-200 rounded" />
+                    <div className="h-4 w-24 bg-gray-200 rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <>
               {/* Product Grid */}
               <div
@@ -356,7 +458,10 @@ export default function ShopView() {
               >
                 {currentProducts.map((product) => (
                   <div key={product.id} className="h-full" role="listitem">
-                    <ProductCard product={product} />
+                    <ProductCard
+                      product={product}
+                      href={`/shop/assembled-product/${product.id}`}
+                    />
                   </div>
                 ))}
               </div>

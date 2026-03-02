@@ -1,62 +1,66 @@
-import { LoginPayload, LoginResponse } from "@/src/types/auth.types";
-import { UserProfile } from "@/src/types/user.types";
-
-import { toast } from "react-toastify";
+import {
+  ApiResponse,
+  ChangePasswordPayload,
+  LoginRequest,
+  RegisterRequest,
+  ResetPasswordPayload,
+  UpdateProfilePayload,
+  UserData,
+  VerifyOtpRequest,
+} from "../types/auth.types";
 import api from "../utils/api";
 
-export const login = async (data: LoginPayload): Promise<LoginResponse> => {
-  const response = await api.post<LoginResponse>("/auth/login", {
-    username: data.username,
-    password: data.password,
-  });
+export const authService = {
+  register: async (
+    payload: RegisterRequest,
+  ): Promise<ApiResponse<UserData>> => {
+    return api.post("/Users/register", payload);
+  },
 
-  const { token } = response.data;
+  sendOtp: async (email: string): Promise<ApiResponse<{ email: string }>> => {
+    return api.post("/Users/send-activation-code", JSON.stringify(email));
+  },
 
-  if (data.remember) {
-    localStorage.setItem("token", token);
-  } else {
-    sessionStorage.setItem("token", token);
-  }
+  // API 3: Xác thực OTP
+  verifyOtp: async (
+    payload: VerifyOtpRequest,
+  ): Promise<ApiResponse<{ email: string }>> => {
+    return api.post("/Users/verify-activation-code", payload);
+  },
 
-  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  login: async (payload: LoginRequest): Promise<ApiResponse<UserData>> => {
+    return api.post("/Users/login", payload);
+  },
 
-  toast.success("Đăng nhập thành công!");
+  logout: async () => {
+    return Promise.resolve(); // Không làm gì cả, chỉ trả về thành công
+  },
 
-  return response.data;
-};
+  // Hàm lấy profile
+  getProfile: async (userId: string): Promise<ApiResponse<UserData>> => {
+    return api.get(`/Users/profile/${userId}`);
+  },
 
-export const getProfile = async (): Promise<UserProfile> => {
-  const response = await api.get<UserProfile>("/users/profile");
-  return response.data;
-};
+  updateProfile: async (userId: string, data: UpdateProfilePayload) => {
+    return api.put<any, ApiResponse<UserData>>(
+      `/Users/profile/${userId}`,
+      data,
+    );
+  },
 
-// --- GET TOKEN (Helper) ---
-export const getToken = () => {
-  if (typeof window === "undefined") return null; // Check SSR
-  return localStorage.getItem("token") || sessionStorage.getItem("token");
-};
+  changePassword: async (userId: string, data: ChangePasswordPayload) => {
+    // Return type là any hoặc generic vì data trả về chỉ có userId
+    return api.post<any, ApiResponse<any>>(
+      `/Users/change-password/${userId}`,
+      data,
+    );
+  },
 
-// --- LOGOUT ---
-export const logout = () => {
-  if (typeof window === "undefined") return;
+  forgotPassword: async (email: string) => {
+    return api.post<any, ApiResponse<any>>("/Users/forgot-password", { email });
+  },
 
-  localStorage.removeItem("token");
-  sessionStorage.removeItem("token");
-
-  toast.info("Đã đăng xuất.");
-
-  window.location.href = "/login";
-};
-
-export const getRedirectPath = (role: string | null | undefined): string => {
-  if (!role) return "/login";
-
-  const adminRoles = ["Collector", "Admin"]; // Mở rộng thêm role nếu cần
-
-  // Logic phân quyền đường dẫn
-  if (adminRoles.includes(role)) {
-    return "/dashboard";
-  }
-
-  return "/profile";
+  resetPassword: async (data: ResetPasswordPayload) => {
+    return api.post<any, ApiResponse<any>>("/Users/reset-password", data);
+  },
 };

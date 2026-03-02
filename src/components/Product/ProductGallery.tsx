@@ -14,7 +14,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { use3DModel } from "@/src/hooks/3d/use3DModel";
-import { EnvironmentPreset } from "@/src/types/model.types";
+import { EnvironmentPreset, Model3DConfig } from "@/src/types/model.types";
 
 /**
  * ============================================================
@@ -48,7 +48,7 @@ const KeyboardViewer = dynamic(
         </span>
       </div>
     ),
-  }
+  },
 );
 
 /**
@@ -103,6 +103,12 @@ interface ProductGalleryProps {
    * Callback when 3D screenshot is taken
    */
   on3DScreenshot?: (dataUrl: string) => void;
+
+  /**
+   * Direct 3D model URL (e.g. .glb file from API).
+   * When provided, creates a Model3DConfig directly instead of using use3DModel hook.
+   */
+  view3DUrl?: string;
 }
 
 /**
@@ -120,6 +126,7 @@ export const ProductGallery = ({
   enable3DGestures = true,
   environmentPreset = "city",
   on3DScreenshot,
+  view3DUrl,
 }: ProductGalleryProps) => {
   const [selectedImage, setSelectedImage] = useState(images[0]);
   const [activeModal, setActiveModal] = useState<ModalType>(MODAL_TYPES.NONE);
@@ -128,15 +135,15 @@ export const ProductGallery = ({
 
   /**
    * Fetch 3D model configuration
-   * TODO: This will automatically use API when FEATURE_FLAGS.USE_API = true
+   * Skipped when view3DUrl is provided (direct URL from API)
    */
   const {
-    modelConfig,
-    isLoading: isLoadingModel,
-    error: modelError,
+    modelConfig: hookModelConfig,
+    isLoading: hookLoading,
+    error: hookError,
     refetch: refetchModel,
   } = use3DModel(productId, {
-    enabled: true, // Auto-fetch on mount
+    enabled: !view3DUrl, // Skip hook when direct URL is provided
     onSuccess: (config) => {
       console.log("✅ 3D Model loaded:", config);
     },
@@ -144,6 +151,23 @@ export const ProductGallery = ({
       console.error("❌ 3D Model failed:", error);
     },
   });
+
+  // Build Model3DConfig from direct URL if provided
+  const directModelConfig: Model3DConfig | null = view3DUrl
+    ? {
+        id: productId,
+        name: productName,
+        modelUrl: view3DUrl,
+        scale: 1,
+        position: [0, 0, 0],
+        rotation: [0, 0, 0],
+      }
+    : null;
+
+  // Use direct config if available, otherwise use hook config
+  const modelConfig = directModelConfig || hookModelConfig;
+  const isLoadingModel = view3DUrl ? false : hookLoading;
+  const modelError = view3DUrl ? null : hookError;
 
   // Check if 3D is available
   const is3DAvailable = modelConfig && !modelError;
@@ -198,7 +222,7 @@ export const ProductGallery = ({
 
       console.log("📸 Screenshot captured:", dataUrl.substring(0, 50) + "...");
     },
-    [on3DScreenshot]
+    [on3DScreenshot],
   );
 
   /**
@@ -251,24 +275,24 @@ export const ProductGallery = ({
                 is3DAvailable
                   ? "bg-slate-900 text-white hover:bg-slate-800 border-transparent cursor-pointer"
                   : modelError
-                  ? "bg-red-900/30 text-red-400 border-red-600 cursor-pointer hover:bg-red-900/50"
-                  : "bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed"
+                    ? "bg-red-900/30 text-red-400 border-red-600 cursor-pointer hover:bg-red-900/50"
+                    : "bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed"
               }
             `}
             aria-label={
               is3DAvailable
                 ? "Open 3D view"
                 : modelError
-                ? "Retry loading 3D model"
-                : "Loading 3D model"
+                  ? "Retry loading 3D model"
+                  : "Loading 3D model"
             }
             type="button"
             title={
               modelError
                 ? "Click to retry"
                 : isLoadingModel
-                ? "Loading..."
-                : undefined
+                  ? "Loading..."
+                  : undefined
             }
           >
             {isLoadingModel ? (
@@ -282,26 +306,26 @@ export const ProductGallery = ({
               {isLoadingModel
                 ? "Loading"
                 : modelError
-                ? "Retry"
-                : is3DAvailable
-                ? "3D View"
-                : "No 3D"}
+                  ? "Retry"
+                  : is3DAvailable
+                    ? "3D View"
+                    : "No 3D"}
             </span>
           </button>
 
           {/* Image Thumbnails */}
           {images.map((img, idx) => (
             <button
-              key={img}
+              key={idx}
               onClick={() => setSelectedImage(img)}
               className={`
-                relative w-16 h-16 shrink-0 bg-[#f8f8f8] rounded-lg overflow-hidden transition-all border 
-                ${
-                  selectedImage === img
-                    ? "border-slate-900 ring-1 ring-slate-900/20 opacity-100"
-                    : "border-transparent opacity-60 hover:opacity-100 hover:bg-gray-200"
-                }
-              `}
+      relative w-16 h-16 shrink-0 bg-[#f8f8f8] rounded-lg overflow-hidden transition-all border 
+      ${
+        selectedImage === img
+          ? "border-slate-900 ring-1 ring-slate-900/20 opacity-100"
+          : "border-transparent opacity-60 hover:opacity-100 hover:bg-gray-200"
+      }
+    `}
               role="tab"
               aria-selected={selectedImage === img}
               aria-label={`View image ${idx + 1}`}

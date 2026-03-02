@@ -1,52 +1,68 @@
-import { BuilderResponse } from "@/src/types/builder";
+import api from "@/src/utils/api";
+import {
+  BuilderPayload,
+  StartBuilderPayload,
+  SelectComponentPayload,
+} from "@/src/types/builder";
+import { PartListData } from "@/src/types/part.types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  errors: string | null;
+}
 
-export const BuilderService = {
-  // 1. Lấy dữ liệu khởi tạo
-  async initSession(sessionId?: string): Promise<BuilderResponse> {
-    const url = sessionId
-      ? `${API_URL}/builder/init?sessionId=${sessionId}`
-      : `${API_URL}/builder/init`;
-
-    const res = await fetch(url, {
-      cache: "no-store", // Luôn lấy dữ liệu mới nhất, không lưu cache cũ
-      mode: "cors", // Báo hiệu đây là gọi chéo server
-    });
-
-    if (!res.ok) throw new Error("Không kết nối được với Backend Builder");
-
-    const json = await res.json();
-    return json.data;
+export const builderService = {
+  /**
+   * Fetch Base Kits for a shop.
+   * GET /parts?ShopId={shopId}&PartType=kit
+   */
+  getBaseKits: async (shopId: string) => {
+    return api.get<unknown, ApiResponse<PartListData>>(
+      `/parts?ShopId=${shopId}&PartType=kit`,
+    );
   },
 
-  // 2. Gửi lựa chọn của khách về bếp
-  async selectProduct(
-    sessionId: string,
-    categorySlug: string,
-    productId: number
-  ): Promise<BuilderResponse> {
-    const res = await fetch(`${API_URL}/builder/select`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId, categorySlug, productId }),
-    });
-
-    if (!res.ok) throw new Error("Lỗi khi chọn sản phẩm");
-
-    const json = await res.json();
-    return json.data;
+  /**
+   * Start a builder session with a selected base kit.
+   * POST /Builder/start
+   * Returns: { success, message, data: { message, data: BuilderPayload } }
+   */
+  startSession: async (payload: StartBuilderPayload) => {
+    const res = await api.post<
+      unknown,
+      ApiResponse<{ message: string; data: BuilderPayload }>
+    >(`/Builder/start`, payload);
+    // Unwrap double-nested: res is already response.data (via interceptor)
+    return res.data.data;
   },
 
-  // Lấy danh sách các Tab
-  getAllSteps: async () => {
-    const res = await fetch(`${API_URL}/builder/steps`);
-    return res.json();
+  /**
+   * Select a component for a step.
+   * POST /Builder/select
+   * Returns: { success, message, data: { message, data: BuilderPayload } }
+   */
+  selectComponent: async (payload: SelectComponentPayload) => {
+    const res = await api.post<
+      unknown,
+      ApiResponse<{ message: string; data: BuilderPayload }>
+    >(`/Builder/select`, payload);
+    // Unwrap double-nested
+    return res.data.data;
   },
 
-  // Lấy sản phẩm khi click vào Tab
-  getStepProducts: async (slug: string) => {
-    const res = await fetch(`${API_URL}/builder/step/${slug}`);
-    return res.json();
+  /**
+   * Remove a selected component from a step.
+   * DELETE /Builder/session/{sessionId}/part/{stepName}
+   * Returns: { success, message, data: { message, data: BuilderPayload } }
+   */
+  removeComponent: async (sessionId: string, stepName: string) => {
+    const res = await api.delete<
+      unknown,
+      ApiResponse<{ message: string; data: BuilderPayload }>
+    >(`/Builder/session/${sessionId}/part/${stepName}`);
+    // Unwrap double-nested
+    return res.data.data;
   },
 };
