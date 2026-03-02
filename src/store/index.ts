@@ -8,6 +8,8 @@ import partsReducer from "./slices/partsSlice";
 import assembledProductsReducer from "./slices/assembledProductsSlice";
 import builderReducer from "./slices/builderSlice";
 import followsReducer from "./slices/followsSlice";
+import walletReducer from "./slices/walletSlice";
+import adminWalletReducer from "./slices/adminWalletSlice";
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +22,8 @@ export const store = configureStore({
     assembledProducts: assembledProductsReducer,
     builder: builderReducer,
     follows: followsReducer,
+    wallet: walletReducer,
+    adminWallet: adminWalletReducer,
   },
 });
 export type RootState = ReturnType<typeof store.getState>;
