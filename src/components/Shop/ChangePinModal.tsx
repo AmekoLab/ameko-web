@@ -117,7 +117,10 @@ interface ChangePinModalProps {
   onClose: () => void;
 }
 
-export default function ChangePinModal({ isOpen, onClose }: ChangePinModalProps) {
+export default function ChangePinModal({
+  isOpen,
+  onClose,
+}: ChangePinModalProps) {
   const dispatch = useAppDispatch();
   const { isChangingPin } = useAppSelector((state) => state.wallet);
 

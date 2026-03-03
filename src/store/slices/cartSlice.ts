@@ -214,7 +214,7 @@ const cartSlice = createSlice({
       .addCase(removeServerCartItem.pending, (state, action) => {
         if (state.serverCart) {
           state.serverCart.orderItems = state.serverCart.orderItems.filter(
-            (item) => item.id !== action.meta.arg,
+            (item) => item.orderItemId !== action.meta.arg,
           );
         }
       })

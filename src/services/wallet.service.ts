@@ -72,6 +72,15 @@ export interface TransactionItem {
   createdAt: string;
 }
 
+export interface HeldTransaction {
+  transactionId: string;
+  amount: number;
+  date: string;
+  orderId: string;
+  orderStatus: string;
+  reason: string;
+}
+
 export interface PaginatedResponse<T> {
   items: T[];
   totalCount: number;
@@ -95,7 +104,9 @@ export const walletService = {
    * Fetch wallet details for the current user.
    * GET /wallet
    */
-  getDetails: async (): Promise<ApiResponse<{ balance: number }>> => {
+  getDetails: async (): Promise<
+    ApiResponse<{ balance: number; heldBalance: number }>
+  > => {
     return api.get("/wallet");
   },
 
@@ -145,6 +156,14 @@ export const walletService = {
    */
   withdraw: async (payload: WithdrawPayload): Promise<ApiResponse<null>> => {
     return api.post<unknown, ApiResponse<null>>("/wallet/withdraw", payload);
+  },
+
+  /**
+   * Fetch held (frozen) transactions for the current shop.
+   * GET /wallet/held-transactions
+   */
+  getHeldTransactions: async (): Promise<ApiResponse<HeldTransaction[]>> => {
+    return api.get("/wallet/held-transactions");
   },
 
   /**

@@ -223,7 +223,7 @@ const OrderCard: FC<OrderCardProps> = ({ order }) => {
       {/* Order Items */}
       <div className="px-5 py-3 divide-y divide-gray-50">
         {visibleItems.map((item) => (
-          <OrderItemRow key={item.id} item={item} />
+          <OrderItemRow key={item.orderItemId} item={item} />
         ))}
 
         {hasMore && (
@@ -432,7 +432,7 @@ export default function MyOrdersPage() {
         ) : (
           <div className="space-y-4">
             {filteredOrders.map((order) => (
-              <OrderCard key={order.id} order={order} />
+              <OrderCard key={order.orderId} order={order} />
             ))}
           </div>
         )}

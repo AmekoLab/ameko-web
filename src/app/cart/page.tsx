@@ -153,7 +153,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
             <input
               type="checkbox"
               checked={selected}
-              onChange={() => onToggleSelect(item.id)}
+              onChange={() => onToggleSelect(item.orderItemId)}
               className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
               aria-label={`Select ${item.productName}`}
             />
@@ -209,7 +209,9 @@ const CartItemCard: FC<CartItemCardProps> = ({
         <div className="md:col-span-2 flex items-center justify-center">
           <div className="flex items-center gap-0 border border-gray-200 rounded">
             <button
-              onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+              onClick={() =>
+                onUpdateQuantity(item.orderItemId, item.quantity - 1)
+              }
               disabled={item.quantity <= 1 || updatingQuantity}
               className="w-8 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Decrease quantity"
@@ -224,7 +226,9 @@ const CartItemCard: FC<CartItemCardProps> = ({
               )}
             </span>
             <button
-              onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+              onClick={() =>
+                onUpdateQuantity(item.orderItemId, item.quantity + 1)
+              }
               disabled={item.quantity >= 99 || updatingQuantity}
               className="w-8 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Increase quantity"
@@ -240,7 +244,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
             {item.totalPrice.toLocaleString()}₫
           </span>
           <button
-            onClick={() => onRemove(item.id)}
+            onClick={() => onRemove(item.orderItemId)}
             disabled={removing}
             className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors disabled:opacity-40"
             aria-label={`Remove ${item.productName}`}
@@ -283,7 +287,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
 }) => {
   // Calculate totals based on selected items only
   const selectedItems = cart.orderItems.filter((item) =>
-    selectedItemIds.has(item.id),
+    selectedItemIds.has(item.orderItemId),
   );
   const selectedTotal = selectedItems.reduce(
     (sum, item) => sum + item.totalPrice,
@@ -412,7 +416,7 @@ export default function CartPage() {
       if (prev.size === cart.orderItems.length) {
         return new Set();
       }
-      return new Set(cart.orderItems.map((item) => item.id));
+      return new Set(cart.orderItems.map((item) => item.orderItemId));
     });
   }, [cart]);
 
@@ -427,7 +431,7 @@ export default function CartPage() {
           setCart(res.data);
           // Auto-select all items on load
           setSelectedItemIds(
-            new Set(res.data.orderItems.map((item) => item.id)),
+            new Set(res.data.orderItems.map((item) => item.orderItemId)),
           );
         } else {
           setError(res.message || "Failed to load cart");
@@ -494,7 +498,7 @@ export default function CartPage() {
         return {
           ...prev,
           orderItems: prev.orderItems.map((item) => {
-            if (item.id !== orderItemId) return item;
+            if (item.orderItemId !== orderItemId) return item;
             return {
               ...item,
               quantity: newQuantity,
@@ -502,7 +506,7 @@ export default function CartPage() {
             };
           }),
           totalAmount: prev.orderItems.reduce((sum, item) => {
-            if (item.id === orderItemId) {
+            if (item.orderItemId === orderItemId) {
               return sum + item.unitPrice * newQuantity;
             }
             return sum + item.totalPrice;
@@ -622,14 +626,14 @@ export default function CartPage() {
           <div className="flex flex-col">
             {cart.orderItems.map((item) => (
               <CartItemCard
-                key={item.id}
+                key={item.orderItemId}
                 item={item}
                 onRemove={handleRemoveItem}
-                removing={removingId === item.id}
-                selected={selectedItemIds.has(item.id)}
+                removing={removingId === item.orderItemId}
+                selected={selectedItemIds.has(item.orderItemId)}
                 onToggleSelect={handleToggleSelect}
                 onUpdateQuantity={handleUpdateQuantity}
-                updatingQuantity={updatingQuantityId === item.id}
+                updatingQuantity={updatingQuantityId === item.orderItemId}
               />
             ))}
           </div>
