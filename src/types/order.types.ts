@@ -14,7 +14,7 @@ export interface OrderItemComponent {
 
 /** A single item in the cart / order */
 export interface OrderItem {
-  id: string;
+  orderItemId: string;
   productId: string;
   assembledProductId: string | null;
   productName: string;
@@ -32,7 +32,7 @@ export interface OrderItem {
 
 /** Cart data returned by GET /orders/cart */
 export interface CartData {
-  id: string;
+  orderId: string;
   orderGroupId: string;
   shopId: string;
   shopName: string;

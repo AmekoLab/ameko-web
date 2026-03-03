@@ -97,7 +97,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
             <input
               type="checkbox"
               checked={selected}
-              onChange={() => onToggleSelect(item.id)}
+              onChange={() => onToggleSelect(item.orderItemId)}
               className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
               aria-label={`Select ${item.productName}`}
             />
@@ -134,7 +134,9 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
             <div className="flex items-center gap-2 mb-1">
               <div className="flex items-center gap-0 border border-gray-200 rounded">
                 <button
-                  onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                  onClick={() =>
+                    onUpdateQuantity(item.orderItemId, item.quantity - 1)
+                  }
                   disabled={item.quantity <= 1 || updatingQuantity}
                   className="w-6 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Decrease quantity"
@@ -149,7 +151,9 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
                   )}
                 </span>
                 <button
-                  onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                  onClick={() =>
+                    onUpdateQuantity(item.orderItemId, item.quantity + 1)
+                  }
                   disabled={item.quantity >= 99 || updatingQuantity}
                   className="w-6 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Increase quantity"
@@ -158,7 +162,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
                 </button>
               </div>
               <button
-                onClick={() => onRemove(item.id)}
+                onClick={() => onRemove(item.orderItemId)}
                 disabled={removing}
                 className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-40"
                 aria-label={`Remove ${item.productName}`}
@@ -230,11 +234,12 @@ export const CartSidebar: FC = memo(() => {
 
   // Compute selected total
   const selectedTotal = items
-    .filter((item) => selectedItemIds.has(item.id))
+    .filter((item) => selectedItemIds.has(item.orderItemId))
     .reduce((sum, item) => sum + item.totalPrice, 0);
   const hasSelection = selectedItemIds.size > 0;
 
   const handleToggleSelect = useCallback((id: string) => {
+    if (!id) return;
     setSelectedItemIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -248,7 +253,9 @@ export const CartSidebar: FC = memo(() => {
 
   const handleToggleSelectAll = useCallback(() => {
     setSelectedItemIds((prev) => {
-      const allIds = (serverCart?.orderItems ?? []).map((item) => item.id);
+      const allIds = (serverCart?.orderItems ?? [])
+        .map((item) => item.orderItemId)
+        .filter(Boolean);
       if (prev.size === allIds.length) {
         return new Set();
       }
@@ -306,7 +313,9 @@ export const CartSidebar: FC = memo(() => {
           if (cartData?.orderItems) {
             setSelectedItemIds(
               new Set(
-                cartData.orderItems.map((item: { id: string }) => item.id),
+                cartData.orderItems
+                  .map((item: { orderItemId: string }) => item.orderItemId)
+                  .filter(Boolean),
               ),
             );
           }
@@ -317,12 +326,13 @@ export const CartSidebar: FC = memo(() => {
 
   const handleCheckout = useCallback(() => {
     dispatch(setCartOpen(false));
-    if (selectedItemIds.size === 0) {
+    const validIds = Array.from(selectedItemIds).filter(Boolean);
+    if (validIds.length === 0) {
       router.push("/cart");
       return;
     }
     const params = new URLSearchParams();
-    selectedItemIds.forEach((id) => params.append("items", id));
+    validIds.forEach((id) => params.append("items", id));
     router.push(`/checkout?${params.toString()}`);
   }, [dispatch, router, selectedItemIds]);
 
@@ -464,14 +474,14 @@ export const CartSidebar: FC = memo(() => {
           ) : (
             items.map((item) => (
               <SidebarCartItem
-                key={item.id}
+                key={item.orderItemId}
                 item={item}
                 onRemove={handleRemoveItem}
-                removing={removingId === item.id}
-                selected={selectedItemIds.has(item.id)}
+                removing={removingId === item.orderItemId}
+                selected={selectedItemIds.has(item.orderItemId)}
                 onToggleSelect={handleToggleSelect}
                 onUpdateQuantity={handleUpdateQuantity}
-                updatingQuantity={updatingQuantityId === item.id}
+                updatingQuantity={updatingQuantityId === item.orderItemId}
               />
             ))
           )}

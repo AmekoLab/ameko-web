@@ -12,6 +12,7 @@ import Link from "next/link";
 import WithdrawModal from "@/src/components/Shop/WithdrawModal";
 import ResetPinModal from "@/src/components/Shop/ResetPinModal";
 import ChangePinModal from "@/src/components/Shop/ChangePinModal";
+import HeldTransactionsModal from "@/src/components/Shop/HeldTransactionsModal";
 
 export default function WalletPage() {
   const dispatch = useAppDispatch();
@@ -19,6 +20,7 @@ export default function WalletPage() {
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [isResetPinOpen, setIsResetPinOpen] = useState(false);
   const [isChangePinOpen, setIsChangePinOpen] = useState(false);
+  const [isHeldOpen, setIsHeldOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchWalletDetails());
@@ -104,7 +106,18 @@ export default function WalletPage() {
             </p>
             <p className="text-3xl font-black text-[#ce2a32] font-oswald">
               {details?.balance?.toLocaleString("vi-VN") ?? 0}
+
               <span className="text-lg ml-1">₫</span>
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Số dư đang chờ xử lý:{" "}
+              <button
+                type="button"
+                onClick={() => setIsHeldOpen(true)}
+                className="font-semibold text-orange-500 hover:underline cursor-pointer"
+              >
+                {details?.heldBalance?.toLocaleString("vi-VN") ?? 0} ₫
+              </button>
             </p>
           </div>
         </div>
@@ -147,6 +160,12 @@ export default function WalletPage() {
       <ChangePinModal
         isOpen={isChangePinOpen}
         onClose={() => setIsChangePinOpen(false)}
+      />
+
+      {/* Held Transactions Modal */}
+      <HeldTransactionsModal
+        isOpen={isHeldOpen}
+        onClose={() => setIsHeldOpen(false)}
       />
     </div>
   );

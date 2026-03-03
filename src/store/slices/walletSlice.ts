@@ -1,10 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { walletService } from "@/src/services/wallet.service";
+import { HeldTransaction } from "@/src/services/wallet.service";
 import { toast } from "react-toastify";
 
 // ─── Types ───────────────────────────────────────────────
 export interface WalletDetails {
   balance: number;
+  heldBalance: number;
 }
 
 interface WalletState {
@@ -17,6 +19,8 @@ interface WalletState {
   isRequestingOtp: boolean;
   isResettingPin: boolean;
   isChangingPin: boolean;
+  heldTransactions: HeldTransaction[];
+  loadingHeld: boolean;
 }
 
 const initialState: WalletState = {
@@ -29,6 +33,8 @@ const initialState: WalletState = {
   isRequestingOtp: false,
   isResettingPin: false,
   isChangingPin: false,
+  heldTransactions: [],
+  loadingHeld: false,
 };
 
 // ─── Async Thunk: Fetch wallet details ───────────────────
@@ -175,6 +181,27 @@ export const submitPinReset = createAsyncThunk(
   },
 );
 
+// ─── Async Thunk: Fetch held transactions ───────────
+export const fetchHeldTransactions = createAsyncThunk(
+  "wallet/fetchHeldTransactions",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await walletService.getHeldTransactions();
+      if (res.success) {
+        return res.data;
+      }
+      return rejectWithValue(
+        res.message || "Failed to fetch held transactions",
+      );
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      return rejectWithValue(
+        err.message || "Failed to fetch held transactions",
+      );
+    }
+  },
+);
+
 // ─── Async Thunk: Change wallet PIN ─────────────────
 export const changeWalletPin = createAsyncThunk(
   "wallet/changeWalletPin",
@@ -313,6 +340,19 @@ const walletSlice = createSlice({
       .addCase(changeWalletPin.rejected, (state, action) => {
         state.isChangingPin = false;
         state.error = (action.payload as string) || "Unknown error";
+      });
+
+    // fetchHeldTransactions
+    builder
+      .addCase(fetchHeldTransactions.pending, (state) => {
+        state.loadingHeld = true;
+      })
+      .addCase(fetchHeldTransactions.fulfilled, (state, action) => {
+        state.loadingHeld = false;
+        state.heldTransactions = action.payload;
+      })
+      .addCase(fetchHeldTransactions.rejected, (state) => {
+        state.loadingHeld = false;
       });
   },
 });

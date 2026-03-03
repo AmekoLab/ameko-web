@@ -277,7 +277,9 @@ function CheckoutContent() {
   // Filter to only selected items
   const selectedItems =
     selectedOrderItemIds.length > 0
-      ? cart.orderItems.filter((item) => selectedOrderItemIds.includes(item.id))
+      ? cart.orderItems.filter((item) =>
+          selectedOrderItemIds.includes(item.orderItemId),
+        )
       : cart.orderItems;
   const selectedTotal = selectedItems.reduce(
     (sum, item) => sum + item.totalPrice,
@@ -473,7 +475,7 @@ function CheckoutContent() {
           {/* Product List */}
           <div className="space-y-4 mb-6">
             {selectedItems.map((item) => (
-              <CheckoutItemRow key={item.id} item={item} />
+              <CheckoutItemRow key={item.orderItemId} item={item} />
             ))}
           </div>
 
