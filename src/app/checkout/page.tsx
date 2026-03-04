@@ -285,6 +285,10 @@ function CheckoutContent() {
     (sum, item) => sum + item.totalPrice,
     0,
   );
+  const finalTotal = Math.max(
+    0,
+    selectedTotal + (cart?.shippingFee || 0) - (cart?.discountAmount || 0),
+  );
 
   // No selected items found
   if (selectedItems.length === 0) {
@@ -462,7 +466,7 @@ function CheckoutContent() {
             />
           </div>
           <span className="font-bold text-lg text-black">
-            {selectedTotal.toLocaleString()}₫
+            {finalTotal.toLocaleString()}₫
           </span>
         </button>
 
@@ -513,7 +517,7 @@ function CheckoutContent() {
             <div className="flex items-baseline gap-2">
               <span className="text-xs text-gray-500 font-medium">VND</span>
               <span className="text-2xl font-bold text-black tracking-tight">
-                {selectedTotal.toLocaleString()}₫
+                {finalTotal.toLocaleString()}₫
               </span>
             </div>
           </div>

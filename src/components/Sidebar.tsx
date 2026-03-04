@@ -33,6 +33,7 @@ export default function Sidebar({ role = "staff" }) {
     { name: "Parts", path: "/shop/parts" },
     { name: "Assembled Products", path: "/shop/assembled-products" },
     { name: "Wallet", path: "/shop/wallet" },
+    { name: "Vouchers", path: "/shop/vouchers" },
   ];
 
   let menu = [...commonMenu];

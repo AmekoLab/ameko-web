@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState, useCallback, useEffect } from "react";
+import { FC, useState, useCallback, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -8,10 +8,14 @@ import {
   ShoppingBag,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   Loader2,
   Trash2,
   Minus,
   Plus,
+  Ticket,
+  Store,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { orderService } from "@/src/services/order.service";
@@ -21,6 +25,22 @@ import {
   OrderItem,
   OrderItemComponent,
 } from "@/src/types/order.types";
+import { useAppDispatch, useAppSelector } from "@/src/store/hook";
+import {
+  fetchApplicableVouchersThunk,
+  selectShopVoucherGroups,
+  selectSystemVouchers,
+  setSelectedSystemVouchers,
+  setSelectedShopVouchers,
+  selectSelectedSystemVoucherIds,
+  selectCheckoutSummary,
+  removeAllVouchersThunk,
+  removeVoucherThunk,
+  selectIsRemovingVoucher,
+  selectIsApplyingVoucher,
+} from "@/src/store/slices/voucherSlice";
+import { Voucher } from "@/src/services/voucher.service";
+import VoucherSelectorModal from "@/src/components/Cart/VoucherSelectorModal";
 
 // Constants
 const ROUTES = {
@@ -30,25 +50,39 @@ const ROUTES = {
 
 // ─── Loading Skeleton ──────────────────────────────────────
 const CartSkeleton: FC = () => (
-  <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-12 lg:py-20 animate-pulse">
-    <div className="h-10 w-48 bg-gray-200 rounded mb-12" />
-    <div className="flex flex-col lg:flex-row gap-12">
-      <div className="flex-1 space-y-6">
-        {[1, 2].map((i) => (
-          <div key={i} className="flex gap-4 py-6 border-b border-gray-100">
-            <div className="w-24 h-24 bg-gray-200 rounded" />
-            <div className="flex-1 space-y-3">
-              <div className="h-5 w-3/4 bg-gray-200 rounded" />
-              <div className="h-4 w-1/2 bg-gray-200 rounded" />
+  <div className="min-h-screen bg-gray-50">
+    <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 lg:py-12 animate-pulse">
+      <div className="h-8 w-48 bg-gray-200 rounded mb-8" />
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex-1 space-y-4">
+          {[1, 2].map((i) => (
+            <div
+              key={i}
+              className="bg-white rounded-lg shadow-sm p-4 space-y-4"
+            >
+              <div className="flex gap-3">
+                <div className="w-5 h-5 bg-gray-200 rounded" />
+                <div className="w-5 h-5 bg-gray-200 rounded" />
+                <div className="h-5 w-32 bg-gray-200 rounded" />
+              </div>
+              <div className="flex gap-3 items-center">
+                <div className="w-5 h-5 bg-gray-200 rounded" />
+                <div className="w-20 h-20 bg-gray-200 rounded" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-3/4 bg-gray-200 rounded" />
+                  <div className="h-4 w-1/2 bg-gray-200 rounded" />
+                </div>
+                <div className="h-4 w-20 bg-gray-200 rounded" />
+              </div>
             </div>
+          ))}
+        </div>
+        <div className="w-full lg:w-[380px] shrink-0">
+          <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
+            <div className="h-6 w-40 bg-gray-200 rounded" />
+            <div className="h-10 w-full bg-gray-200 rounded" />
+            <div className="h-12 w-full bg-gray-200 rounded" />
           </div>
-        ))}
-      </div>
-      <div className="w-full lg:w-[350px] shrink-0">
-        <div className="bg-gray-100 p-8 rounded space-y-4">
-          <div className="h-6 w-40 bg-gray-200 rounded" />
-          <div className="h-10 w-full bg-gray-200 rounded" />
-          <div className="h-12 w-full bg-gray-200 rounded" />
         </div>
       </div>
     </div>
@@ -142,83 +176,132 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
   return (
     <div
-      className={`py-6 border-b border-gray-100 transition-colors ${selected ? "bg-red-50/30" : ""}`}
+      className={`border-b border-gray-100 last:border-b-0 transition-colors ${
+        selected ? "bg-[#fff0f1]" : ""
+      }`}
     >
       {/* Main row */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-        {/* Product Info */}
-        <div className="md:col-span-7 flex gap-4">
-          {/* Checkbox */}
-          <div className="flex items-center shrink-0">
-            <input
-              type="checkbox"
-              checked={selected}
-              onChange={() => onToggleSelect(item.orderItemId)}
-              className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
-              aria-label={`Select ${item.productName}`}
+      <div className="flex items-center p-4 gap-3">
+        {/* Checkbox */}
+        <div className="shrink-0 self-center">
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={() => onToggleSelect(item.orderItemId)}
+            className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
+            aria-label={`Select ${item.productName}`}
+          />
+        </div>
+
+        {/* Image */}
+        <div className="relative w-20 h-20 shrink-0 rounded border border-gray-200 overflow-hidden bg-white">
+          {displayImage ? (
+            <Image
+              src={displayImage}
+              alt={item.productName}
+              fill
+              sizes="80px"
+              className="object-cover p-1"
             />
-          </div>
-          {/* Image */}
-          <div className="relative w-24 h-24 bg-gray-50 shrink-0 border border-gray-100 rounded-sm overflow-hidden">
-            {displayImage ? (
-              <Image
-                src={displayImage}
-                alt={item.productName}
-                fill
-                sizes="96px"
-                className="object-contain p-2"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <ShoppingBag className="w-8 h-8 text-gray-200" />
-              </div>
-            )}
-          </div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <ShoppingBag className="w-6 h-6 text-gray-300" />
+            </div>
+          )}
+        </div>
 
-          {/* Text */}
-          <div className="flex flex-col justify-center min-w-0">
-            <h3 className="font-bold text-black text-lg leading-tight mb-1 truncate capitalize">
-              {item.productName}
-            </h3>
-
-            {isCustom && (
+        {/* Product Details */}
+        <div className="flex-1 min-w-0 pr-2">
+          <p className="text-sm text-gray-800 line-clamp-2 capitalize leading-snug">
+            {item.productName}
+          </p>
+          {isCustom && (
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="flex items-center gap-1 text-xs text-[#ce2a32] hover:underline mt-1.5 w-fit"
+            >
+              {expanded ? (
+                <>
+                  Hide components <ChevronUp className="w-3 h-3" />
+                </>
+              ) : (
+                <>
+                  View {item.orderItemComponents.length} components{" "}
+                  <ChevronDown className="w-3 h-3" />
+                </>
+              )}
+            </button>
+          )}
+          {/* Mobile: price, qty, action */}
+          <div className="md:hidden flex items-center gap-3 mt-2">
+            <span className="text-sm font-semibold text-[#ce2a32]">
+              {item.totalPrice.toLocaleString()}₫
+            </span>
+            <div className="flex items-center border border-gray-300 rounded ml-auto">
               <button
-                onClick={() => setExpanded(!expanded)}
-                className="flex items-center gap-1 text-xs text-[#ce2a32] hover:underline mt-1 w-fit"
+                onClick={() =>
+                  onUpdateQuantity(item.orderItemId, item.quantity - 1)
+                }
+                disabled={item.quantity <= 1 || updatingQuantity}
+                className="w-7 h-7 flex items-center justify-center text-gray-500 disabled:opacity-30"
+                aria-label="Decrease quantity"
               >
-                {expanded ? (
-                  <>
-                    Hide components <ChevronUp className="w-3 h-3" />
-                  </>
-                ) : (
-                  <>
-                    View {item.orderItemComponents.length} components{" "}
-                    <ChevronDown className="w-3 h-3" />
-                  </>
-                )}
+                <Minus className="w-3 h-3" />
               </button>
-            )}
-
-            <p className="md:hidden text-sm font-medium text-gray-700 mt-1">
-              {item.unitPrice.toLocaleString()}₫
-            </p>
+              <span className="w-8 h-7 flex items-center justify-center text-xs font-semibold border-x border-gray-300 tabular-nums">
+                {updatingQuantity ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  item.quantity
+                )}
+              </span>
+              <button
+                onClick={() =>
+                  onUpdateQuantity(item.orderItemId, item.quantity + 1)
+                }
+                disabled={item.quantity >= 99 || updatingQuantity}
+                className="w-7 h-7 flex items-center justify-center text-gray-500 disabled:opacity-30"
+                aria-label="Increase quantity"
+              >
+                <Plus className="w-3 h-3" />
+              </button>
+            </div>
+            <button
+              onClick={() => onRemove(item.orderItemId)}
+              disabled={removing}
+              className="text-gray-400 hover:text-red-500 disabled:opacity-40"
+              aria-label={`Remove ${item.productName}`}
+            >
+              {removing ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Trash2 className="w-4 h-4" />
+              )}
+            </button>
           </div>
         </div>
 
-        {/* Quantity */}
-        <div className="md:col-span-2 flex items-center justify-center">
-          <div className="flex items-center gap-0 border border-gray-200 rounded">
+        {/* Desktop: Unit Price */}
+        <div className="hidden md:flex w-28 justify-center shrink-0">
+          <span className="text-sm text-gray-500">
+            {item.unitPrice.toLocaleString()}₫
+          </span>
+        </div>
+
+        {/* Desktop: Quantity */}
+        <div className="hidden md:flex w-32 justify-center shrink-0">
+          <div className="flex items-center border border-gray-300 rounded">
             <button
               onClick={() =>
                 onUpdateQuantity(item.orderItemId, item.quantity - 1)
               }
               disabled={item.quantity <= 1 || updatingQuantity}
-              className="w-8 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Decrease quantity"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
-            <span className="w-10 h-9 flex items-center justify-center text-sm font-bold text-gray-700 border-x border-gray-200 tabular-nums">
+            <span className="w-10 h-8 flex items-center justify-center text-sm font-medium text-gray-700 border-x border-gray-300 tabular-nums">
               {updatingQuantity ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400" />
               ) : (
@@ -230,7 +313,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
                 onUpdateQuantity(item.orderItemId, item.quantity + 1)
               }
               disabled={item.quantity >= 99 || updatingQuantity}
-              className="w-8 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Increase quantity"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -238,15 +321,19 @@ const CartItemCard: FC<CartItemCardProps> = ({
           </div>
         </div>
 
-        {/* Total Price & Remove */}
-        <div className="md:col-span-3 flex items-center justify-end gap-4">
-          <span className="font-bold text-lg">
+        {/* Desktop: Total Price */}
+        <div className="hidden md:flex w-28 justify-center shrink-0">
+          <span className="text-sm font-semibold text-[#ce2a32]">
             {item.totalPrice.toLocaleString()}₫
           </span>
+        </div>
+
+        {/* Desktop: Remove */}
+        <div className="hidden md:flex w-10 justify-center shrink-0">
           <button
             onClick={() => onRemove(item.orderItemId)}
             disabled={removing}
-            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors disabled:opacity-40"
+            className="p-1.5 text-gray-400 hover:text-red-500 transition-colors disabled:opacity-40"
             aria-label={`Remove ${item.productName}`}
           >
             {removing ? (
@@ -260,7 +347,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
       {/* Accordion: Component list for custom builds */}
       {isCustom && expanded && (
-        <div className="mt-4 ml-0 md:ml-28 space-y-0 bg-gray-50/50 rounded-lg p-3">
+        <div className="mx-4 mb-4 ml-[7.5rem] bg-gray-50/80 rounded-lg p-3">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
             Build Components
           </p>
@@ -278,13 +365,23 @@ interface OrderSummaryProps {
   cart: CartData;
   selectedItemIds: Set<string>;
   onCheckout: () => void;
+  onOpenSystemVoucher: () => void;
 }
 
 const OrderSummary: FC<OrderSummaryProps> = ({
   cart,
   selectedItemIds,
   onCheckout,
+  onOpenSystemVoucher,
 }) => {
+  const dispatch = useAppDispatch();
+  const systemVouchers = useAppSelector(selectSystemVouchers);
+  const selectedSystemIds = useAppSelector(selectSelectedSystemVoucherIds);
+  const checkoutSummary = useAppSelector(selectCheckoutSummary);
+  const isRemovingVoucher = useAppSelector(selectIsRemovingVoucher);
+  const isApplyingVoucher = useAppSelector(selectIsApplyingVoucher);
+  const availableSystemVouchersCount = systemVouchers.length;
+
   // Calculate totals based on selected items only
   const selectedItems = cart.orderItems.filter((item) =>
     selectedItemIds.has(item.orderItemId),
@@ -300,11 +397,39 @@ const OrderSummary: FC<OrderSummaryProps> = ({
   const hasSelection = selectedItemIds.size > 0;
 
   return (
-    <div className="w-full lg:w-[350px] shrink-0">
-      <div className="bg-gray-50 p-6 md:p-8 rounded-sm sticky top-28">
+    <div className="w-full lg:w-[380px] shrink-0">
+      <div className="bg-white rounded-lg shadow-sm p-6 sticky top-28">
         <h3 className="font-oswald font-bold text-lg uppercase mb-4 border-b border-gray-200 pb-2">
           Order Summary
         </h3>
+
+        {/* Ameko Platform Voucher */}
+        <div className="mb-4 p-3 rounded-lg border border-gray-100 bg-gray-50/50">
+          <button
+            type="button"
+            onClick={onOpenSystemVoucher}
+            className="w-full flex items-center justify-between cursor-pointer group"
+          >
+            <div className="flex items-center gap-2">
+              <Ticket className="w-5 h-5 text-[#ce2a32]" />
+              <span className="font-medium text-gray-800">Ameko Voucher</span>
+            </div>
+            <div className="flex items-center gap-1">
+              {selectedSystemIds.length > 0 ? (
+                <span className="text-sm font-medium text-[#ce2a32]">
+                  Đã chọn {selectedSystemIds.length} mã
+                </span>
+              ) : availableSystemVouchersCount > 0 ? (
+                <span className="text-sm font-medium text-[#ce2a32]">
+                  Chọn mã (Có {availableSystemVouchersCount} mã)
+                </span>
+              ) : (
+                <span className="text-sm text-gray-500">Chọn hoặc nhập mã</span>
+              )}
+              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+            </div>
+          </button>
+        </div>
 
         {/* Selected items info */}
         <div className="flex justify-between items-center mb-2 text-sm">
@@ -336,12 +461,75 @@ const OrderSummary: FC<OrderSummaryProps> = ({
         )}
 
         {/* Discount */}
-        {cart.discountAmount > 0 && (
+        {checkoutSummary && checkoutSummary.totalDiscountAmount > 0 && (
           <div className="flex justify-between items-center mb-2 text-sm">
             <span className="text-gray-600">Discount</span>
             <span className="font-medium text-green-600">
-              -{cart.discountAmount.toLocaleString()}₫
+              -{checkoutSummary.totalDiscountAmount.toLocaleString()}₫
             </span>
+          </div>
+        )}
+
+        {/* Applied Vouchers Breakdown */}
+        {checkoutSummary && checkoutSummary.appliedVouchers.length > 0 && (
+          <div className="mb-2 space-y-1 py-2 border-t border-dashed border-gray-100">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                Applied Vouchers
+              </p>
+              <button
+                type="button"
+                disabled={isRemovingVoucher}
+                onClick={() => {
+                  if (cart.orderId) {
+                    dispatch(removeAllVouchersThunk(cart.orderId));
+                  }
+                }}
+                className="flex items-center gap-1 text-[11px] text-[#ce2a32] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isRemovingVoucher ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <Trash2 className="w-3 h-3" />
+                )}
+                Hủy áp dụng
+              </button>
+            </div>
+            {checkoutSummary.appliedVouchers.map((av) => (
+              <div
+                key={av.code}
+                className="flex items-center justify-between text-xs"
+              >
+                <div className="flex items-center gap-1.5">
+                  <Ticket className="w-3 h-3 text-green-500" />
+                  <span className="text-gray-600 font-medium">{av.code}</span>
+                  <span className="text-gray-400">({av.voucherType})</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-green-600 font-medium">
+                    -{av.discountApplied.toLocaleString()}₫
+                  </span>
+                  <button
+                    type="button"
+                    disabled={isRemovingVoucher || isApplyingVoucher}
+                    onClick={() => {
+                      if (cart.orderId) {
+                        dispatch(
+                          removeVoucherThunk({
+                            orderId: cart.orderId,
+                            code: av.code,
+                          }),
+                        );
+                      }
+                    }}
+                    className="p-0.5 text-gray-400 hover:text-[#ce2a32] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={`Remove voucher ${av.code}`}
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -351,7 +539,11 @@ const OrderSummary: FC<OrderSummaryProps> = ({
             Estimated Total
           </span>
           <span className="text-xl font-black text-black">
-            {selectedTotal.toLocaleString()}₫
+            {(checkoutSummary
+              ? checkoutSummary.finalTotal
+              : selectedTotal
+            ).toLocaleString()}
+            ₫
           </span>
         </div>
 
@@ -385,6 +577,10 @@ const OrderSummary: FC<OrderSummaryProps> = ({
 // ═════════════════════════════════════════════════════════════
 export default function CartPage() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const shopVoucherGroups = useAppSelector(selectShopVoucherGroups);
+  const systemVouchersMain = useAppSelector(selectSystemVouchers);
+  const selectedSystemIds = useAppSelector(selectSelectedSystemVoucherIds);
   const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -395,6 +591,25 @@ export default function CartPage() {
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(
     new Set(),
   );
+
+  // ── Voucher modal state ──
+  const [voucherModal, setVoucherModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    vouchers: Voucher[];
+    subtotal: number;
+    brandLabel: string;
+    selectedIds: string[];
+    scope: { type: "system" } | { type: "shop"; shopId: string };
+  }>({
+    isOpen: false,
+    title: "",
+    vouchers: [],
+    subtotal: 0,
+    brandLabel: "Ameko",
+    selectedIds: [],
+    scope: { type: "system" },
+  });
 
   // Toggle selection for a single item
   const handleToggleSelect = useCallback((id: string) => {
@@ -420,6 +635,26 @@ export default function CartPage() {
     });
   }, [cart]);
 
+  // Select / deselect all items belonging to one shop
+  const handleToggleShopSelect = useCallback(
+    (shopId: string) => {
+      const shopItems =
+        cart?.orderItems.filter((item) => item.shopId === shopId) ?? [];
+      const shopItemIds = shopItems.map((item) => item.orderItemId);
+      setSelectedItemIds((prev) => {
+        const allSelected = shopItemIds.every((id) => prev.has(id));
+        const next = new Set(prev);
+        if (allSelected) {
+          shopItemIds.forEach((id) => next.delete(id));
+        } else {
+          shopItemIds.forEach((id) => next.add(id));
+        }
+        return next;
+      });
+    },
+    [cart],
+  );
+
   // Fetch cart from API
   useEffect(() => {
     const fetchCart = async () => {
@@ -444,6 +679,96 @@ export default function CartPage() {
       }
     };
     fetchCart();
+  }, []);
+
+  // Fetch applicable vouchers
+  useEffect(() => {
+    dispatch(fetchApplicableVouchersThunk());
+  }, [dispatch]);
+
+  // Group cart items by shopId for shop-level voucher display
+  const shopGroups = useMemo(() => {
+    if (!cart) return [];
+    const map = new Map<
+      string,
+      { shopId: string; shopName: string; items: OrderItem[] }
+    >();
+    cart.orderItems.forEach((item) => {
+      const key = item.shopId;
+      if (!map.has(key)) {
+        map.set(key, {
+          shopId: item.shopId,
+          shopName: item.shopName || "Shop",
+          items: [],
+        });
+      }
+      map.get(key)!.items.push(item);
+    });
+    return Array.from(map.values());
+  }, [cart]);
+
+  // ── Open voucher modal for system vouchers ──
+  const handleOpenSystemVoucherModal = useCallback(() => {
+    const selectedTotal = cart
+      ? cart.orderItems
+          .filter((i) => selectedItemIds.has(i.orderItemId))
+          .reduce((s, i) => s + i.totalPrice, 0)
+      : 0;
+    setVoucherModal({
+      isOpen: true,
+      title: "Chọn Ameko Voucher",
+      vouchers: systemVouchersMain,
+      subtotal: selectedTotal,
+      brandLabel: "Ameko",
+      selectedIds: selectedSystemIds,
+      scope: { type: "system" },
+    });
+  }, [cart, selectedItemIds, systemVouchersMain, selectedSystemIds]);
+
+  // ── Open voucher modal for a specific shop ──
+  const handleOpenShopVoucherModal = useCallback(
+    (shopId: string, shopName: string) => {
+      const group = shopVoucherGroups.find((g) => g.shopId === shopId);
+      const shopSubtotal = cart
+        ? cart.orderItems
+            .filter(
+              (i) => i.shopId === shopId && selectedItemIds.has(i.orderItemId),
+            )
+            .reduce((s, i) => s + i.totalPrice, 0)
+        : 0;
+      setVoucherModal({
+        isOpen: true,
+        title: `Chọn Voucher từ ${shopName}`,
+        vouchers: group?.vouchers ?? [],
+        subtotal: shopSubtotal,
+        brandLabel: shopName,
+        selectedIds: [],
+        scope: { type: "shop", shopId },
+      });
+    },
+    [cart, selectedItemIds, shopVoucherGroups],
+  );
+
+  // ── Handle voucher confirm ──
+  const handleVoucherConfirm = useCallback(
+    (selectedVouchers: Voucher[]) => {
+      const ids = selectedVouchers.map((v) => v.id);
+      if (voucherModal.scope.type === "system") {
+        dispatch(setSelectedSystemVouchers(ids));
+      } else {
+        dispatch(
+          setSelectedShopVouchers({
+            shopId: voucherModal.scope.shopId,
+            voucherIds: ids,
+          }),
+        );
+      }
+    },
+    [dispatch, voucherModal.scope],
+  );
+
+  const handleCloseVoucherModal = useCallback(() => {
+    setVoucherModal((prev) => ({ ...prev, isOpen: false }));
   }, []);
 
   const handleCheckout = useCallback(() => {
@@ -569,26 +894,47 @@ export default function CartPage() {
 
   // Main cart content
   return (
-    <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-12 lg:py-20">
-      {/* Header */}
-      <header className="flex items-center justify-between mb-8 md:mb-12 pb-4">
-        <h1 className="text-3xl md:text-4xl font-oswald font-bold uppercase tracking-wide">
-          Your Cart
-        </h1>
-        <Link
-          href={ROUTES.SHOP}
-          className="hidden md:flex items-center gap-2 text-sm text-gray-500 hover:text-[#ce2a32] transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" /> Continue Shopping
-        </Link>
-      </header>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 lg:py-12">
+        {/* Header */}
+        <header className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl md:text-3xl font-oswald font-bold uppercase tracking-wide text-gray-900">
+            Your Cart
+          </h1>
+          <Link
+            href={ROUTES.SHOP}
+            className="hidden md:flex items-center gap-2 text-sm text-gray-500 hover:text-[#ce2a32] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" /> Continue Shopping
+          </Link>
+        </header>
 
-      <div className="flex flex-col lg:flex-row gap-12">
-        {/* Product List */}
-        <div className="flex-1">
-          {/* Table Header (Desktop) */}
-          <div className="hidden md:grid grid-cols-12 gap-4 pb-4 border-b border-gray-200 text-xs font-bold text-gray-400 uppercase tracking-widest">
-            <div className="col-span-7 flex items-center gap-3">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Product List */}
+          <div className="flex-1 space-y-4">
+            {/* Column Header (Desktop) */}
+            <div className="hidden md:flex items-center bg-white rounded-lg shadow-sm px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              <div className="flex items-center gap-3 shrink-0">
+                <input
+                  type="checkbox"
+                  checked={
+                    selectedItemIds.size === cart.orderItems.length &&
+                    cart.orderItems.length > 0
+                  }
+                  onChange={handleToggleSelectAll}
+                  className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
+                  aria-label="Select all items"
+                />
+              </div>
+              <span className="flex-1 ml-3">Sản Phẩm</span>
+              <span className="w-28 text-center">Đơn Giá</span>
+              <span className="w-32 text-center">Số Lượng</span>
+              <span className="w-28 text-center">Số Tiền</span>
+              <span className="w-10 text-center">Thao Tác</span>
+            </div>
+
+            {/* Mobile: Select All */}
+            <div className="md:hidden flex items-center gap-2 bg-white rounded-lg shadow-sm px-4 py-3">
               <input
                 type="checkbox"
                 checked={
@@ -599,53 +945,105 @@ export default function CartPage() {
                 className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
                 aria-label="Select all items"
               />
-              Product
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Chọn Tất Cả ({cart.orderItems.length})
+              </span>
             </div>
-            <div className="col-span-2 text-center">Quantity</div>
-            <div className="col-span-3 text-right">Total</div>
+
+            {/* Shop Cards */}
+            {shopGroups.map(({ shopId, shopName, items: shopItems }) => {
+              const vouchers =
+                shopVoucherGroups.find((g) => g.shopId === shopId)?.vouchers ??
+                [];
+              const shopItemIds = shopItems.map((i) => i.orderItemId);
+              const allShopSelected =
+                shopItemIds.length > 0 &&
+                shopItemIds.every((id) => selectedItemIds.has(id));
+
+              return (
+                <div
+                  key={shopId}
+                  className="bg-white rounded-lg shadow-sm overflow-hidden"
+                >
+                  {/* Shop Header */}
+                  <div className="flex items-center p-4 border-b border-gray-100">
+                    <input
+                      type="checkbox"
+                      checked={allShopSelected}
+                      onChange={() => handleToggleShopSelect(shopId)}
+                      className="w-4 h-4 accent-[#ce2a32] cursor-pointer shrink-0"
+                      aria-label={`Select all from ${shopName}`}
+                    />
+                    <Store className="w-[18px] h-[18px] text-gray-600 ml-3" />
+                    <span className="font-semibold text-gray-800 ml-2 truncate">
+                      {shopName}
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-gray-400 ml-1 shrink-0" />
+                  </div>
+
+                  {/* Product Rows */}
+                  {shopItems.map((item) => (
+                    <CartItemCard
+                      key={item.orderItemId}
+                      item={item}
+                      onRemove={handleRemoveItem}
+                      removing={removingId === item.orderItemId}
+                      selected={selectedItemIds.has(item.orderItemId)}
+                      onToggleSelect={handleToggleSelect}
+                      onUpdateQuantity={handleUpdateQuantity}
+                      updatingQuantity={updatingQuantityId === item.orderItemId}
+                    />
+                  ))}
+
+                  {/* Shop Voucher Footer */}
+                  <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50/50">
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Ticket className="w-4 h-4 text-[#ce2a32]" />
+                      <span>Voucher của Shop</span>
+                    </div>
+                    {vouchers.length > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleOpenShopVoucherModal(shopId, shopName)
+                        }
+                        className="text-sm font-medium text-[#ce2a32] hover:underline"
+                      >
+                        Chọn Hoặc Nhập Mã ({vouchers.length} mã khả dụng)
+                      </button>
+                    ) : (
+                      <span className="text-sm text-gray-400">
+                        Chọn Hoặc Nhập Mã
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {/* Mobile: Select All */}
-          <div className="md:hidden flex items-center gap-2 py-3 border-b border-gray-200">
-            <input
-              type="checkbox"
-              checked={
-                selectedItemIds.size === cart.orderItems.length &&
-                cart.orderItems.length > 0
-              }
-              onChange={handleToggleSelectAll}
-              className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
-              aria-label="Select all items"
-            />
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-              Select All ({cart.orderItems.length})
-            </span>
-          </div>
-
-          {/* Cart Items */}
-          <div className="flex flex-col">
-            {cart.orderItems.map((item) => (
-              <CartItemCard
-                key={item.orderItemId}
-                item={item}
-                onRemove={handleRemoveItem}
-                removing={removingId === item.orderItemId}
-                selected={selectedItemIds.has(item.orderItemId)}
-                onToggleSelect={handleToggleSelect}
-                onUpdateQuantity={handleUpdateQuantity}
-                updatingQuantity={updatingQuantityId === item.orderItemId}
-              />
-            ))}
-          </div>
+          {/* Order Summary */}
+          <OrderSummary
+            cart={cart}
+            selectedItemIds={selectedItemIds}
+            onCheckout={handleCheckout}
+            onOpenSystemVoucher={handleOpenSystemVoucherModal}
+          />
         </div>
-
-        {/* Order Summary */}
-        <OrderSummary
-          cart={cart}
-          selectedItemIds={selectedItemIds}
-          onCheckout={handleCheckout}
-        />
       </div>
+
+      {/* Voucher Selector Modal */}
+      <VoucherSelectorModal
+        isOpen={voucherModal.isOpen}
+        onClose={handleCloseVoucherModal}
+        title={voucherModal.title}
+        vouchers={voucherModal.vouchers}
+        currentSubtotal={voucherModal.subtotal}
+        brandLabel={voucherModal.brandLabel}
+        selectedIds={voucherModal.selectedIds}
+        onConfirm={handleVoucherConfirm}
+        orderId={cart?.orderId}
+      />
     </div>
   );
 }
