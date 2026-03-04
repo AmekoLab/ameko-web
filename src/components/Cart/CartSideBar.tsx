@@ -20,6 +20,8 @@ import {
   Trash2,
   Minus,
   Plus,
+  Ticket,
+  Store,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
@@ -27,10 +29,25 @@ import {
   fetchServerCart,
   removeServerCartItem,
 } from "@/src/store/slices/cartSlice";
+import {
+  selectSystemVouchers,
+  selectShopVoucherGroups,
+  fetchApplicableVouchersThunk,
+  setSelectedSystemVouchers,
+  setSelectedShopVouchers,
+  selectSelectedSystemVoucherIds,
+  selectCheckoutSummary,
+  removeAllVouchersThunk,
+  removeVoucherThunk,
+  selectIsRemovingVoucher,
+  selectIsApplyingVoucher,
+} from "@/src/store/slices/voucherSlice";
 import { OrderItem, OrderItemComponent } from "@/src/types/order.types";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { orderService } from "@/src/services/order.service";
+import { Voucher } from "@/src/services/voucher.service";
+import VoucherSelectorModal from "@/src/components/Cart/VoucherSelectorModal";
 
 // ─── Component Row (part inside a custom build) ────────────
 const SidebarComponentRow: FC<{ component: OrderItemComponent }> = ({
@@ -221,9 +238,38 @@ export const CartSidebar: FC = memo(() => {
     (state) => state.cart,
   );
   const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const systemVouchers = useAppSelector(selectSystemVouchers);
+  const shopVoucherGroups = useAppSelector(selectShopVoucherGroups);
+  const selectedSystemVoucherIds = useAppSelector(
+    selectSelectedSystemVoucherIds,
+  );
+  const checkoutSummary = useAppSelector(selectCheckoutSummary);
+  const isRemovingVoucher = useAppSelector(selectIsRemovingVoucher);
+  const isApplyingVoucher = useAppSelector(selectIsApplyingVoucher);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const items = useMemo(() => serverCart?.orderItems ?? [], [serverCart]);
+
+  // Group items by shopId
+  const shopGroups = useMemo(() => {
+    const map = new Map<
+      string,
+      { shopId: string; shopName: string; items: OrderItem[] }
+    >();
+    items.forEach((item) => {
+      const key = item.shopId;
+      if (!map.has(key)) {
+        map.set(key, {
+          shopId: item.shopId,
+          shopName: item.shopName || "Shop",
+          items: [],
+        });
+      }
+      map.get(key)!.items.push(item);
+    });
+    return Array.from(map.values());
+  }, [items]);
+
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [updatingQuantityId, setUpdatingQuantityId] = useState<string | null>(
     null,
@@ -237,6 +283,79 @@ export const CartSidebar: FC = memo(() => {
     .filter((item) => selectedItemIds.has(item.orderItemId))
     .reduce((sum, item) => sum + item.totalPrice, 0);
   const hasSelection = selectedItemIds.size > 0;
+
+  // ── Voucher modal state ──
+  const [voucherModal, setVoucherModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    vouchers: Voucher[];
+    subtotal: number;
+    brandLabel: string;
+    selectedIds: string[];
+    scope: { type: "system" } | { type: "shop"; shopId: string };
+  }>({
+    isOpen: false,
+    title: "",
+    vouchers: [],
+    subtotal: 0,
+    brandLabel: "Ameko",
+    selectedIds: [],
+    scope: { type: "system" },
+  });
+
+  const handleOpenSystemVoucherModal = useCallback(() => {
+    setVoucherModal({
+      isOpen: true,
+      title: "Chọn Ameko Voucher",
+      vouchers: systemVouchers,
+      subtotal: selectedTotal,
+      brandLabel: "Ameko",
+      selectedIds: selectedSystemVoucherIds,
+      scope: { type: "system" },
+    });
+  }, [systemVouchers, selectedTotal, selectedSystemVoucherIds]);
+
+  const handleOpenShopVoucherModal = useCallback(
+    (shopId: string, shopName: string) => {
+      const group = shopVoucherGroups.find((g) => g.shopId === shopId);
+      const shopSubtotal = items
+        .filter(
+          (i) => i.shopId === shopId && selectedItemIds.has(i.orderItemId),
+        )
+        .reduce((s, i) => s + i.totalPrice, 0);
+      setVoucherModal({
+        isOpen: true,
+        title: `Chọn Voucher từ ${shopName}`,
+        vouchers: group?.vouchers ?? [],
+        subtotal: shopSubtotal,
+        brandLabel: shopName,
+        selectedIds: [],
+        scope: { type: "shop", shopId },
+      });
+    },
+    [items, selectedItemIds, shopVoucherGroups],
+  );
+
+  const handleVoucherConfirm = useCallback(
+    (selectedVouchers: Voucher[]) => {
+      const ids = selectedVouchers.map((v) => v.id);
+      if (voucherModal.scope.type === "system") {
+        dispatch(setSelectedSystemVouchers(ids));
+      } else {
+        dispatch(
+          setSelectedShopVouchers({
+            shopId: voucherModal.scope.shopId,
+            voucherIds: ids,
+          }),
+        );
+      }
+    },
+    [dispatch, voucherModal.scope],
+  );
+
+  const handleCloseVoucherModal = useCallback(() => {
+    setVoucherModal((prev) => ({ ...prev, isOpen: false }));
+  }, []);
 
   const handleToggleSelect = useCallback((id: string) => {
     if (!id) return;
@@ -304,9 +423,10 @@ export const CartSidebar: FC = memo(() => {
     [dispatch],
   );
 
-  // Fetch cart when sidebar opens, then auto-select all items
+  // Fetch cart & applicable vouchers when sidebar opens
   useEffect(() => {
     if (isCartOpen && isAuthenticated) {
+      dispatch(fetchApplicableVouchersThunk());
       dispatch(fetchServerCart()).then((action) => {
         if (fetchServerCart.fulfilled.match(action)) {
           const cartData = action.payload;
@@ -374,15 +494,17 @@ export const CartSidebar: FC = memo(() => {
     };
   }, [isCartOpen]);
 
-  // Close on click outside
+  // Close on click outside (skip when voucher modal is open)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target as Node)
+        voucherModal.isOpen ||
+        !sidebarRef.current ||
+        sidebarRef.current.contains(event.target as Node)
       ) {
-        handleClose();
+        return;
       }
+      handleClose();
     };
 
     if (isCartOpen) {
@@ -392,19 +514,19 @@ export const CartSidebar: FC = memo(() => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isCartOpen, handleClose]);
+  }, [isCartOpen, handleClose, voucherModal.isOpen]);
 
-  // Close on ESC key
+  // Close on ESC key (skip when voucher modal is open — let the modal handle its own ESC)
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isCartOpen) {
+      if (event.key === "Escape" && isCartOpen && !voucherModal.isOpen) {
         handleClose();
       }
     };
 
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [isCartOpen, handleClose]);
+  }, [isCartOpen, handleClose, voucherModal.isOpen]);
 
   return (
     <>
@@ -472,24 +594,82 @@ export const CartSidebar: FC = memo(() => {
               </Link>
             </div>
           ) : (
-            items.map((item) => (
-              <SidebarCartItem
-                key={item.orderItemId}
-                item={item}
-                onRemove={handleRemoveItem}
-                removing={removingId === item.orderItemId}
-                selected={selectedItemIds.has(item.orderItemId)}
-                onToggleSelect={handleToggleSelect}
-                onUpdateQuantity={handleUpdateQuantity}
-                updatingQuantity={updatingQuantityId === item.orderItemId}
-              />
-            ))
+            shopGroups.map(({ shopId, shopName, items: shopItems }) => {
+              const shopVouchers =
+                shopVoucherGroups.find((g) => g.shopId === shopId)?.vouchers ??
+                [];
+              return (
+                <div key={shopId} className="space-y-0">
+                  {/* Shop Header */}
+                  <div className="flex items-center gap-2 px-1 py-2 border-b border-gray-100">
+                    <Store className="w-4 h-4 text-gray-500 shrink-0" />
+                    <span className="text-xs font-semibold text-gray-700 truncate">
+                      {shopName}
+                    </span>
+                  </div>
+
+                  {/* Shop Items */}
+                  <div className="space-y-3 pt-2">
+                    {shopItems.map((item) => (
+                      <SidebarCartItem
+                        key={item.orderItemId}
+                        item={item}
+                        onRemove={handleRemoveItem}
+                        removing={removingId === item.orderItemId}
+                        selected={selectedItemIds.has(item.orderItemId)}
+                        onToggleSelect={handleToggleSelect}
+                        onUpdateQuantity={handleUpdateQuantity}
+                        updatingQuantity={
+                          updatingQuantityId === item.orderItemId
+                        }
+                      />
+                    ))}
+                  </div>
+
+                  {/* Shop Voucher Footer */}
+                  <div className="flex items-center justify-between px-1 py-2 border-t border-gray-100">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <Ticket className="w-3.5 h-3.5 text-[#ce2a32]" />
+                      <span>Voucher của Shop</span>
+                    </div>
+                    {shopVouchers.length > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleOpenShopVoucherModal(shopId, shopName)
+                        }
+                        className="text-xs font-medium text-[#ce2a32] hover:underline"
+                      >
+                        Chọn mã ({shopVouchers.length})
+                      </button>
+                    ) : (
+                      <span className="text-xs text-gray-400">Nhập mã</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
 
         {/* FOOTER */}
         {items.length > 0 && (
           <div className="border-t border-gray-100 p-6 space-y-4 bg-white">
+            {/* Ameko Platform Vouchers */}
+            {systemVouchers.length > 0 && (
+              <button
+                type="button"
+                onClick={handleOpenSystemVoucherModal}
+                className="w-full flex items-center gap-2 px-3 py-2.5 border border-dashed border-[#ce2a32]/40 rounded-sm text-sm text-[#ce2a32] hover:bg-red-50/40 transition-colors"
+              >
+                <Ticket className="w-4 h-4 shrink-0" />
+                <span className="font-medium">
+                  Chọn mã giảm giá toàn sàn ({systemVouchers.length} mã khả
+                  dụng)
+                </span>
+              </button>
+            )}
+
             {/* Select All */}
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
@@ -515,6 +695,77 @@ export const CartSidebar: FC = memo(() => {
               Shipping & taxes calculated at checkout
             </p>
 
+            {/* Applied Vouchers Summary */}
+            {checkoutSummary && checkoutSummary.appliedVouchers.length > 0 && (
+              <div className="space-y-1.5 py-2 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                    Voucher đã áp dụng
+                  </span>
+                  <button
+                    type="button"
+                    disabled={isRemovingVoucher}
+                    onClick={() => {
+                      if (serverCart?.orderId) {
+                        dispatch(removeAllVouchersThunk(serverCart.orderId));
+                      }
+                    }}
+                    className="flex items-center gap-1 text-[11px] text-[#ce2a32] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isRemovingVoucher ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-3 h-3" />
+                    )}
+                    Hủy áp dụng
+                  </button>
+                </div>
+                {checkoutSummary.appliedVouchers.map((av) => (
+                  <div
+                    key={av.code}
+                    className="flex items-center justify-between text-xs"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <Ticket className="w-3 h-3 text-green-500" />
+                      <span className="text-gray-600 font-medium">
+                        {av.code}
+                      </span>
+                      <span className="text-gray-400">({av.voucherType})</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-green-600 font-medium">
+                        -{av.discountApplied.toLocaleString()}₫
+                      </span>
+                      <button
+                        type="button"
+                        disabled={isRemovingVoucher || isApplyingVoucher}
+                        onClick={() => {
+                          if (serverCart?.orderId) {
+                            dispatch(
+                              removeVoucherThunk({
+                                orderId: serverCart.orderId,
+                                code: av.code,
+                              }),
+                            );
+                          }
+                        }}
+                        className="p-0.5 text-gray-400 hover:text-[#ce2a32] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label={`Remove voucher ${av.code}`}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between text-xs pt-1 border-t border-dashed border-gray-100">
+                  <span className="text-gray-500 font-medium">Tổng giảm</span>
+                  <span className="text-green-600 font-bold">
+                    -{checkoutSummary.totalDiscountAmount.toLocaleString()}₫
+                  </span>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-3">
               {/* Checkout Button */}
               <button
@@ -528,13 +779,26 @@ export const CartSidebar: FC = memo(() => {
               >
                 <ShoppingBag className="w-4 h-4" />
                 {hasSelection
-                  ? `Checkout • ${selectedTotal.toLocaleString()}₫`
+                  ? `Checkout • ${(checkoutSummary ? checkoutSummary.finalTotal : selectedTotal).toLocaleString()}₫`
                   : "Select Items"}
               </button>
             </div>
           </div>
         )}
       </div>
+
+      {/* Voucher Selector Modal */}
+      <VoucherSelectorModal
+        isOpen={voucherModal.isOpen}
+        onClose={handleCloseVoucherModal}
+        title={voucherModal.title}
+        vouchers={voucherModal.vouchers}
+        currentSubtotal={voucherModal.subtotal}
+        brandLabel={voucherModal.brandLabel}
+        selectedIds={voucherModal.selectedIds}
+        onConfirm={handleVoucherConfirm}
+        orderId={serverCart?.orderId}
+      />
     </>
   );
 });

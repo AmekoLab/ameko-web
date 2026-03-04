@@ -10,6 +10,7 @@ import builderReducer from "./slices/builderSlice";
 import followsReducer from "./slices/followsSlice";
 import walletReducer from "./slices/walletSlice";
 import adminWalletReducer from "./slices/adminWalletSlice";
+import voucherReducer from "./slices/voucherSlice";
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ export const store = configureStore({
     follows: followsReducer,
     wallet: walletReducer,
     adminWallet: adminWalletReducer,
+    voucher: voucherReducer,
   },
 });
 export type RootState = ReturnType<typeof store.getState>;
