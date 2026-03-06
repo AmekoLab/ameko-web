@@ -282,6 +282,15 @@ export const Header: FC = () => {
                         View My Wallet
                       </Link>
                     )}
+                  {user.role !== "Admin" && (
+                    <Link
+                      href={`/my-commissions`}
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
+                      onClick={() => setUserDropdownOpen(false)}
+                    >
+                      View My Custom Requests
+                    </Link>
+                  )}
 
                   <button
                     onClick={handleLogout}

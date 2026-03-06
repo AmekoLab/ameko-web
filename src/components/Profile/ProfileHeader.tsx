@@ -8,6 +8,7 @@ import {
   Settings,
   Wrench,
   ChevronDown,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +21,7 @@ import { ShopPublicProfile } from "@/src/types/shop.types";
 import { ImageModal } from "../Community/ImageModal";
 
 import { FollowsModal } from "./FollowModal";
+import { CreateCommissionModal } from "./CreateCommissionModal";
 
 interface ProfileHeaderProps {
   profile: ShopPublicProfile;
@@ -31,6 +33,8 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
   kitCategoryId = "4a84738d-736c-4ab8-af97-b9db8df05ba3",
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isCommissionModalOpen, setIsCommissionModalOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
   const [followsModalState, setFollowsModalState] = useState<{
@@ -105,6 +109,12 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
         onClose={closeFollowsModal}
         title={followsModalState.title}
         shopUserId={profile.userId}
+      />
+
+      <CreateCommissionModal
+        isOpen={isCommissionModalOpen}
+        onClose={() => setIsCommissionModalOpen(false)}
+        targetedShopId={profile.id}
       />
 
       {/* 1. Banner Image */}
@@ -227,13 +237,36 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                   )}
                 </button>
 
-                {/* Các nút Customize, Chat */}
-                <Link
-                  href={`/builder?shopId=${profile.id}&categoryId=${kitCategoryId}`}
-                  className="flex items-center gap-2 px-6 py-2 bg-[#ce2a32] text-white hover:bg-[#b02028] font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm"
-                >
-                  <Wrench className="w-4 h-4" /> Customize
-                </Link>
+                {/* Dropdown: Đặt Phím Custom */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsDropdownOpen((prev) => !prev)}
+                    className="flex items-center gap-2 px-6 py-2 bg-[#ce2a32] text-white hover:bg-[#b02028] font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm"
+                  >
+                    Đặt Phím Custom <ChevronDown className="w-4 h-4" />
+                  </button>
+
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50">
+                      <Link
+                        href={`/builder?shopId=${profile.id}&categoryId=${kitCategoryId}`}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <Wrench className="w-4 h-4" /> Tự thiết kế cấu hình
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setIsCommissionModalOpen(true);
+                          setIsDropdownOpen(false);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors w-full text-left"
+                      >
+                        <FileText className="w-4 h-4" /> Gửi yêu cầu báo giá
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-black font-bold text-sm rounded-sm transition-colors">
                   <MessageCircle className="w-4 h-4" /> Chat
                 </button>
