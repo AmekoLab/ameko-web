@@ -19,6 +19,7 @@ export default function Sidebar({ role = "staff" }) {
     { name: "Wallet", path: "/admin/wallet" },
     { name: "Pending Withdrawals", path: "/admin/pending-withdrawals" },
     { name: "Transactions", path: "/admin/transactions" },
+    { name: "Vouchers", path: "/admin/vouchers" },
   ];
 
   const staffMenu = [
@@ -34,6 +35,8 @@ export default function Sidebar({ role = "staff" }) {
     { name: "Assembled Products", path: "/shop/assembled-products" },
     { name: "Wallet", path: "/shop/wallet" },
     { name: "Vouchers", path: "/shop/vouchers" },
+    { name: "Commissions", path: "/shop/commissions" },
+    { name: "Quote Management", path: "/shop/quoted-commissions" },
   ];
 
   let menu = [...commonMenu];
