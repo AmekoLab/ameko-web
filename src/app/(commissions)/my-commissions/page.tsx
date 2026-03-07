@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/src/store/index";
 import { fetchMyRequests } from "@/src/store/slices/commissionSlice";
+import { CreateCommissionModal } from "@/src/components/Profile/CreateCommissionModal";
 import {
   FileText,
   Store,
@@ -14,6 +15,7 @@ import {
   Banknote,
   Inbox,
   Quote,
+  PlusCircle,
 } from "lucide-react";
 
 // ─── Constants ─────────────────────────────────────────────
@@ -89,6 +91,7 @@ export default function MyCommissionsPage() {
   const { myRequests, loadingMyRequests } = useSelector(
     (state: RootState) => state.commission,
   );
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchMyRequests());
@@ -98,11 +101,20 @@ export default function MyCommissionsPage() {
     <div className="bg-[#FAFAFA] min-h-screen">
       <div className="max-w-[1280px] mx-auto px-4 py-8 lg:py-12">
         {/* Page Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <FileText className="w-7 h-7 text-[#ce2a32]" />
-          <h1 className="text-2xl font-black text-gray-900">
-            Yêu cầu báo giá của tôi
-          </h1>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <FileText className="w-7 h-7 text-[#ce2a32]" />
+            <h1 className="text-2xl font-black text-gray-900">
+              Yêu cầu báo giá của tôi
+            </h1>
+          </div>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium text-sm"
+          >
+            <PlusCircle className="w-5 h-5" />
+            Tạo yêu cầu mới
+          </button>
         </div>
 
         {/* Loading */}
@@ -121,11 +133,18 @@ export default function MyCommissionsPage() {
               <Inbox className="w-10 h-10 text-gray-400" />
             </div>
             <h2 className="text-lg font-bold text-gray-900 mb-1">
-              Bạn chưa có yêu cầu nào
+              Bạn chưa có yêu cầu custom nào
             </h2>
-            <p className="text-sm text-gray-500 max-w-sm">
-              Hãy đến trang Shop và gửi yêu cầu báo giá để bắt đầu.
+            <p className="text-sm text-gray-500 max-w-sm mb-6">
+              Tạo yêu cầu đầu tiên của bạn để nhận báo giá từ các Shop.
             </p>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium text-sm"
+            >
+              <PlusCircle className="w-5 h-5" />
+              Tạo yêu cầu mới
+            </button>
           </div>
         )}
 
@@ -222,6 +241,13 @@ export default function MyCommissionsPage() {
           </div>
         )}
       </div>
+
+      {/* Create Commission Modal (public - no targetedShopId) */}
+      <CreateCommissionModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => dispatch(fetchMyRequests())}
+      />
     </div>
   );
 }

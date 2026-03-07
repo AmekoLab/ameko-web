@@ -1,5 +1,5 @@
 export interface CreateCommissionPayload {
-  targetedShopId: string;
+  targetedShopId?: string | null;
   title: string;
   description: string;
   referenceImages: string;

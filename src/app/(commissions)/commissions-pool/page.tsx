@@ -9,6 +9,7 @@ import {
   submitCommissionQuote,
 } from "@/src/store/slices/commissionSlice";
 import { CommissionRequest } from "@/src/types/commission.types";
+import { CreateCommissionModal } from "@/src/components/Profile/CreateCommissionModal";
 import {
   Loader2,
   Package,
@@ -21,6 +22,7 @@ import {
   Send,
   FileText,
   DollarSign,
+  Info,
 } from "lucide-react";
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -129,6 +131,8 @@ const CommissionModal = ({
   const { isSubmittingQuote } = useSelector(
     (state: RootState) => state.commission,
   );
+  const currentUserId = useSelector((state: RootState) => state.auth.user?.id);
+  const isOwner = currentUserId === request.userId;
 
   const [price, setPrice] = useState("");
   const [estimatedDays, setEstimatedDays] = useState("7");
@@ -265,105 +269,130 @@ const CommissionModal = ({
 
         {/* ─── Right Column: Quote Form ─── */}
         <div className="lg:w-1/2 border-t lg:border-t-0 lg:border-l border-gray-100 bg-gray-50 p-8 overflow-y-auto flex flex-col">
-          {/* Form Header */}
-          <div className="mb-6">
-            <h3 className="text-lg font-bold text-gray-900">
-              Gửi báo giá cho khách hàng
-            </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Đưa ra mức giá cạnh tranh và mô tả chi tiết vật tư bạn sẽ sử dụng.
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="flex flex-col flex-1 gap-5">
-            {/* Proposed Price */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Mức giá đề xuất (VND) <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-                  <DollarSign className="w-4 h-4" />
-                </div>
-                <input
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  min={1}
-                  placeholder="1,500,000"
-                  className="w-full border border-gray-300 rounded-xl pl-10 pr-14 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white"
-                />
-                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-semibold">
-                  VNĐ
-                </span>
+          {isOwner ? (
+            <div className="flex flex-col items-center justify-center flex-1 text-center">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                <Info className="w-8 h-8 text-gray-400" />
               </div>
-              {errors.price && (
-                <p className="text-xs text-red-500 mt-1">{errors.price}</p>
-              )}
+              <h3 className="text-lg font-bold text-gray-900 mb-2">
+                Đây là yêu cầu do bạn tạo
+              </h3>
+              <p className="text-sm text-gray-500 max-w-xs">
+                Bạn không thể gửi báo giá cho yêu cầu của chính mình.
+              </p>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-500 rounded-md text-sm font-medium mt-4">
+                <Info className="w-4 h-4" />
+                Chỉ xem
+              </div>
             </div>
-
-            {/* Estimated Time */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Thời gian hoàn thành dự kiến{" "}
-                <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={estimatedDays}
-                onChange={(e) => setEstimatedDays(e.target.value)}
-                className="w-full border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white appearance-none cursor-pointer"
-              >
-                <option value="3">3 ngày</option>
-                <option value="5">5 ngày</option>
-                <option value="7">7 ngày</option>
-                <option value="10">10 ngày</option>
-                <option value="14">14 ngày</option>
-                <option value="21">21 ngày</option>
-                <option value="30">30 ngày</option>
-              </select>
-            </div>
-
-            {/* Note / Details */}
-            <div className="flex-1 flex flex-col">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Lời nhắn / Chi tiết vật tư{" "}
-                <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                rows={5}
-                placeholder="Mô tả chi tiết switch, keycap, mod bạn sẽ sử dụng...&#10;Ví dụ: Gateron Oil King lubed, GMK Olivia clone, foam mod, tape mod..."
-                className="w-full flex-1 min-h-[120px] border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white resize-none"
-              />
-              {errors.note ? (
-                <p className="text-xs text-red-500 mt-1.5">{errors.note}</p>
-              ) : (
-                <p className="text-xs text-gray-400 mt-1.5">
-                  Tối thiểu 10 ký tự. Hãy mô tả rõ để khách hàng tin tưởng.
+          ) : (
+            <>
+              {/* Form Header */}
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-gray-900">
+                  Gửi báo giá cho khách hàng
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Đưa ra mức giá cạnh tranh và mô tả chi tiết vật tư bạn sẽ sử
+                  dụng.
                 </p>
-              )}
-            </div>
+              </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isSubmittingQuote}
-              className="w-full py-4 bg-black hover:bg-gray-800 disabled:bg-gray-400 text-white font-bold text-lg rounded-xl shadow-md transition-all flex items-center justify-center gap-2.5 mt-auto"
-            >
-              {isSubmittingQuote ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Đang gửi...
-                </>
-              ) : (
-                <>
-                  <Send className="w-5 h-5" />
-                  Gửi báo giá
-                </>
-              )}
-            </button>
-          </form>
+              <form
+                onSubmit={handleSubmit}
+                className="flex flex-col flex-1 gap-5"
+              >
+                {/* Proposed Price */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Mức giá đề xuất (VND){" "}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+                      <DollarSign className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="number"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      min={1}
+                      placeholder="1,500,000"
+                      className="w-full border border-gray-300 rounded-xl pl-10 pr-14 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white"
+                    />
+                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-semibold">
+                      VNĐ
+                    </span>
+                  </div>
+                  {errors.price && (
+                    <p className="text-xs text-red-500 mt-1">{errors.price}</p>
+                  )}
+                </div>
+
+                {/* Estimated Time */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Thời gian hoàn thành dự kiến{" "}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={estimatedDays}
+                    onChange={(e) => setEstimatedDays(e.target.value)}
+                    className="w-full border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white appearance-none cursor-pointer"
+                  >
+                    <option value="3">3 ngày</option>
+                    <option value="5">5 ngày</option>
+                    <option value="7">7 ngày</option>
+                    <option value="10">10 ngày</option>
+                    <option value="14">14 ngày</option>
+                    <option value="21">21 ngày</option>
+                    <option value="30">30 ngày</option>
+                  </select>
+                </div>
+
+                {/* Note / Details */}
+                <div className="flex-1 flex flex-col">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Lời nhắn / Chi tiết vật tư{" "}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    rows={5}
+                    placeholder="Mô tả chi tiết switch, keycap, mod bạn sẽ sử dụng...&#10;Ví dụ: Gateron Oil King lubed, GMK Olivia clone, foam mod, tape mod..."
+                    className="w-full flex-1 min-h-[120px] border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white resize-none"
+                  />
+                  {errors.note ? (
+                    <p className="text-xs text-red-500 mt-1.5">{errors.note}</p>
+                  ) : (
+                    <p className="text-xs text-gray-400 mt-1.5">
+                      Tối thiểu 10 ký tự. Hãy mô tả rõ để khách hàng tin tưởng.
+                    </p>
+                  )}
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={isSubmittingQuote}
+                  className="w-full py-4 bg-black hover:bg-gray-800 disabled:bg-gray-400 text-white font-bold text-lg rounded-xl shadow-md transition-all flex items-center justify-center gap-2.5 mt-auto"
+                >
+                  {isSubmittingQuote ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Đang gửi...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5" />
+                      Gửi báo giá
+                    </>
+                  )}
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -378,6 +407,7 @@ export default function CommissionPoolPage() {
   );
   const [selectedRequest, setSelectedRequest] =
     useState<CommissionRequest | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchPoolRequests());
@@ -390,6 +420,23 @@ export default function CommissionPoolPage() {
   return (
     <div className="bg-white min-h-screen">
       <div className="max-w-[1280px] mx-auto px-4 py-10 lg:py-14">
+        {/* Hero Banner */}
+        <div className="w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl p-8 mb-8 shadow-md flex flex-col items-center text-center">
+          <h2 className="text-3xl font-bold text-white">
+            Bạn có ý tưởng phím cơ độc lạ?
+          </h2>
+          <p className="text-white opacity-90 mt-2">
+            Đăng yêu cầu ngay để nhận báo giá từ hàng chục Shop uy tín trên hệ
+            thống.
+          </p>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="mt-6 bg-white text-purple-600 font-bold rounded-full px-8 py-3 hover:bg-gray-100 transition shadow-lg cursor-pointer"
+          >
+            Đăng Yêu Cầu Lên Chợ
+          </button>
+        </div>
+
         {/* Header */}
         <div className="mb-10">
           <h1 className="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight">
@@ -470,6 +517,13 @@ export default function CommissionPoolPage() {
           }}
         />
       )}
+
+      {/* Create Commission Modal (public - no targetedShopId) */}
+      <CreateCommissionModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => dispatch(fetchPoolRequests())}
+      />
     </div>
   );
 }

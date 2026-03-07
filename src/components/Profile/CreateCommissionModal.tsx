@@ -31,12 +31,14 @@ interface CreateCommissionModalProps {
   isOpen: boolean;
   onClose: () => void;
   targetedShopId?: string;
+  onSuccess?: () => void;
 }
 
 export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
   isOpen,
   onClose,
   targetedShopId,
+  onSuccess,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -78,12 +80,10 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
   };
 
   const onSubmit = async (data: CommissionFormData) => {
-    if (!targetedShopId) return;
-
     try {
       await dispatch(
         createCommissionRequest({
-          targetedShopId,
+          ...(targetedShopId ? { targetedShopId } : {}),
           title: data.title,
           description: data.description,
           referenceImages: data.referenceImages,
@@ -93,10 +93,11 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
         }),
       ).unwrap();
 
-      toast.success("Gửi yêu cầu báo giá thành công!");
+      toast.success("Gửi yêu cầu thành công!");
       reset();
       setPreviewUrl(null);
       onClose();
+      onSuccess?.();
     } catch (err) {
       toast.error(typeof err === "string" ? err : "Gửi yêu cầu thất bại");
     }
@@ -124,7 +125,9 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
           <h3 className="text-base font-semibold text-gray-900">
-            Gửi yêu cầu báo giá
+            {targetedShopId
+              ? "Gửi yêu cầu báo giá"
+              : "Đăng yêu cầu lên Chợ chung"}
           </h3>
           <button
             onClick={handleClose}
