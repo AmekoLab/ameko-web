@@ -5,6 +5,7 @@ import {
   AddToCartPayload,
   CheckoutPayload,
   CheckoutResponseData,
+  OrderGroup,
 } from "@/src/types/order.types";
 
 export const orderService = {
@@ -69,5 +70,13 @@ export const orderService = {
     orderGroupId: string,
   ): Promise<ApiResponse<{ paymentUrl: string }>> => {
     return api.post(`/orders/repay/${orderGroupId}`);
+  },
+
+  /**
+   * Fetch user's payment / order history.
+   * GET /orders/my-payment-history
+   */
+  getMyPaymentHistory: async (): Promise<ApiResponse<OrderGroup[]>> => {
+    return api.get("/orders/my-payment-history");
   },
 };

@@ -292,6 +292,26 @@ export const Header: FC = () => {
                     </Link>
                   )}
 
+                  {user.role !== "Admin" && (
+                    <Link
+                      href={`/my-payments`}
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
+                      onClick={() => setUserDropdownOpen(false)}
+                    >
+                      View My Payment History
+                    </Link>
+                  )}
+
+                  {user.role !== "Admin" && (
+                    <Link
+                      href={`/my-warranty-requests`}
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
+                      onClick={() => setUserDropdownOpen(false)}
+                    >
+                      View My Warranty Requests
+                    </Link>
+                  )}
+
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
