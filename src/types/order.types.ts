@@ -117,3 +117,36 @@ export interface OrderGroup {
   createdAt: string;
   orders: PaymentHistoryOrder[];
 }
+
+// ============================================================
+// Cart Preview (POST /orders/calculate-preview)
+// ============================================================
+
+/** Payload for POST /orders/calculate-preview */
+export interface CartPreviewPayload {
+  selectedOrderItemIds: string[];
+  appliedSystemVoucherCode: string | null;
+  appliedShopVoucherCodes: Record<string, string>;
+}
+
+/** A single shop's preview data */
+export interface ShopPreview {
+  shopId: string;
+  shopName: string;
+  subTotal: number;
+  shippingFee: number;
+  shopDiscountAmount: number;
+  totalAmount: number;
+  includedOrderItemIds: string[];
+  shopVoucherError: string | null;
+}
+
+/** Response data from POST /orders/calculate-preview */
+export interface CartPreviewData {
+  totalCartSubTotal: number;
+  totalShippingFee: number;
+  totalDiscountAmount: number;
+  finalTotalAmount: number;
+  systemVoucherError: string | null;
+  shopPreviews: ShopPreview[];
+}

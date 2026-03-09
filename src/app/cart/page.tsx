@@ -15,7 +15,6 @@ import {
   Plus,
   Ticket,
   Store,
-  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { orderService } from "@/src/services/order.service";
@@ -33,12 +32,13 @@ import {
   setSelectedSystemVouchers,
   setSelectedShopVouchers,
   selectSelectedSystemVoucherIds,
-  selectCheckoutSummary,
-  removeAllVouchersThunk,
-  removeVoucherThunk,
-  selectIsRemovingVoucher,
-  selectIsApplyingVoucher,
+  selectAllSelectedShopVoucherIds,
 } from "@/src/store/slices/voucherSlice";
+import {
+  calculateCartPreview,
+  selectCartPreview,
+  selectIsCalculatingPreview,
+} from "@/src/store/slices/cartSlice";
 import { Voucher } from "@/src/services/voucher.service";
 import VoucherSelectorModal from "@/src/components/Cart/VoucherSelectorModal";
 
@@ -360,41 +360,44 @@ const CartItemCard: FC<CartItemCardProps> = ({
   );
 };
 
+// ─── Price display helper for Order Summary ────────────────
+const PriceValue: FC<{
+  value: number;
+  className?: string;
+  loading?: boolean;
+}> = ({ value, className = "", loading }) =>
+  loading ? (
+    <span
+      className={`inline-block w-16 h-4 bg-gray-200 rounded animate-pulse ${className}`}
+    />
+  ) : (
+    <span className={className}>{value.toLocaleString()}₫</span>
+  );
+
 // ─── Order Summary Sidebar ─────────────────────────────────
 interface OrderSummaryProps {
-  cart: CartData;
   selectedItemIds: Set<string>;
   onCheckout: () => void;
   onOpenSystemVoucher: () => void;
 }
 
 const OrderSummary: FC<OrderSummaryProps> = ({
-  cart,
   selectedItemIds,
   onCheckout,
   onOpenSystemVoucher,
 }) => {
-  const dispatch = useAppDispatch();
   const systemVouchers = useAppSelector(selectSystemVouchers);
   const selectedSystemIds = useAppSelector(selectSelectedSystemVoucherIds);
-  const checkoutSummary = useAppSelector(selectCheckoutSummary);
-  const isRemovingVoucher = useAppSelector(selectIsRemovingVoucher);
-  const isApplyingVoucher = useAppSelector(selectIsApplyingVoucher);
+  const cartPreview = useAppSelector(selectCartPreview);
+  const isCalculating = useAppSelector(selectIsCalculatingPreview);
   const availableSystemVouchersCount = systemVouchers.length;
 
-  // Calculate totals based on selected items only
-  const selectedItems = cart.orderItems.filter((item) =>
-    selectedItemIds.has(item.orderItemId),
-  );
-  const selectedTotal = selectedItems.reduce(
-    (sum, item) => sum + item.totalPrice,
-    0,
-  );
-  const selectedCount = selectedItems.reduce(
-    (sum, item) => sum + item.quantity,
-    0,
-  );
   const hasSelection = selectedItemIds.size > 0;
+  const canCheckout =
+    hasSelection &&
+    !isCalculating &&
+    cartPreview !== null &&
+    !cartPreview.systemVoucherError;
 
   return (
     <div className="w-full lg:w-[380px] shrink-0">
@@ -431,120 +434,80 @@ const OrderSummary: FC<OrderSummaryProps> = ({
           </button>
         </div>
 
+        {/* System voucher error */}
+        {cartPreview?.systemVoucherError && (
+          <div className="mb-3 p-2 rounded bg-red-50 border border-red-200 text-xs text-red-600">
+            {cartPreview.systemVoucherError}
+          </div>
+        )}
+
         {/* Selected items info */}
         <div className="flex justify-between items-center mb-2 text-sm">
           <span className="text-gray-600">Selected items</span>
           <span className="font-medium">
-            {selectedItemIds.size} item{selectedItemIds.size !== 1 ? "s" : ""} (
-            {selectedCount} qty)
+            {selectedItemIds.size} item{selectedItemIds.size !== 1 ? "s" : ""}
           </span>
         </div>
 
         {/* Subtotal */}
-        {cart.subTotal > 0 && (
-          <div className="flex justify-between items-center mb-2 text-sm">
-            <span className="text-gray-600">Subtotal</span>
-            <span className="font-medium">
-              {cart.subTotal.toLocaleString()}₫
-            </span>
-          </div>
-        )}
+        <div className="flex justify-between items-center mb-2 text-sm">
+          <span className="text-gray-600">Subtotal</span>
+          <PriceValue
+            value={cartPreview?.totalCartSubTotal ?? 0}
+            className="font-medium"
+            loading={isCalculating}
+          />
+        </div>
 
         {/* Shipping */}
-        {cart.shippingFee > 0 && (
-          <div className="flex justify-between items-center mb-2 text-sm">
-            <span className="text-gray-600">Shipping</span>
-            <span className="font-medium">
-              {cart.shippingFee.toLocaleString()}₫
-            </span>
-          </div>
-        )}
+        <div className="flex justify-between items-center mb-2 text-sm">
+          <span className="text-gray-600">Shipping</span>
+          <PriceValue
+            value={cartPreview?.totalShippingFee ?? 0}
+            className="font-medium"
+            loading={isCalculating}
+          />
+        </div>
 
         {/* Discount */}
-        {checkoutSummary && checkoutSummary.totalDiscountAmount > 0 && (
+        {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (
           <div className="flex justify-between items-center mb-2 text-sm">
             <span className="text-gray-600">Discount</span>
-            <span className="font-medium text-green-600">
-              -{checkoutSummary.totalDiscountAmount.toLocaleString()}₫
-            </span>
+            {isCalculating ? (
+              <span className="inline-block w-16 h-4 bg-gray-200 rounded animate-pulse" />
+            ) : (
+              <span className="font-medium text-green-600">
+                -{cartPreview!.totalDiscountAmount.toLocaleString()}₫
+              </span>
+            )}
           </div>
         )}
 
-        {/* Applied Vouchers Breakdown */}
-        {checkoutSummary && checkoutSummary.appliedVouchers.length > 0 && (
-          <div className="mb-2 space-y-1 py-2 border-t border-dashed border-gray-100">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-                Applied Vouchers
-              </p>
-              <button
-                type="button"
-                disabled={isRemovingVoucher}
-                onClick={() => {
-                  if (cart.orderId) {
-                    dispatch(removeAllVouchersThunk(cart.orderId));
-                  }
-                }}
-                className="flex items-center gap-1 text-[11px] text-[#ce2a32] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isRemovingVoucher ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                ) : (
-                  <Trash2 className="w-3 h-3" />
-                )}
-                Hủy áp dụng
-              </button>
+        {/* Shop-level voucher errors */}
+        {cartPreview?.shopPreviews
+          .filter((sp) => sp.shopVoucherError)
+          .map((sp) => (
+            <div
+              key={sp.shopId}
+              className="mb-2 p-2 rounded bg-amber-50 border border-amber-200 text-xs text-amber-700"
+            >
+              <span className="font-medium">{sp.shopName}:</span>{" "}
+              {sp.shopVoucherError}
             </div>
-            {checkoutSummary.appliedVouchers.map((av) => (
-              <div
-                key={av.code}
-                className="flex items-center justify-between text-xs"
-              >
-                <div className="flex items-center gap-1.5">
-                  <Ticket className="w-3 h-3 text-green-500" />
-                  <span className="text-gray-600 font-medium">{av.code}</span>
-                  <span className="text-gray-400">({av.voucherType})</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-green-600 font-medium">
-                    -{av.discountApplied.toLocaleString()}₫
-                  </span>
-                  <button
-                    type="button"
-                    disabled={isRemovingVoucher || isApplyingVoucher}
-                    onClick={() => {
-                      if (cart.orderId) {
-                        dispatch(
-                          removeVoucherThunk({
-                            orderId: cart.orderId,
-                            code: av.code,
-                          }),
-                        );
-                      }
-                    }}
-                    className="p-0.5 text-gray-400 hover:text-[#ce2a32] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-label={`Remove voucher ${av.code}`}
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+          ))}
 
         {/* Total */}
         <div className="flex justify-between items-end mb-2 mt-4 pt-3 border-t border-gray-200">
           <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">
             Estimated Total
           </span>
-          <span className="text-xl font-black text-black">
-            {(checkoutSummary
-              ? checkoutSummary.finalTotal
-              : selectedTotal
-            ).toLocaleString()}
-            ₫
-          </span>
+          {isCalculating ? (
+            <span className="inline-block w-24 h-6 bg-gray-200 rounded animate-pulse" />
+          ) : (
+            <span className="text-xl font-black text-black">
+              {(cartPreview?.finalTotalAmount ?? 0).toLocaleString()}₫
+            </span>
+          )}
         </div>
 
         <p className="text-xs text-gray-400 mb-6 text-right">
@@ -555,13 +518,14 @@ const OrderSummary: FC<OrderSummaryProps> = ({
         <div className="space-y-3">
           <button
             onClick={onCheckout}
-            disabled={!hasSelection}
-            className={`w-full h-12 text-sm font-bold uppercase tracking-widest transition-colors duration-200 rounded-sm ${
-              hasSelection
+            disabled={!canCheckout}
+            className={`w-full h-12 text-sm font-bold uppercase tracking-widest transition-colors duration-200 rounded-sm flex items-center justify-center gap-2 ${
+              canCheckout
                 ? "bg-black text-white hover:bg-[#ce2a32]"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
+            {isCalculating && <Loader2 className="w-4 h-4 animate-spin" />}
             {hasSelection
               ? `Proceed to Checkout (${selectedItemIds.size})`
               : "Select Items to Checkout"}
@@ -581,6 +545,9 @@ export default function CartPage() {
   const shopVoucherGroups = useAppSelector(selectShopVoucherGroups);
   const systemVouchersMain = useAppSelector(selectSystemVouchers);
   const selectedSystemIds = useAppSelector(selectSelectedSystemVoucherIds);
+  const selectedShopVoucherIdsMap = useAppSelector(
+    selectAllSelectedShopVoucherIds,
+  );
   const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -686,6 +653,46 @@ export default function CartPage() {
     dispatch(fetchApplicableVouchersThunk());
   }, [dispatch]);
 
+  // ── Dispatch cart preview calculation whenever inputs change ──
+  useEffect(() => {
+    if (selectedItemIds.size === 0) return;
+
+    // Look up system voucher code from selected ID
+    const systemVoucher =
+      selectedSystemIds.length > 0
+        ? systemVouchersMain.find((v) => v.id === selectedSystemIds[0])
+        : null;
+
+    // Build shop voucher codes map: shopId -> voucher code
+    const appliedShopVoucherCodes: Record<string, string> = {};
+    for (const [shopId, voucherIds] of Object.entries(
+      selectedShopVoucherIdsMap,
+    )) {
+      if (voucherIds.length > 0) {
+        const shopGroup = shopVoucherGroups.find((g) => g.shopId === shopId);
+        const voucher = shopGroup?.vouchers.find((v) => v.id === voucherIds[0]);
+        if (voucher) {
+          appliedShopVoucherCodes[shopId] = voucher.code;
+        }
+      }
+    }
+
+    dispatch(
+      calculateCartPreview({
+        selectedOrderItemIds: Array.from(selectedItemIds),
+        appliedSystemVoucherCode: systemVoucher?.code ?? null,
+        appliedShopVoucherCodes,
+      }),
+    );
+  }, [
+    dispatch,
+    selectedItemIds,
+    selectedSystemIds,
+    selectedShopVoucherIdsMap,
+    systemVouchersMain,
+    shopVoucherGroups,
+  ]);
+
   // Group cart items by shopId for shop-level voucher display
   const shopGroups = useMemo(() => {
     if (!cart) return [];
@@ -709,44 +716,32 @@ export default function CartPage() {
 
   // ── Open voucher modal for system vouchers ──
   const handleOpenSystemVoucherModal = useCallback(() => {
-    const selectedTotal = cart
-      ? cart.orderItems
-          .filter((i) => selectedItemIds.has(i.orderItemId))
-          .reduce((s, i) => s + i.totalPrice, 0)
-      : 0;
     setVoucherModal({
       isOpen: true,
       title: "Chọn Ameko Voucher",
       vouchers: systemVouchersMain,
-      subtotal: selectedTotal,
+      subtotal: 0,
       brandLabel: "Ameko",
       selectedIds: selectedSystemIds,
       scope: { type: "system" },
     });
-  }, [cart, selectedItemIds, systemVouchersMain, selectedSystemIds]);
+  }, [systemVouchersMain, selectedSystemIds]);
 
   // ── Open voucher modal for a specific shop ──
   const handleOpenShopVoucherModal = useCallback(
     (shopId: string, shopName: string) => {
       const group = shopVoucherGroups.find((g) => g.shopId === shopId);
-      const shopSubtotal = cart
-        ? cart.orderItems
-            .filter(
-              (i) => i.shopId === shopId && selectedItemIds.has(i.orderItemId),
-            )
-            .reduce((s, i) => s + i.totalPrice, 0)
-        : 0;
       setVoucherModal({
         isOpen: true,
         title: `Chọn Voucher từ ${shopName}`,
         vouchers: group?.vouchers ?? [],
-        subtotal: shopSubtotal,
+        subtotal: 0,
         brandLabel: shopName,
         selectedIds: [],
         scope: { type: "shop", shopId },
       });
     },
-    [cart, selectedItemIds, shopVoucherGroups],
+    [shopVoucherGroups],
   );
 
   // ── Handle voucher confirm ──
@@ -1024,7 +1019,6 @@ export default function CartPage() {
 
           {/* Order Summary */}
           <OrderSummary
-            cart={cart}
             selectedItemIds={selectedItemIds}
             onCheckout={handleCheckout}
             onOpenSystemVoucher={handleOpenSystemVoucherModal}

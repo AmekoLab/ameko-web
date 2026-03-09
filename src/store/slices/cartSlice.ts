@@ -1,6 +1,11 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { orderService } from "@/src/services/order.service";
-import { CartData } from "@/src/types/order.types";
+import {
+  CartData,
+  CartPreviewPayload,
+  CartPreviewData,
+} from "@/src/types/order.types";
+import { RootState } from "@/src/store";
 
 export interface CartItem {
   id: string;
@@ -73,6 +78,23 @@ export const updateServerCartItemQuantity = createAsyncThunk(
   },
 );
 
+// ─── Async Thunk: Calculate cart preview from backend ────
+export const calculateCartPreview = createAsyncThunk(
+  "cart/calculateCartPreview",
+  async (payload: CartPreviewPayload, { rejectWithValue }) => {
+    try {
+      const res = await orderService.calculatePreview(payload);
+      if (res.success) {
+        return res.data;
+      }
+      return rejectWithValue(res.message || "Failed to calculate preview");
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      return rejectWithValue(err.message || "Failed to calculate preview");
+    }
+  },
+);
+
 interface CartState {
   items: CartItem[];
   totalQuantity: number;
@@ -83,6 +105,10 @@ interface CartState {
   serverCart: CartData | null;
   serverCartLoading: boolean;
   serverCartError: string | null;
+  // Cart preview (backend-calculated totals)
+  cartPreview: CartPreviewData | null;
+  isCalculatingPreview: boolean;
+  cartPreviewError: string | null;
 }
 
 // Load cart from localStorage
@@ -120,6 +146,9 @@ const initialState: CartState = {
   serverCart: null,
   serverCartLoading: false,
   serverCartError: null,
+  cartPreview: null,
+  isCalculatingPreview: false,
+  cartPreviewError: null,
 };
 
 const cartSlice = createSlice({
@@ -195,6 +224,11 @@ const cartSlice = createSlice({
       state.totalQuantity = totalQuantity;
       state.totalAmount = totalAmount;
     },
+
+    clearCartPreview(state) {
+      state.cartPreview = null;
+      state.cartPreviewError = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -220,6 +254,19 @@ const cartSlice = createSlice({
       })
       .addCase(removeServerCartItem.rejected, (state, action) => {
         state.serverCartError = action.payload as string;
+      })
+      // calculateCartPreview
+      .addCase(calculateCartPreview.pending, (state) => {
+        state.isCalculatingPreview = true;
+        state.cartPreviewError = null;
+      })
+      .addCase(calculateCartPreview.fulfilled, (state, action) => {
+        state.isCalculatingPreview = false;
+        state.cartPreview = action.payload;
+      })
+      .addCase(calculateCartPreview.rejected, (state, action) => {
+        state.isCalculatingPreview = false;
+        state.cartPreviewError = action.payload as string;
       });
   },
 });
@@ -232,9 +279,17 @@ export const {
   clearCart,
   recalculateTotals,
   setOrderNote,
+  clearCartPreview,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
+
+// ─── Selectors ───────────────────────────────────────────
+export const selectCartPreview = (state: RootState) => state.cart.cartPreview;
+export const selectIsCalculatingPreview = (state: RootState) =>
+  state.cart.isCalculatingPreview;
+export const selectCartPreviewError = (state: RootState) =>
+  state.cart.cartPreviewError;
 
 // Middleware to save cart to localStorage
 export const cartMiddleware = (store: any) => (next: any) => (action: any) => {

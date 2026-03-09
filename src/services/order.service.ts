@@ -6,6 +6,8 @@ import {
   CheckoutPayload,
   CheckoutResponseData,
   OrderGroup,
+  CartPreviewPayload,
+  CartPreviewData,
 } from "@/src/types/order.types";
 
 export const orderService = {
@@ -78,5 +80,15 @@ export const orderService = {
    */
   getMyPaymentHistory: async (): Promise<ApiResponse<OrderGroup[]>> => {
     return api.get("/orders/my-payment-history");
+  },
+
+  /**
+   * Calculate cart preview with vouchers.
+   * POST /orders/calculate-preview
+   */
+  calculatePreview: async (
+    payload: CartPreviewPayload,
+  ): Promise<ApiResponse<CartPreviewData>> => {
+    return api.post("/orders/calculate-preview", payload);
   },
 };

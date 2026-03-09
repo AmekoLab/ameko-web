@@ -28,6 +28,9 @@ import {
   setCartOpen,
   fetchServerCart,
   removeServerCartItem,
+  calculateCartPreview,
+  selectCartPreview,
+  selectIsCalculatingPreview,
 } from "@/src/store/slices/cartSlice";
 import {
   selectSystemVouchers,
@@ -36,11 +39,7 @@ import {
   setSelectedSystemVouchers,
   setSelectedShopVouchers,
   selectSelectedSystemVoucherIds,
-  selectCheckoutSummary,
-  removeAllVouchersThunk,
-  removeVoucherThunk,
-  selectIsRemovingVoucher,
-  selectIsApplyingVoucher,
+  selectAllSelectedShopVoucherIds,
 } from "@/src/store/slices/voucherSlice";
 import { OrderItem, OrderItemComponent } from "@/src/types/order.types";
 import { useRouter } from "next/navigation";
@@ -243,9 +242,11 @@ export const CartSidebar: FC = memo(() => {
   const selectedSystemVoucherIds = useAppSelector(
     selectSelectedSystemVoucherIds,
   );
-  const checkoutSummary = useAppSelector(selectCheckoutSummary);
-  const isRemovingVoucher = useAppSelector(selectIsRemovingVoucher);
-  const isApplyingVoucher = useAppSelector(selectIsApplyingVoucher);
+  const selectedShopVoucherIdsMap = useAppSelector(
+    selectAllSelectedShopVoucherIds,
+  );
+  const cartPreview = useAppSelector(selectCartPreview);
+  const isCalculating = useAppSelector(selectIsCalculatingPreview);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const items = useMemo(() => serverCart?.orderItems ?? [], [serverCart]);
@@ -278,11 +279,12 @@ export const CartSidebar: FC = memo(() => {
     new Set(),
   );
 
-  // Compute selected total
-  const selectedTotal = items
-    .filter((item) => selectedItemIds.has(item.orderItemId))
-    .reduce((sum, item) => sum + item.totalPrice, 0);
   const hasSelection = selectedItemIds.size > 0;
+  const canCheckout =
+    hasSelection &&
+    !isCalculating &&
+    cartPreview !== null &&
+    !cartPreview.systemVoucherError;
 
   // ── Voucher modal state ──
   const [voucherModal, setVoucherModal] = useState<{
@@ -308,32 +310,27 @@ export const CartSidebar: FC = memo(() => {
       isOpen: true,
       title: "Chọn Ameko Voucher",
       vouchers: systemVouchers,
-      subtotal: selectedTotal,
+      subtotal: 0,
       brandLabel: "Ameko",
       selectedIds: selectedSystemVoucherIds,
       scope: { type: "system" },
     });
-  }, [systemVouchers, selectedTotal, selectedSystemVoucherIds]);
+  }, [systemVouchers, selectedSystemVoucherIds]);
 
   const handleOpenShopVoucherModal = useCallback(
     (shopId: string, shopName: string) => {
       const group = shopVoucherGroups.find((g) => g.shopId === shopId);
-      const shopSubtotal = items
-        .filter(
-          (i) => i.shopId === shopId && selectedItemIds.has(i.orderItemId),
-        )
-        .reduce((s, i) => s + i.totalPrice, 0);
       setVoucherModal({
         isOpen: true,
         title: `Chọn Voucher từ ${shopName}`,
         vouchers: group?.vouchers ?? [],
-        subtotal: shopSubtotal,
+        subtotal: 0,
         brandLabel: shopName,
         selectedIds: [],
         scope: { type: "shop", shopId },
       });
     },
-    [items, selectedItemIds, shopVoucherGroups],
+    [shopVoucherGroups],
   );
 
   const handleVoucherConfirm = useCallback(
@@ -443,6 +440,47 @@ export const CartSidebar: FC = memo(() => {
       });
     }
   }, [isCartOpen, isAuthenticated, dispatch]);
+
+  // ── Dispatch cart preview calculation whenever inputs change ──
+  useEffect(() => {
+    if (!isCartOpen || selectedItemIds.size === 0) return;
+
+    // Look up system voucher code from selected ID
+    const systemVoucher =
+      selectedSystemVoucherIds.length > 0
+        ? systemVouchers.find((v) => v.id === selectedSystemVoucherIds[0])
+        : null;
+
+    // Build shop voucher codes map: shopId -> voucher code
+    const appliedShopVoucherCodes: Record<string, string> = {};
+    for (const [shopId, voucherIds] of Object.entries(
+      selectedShopVoucherIdsMap,
+    )) {
+      if (voucherIds.length > 0) {
+        const shopGroup = shopVoucherGroups.find((g) => g.shopId === shopId);
+        const voucher = shopGroup?.vouchers.find((v) => v.id === voucherIds[0]);
+        if (voucher) {
+          appliedShopVoucherCodes[shopId] = voucher.code;
+        }
+      }
+    }
+
+    dispatch(
+      calculateCartPreview({
+        selectedOrderItemIds: Array.from(selectedItemIds),
+        appliedSystemVoucherCode: systemVoucher?.code ?? null,
+        appliedShopVoucherCodes,
+      }),
+    );
+  }, [
+    dispatch,
+    isCartOpen,
+    selectedItemIds,
+    selectedSystemVoucherIds,
+    selectedShopVoucherIdsMap,
+    systemVouchers,
+    shopVoucherGroups,
+  ]);
 
   const handleCheckout = useCallback(() => {
     dispatch(setCartOpen(false));
@@ -691,78 +729,48 @@ export const CartSidebar: FC = memo(() => {
               </span>
             </div>
 
-            <p className="text-gray-400 text-xs">
-              Shipping & taxes calculated at checkout
-            </p>
-
-            {/* Applied Vouchers Summary */}
-            {checkoutSummary && checkoutSummary.appliedVouchers.length > 0 && (
+            {/* Backend-calculated summary */}
+            {cartPreview && hasSelection && (
               <div className="space-y-1.5 py-2 border-t border-gray-100">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-                    Voucher đã áp dụng
-                  </span>
-                  <button
-                    type="button"
-                    disabled={isRemovingVoucher}
-                    onClick={() => {
-                      if (serverCart?.orderId) {
-                        dispatch(removeAllVouchersThunk(serverCart.orderId));
-                      }
-                    }}
-                    className="flex items-center gap-1 text-[11px] text-[#ce2a32] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isRemovingVoucher ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-500">Subtotal</span>
+                  {isCalculating ? (
+                    <span className="inline-block w-14 h-3.5 bg-gray-200 rounded animate-pulse" />
+                  ) : (
+                    <span className="text-gray-700 font-medium">
+                      {cartPreview.totalCartSubTotal.toLocaleString()}₫
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-500">Shipping</span>
+                  {isCalculating ? (
+                    <span className="inline-block w-14 h-3.5 bg-gray-200 rounded animate-pulse" />
+                  ) : (
+                    <span className="text-gray-700 font-medium">
+                      {cartPreview.totalShippingFee.toLocaleString()}₫
+                    </span>
+                  )}
+                </div>
+                {cartPreview.totalDiscountAmount > 0 && (
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-gray-500">Discount</span>
+                    {isCalculating ? (
+                      <span className="inline-block w-14 h-3.5 bg-gray-200 rounded animate-pulse" />
                     ) : (
-                      <Trash2 className="w-3 h-3" />
-                    )}
-                    Hủy áp dụng
-                  </button>
-                </div>
-                {checkoutSummary.appliedVouchers.map((av) => (
-                  <div
-                    key={av.code}
-                    className="flex items-center justify-between text-xs"
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <Ticket className="w-3 h-3 text-green-500" />
-                      <span className="text-gray-600 font-medium">
-                        {av.code}
-                      </span>
-                      <span className="text-gray-400">({av.voucherType})</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
                       <span className="text-green-600 font-medium">
-                        -{av.discountApplied.toLocaleString()}₫
+                        -{cartPreview.totalDiscountAmount.toLocaleString()}₫
                       </span>
-                      <button
-                        type="button"
-                        disabled={isRemovingVoucher || isApplyingVoucher}
-                        onClick={() => {
-                          if (serverCart?.orderId) {
-                            dispatch(
-                              removeVoucherThunk({
-                                orderId: serverCart.orderId,
-                                code: av.code,
-                              }),
-                            );
-                          }
-                        }}
-                        className="p-0.5 text-gray-400 hover:text-[#ce2a32] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label={`Remove voucher ${av.code}`}
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
+                    )}
                   </div>
-                ))}
-                <div className="flex items-center justify-between text-xs pt-1 border-t border-dashed border-gray-100">
-                  <span className="text-gray-500 font-medium">Tổng giảm</span>
-                  <span className="text-green-600 font-bold">
-                    -{checkoutSummary.totalDiscountAmount.toLocaleString()}₫
-                  </span>
-                </div>
+                )}
+              </div>
+            )}
+
+            {/* System voucher error */}
+            {cartPreview?.systemVoucherError && (
+              <div className="p-2 rounded bg-red-50 border border-red-200 text-[11px] text-red-600">
+                {cartPreview.systemVoucherError}
               </div>
             )}
 
@@ -770,16 +778,22 @@ export const CartSidebar: FC = memo(() => {
               {/* Checkout Button */}
               <button
                 onClick={handleCheckout}
-                disabled={!hasSelection}
+                disabled={!canCheckout}
                 className={`w-full py-3.5 px-4 flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest transition-colors ${
-                  hasSelection
+                  canCheckout
                     ? "bg-[#1a1a1a] hover:bg-black text-white"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
-                <ShoppingBag className="w-4 h-4" />
+                {isCalculating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <ShoppingBag className="w-4 h-4" />
+                )}
                 {hasSelection
-                  ? `Checkout • ${(checkoutSummary ? checkoutSummary.finalTotal : selectedTotal).toLocaleString()}₫`
+                  ? isCalculating
+                    ? "Calculating..."
+                    : `Checkout • ${(cartPreview?.finalTotalAmount ?? 0).toLocaleString()}₫`
                   : "Select Items"}
               </button>
             </div>
