@@ -75,3 +75,45 @@ export interface CheckoutResponseData {
   totalAmount: number;
   paymentUrl: string;
 }
+
+// ============================================================
+// Payment History Types
+// ============================================================
+
+/** A single item in a payment-history order */
+export interface PaymentHistoryOrderItem {
+  orderItemId: string;
+  productId: string;
+  productName: string;
+  productImage: string | null;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  isCustom: boolean;
+}
+
+/** A single order within a payment-history order group */
+export interface PaymentHistoryOrder {
+  orderId: string;
+  orderGroupId: string;
+  shopId: string;
+  shopName: string;
+  shopAvatar: string;
+  orderStatus: string;
+  paymentStatus: string;
+  subTotal: number;
+  shippingFee: number;
+  discountAmount: number;
+  totalAmount: number;
+  createdAt: string;
+  orderItems: PaymentHistoryOrderItem[];
+}
+
+/** A group of orders sharing the same payment */
+export interface OrderGroup {
+  orderGroupId: string;
+  totalGroupAmount: number;
+  paymentStatus: string;
+  createdAt: string;
+  orders: PaymentHistoryOrder[];
+}

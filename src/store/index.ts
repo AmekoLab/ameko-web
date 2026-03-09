@@ -12,6 +12,10 @@ import walletReducer from "./slices/walletSlice";
 import adminWalletReducer from "./slices/adminWalletSlice";
 import voucherReducer from "./slices/voucherSlice";
 import commissionReducer from "./slices/commissionSlice";
+import orderReducer from "./slices/orderSlice";
+import warrantyReducer from "./slices/warrantySlice";
+import shopWarrantyReducer from "./slices/shopWarrantySlice";
+import adminWarrantyReducer from "./slices/adminWarrantySlice";
 
 export const store = configureStore({
   reducer: {
@@ -28,6 +32,10 @@ export const store = configureStore({
     adminWallet: adminWalletReducer,
     voucher: voucherReducer,
     commission: commissionReducer,
+    order: orderReducer,
+    warranty: warrantyReducer,
+    shopWarranty: shopWarrantyReducer,
+    adminWarranty: adminWarrantyReducer,
   },
 });
 export type RootState = ReturnType<typeof store.getState>;
