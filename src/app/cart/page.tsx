@@ -748,7 +748,7 @@ export default function CartPage() {
           // Auto-select all items on load
           dispatch(
             setAllSelectedItems(
-              res.data.orderItems.map((item) => item.orderItemId),
+              res.data?.orderItems?.map((item) => item.orderItemId) || [],
             ),
           );
         } else {
@@ -971,9 +971,9 @@ export default function CartPage() {
   }
 
   // Empty cart
-  if (!cart || cart.orderItems.length === 0) {
-    return <EmptyCart />;
-  }
+if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
+  return <EmptyCart />;
+}
 
   // Main cart content
   return (
