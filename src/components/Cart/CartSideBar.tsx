@@ -28,9 +28,8 @@ import {
   setCartOpen,
   fetchServerCart,
   removeServerCartItem,
-  calculateCartPreview,
-  selectCartPreview,
-  selectIsCalculatingPreview,
+  toggleItemSelection,
+  setAllSelectedItems,
 } from "@/src/store/slices/cartSlice";
 import {
   selectSystemVouchers,
@@ -39,7 +38,6 @@ import {
   setSelectedSystemVouchers,
   setSelectedShopVouchers,
   selectSelectedSystemVoucherIds,
-  selectAllSelectedShopVoucherIds,
 } from "@/src/store/slices/voucherSlice";
 import { OrderItem, OrderItemComponent } from "@/src/types/order.types";
 import { useRouter } from "next/navigation";
@@ -47,6 +45,9 @@ import { toast } from "react-toastify";
 import { orderService } from "@/src/services/order.service";
 import { Voucher } from "@/src/services/voucher.service";
 import VoucherSelectorModal from "@/src/components/Cart/VoucherSelectorModal";
+import { useCartPreviewLogic } from "@/src/hooks/useCartPreviewLogic";
+
+const formatCurrency = (amount: number) => `${amount.toLocaleString()}₫`;
 
 // ─── Component Row (part inside a custom build) ────────────
 const SidebarComponentRow: FC<{ component: OrderItemComponent }> = ({
@@ -243,10 +244,11 @@ export const CartSidebar: FC = memo(() => {
     selectSelectedSystemVoucherIds,
   );
   const selectedShopVoucherIdsMap = useAppSelector(
-    selectAllSelectedShopVoucherIds,
+    (state) => state.voucher.selectedShopVoucherIds,
   );
-  const cartPreview = useAppSelector(selectCartPreview);
-  const isCalculating = useAppSelector(selectIsCalculatingPreview);
+  const applicableVouchers = useAppSelector(
+    (state) => state.voucher.applicableVouchers,
+  );
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const items = useMemo(() => serverCart?.orderItems ?? [], [serverCart]);
@@ -275,16 +277,23 @@ export const CartSidebar: FC = memo(() => {
   const [updatingQuantityId, setUpdatingQuantityId] = useState<string | null>(
     null,
   );
-  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(
-    new Set(),
+
+  // Global selection from Redux (single source of truth)
+  const selectedItemIdsArray = useAppSelector(
+    (state) => state.cart.selectedItemIds,
+  );
+  const selectedItemIds = useMemo(
+    () => new Set(selectedItemIdsArray),
+    [selectedItemIdsArray],
   );
 
   const hasSelection = selectedItemIds.size > 0;
-  const canCheckout =
-    hasSelection &&
-    !isCalculating &&
-    cartPreview !== null &&
-    !cartPreview.systemVoucherError;
+
+  // Preview via custom hook
+  const { cartPreview, isCalculatingPreview } = useCartPreviewLogic(
+    items,
+    selectedItemIds,
+  );
 
   // ── Voucher modal state ──
   const [voucherModal, setVoucherModal] = useState<{
@@ -310,27 +319,32 @@ export const CartSidebar: FC = memo(() => {
       isOpen: true,
       title: "Chọn Ameko Voucher",
       vouchers: systemVouchers,
-      subtotal: 0,
+      subtotal: cartPreview?.totalCartSubTotal ?? 0,
       brandLabel: "Ameko",
       selectedIds: selectedSystemVoucherIds,
       scope: { type: "system" },
     });
-  }, [systemVouchers, selectedSystemVoucherIds]);
+  }, [systemVouchers, cartPreview, selectedSystemVoucherIds]);
 
   const handleOpenShopVoucherModal = useCallback(
     (shopId: string, shopName: string) => {
       const group = shopVoucherGroups.find((g) => g.shopId === shopId);
+      const shopSubtotal = items
+        .filter(
+          (i) => i.shopId === shopId && selectedItemIds.has(i.orderItemId),
+        )
+        .reduce((s, i) => s + i.totalPrice, 0);
       setVoucherModal({
         isOpen: true,
         title: `Chọn Voucher từ ${shopName}`,
         vouchers: group?.vouchers ?? [],
-        subtotal: 0,
+        subtotal: shopSubtotal,
         brandLabel: shopName,
         selectedIds: [],
         scope: { type: "shop", shopId },
       });
     },
-    [shopVoucherGroups],
+    [items, selectedItemIds, shopVoucherGroups],
   );
 
   const handleVoucherConfirm = useCallback(
@@ -356,42 +370,31 @@ export const CartSidebar: FC = memo(() => {
 
   const handleToggleSelect = useCallback((id: string) => {
     if (!id) return;
-    setSelectedItemIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  }, []);
+    dispatch(toggleItemSelection(id));
+  }, [dispatch]);
 
   const handleToggleSelectAll = useCallback(() => {
-    setSelectedItemIds((prev) => {
-      const allIds = (serverCart?.orderItems ?? [])
-        .map((item) => item.orderItemId)
-        .filter(Boolean);
-      if (prev.size === allIds.length) {
-        return new Set();
-      }
-      return new Set(allIds);
-    });
-  }, [serverCart]);
+    const allIds = (serverCart?.orderItems ?? [])
+      .map((item) => item.orderItemId)
+      .filter(Boolean);
+    if (selectedItemIds.size === allIds.length) {
+      dispatch(setAllSelectedItems([]));
+    } else {
+      dispatch(setAllSelectedItems(allIds));
+    }
+  }, [serverCart, selectedItemIds.size, dispatch]);
 
   const handleRemoveItem = useCallback(
     async (orderItemId: string) => {
       setRemovingId(orderItemId);
       await dispatch(removeServerCartItem(orderItemId));
       // Remove from selection
-      setSelectedItemIds((prev) => {
-        const next = new Set(prev);
-        next.delete(orderItemId);
-        return next;
-      });
+      dispatch(setAllSelectedItems(
+        selectedItemIdsArray.filter((id) => id !== orderItemId),
+      ));
       setRemovingId(null);
     },
-    [dispatch],
+    [dispatch, selectedItemIdsArray],
   );
 
   // Update item quantity with optimistic UI
@@ -428,59 +431,16 @@ export const CartSidebar: FC = memo(() => {
         if (fetchServerCart.fulfilled.match(action)) {
           const cartData = action.payload;
           if (cartData?.orderItems) {
-            setSelectedItemIds(
-              new Set(
-                cartData.orderItems
-                  .map((item: { orderItemId: string }) => item.orderItemId)
-                  .filter(Boolean),
-              ),
-            );
+            dispatch(setAllSelectedItems(
+              cartData.orderItems
+                .map((item: { orderItemId: string }) => item.orderItemId)
+                .filter(Boolean),
+            ));
           }
         }
       });
     }
   }, [isCartOpen, isAuthenticated, dispatch]);
-
-  // ── Dispatch cart preview calculation whenever inputs change ──
-  useEffect(() => {
-    if (!isCartOpen || selectedItemIds.size === 0) return;
-
-    // Look up system voucher code from selected ID
-    const systemVoucher =
-      selectedSystemVoucherIds.length > 0
-        ? systemVouchers.find((v) => v.id === selectedSystemVoucherIds[0])
-        : null;
-
-    // Build shop voucher codes map: shopId -> voucher code
-    const appliedShopVoucherCodes: Record<string, string> = {};
-    for (const [shopId, voucherIds] of Object.entries(
-      selectedShopVoucherIdsMap,
-    )) {
-      if (voucherIds.length > 0) {
-        const shopGroup = shopVoucherGroups.find((g) => g.shopId === shopId);
-        const voucher = shopGroup?.vouchers.find((v) => v.id === voucherIds[0]);
-        if (voucher) {
-          appliedShopVoucherCodes[shopId] = voucher.code;
-        }
-      }
-    }
-
-    dispatch(
-      calculateCartPreview({
-        selectedOrderItemIds: Array.from(selectedItemIds),
-        appliedSystemVoucherCode: systemVoucher?.code ?? null,
-        appliedShopVoucherCodes,
-      }),
-    );
-  }, [
-    dispatch,
-    isCartOpen,
-    selectedItemIds,
-    selectedSystemVoucherIds,
-    selectedShopVoucherIdsMap,
-    systemVouchers,
-    shopVoucherGroups,
-  ]);
 
   const handleCheckout = useCallback(() => {
     dispatch(setCartOpen(false));
@@ -636,6 +596,9 @@ export const CartSidebar: FC = memo(() => {
               const shopVouchers =
                 shopVoucherGroups.find((g) => g.shopId === shopId)?.vouchers ??
                 [];
+              const shopPreview = cartPreview?.shopPreviews.find(
+                (s) => s.shopId === shopId,
+              );
               return (
                 <div key={shopId} className="space-y-0">
                   {/* Shop Header */}
@@ -665,23 +628,31 @@ export const CartSidebar: FC = memo(() => {
                   </div>
 
                   {/* Shop Voucher Footer */}
-                  <div className="flex items-center justify-between px-1 py-2 border-t border-gray-100">
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                      <Ticket className="w-3.5 h-3.5 text-[#ce2a32]" />
-                      <span>Voucher của Shop</span>
+                  <div className="px-1 py-2 border-t border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                        <Ticket className="w-3.5 h-3.5 text-[#ce2a32]" />
+                        <span>Voucher của Shop</span>
+                      </div>
+                      {shopVouchers.length > 0 ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleOpenShopVoucherModal(shopId, shopName)
+                          }
+                          className="text-xs font-medium text-[#ce2a32] hover:underline"
+                        >
+                          Chọn mã ({shopVouchers.length})
+                        </button>
+                      ) : (
+                        <span className="text-xs text-gray-400">Nhập mã</span>
+                      )}
                     </div>
-                    {shopVouchers.length > 0 ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleOpenShopVoucherModal(shopId, shopName)
-                        }
-                        className="text-xs font-medium text-[#ce2a32] hover:underline"
-                      >
-                        Chọn mã ({shopVouchers.length})
-                      </button>
-                    ) : (
-                      <span className="text-xs text-gray-400">Nhập mã</span>
+                    {/* Shop voucher error */}
+                    {shopPreview?.shopVoucherError && (
+                      <p className="text-red-500 text-[11px] mt-1 font-medium">
+                        {shopPreview.shopVoucherError}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -693,19 +664,43 @@ export const CartSidebar: FC = memo(() => {
         {/* FOOTER */}
         {items.length > 0 && (
           <div className="border-t border-gray-100 p-6 space-y-4 bg-white">
-            {/* Ameko Platform Vouchers */}
+            {/* Ameko Platform Voucher button */}
             {systemVouchers.length > 0 && (
-              <button
-                type="button"
-                onClick={handleOpenSystemVoucherModal}
-                className="w-full flex items-center gap-2 px-3 py-2.5 border border-dashed border-[#ce2a32]/40 rounded-sm text-sm text-[#ce2a32] hover:bg-red-50/40 transition-colors"
-              >
-                <Ticket className="w-4 h-4 shrink-0" />
-                <span className="font-medium">
-                  Chọn mã giảm giá toàn sàn ({systemVouchers.length} mã khả
-                  dụng)
-                </span>
-              </button>
+              <div>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={handleOpenSystemVoucherModal}
+                  onKeyDown={(e) => e.key === 'Enter' && handleOpenSystemVoucherModal()}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 border border-dashed border-[#ce2a32]/40 rounded-sm text-sm text-[#ce2a32] hover:bg-red-50/40 transition-colors cursor-pointer"
+                >
+                  <Ticket className="w-4 h-4 shrink-0" />
+                  <span className="font-medium">
+                    {selectedSystemVoucherIds.length > 0
+                      ? `Đã chọn ${selectedSystemVoucherIds.length} mã toàn sàn`
+                      : `Chọn mã giảm giá toàn sàn (${systemVouchers.length} mã khả dụng)`}
+                  </span>
+                  {selectedSystemVoucherIds.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        dispatch(setSelectedSystemVouchers([]));
+                      }}
+                      className="ml-auto p-0.5 text-gray-400 hover:text-[#ce2a32]"
+                      aria-label="Remove system voucher"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+                {/* System voucher error */}
+                {cartPreview?.systemVoucherError && (
+                  <p className="text-red-500 text-[11px] mt-1 font-medium px-1">
+                    {cartPreview.systemVoucherError}
+                  </p>
+                )}
+              </div>
             )}
 
             {/* Select All */}
@@ -729,48 +724,125 @@ export const CartSidebar: FC = memo(() => {
               </span>
             </div>
 
-            {/* Backend-calculated summary */}
-            {cartPreview && hasSelection && (
+            <p className="text-gray-400 text-xs">
+              Shipping & taxes calculated at checkout
+            </p>
+
+            {/* Applied Vouchers Summary */}
+            {(selectedSystemVoucherIds.length > 0 ||
+              Object.values(selectedShopVoucherIdsMap).some(
+                (v) => v && v.length > 0,
+              )) && (
               <div className="space-y-1.5 py-2 border-t border-gray-100">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500">Subtotal</span>
-                  {isCalculating ? (
-                    <span className="inline-block w-14 h-3.5 bg-gray-200 rounded animate-pulse" />
-                  ) : (
-                    <span className="text-gray-700 font-medium">
-                      {cartPreview.totalCartSubTotal.toLocaleString()}₫
-                    </span>
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                  Voucher đã chọn
+                </span>
+
+                {/* System voucher */}
+                {selectedSystemVoucherIds.length > 0 &&
+                  applicableVouchers?.systemVouchers && (() => {
+                    const sv = applicableVouchers.systemVouchers.find(
+                      (v) => v.id === selectedSystemVoucherIds[0],
+                    );
+                    if (!sv) return null;
+                    const totalShopDiscount =
+                      cartPreview?.shopPreviews?.reduce(
+                        (sum, shop) => sum + (shop.shopDiscountAmount || 0),
+                        0,
+                      ) || 0;
+                    const systemDiscountAmount =
+                      (cartPreview?.totalDiscountAmount || 0) - totalShopDiscount;
+                    return (
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1.5">
+                          <Ticket className="w-3 h-3 text-green-500" />
+                          <span className="text-gray-600 font-medium">{sv.code}</span>
+                          <span className="text-gray-400">(System)</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          {systemDiscountAmount > 0 && (
+                            <span className="text-green-600 font-medium">
+                              -{formatCurrency(systemDiscountAmount)}
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => dispatch(setSelectedSystemVouchers([]))}
+                            className="p-0.5 text-gray-400 hover:text-[#ce2a32]"
+                            aria-label="Remove system voucher"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                {/* Shop vouchers */}
+                {applicableVouchers?.shopVoucherGroups &&
+                  Object.entries(selectedShopVoucherIdsMap).map(
+                    ([shopId, vIds]) => {
+                      if (!vIds || vIds.length === 0) return null;
+                      const group = applicableVouchers.shopVoucherGroups.find(
+                        (g) => g.shopId === shopId,
+                      );
+                      const voucher = group?.vouchers.find(
+                        (v) => v.id === vIds[0],
+                      );
+                      if (!voucher) return null;
+                      const shopPreview = cartPreview?.shopPreviews.find(
+                        (s) => s.shopId === shopId,
+                      );
+                      return (
+                        <div
+                          key={shopId}
+                          className="flex items-center justify-between text-xs"
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <Ticket className="w-3 h-3 text-green-500" />
+                            <span className="text-gray-600 font-medium">
+                              {voucher.code}
+                            </span>
+                            <span className="text-gray-400">
+                              ({shopPreview?.shopName ?? shopId})
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            {(shopPreview?.shopDiscountAmount ?? 0) > 0 && (
+                              <span className="text-green-600 font-medium">
+                                -{formatCurrency(shopPreview!.shopDiscountAmount)}
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                dispatch(
+                                  setSelectedShopVouchers({
+                                    shopId,
+                                    voucherIds: [],
+                                  }),
+                                )
+                              }
+                              className="p-0.5 text-gray-400 hover:text-[#ce2a32]"
+                              aria-label={`Remove voucher ${voucher.code}`}
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    },
                   )}
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500">Shipping</span>
-                  {isCalculating ? (
-                    <span className="inline-block w-14 h-3.5 bg-gray-200 rounded animate-pulse" />
-                  ) : (
-                    <span className="text-gray-700 font-medium">
-                      {cartPreview.totalShippingFee.toLocaleString()}₫
+
+                {/* Total discount */}
+                {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (
+                  <div className="flex items-center justify-between text-xs pt-1 border-t border-dashed border-gray-100">
+                    <span className="text-gray-500 font-medium">Tổng giảm</span>
+                    <span className="text-green-600 font-bold">
+                      -{formatCurrency(cartPreview!.totalDiscountAmount)}
                     </span>
-                  )}
-                </div>
-                {cartPreview.totalDiscountAmount > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-500">Discount</span>
-                    {isCalculating ? (
-                      <span className="inline-block w-14 h-3.5 bg-gray-200 rounded animate-pulse" />
-                    ) : (
-                      <span className="text-green-600 font-medium">
-                        -{cartPreview.totalDiscountAmount.toLocaleString()}₫
-                      </span>
-                    )}
                   </div>
                 )}
-              </div>
-            )}
-
-            {/* System voucher error */}
-            {cartPreview?.systemVoucherError && (
-              <div className="p-2 rounded bg-red-50 border border-red-200 text-[11px] text-red-600">
-                {cartPreview.systemVoucherError}
               </div>
             )}
 
@@ -778,23 +850,23 @@ export const CartSidebar: FC = memo(() => {
               {/* Checkout Button */}
               <button
                 onClick={handleCheckout}
-                disabled={!canCheckout}
+                disabled={!hasSelection || isCalculatingPreview}
                 className={`w-full py-3.5 px-4 flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest transition-colors ${
-                  canCheckout
+                  hasSelection && !isCalculatingPreview
                     ? "bg-[#1a1a1a] hover:bg-black text-white"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
-                {isCalculating ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                <ShoppingBag className="w-4 h-4" />
+                {isCalculatingPreview ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Calculating...
+                  </>
+                ) : hasSelection ? (
+                  `Checkout • ${formatCurrency(cartPreview?.finalTotalAmount || 0)}`
                 ) : (
-                  <ShoppingBag className="w-4 h-4" />
+                  "Select Items"
                 )}
-                {hasSelection
-                  ? isCalculating
-                    ? "Calculating..."
-                    : `Checkout • ${(cartPreview?.finalTotalAmount ?? 0).toLocaleString()}₫`
-                  : "Select Items"}
               </button>
             </div>
           </div>

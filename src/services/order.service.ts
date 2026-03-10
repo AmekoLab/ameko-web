@@ -6,7 +6,7 @@ import {
   CheckoutPayload,
   CheckoutResponseData,
   OrderGroup,
-  CartPreviewPayload,
+  CalculatePreviewPayload,
   CartPreviewData,
 } from "@/src/types/order.types";
 
@@ -83,11 +83,11 @@ export const orderService = {
   },
 
   /**
-   * Calculate cart preview with vouchers.
+   * Calculate cart preview (subtotal, shipping, discounts) without persisting.
    * POST /orders/calculate-preview
    */
-  calculatePreview: async (
-    payload: CartPreviewPayload,
+  calculateCartPreview: async (
+    payload: CalculatePreviewPayload,
   ): Promise<ApiResponse<CartPreviewData>> => {
     return api.post("/orders/calculate-preview", payload);
   },

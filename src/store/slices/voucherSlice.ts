@@ -547,10 +547,6 @@ export const selectIsFetchingApplicable = (state: RootState) =>
 export const selectSelectedSystemVoucherIds = (state: RootState) =>
   state.voucher.selectedSystemVoucherIds;
 
-/** Full map of selected shop voucher IDs: shopId -> voucherIds[] */
-export const selectAllSelectedShopVoucherIds = (state: RootState) =>
-  state.voucher.selectedShopVoucherIds;
-
 /** Currently selected shop voucher IDs for a given shop */
 export const selectSelectedShopVoucherIds = (
   state: RootState,

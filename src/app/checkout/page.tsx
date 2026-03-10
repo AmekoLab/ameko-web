@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, FormEvent, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, FormEvent, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -15,6 +15,7 @@ import { orderService } from "@/src/services/order.service";
 import { CartData, OrderItem } from "@/src/types/order.types";
 import { toast } from "react-toastify";
 import { useSearchParams } from "next/navigation";
+import { useCartPreviewLogic } from "@/src/hooks/useCartPreviewLogic";
 
 // ─── Form State ────────────────────────────────────────────
 interface CheckoutForm {
@@ -249,6 +250,40 @@ function CheckoutContent() {
     [form, selectedOrderItemIds],
   );
 
+  // ─── Derived data (must be above early returns — Rules of Hooks) ───────────
+  // Build a stable Set for the hook
+  const selectedItemIdsSet = useMemo(
+    () => new Set(selectedOrderItemIds),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedOrderItemIds.join(",")],
+  );
+
+  // Selected items list (safe: cart may be null before fetch completes)
+  const selectedItems = useMemo(() => {
+    if (!cart) return [];
+    return selectedOrderItemIds.length > 0
+      ? cart.orderItems.filter((item) =>
+          selectedOrderItemIds.includes(item.orderItemId),
+        )
+      : cart.orderItems;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart, selectedOrderItemIds.join(",")]);
+
+  const selectedTotal = selectedItems.reduce(
+    (sum, item) => sum + item.totalPrice,
+    0,
+  );
+
+  // Live pricing from the calculate-preview API
+  const { cartPreview, isCalculatingPreview } = useCartPreviewLogic(
+    cart?.orderItems || [],
+    selectedItemIdsSet,
+  );
+
+  // Mobile total: prefer live preview, fall back to local sum
+  const displayTotal = cartPreview?.finalTotalAmount ?? selectedTotal;
+
+
   // ─── Loading ─────────────────────────────────────────────
   if (loading) {
     return (
@@ -274,22 +309,6 @@ function CheckoutContent() {
       </div>
     );
   }
-  // Filter to only selected items
-  const selectedItems =
-    selectedOrderItemIds.length > 0
-      ? cart.orderItems.filter((item) =>
-          selectedOrderItemIds.includes(item.orderItemId),
-        )
-      : cart.orderItems;
-  const selectedTotal = selectedItems.reduce(
-    (sum, item) => sum + item.totalPrice,
-    0,
-  );
-  const finalTotal = Math.max(
-    0,
-    selectedTotal + (cart?.shippingFee || 0) - (cart?.discountAmount || 0),
-  );
-
   // No selected items found
   if (selectedItems.length === 0) {
     return (
@@ -429,7 +448,7 @@ function CheckoutContent() {
             </Link>
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || isCalculatingPreview || cartPreview === null}
               className="w-full md:w-auto bg-[#1a1a1a] hover:bg-black text-white px-8 py-4 rounded-md font-medium transition-colors text-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {submitting ? (
@@ -466,7 +485,11 @@ function CheckoutContent() {
             />
           </div>
           <span className="font-bold text-lg text-black">
-            {finalTotal.toLocaleString()}₫
+            {isCalculatingPreview ? (
+              <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+            ) : (
+              `${displayTotal.toLocaleString()}₫`
+            )}
           </span>
         </button>
 
@@ -485,27 +508,35 @@ function CheckoutContent() {
 
           {/* Cost Breakdown */}
           <div className="space-y-3 border-t border-gray-200 pt-6 pb-6 mb-6 text-sm text-gray-600">
-            {cart.subTotal > 0 && (
-              <div className="flex justify-between">
+            <div className="flex justify-between">
                 <span>Subtotal</span>
                 <span className="font-medium text-black">
-                  {cart.subTotal.toLocaleString()}₫
+                  {isCalculatingPreview ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                  ) : (
+                    `${(cartPreview?.totalCartSubTotal ?? selectedTotal).toLocaleString()}₫`
+                  )}
                 </span>
               </div>
-            )}
-            {cart.shippingFee > 0 && (
               <div className="flex justify-between">
                 <span>Shipping</span>
                 <span className="font-medium text-black">
-                  {cart.shippingFee.toLocaleString()}₫
+                  {isCalculatingPreview ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                  ) : (
+                    `${(cartPreview?.totalShippingFee ?? 0).toLocaleString()}₫`
+                  )}
                 </span>
               </div>
-            )}
-            {cart.discountAmount > 0 && (
+              {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (
               <div className="flex justify-between">
                 <span>Discount</span>
                 <span className="font-medium text-green-600">
-                  -{cart.discountAmount.toLocaleString()}₫
+                  {isCalculatingPreview ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                  ) : (
+                    `-${cartPreview!.totalDiscountAmount.toLocaleString()}₫`
+                  )}
                 </span>
               </div>
             )}
@@ -517,7 +548,11 @@ function CheckoutContent() {
             <div className="flex items-baseline gap-2">
               <span className="text-xs text-gray-500 font-medium">VND</span>
               <span className="text-2xl font-bold text-black tracking-tight">
-                {finalTotal.toLocaleString()}₫
+                {isCalculatingPreview ? (
+                  <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                ) : (
+                  `${(cartPreview?.finalTotalAmount ?? displayTotal).toLocaleString()}₫`
+                )}
               </span>
             </div>
           </div>

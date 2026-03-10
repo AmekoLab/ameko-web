@@ -2,10 +2,9 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { orderService } from "@/src/services/order.service";
 import {
   CartData,
-  CartPreviewPayload,
   CartPreviewData,
+  CalculatePreviewPayload,
 } from "@/src/types/order.types";
-import { RootState } from "@/src/store";
 
 export interface CartItem {
   id: string;
@@ -78,12 +77,12 @@ export const updateServerCartItemQuantity = createAsyncThunk(
   },
 );
 
-// ─── Async Thunk: Calculate cart preview from backend ────
-export const calculateCartPreview = createAsyncThunk(
+// ─── Async Thunk: Calculate cart preview ────────────────
+export const calculateCartPreviewThunk = createAsyncThunk(
   "cart/calculateCartPreview",
-  async (payload: CartPreviewPayload, { rejectWithValue }) => {
+  async (payload: CalculatePreviewPayload, { rejectWithValue }) => {
     try {
-      const res = await orderService.calculatePreview(payload);
+      const res = await orderService.calculateCartPreview(payload);
       if (res.success) {
         return res.data;
       }
@@ -105,10 +104,11 @@ interface CartState {
   serverCart: CartData | null;
   serverCartLoading: boolean;
   serverCartError: string | null;
-  // Cart preview (backend-calculated totals)
+  // Cart preview (calculate-preview API)
   cartPreview: CartPreviewData | null;
   isCalculatingPreview: boolean;
-  cartPreviewError: string | null;
+  // Global selection (single source of truth shared by CartPage + CartSidebar)
+  selectedItemIds: string[];
 }
 
 // Load cart from localStorage
@@ -148,7 +148,7 @@ const initialState: CartState = {
   serverCartError: null,
   cartPreview: null,
   isCalculatingPreview: false,
-  cartPreviewError: null,
+  selectedItemIds: [],
 };
 
 const cartSlice = createSlice({
@@ -227,7 +227,21 @@ const cartSlice = createSlice({
 
     clearCartPreview(state) {
       state.cartPreview = null;
-      state.cartPreviewError = null;
+      state.isCalculatingPreview = false;
+    },
+
+    toggleItemSelection(state, action: PayloadAction<string>) {
+      const id = action.payload;
+      const index = state.selectedItemIds.indexOf(id);
+      if (index !== -1) {
+        state.selectedItemIds.splice(index, 1);
+      } else {
+        state.selectedItemIds.push(id);
+      }
+    },
+
+    setAllSelectedItems(state, action: PayloadAction<string[]>) {
+      state.selectedItemIds = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -255,18 +269,17 @@ const cartSlice = createSlice({
       .addCase(removeServerCartItem.rejected, (state, action) => {
         state.serverCartError = action.payload as string;
       })
-      // calculateCartPreview
-      .addCase(calculateCartPreview.pending, (state) => {
+      // ── calculateCartPreview ──
+      .addCase(calculateCartPreviewThunk.pending, (state) => {
         state.isCalculatingPreview = true;
-        state.cartPreviewError = null;
       })
-      .addCase(calculateCartPreview.fulfilled, (state, action) => {
+      .addCase(calculateCartPreviewThunk.fulfilled, (state, action) => {
         state.isCalculatingPreview = false;
         state.cartPreview = action.payload;
       })
-      .addCase(calculateCartPreview.rejected, (state, action) => {
+      .addCase(calculateCartPreviewThunk.rejected, (state) => {
         state.isCalculatingPreview = false;
-        state.cartPreviewError = action.payload as string;
+        state.cartPreview = null;
       });
   },
 });
@@ -280,16 +293,11 @@ export const {
   recalculateTotals,
   setOrderNote,
   clearCartPreview,
+  toggleItemSelection,
+  setAllSelectedItems,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
-
-// ─── Selectors ───────────────────────────────────────────
-export const selectCartPreview = (state: RootState) => state.cart.cartPreview;
-export const selectIsCalculatingPreview = (state: RootState) =>
-  state.cart.isCalculatingPreview;
-export const selectCartPreviewError = (state: RootState) =>
-  state.cart.cartPreviewError;
 
 // Middleware to save cart to localStorage
 export const cartMiddleware = (store: any) => (next: any) => (action: any) => {

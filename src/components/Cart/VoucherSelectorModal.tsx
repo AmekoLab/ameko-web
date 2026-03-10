@@ -1,5 +1,3 @@
-"use client";
-
 import { FC, useState, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   X,
@@ -8,19 +6,9 @@ import {
   Tag,
   Clock,
   AlertCircle,
-  Loader2,
   CheckCircle2,
 } from "lucide-react";
 import { Voucher } from "@/src/services/voucher.service";
-import { useAppDispatch, useAppSelector } from "@/src/store/hook";
-import {
-  applyVoucherThunk,
-  removeAllVouchersThunk,
-  removeVoucherThunk,
-  selectIsApplyingVoucher,
-  selectIsRemovingVoucher,
-  selectCheckoutSummary,
-} from "@/src/store/slices/voucherSlice";
 
 // ─── Helpers ─────────────────────────────────────────────
 
@@ -56,23 +44,15 @@ function usageProgress(v: Voucher): number {
 // ─── Props ───────────────────────────────────────────────
 
 export interface VoucherSelectorModalProps {
-  /** Modal open state */
   isOpen: boolean;
-  /** Close callback */
   onClose: () => void;
-  /** Title displayed in the header */
   title: string;
-  /** Available vouchers for this scope (shop or system) */
   vouchers: Voucher[];
-  /** The subtotal used to check eligibility (shop subtotal or grand total) */
   currentSubtotal: number;
-  /** Brand label shown on the ticket left part */
   brandLabel?: string;
-  /** Currently selected voucher IDs (controlled) */
   selectedIds?: string[];
-  /** Called when user confirms selection */
   onConfirm: (selectedVouchers: Voucher[]) => void;
-  /** The orderId to apply the voucher to (if provided, dispatches applyVoucherThunk) */
+  /** Kept for API compat but no longer used to call API */
   orderId?: string;
 }
 
@@ -230,28 +210,22 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
   brandLabel = "Ameko",
   selectedIds = [],
   onConfirm,
-  orderId,
 }) => {
-  const dispatch = useAppDispatch();
-  const isApplyingVoucher = useAppSelector(selectIsApplyingVoucher);
-  const isRemovingVoucher = useAppSelector(selectIsRemovingVoucher);
-  const checkoutSummary = useAppSelector(selectCheckoutSummary);
-  const appliedVouchers = checkoutSummary?.appliedVouchers ?? [];
-  const hasAppliedVouchers = appliedVouchers.length > 0;
-
   // Track the modal open transition to reset local state
   const [prevOpen, setPrevOpen] = useState(false);
   const [localSelectedIds, setLocalSelectedIds] = useState<Set<string>>(
     () => new Set(selectedIds),
   );
   const [codeInput, setCodeInput] = useState("");
+  const [codeError, setCodeError] = useState<string | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // Reset local selection when modal opens (render-time state sync, no effect needed)
+  // Reset local selection when modal opens
   if (isOpen && !prevOpen) {
     setPrevOpen(true);
     setLocalSelectedIds(new Set(selectedIds));
     setCodeInput("");
+    setCodeError(null);
   } else if (!isOpen && prevOpen) {
     setPrevOpen(false);
   }
@@ -292,75 +266,41 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
 
   const handleToggle = useCallback(
     (id: string) => {
-      // Check if the clicked voucher is already applied on the backend
-      const clickedVoucher = vouchers.find((v) => v.id === id);
-      if (clickedVoucher && orderId && checkoutSummary) {
-        const isAlreadyApplied = checkoutSummary.appliedVouchers.some(
-          (av) => av.code === clickedVoucher.code,
-        );
-        if (isAlreadyApplied) {
-          // Deselect: remove from backend immediately
-          dispatch(
-            removeVoucherThunk({ orderId, code: clickedVoucher.code }),
-          ).then(() => {
-            setLocalSelectedIds((prev) => {
-              const next = new Set(prev);
-              next.delete(id);
-              return next;
-            });
-          });
-          return;
-        }
-      }
-
       setLocalSelectedIds((prev) => {
-        // Radio logic: only one voucher at a time
+        // Radio: one at a time; clicking selected one deselects
         if (prev.has(id)) return new Set();
         return new Set([id]);
       });
     },
-    [vouchers, orderId, checkoutSummary, dispatch],
+    [],
   );
 
-  const handleConfirm = useCallback(async () => {
+  const handleConfirm = useCallback(() => {
     const selectedVouchers = vouchers.filter((v) => localSelectedIds.has(v.id));
-
-    // If orderId is provided, apply via API
-    if (orderId && selectedVouchers.length > 0) {
-      try {
-        await dispatch(
-          applyVoucherThunk({
-            orderId,
-            code: selectedVouchers[0].code,
-          }),
-        ).unwrap();
-        onConfirm(selectedVouchers);
-        onClose();
-      } catch {
-        // Error toast handled by the thunk rejected case
-      }
-      return;
-    }
-
-    // Fallback: just pass selected vouchers to parent
     onConfirm(selectedVouchers);
     onClose();
-  }, [vouchers, localSelectedIds, onConfirm, onClose, orderId, dispatch]);
+  }, [vouchers, localSelectedIds, onConfirm, onClose]);
 
-  // Handle manual code input apply
-  const handleApplyCode = useCallback(async () => {
-    const code = codeInput.trim();
+  // Handle manual code input apply — find by code locally, call onConfirm
+  const handleApplyCode = useCallback(() => {
+    const code = codeInput.trim().toUpperCase();
     if (!code) return;
-
-    if (orderId) {
-      try {
-        await dispatch(applyVoucherThunk({ orderId, code })).unwrap();
-        onClose();
-      } catch {
-        // Error toast handled by the thunk rejected case
-      }
+    const found = vouchers.find(
+      (v) => v.code.toUpperCase() === code,
+    );
+    if (!found) {
+      setCodeError("Mã không hợp lệ hoặc không có trong danh sách.");
+      return;
     }
-  }, [codeInput, orderId, dispatch, onClose]);
+    const eligible = currentSubtotal >= found.minOrderValue;
+    if (!eligible) {
+      setCodeError(`Đơn hàng chưa đạt tối thiểu ${fmtVND(found.minOrderValue)}.`);
+      return;
+    }
+    setCodeError(null);
+    onConfirm([found]);
+    onClose();
+  }, [codeInput, vouchers, currentSubtotal, onConfirm, onClose]);
 
   const handleOverlayClick = useCallback(
     (e: React.MouseEvent) => {
@@ -407,27 +347,31 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
             <input
               type="text"
               value={codeInput}
-              onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+              onChange={(e) => {
+                setCodeInput(e.target.value.toUpperCase());
+                setCodeError(null);
+              }}
+              onKeyDown={(e) => e.key === 'Enter' && handleApplyCode()}
               placeholder="Nhập mã Voucher"
               className="w-full pl-9 pr-20 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-[#ce2a32] focus:ring-1 focus:ring-[#ce2a32]/30 outline-none transition placeholder:text-gray-400"
             />
             <button
               type="button"
-              disabled={!codeInput.trim() || isApplyingVoucher}
+              disabled={!codeInput.trim()}
               onClick={handleApplyCode}
               className={`absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 text-xs font-bold uppercase rounded-md transition-colors ${
-                codeInput.trim() && !isApplyingVoucher
+                codeInput.trim()
                   ? "bg-[#ce2a32] text-white hover:bg-[#a82028]"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
             >
-              {isApplyingVoucher ? (
-                <Loader2 className="w-3 h-3 animate-spin" />
-              ) : (
-                "Áp dụng"
-              )}
+              Áp dụng
             </button>
           </div>
+          {/* Inline error for manual code */}
+          {codeError && (
+            <p className="mt-1.5 text-xs text-red-500 font-medium">{codeError}</p>
+          )}
         </div>
 
         {/* ── Voucher List ── */}
@@ -444,9 +388,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                 ? 0
                 : v.minOrderValue - currentSubtotal;
 
-              const isApplied = appliedVouchers.some(
-                (av) => av.code === v.code,
-              );
+              const isApplied = localSelectedIds.has(v.id);
 
               return (
                 <VoucherCard
@@ -484,43 +426,10 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
             )}
           </div>
           <div className="flex gap-2">
-            {hasAppliedVouchers && orderId && (
-              <button
-                type="button"
-                disabled={isRemovingVoucher || isApplyingVoucher}
-                onClick={async () => {
-                  try {
-                    await dispatch(removeAllVouchersThunk(orderId)).unwrap();
-                    setLocalSelectedIds(new Set());
-                    onClose();
-                  } catch {
-                    // Error toast handled by thunk
-                  }
-                }}
-                className={`flex-1 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 border border-[#ce2a32] ${
-                  isRemovingVoucher
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "bg-white text-[#ce2a32] hover:bg-red-50"
-                }`}
-              >
-                {isRemovingVoucher && (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                )}
-                Bỏ chọn mã
-              </button>
-            )}
             <button
               onClick={handleConfirm}
-              disabled={isApplyingVoucher || isRemovingVoucher}
-              className={`flex-1 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 ${
-                isApplyingVoucher || isRemovingVoucher
-                  ? "bg-gray-400 text-white cursor-not-allowed"
-                  : "bg-[#ce2a32] text-white hover:bg-[#a82028]"
-              }`}
+              className="flex-1 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 bg-[#ce2a32] text-white hover:bg-[#a82028]"
             >
-              {isApplyingVoucher && (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              )}
               Xác nhận
             </button>
           </div>

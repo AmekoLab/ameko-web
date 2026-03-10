@@ -119,17 +119,17 @@ export interface OrderGroup {
 }
 
 // ============================================================
-// Cart Preview (POST /orders/calculate-preview)
+// Calculate Preview Types
 // ============================================================
 
 /** Payload for POST /orders/calculate-preview */
-export interface CartPreviewPayload {
+export interface CalculatePreviewPayload {
   selectedOrderItemIds: string[];
-  appliedSystemVoucherCode: string | null;
-  appliedShopVoucherCodes: Record<string, string>;
+  appliedSystemVoucherCode?: string;
+  appliedShopVoucherCodes?: Record<string, string>;
 }
 
-/** A single shop's preview data */
+/** Per-shop result from the calculate-preview response */
 export interface ShopPreview {
   shopId: string;
   shopName: string;
@@ -141,7 +141,7 @@ export interface ShopPreview {
   shopVoucherError: string | null;
 }
 
-/** Response data from POST /orders/calculate-preview */
+/** Full response from POST /orders/calculate-preview */
 export interface CartPreviewData {
   totalCartSubTotal: number;
   totalShippingFee: number;
