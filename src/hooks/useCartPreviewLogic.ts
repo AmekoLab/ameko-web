@@ -19,6 +19,7 @@ let globalPreviewTimer: NodeJS.Timeout | null = null;
 export const useCartPreviewLogic = (
   cartItems: OrderItem[],
   selectedItemIds: Set<string>,
+  isUpdating: boolean = false,
 ) => {
   const dispatch = useAppDispatch();
   const [isHydrated, setIsHydrated] = useState(false);
@@ -123,6 +124,15 @@ export const useCartPreviewLogic = (
     selectedSystemIds,
   ]); // Intentional: .size and .length used to avoid Set/array reference loops
 
+  // Create a signature that tracks the exact quantities of selected items
+  const selectedItemsQuantitySignature = useMemo(() => {
+    if (!cartItems || cartItems.length === 0) return "";
+    return cartItems
+      .filter(item => selectedItemIds.has(item.orderItemId))
+      .map(item => `${item.orderItemId}:${item.quantity}`)
+      .join('|');
+  }, [cartItems, selectedItemIds]);
+
   // 3. Global debounced API call — deduplicates across all mounted instances
   const payloadToFetch = {
     selectedOrderItemIds: Array.from(selectedItemIds),
@@ -137,20 +147,24 @@ export const useCartPreviewLogic = (
   const payloadString = JSON.stringify(payloadToFetch);
 
   useEffect(() => {
-    if (!isHydrated || selectedItemIds.size === 0) return;
+    // Block execution if hydrating, nothing selected, OR a DB update is pending
+    if (!isHydrated || selectedItemIds.size === 0 || isUpdating) {
+      if (globalPreviewTimer) clearTimeout(globalPreviewTimer);
+      return;
+    }
 
     // Clear the shared global timer — any instance re-rendering resets it
     if (globalPreviewTimer) clearTimeout(globalPreviewTimer);
 
-    // Set the shared global timer — only the last render within 500 ms wins
+    // 300ms — snappier UX since the DB write is already debounced at 600ms
     globalPreviewTimer = setTimeout(() => {
       dispatch(calculateCartPreviewThunk(JSON.parse(payloadString)));
-    }, 500);
+    }, 300);
 
     // Deliberately no cleanup return: if Component A unmounts we must NOT
     // cancel the timer that Component B is still expecting to fire.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, payloadString, isHydrated]);
+  }, [dispatch, payloadString, isHydrated, selectedItemsQuantitySignature, isUpdating]);
 
   return { cartPreview, isCalculatingPreview };
 };

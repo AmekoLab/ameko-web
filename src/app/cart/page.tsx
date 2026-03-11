@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState, useCallback, useEffect, useMemo } from "react";
+import { FC, useState, useCallback, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -171,6 +171,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
   const isCustom = item.isCustom && item.orderItemComponents.length > 0;
+  const isStrictCustomRequest = item.productName?.includes('Custom Request');
 
   // Determine the first component image as fallback for custom items
   const displayImage =
@@ -245,7 +246,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
                 onClick={() =>
                   onUpdateQuantity(item.orderItemId, item.quantity - 1)
                 }
-                disabled={item.quantity <= 1 || updatingQuantity}
+                disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
                 className="w-7 h-7 flex items-center justify-center text-gray-500 disabled:opacity-30"
                 aria-label="Decrease quantity"
               >
@@ -262,7 +263,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
                 onClick={() =>
                   onUpdateQuantity(item.orderItemId, item.quantity + 1)
                 }
-                disabled={item.quantity >= 99 || updatingQuantity}
+                disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
                 className="w-7 h-7 flex items-center justify-center text-gray-500 disabled:opacity-30"
                 aria-label="Increase quantity"
               >
@@ -298,7 +299,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
               onClick={() =>
                 onUpdateQuantity(item.orderItemId, item.quantity - 1)
               }
-              disabled={item.quantity <= 1 || updatingQuantity}
+              disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
               className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Decrease quantity"
             >
@@ -315,7 +316,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
               onClick={() =>
                 onUpdateQuantity(item.orderItemId, item.quantity + 1)
               }
-              disabled={item.quantity >= 99 || updatingQuantity}
+              disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
               className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Increase quantity"
             >
@@ -369,6 +370,7 @@ interface OrderSummaryProps {
   selectedItemIds: Set<string>;
   onCheckout: () => void;
   onOpenSystemVoucher: () => void;
+  isUpdating: boolean;
 }
 
 const OrderSummary: FC<OrderSummaryProps> = ({
@@ -376,6 +378,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
   selectedItemIds,
   onCheckout,
   onOpenSystemVoucher,
+  isUpdating,
 }) => {
   const dispatch = useAppDispatch();
   const systemVouchers = useAppSelector(selectSystemVouchers);
@@ -392,6 +395,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
   const { cartPreview, isCalculatingPreview } = useCartPreviewLogic(
     cart.orderItems,
     selectedItemIds,
+    isUpdating,
   );
 
   // Derive the selected system voucher code (for display)
@@ -664,6 +668,7 @@ export default function CartPage() {
   const [updatingQuantityId, setUpdatingQuantityId] = useState<string | null>(
     null,
   );
+  const quantityTimerRef = useRef<NodeJS.Timeout | null>(null);
   // Global selection from Redux (single source of truth)
   const selectedItemIdsArray = useAppSelector(
     (state) => state.cart.selectedItemIds,
@@ -887,20 +892,16 @@ export default function CartPage() {
     } finally {
       setRemovingId(null);
     }
-  }, []);
+  }, [dispatch, selectedItemIdsArray]);
 
-  // Update item quantity with optimistic UI
+  // Update item quantity with debounced DB write + instant optimistic UI
   const handleUpdateQuantity = useCallback(
     async (orderItemId: string, newQuantity: number) => {
-      // Validate
       if (!Number.isInteger(newQuantity) || newQuantity < 1 || newQuantity > 99)
         return;
       if (!cart) return;
 
-      // Save previous state for rollback
-      const previousCart = cart;
-
-      // Optimistic update
+      // 1. Instant optimistic UI update
       setCart((prev) => {
         if (!prev) return prev;
         return {
@@ -914,38 +915,41 @@ export default function CartPage() {
             };
           }),
           totalAmount: prev.orderItems.reduce((sum, item) => {
-            if (item.orderItemId === orderItemId) {
+            if (item.orderItemId === orderItemId)
               return sum + item.unitPrice * newQuantity;
-            }
             return sum + item.totalPrice;
           }, 0),
         };
       });
 
+      // 2. Block the preview hook immediately
       setUpdatingQuantityId(orderItemId);
-      try {
-        const res = await orderService.updateCartItemQuantity(
-          orderItemId,
-          newQuantity,
-        );
-        if (res.success) {
-          // Re-fetch to sync with server
-          const cartRes = await orderService.getCart();
-          if (cartRes.success) {
-            setCart(cartRes.data);
+
+      // 3. Debounce the actual DB write (600ms)
+      if (quantityTimerRef.current) clearTimeout(quantityTimerRef.current);
+      quantityTimerRef.current = setTimeout(async () => {
+        try {
+          const res = await orderService.updateCartItemQuantity(
+            orderItemId,
+            newQuantity,
+          );
+          if (res.success) {
+            // DB confirmed — unblock the preview hook. No extra getCart() needed.
+            setUpdatingQuantityId(null);
+          } else {
+            // Rollback: fetch authoritative state, then unblock
+            const cartRes = await orderService.getCart();
+            if (cartRes.success) setCart(cartRes.data);
+            toast.error(res.message || "Failed to update quantity");
+            setUpdatingQuantityId(null);
           }
-        } else {
-          // Revert on error
-          setCart(previousCart);
-          toast.error(res.message || "Failed to update quantity");
+        } catch {
+          const cartRes = await orderService.getCart();
+          if (cartRes.success) setCart(cartRes.data);
+          toast.error("Failed to update quantity");
+          setUpdatingQuantityId(null);
         }
-      } catch {
-        // Revert on error
-        setCart(previousCart);
-        toast.error("Failed to update quantity");
-      } finally {
-        setUpdatingQuantityId(null);
-      }
+      }, 600);
     },
     [cart],
   );
@@ -1113,6 +1117,7 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
             selectedItemIds={selectedItemIds}
             onCheckout={handleCheckout}
             onOpenSystemVoucher={handleOpenSystemVoucherModal}
+            isUpdating={!!updatingQuantityId || !!removingId}
           />
         </div>
       </div>

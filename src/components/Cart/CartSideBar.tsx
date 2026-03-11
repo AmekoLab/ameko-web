@@ -99,6 +99,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
   }) => {
     const [expanded, setExpanded] = useState(false);
     const isCustom = item.isCustom && item.orderItemComponents.length > 0;
+    const isStrictCustomRequest = item.productName?.includes('Custom Request');
 
     const displayImage =
       item.productImage ||
@@ -154,7 +155,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
                   onClick={() =>
                     onUpdateQuantity(item.orderItemId, item.quantity - 1)
                   }
-                  disabled={item.quantity <= 1 || updatingQuantity}
+                  disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
                   className="w-6 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Decrease quantity"
                 >
@@ -171,7 +172,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
                   onClick={() =>
                     onUpdateQuantity(item.orderItemId, item.quantity + 1)
                   }
-                  disabled={item.quantity >= 99 || updatingQuantity}
+                  disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
                   className="w-6 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Increase quantity"
                 >
@@ -251,6 +252,16 @@ export const CartSidebar: FC = memo(() => {
   );
   const sidebarRef = useRef<HTMLDivElement>(null);
 
+  // Optimistic local items — updated immediately on quantity change so
+  // useCartPreviewLogic receives fresh quantities without waiting for a
+  // full server fetch to complete.
+  const [localItems, setLocalItems] = useState(() => serverCart?.orderItems ?? []);
+
+  // Keep localItems in sync whenever the server cart updates
+  useEffect(() => {
+    setLocalItems(serverCart?.orderItems ?? []);
+  }, [serverCart]);
+
   const items = useMemo(() => serverCart?.orderItems ?? [], [serverCart]);
 
   // Group items by shopId
@@ -277,6 +288,7 @@ export const CartSidebar: FC = memo(() => {
   const [updatingQuantityId, setUpdatingQuantityId] = useState<string | null>(
     null,
   );
+  const quantityTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Global selection from Redux (single source of truth)
   const selectedItemIdsArray = useAppSelector(
@@ -289,10 +301,12 @@ export const CartSidebar: FC = memo(() => {
 
   const hasSelection = selectedItemIds.size > 0;
 
-  // Preview via custom hook
+  // Preview via custom hook — uses localItems so optimistic quantity
+  // changes immediately change the quantity signature and fire the API.
   const { cartPreview, isCalculatingPreview } = useCartPreviewLogic(
-    items,
+    localItems,
     selectedItemIds,
+    !!updatingQuantityId || !!removingId,
   );
 
   // ── Voucher modal state ──
@@ -397,30 +411,53 @@ export const CartSidebar: FC = memo(() => {
     [dispatch, selectedItemIdsArray],
   );
 
-  // Update item quantity with optimistic UI
+  // Update item quantity with debounced DB write + instant optimistic UI
   const handleUpdateQuantity = useCallback(
     async (orderItemId: string, newQuantity: number) => {
       if (!Number.isInteger(newQuantity) || newQuantity < 1 || newQuantity > 99)
         return;
 
+      // Snapshot for rollback
+      const previousItems = localItems;
+
+      // 1. Instant optimistic UI update
+      setLocalItems((prev) =>
+        prev.map((item) =>
+          item.orderItemId === orderItemId
+            ? { ...item, quantity: newQuantity, totalPrice: item.unitPrice * newQuantity }
+            : item,
+        ),
+      );
+
+      // 2. Block the preview hook immediately
       setUpdatingQuantityId(orderItemId);
-      try {
-        const res = await orderService.updateCartItemQuantity(
-          orderItemId,
-          newQuantity,
-        );
-        if (res.success) {
-          dispatch(fetchServerCart());
-        } else {
-          toast.error(res.message || "Failed to update quantity");
+
+      // 3. Debounce the actual DB write (600ms)
+      if (quantityTimerRef.current) clearTimeout(quantityTimerRef.current);
+      quantityTimerRef.current = setTimeout(async () => {
+        try {
+          const res = await orderService.updateCartItemQuantity(
+            orderItemId,
+            newQuantity,
+          );
+          if (res.success) {
+            // DB confirmed — sync authoritative state, unblock preview
+            dispatch(fetchServerCart());
+            setUpdatingQuantityId(null);
+          } else {
+            // Rollback optimistic update
+            setLocalItems(previousItems);
+            toast.error(res.message || "Failed to update quantity");
+            setUpdatingQuantityId(null);
+          }
+        } catch {
+          setLocalItems(previousItems);
+          toast.error("Failed to update quantity");
+          setUpdatingQuantityId(null);
         }
-      } catch {
-        toast.error("Failed to update quantity");
-      } finally {
-        setUpdatingQuantityId(null);
-      }
+      }, 600);
     },
-    [dispatch],
+    [dispatch, localItems],
   );
 
   // Fetch cart & applicable vouchers when sidebar opens
