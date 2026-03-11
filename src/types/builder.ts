@@ -44,6 +44,7 @@ export interface BuilderNextStep {
 // --- Session state from the server ---
 export interface BuilderSession {
   id: string;
+  kitId: string;
   selection: Record<string, SelectedPart>;
   totalPrice: number;
   updatedAt: string;

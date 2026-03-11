@@ -30,7 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${oswald.variable} antialiased`}>
+      <body
+        className={`${inter.variable} ${oswald.variable} antialiased font-sans`}
+      >
         <StoreProvider>
           {children}
           <CartSidebar />

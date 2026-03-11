@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState, useCallback, useEffect, useMemo } from "react";
+import { FC, useState, useCallback, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -33,14 +33,17 @@ import {
   setSelectedSystemVouchers,
   setSelectedShopVouchers,
   selectSelectedSystemVoucherIds,
-  selectCheckoutSummary,
-  removeAllVouchersThunk,
-  removeVoucherThunk,
-  selectIsRemovingVoucher,
-  selectIsApplyingVoucher,
 } from "@/src/store/slices/voucherSlice";
+import {
+  toggleItemSelection,
+  setAllSelectedItems,
+} from "@/src/store/slices/cartSlice";
 import { Voucher } from "@/src/services/voucher.service";
 import VoucherSelectorModal from "@/src/components/Cart/VoucherSelectorModal";
+import { useCartPreviewLogic } from "@/src/hooks/useCartPreviewLogic";
+
+// Helper
+const formatCurrency = (amount: number) => `${amount.toLocaleString()}₫`;
 
 // Constants
 const ROUTES = {
@@ -168,6 +171,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
   const isCustom = item.isCustom && item.orderItemComponents.length > 0;
+  const isStrictCustomRequest = item.productName?.includes('Custom Request');
 
   // Determine the first component image as fallback for custom items
   const displayImage =
@@ -242,7 +246,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
                 onClick={() =>
                   onUpdateQuantity(item.orderItemId, item.quantity - 1)
                 }
-                disabled={item.quantity <= 1 || updatingQuantity}
+                disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
                 className="w-7 h-7 flex items-center justify-center text-gray-500 disabled:opacity-30"
                 aria-label="Decrease quantity"
               >
@@ -259,7 +263,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
                 onClick={() =>
                   onUpdateQuantity(item.orderItemId, item.quantity + 1)
                 }
-                disabled={item.quantity >= 99 || updatingQuantity}
+                disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
                 className="w-7 h-7 flex items-center justify-center text-gray-500 disabled:opacity-30"
                 aria-label="Increase quantity"
               >
@@ -295,7 +299,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
               onClick={() =>
                 onUpdateQuantity(item.orderItemId, item.quantity - 1)
               }
-              disabled={item.quantity <= 1 || updatingQuantity}
+              disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
               className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Decrease quantity"
             >
@@ -312,7 +316,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
               onClick={() =>
                 onUpdateQuantity(item.orderItemId, item.quantity + 1)
               }
-              disabled={item.quantity >= 99 || updatingQuantity}
+              disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
               className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Increase quantity"
             >
@@ -366,6 +370,7 @@ interface OrderSummaryProps {
   selectedItemIds: Set<string>;
   onCheckout: () => void;
   onOpenSystemVoucher: () => void;
+  isUpdating: boolean;
 }
 
 const OrderSummary: FC<OrderSummaryProps> = ({
@@ -373,28 +378,78 @@ const OrderSummary: FC<OrderSummaryProps> = ({
   selectedItemIds,
   onCheckout,
   onOpenSystemVoucher,
+  isUpdating,
 }) => {
   const dispatch = useAppDispatch();
   const systemVouchers = useAppSelector(selectSystemVouchers);
   const selectedSystemIds = useAppSelector(selectSelectedSystemVoucherIds);
-  const checkoutSummary = useAppSelector(selectCheckoutSummary);
-  const isRemovingVoucher = useAppSelector(selectIsRemovingVoucher);
-  const isApplyingVoucher = useAppSelector(selectIsApplyingVoucher);
+  const selectedShopVoucherIdsMap = useAppSelector(
+    (state) => state.voucher.selectedShopVoucherIds,
+  );
+  const applicableVouchers = useAppSelector(
+    (state) => state.voucher.applicableVouchers,
+  );
   const availableSystemVouchersCount = systemVouchers.length;
-
-  // Calculate totals based on selected items only
-  const selectedItems = cart.orderItems.filter((item) =>
-    selectedItemIds.has(item.orderItemId),
-  );
-  const selectedTotal = selectedItems.reduce(
-    (sum, item) => sum + item.totalPrice,
-    0,
-  );
-  const selectedCount = selectedItems.reduce(
-    (sum, item) => sum + item.quantity,
-    0,
-  );
   const hasSelection = selectedItemIds.size > 0;
+
+  const { cartPreview, isCalculatingPreview } = useCartPreviewLogic(
+    cart.orderItems,
+    selectedItemIds,
+    isUpdating,
+  );
+
+  // Derive the selected system voucher code (for display)
+  const selectedSystemVoucherCode = useMemo(() => {
+    if (!selectedSystemIds?.length || !applicableVouchers?.systemVouchers)
+      return null;
+    return (
+      applicableVouchers.systemVouchers.find(
+        (v) => v.id === selectedSystemIds[0],
+      ) ?? null
+    );
+  }, [selectedSystemIds, applicableVouchers]);
+
+  // Derive selected shop vouchers (for display)
+  const selectedShopVouchers = useMemo(() => {
+    if (!applicableVouchers?.shopVoucherGroups) return [];
+    const result: {
+      shopId: string;
+      shopName: string;
+      code: string;
+      discountAmount: number;
+    }[] = [];
+    Object.entries(selectedShopVoucherIdsMap).forEach(([shopId, vIds]) => {
+      if (!vIds || vIds.length === 0) return;
+      const group = applicableVouchers.shopVoucherGroups.find(
+        (g) => g.shopId === shopId,
+      );
+      const voucher = group?.vouchers.find((v) => v.id === vIds[0]);
+      if (voucher) {
+        const shopPreview = cartPreview?.shopPreviews.find(
+          (s) => s.shopId === shopId,
+        );
+        result.push({
+          shopId,
+          shopName: shopPreview?.shopName ?? shopId,
+          code: voucher.code,
+          discountAmount: shopPreview?.shopDiscountAmount ?? 0,
+        });
+      }
+    });
+    return result;
+  }, [selectedShopVoucherIdsMap, applicableVouchers, cartPreview]);
+
+  const hasAppliedVouchers =
+    !!selectedSystemVoucherCode || selectedShopVouchers.length > 0;
+
+  // Derive system-only discount = total minus all shop discounts
+  const totalShopDiscount =
+    cartPreview?.shopPreviews?.reduce(
+      (sum, shop) => sum + (shop.shopDiscountAmount || 0),
+      0,
+    ) || 0;
+  const systemDiscountAmount =
+    (cartPreview?.totalDiscountAmount || 0) - totalShopDiscount;
 
   return (
     <div className="w-full lg:w-[380px] shrink-0">
@@ -404,7 +459,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
         </h3>
 
         {/* Ameko Platform Voucher */}
-        <div className="mb-4 p-3 rounded-lg border border-gray-100 bg-gray-50/50">
+        <div className="mb-3 p-3 rounded-lg border border-gray-100 bg-gray-50/50">
           <button
             type="button"
             onClick={onOpenSystemVoucher}
@@ -429,101 +484,78 @@ const OrderSummary: FC<OrderSummaryProps> = ({
               <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
             </div>
           </button>
+          {/* System voucher error */}
+          {cartPreview?.systemVoucherError && (
+            <p className="text-red-500 text-[11px] mt-1.5 font-medium">
+              {cartPreview.systemVoucherError}
+            </p>
+          )}
         </div>
-
-        {/* Selected items info */}
-        <div className="flex justify-between items-center mb-2 text-sm">
-          <span className="text-gray-600">Selected items</span>
-          <span className="font-medium">
-            {selectedItemIds.size} item{selectedItemIds.size !== 1 ? "s" : ""} (
-            {selectedCount} qty)
-          </span>
-        </div>
-
-        {/* Subtotal */}
-        {cart.subTotal > 0 && (
-          <div className="flex justify-between items-center mb-2 text-sm">
-            <span className="text-gray-600">Subtotal</span>
-            <span className="font-medium">
-              {cart.subTotal.toLocaleString()}₫
-            </span>
-          </div>
-        )}
-
-        {/* Shipping */}
-        {cart.shippingFee > 0 && (
-          <div className="flex justify-between items-center mb-2 text-sm">
-            <span className="text-gray-600">Shipping</span>
-            <span className="font-medium">
-              {cart.shippingFee.toLocaleString()}₫
-            </span>
-          </div>
-        )}
-
-        {/* Discount */}
-        {checkoutSummary && checkoutSummary.totalDiscountAmount > 0 && (
-          <div className="flex justify-between items-center mb-2 text-sm">
-            <span className="text-gray-600">Discount</span>
-            <span className="font-medium text-green-600">
-              -{checkoutSummary.totalDiscountAmount.toLocaleString()}₫
-            </span>
-          </div>
-        )}
 
         {/* Applied Vouchers Breakdown */}
-        {checkoutSummary && checkoutSummary.appliedVouchers.length > 0 && (
-          <div className="mb-2 space-y-1 py-2 border-t border-dashed border-gray-100">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-                Applied Vouchers
-              </p>
-              <button
-                type="button"
-                disabled={isRemovingVoucher}
-                onClick={() => {
-                  if (cart.orderId) {
-                    dispatch(removeAllVouchersThunk(cart.orderId));
-                  }
-                }}
-                className="flex items-center gap-1 text-[11px] text-[#ce2a32] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isRemovingVoucher ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                ) : (
-                  <Trash2 className="w-3 h-3" />
-                )}
-                Hủy áp dụng
-              </button>
-            </div>
-            {checkoutSummary.appliedVouchers.map((av) => (
+        {hasAppliedVouchers && (
+          <div className="mb-4 space-y-1.5 py-2 border-t border-dashed border-gray-100">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+              Applied Vouchers
+            </p>
+
+            {/* System voucher row */}
+            {selectedSystemVoucherCode && (
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5">
+                  <Ticket className="w-3 h-3 text-green-500" />
+                  <span className="text-gray-600 font-medium">
+                    {selectedSystemVoucherCode.code}
+                  </span>
+                  <span className="text-gray-400">(System)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {systemDiscountAmount > 0 && (
+                    <span className="text-green-600 font-medium">
+                      -{formatCurrency(systemDiscountAmount)}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => dispatch(setSelectedSystemVouchers([]))}
+                    className="p-0.5 text-gray-400 hover:text-[#ce2a32] transition-colors"
+                    aria-label="Remove system voucher"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Shop voucher rows */}
+            {selectedShopVouchers.map((sv) => (
               <div
-                key={av.code}
+                key={sv.shopId}
                 className="flex items-center justify-between text-xs"
               >
                 <div className="flex items-center gap-1.5">
                   <Ticket className="w-3 h-3 text-green-500" />
-                  <span className="text-gray-600 font-medium">{av.code}</span>
-                  <span className="text-gray-400">({av.voucherType})</span>
+                  <span className="text-gray-600 font-medium">{sv.code}</span>
+                  <span className="text-gray-400">({sv.shopName})</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-green-600 font-medium">
-                    -{av.discountApplied.toLocaleString()}₫
-                  </span>
+                  {sv.discountAmount > 0 && (
+                    <span className="text-green-600 font-medium">
+                      -{formatCurrency(sv.discountAmount)}
+                    </span>
+                  )}
                   <button
                     type="button"
-                    disabled={isRemovingVoucher || isApplyingVoucher}
-                    onClick={() => {
-                      if (cart.orderId) {
-                        dispatch(
-                          removeVoucherThunk({
-                            orderId: cart.orderId,
-                            code: av.code,
-                          }),
-                        );
-                      }
-                    }}
-                    className="p-0.5 text-gray-400 hover:text-[#ce2a32] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-label={`Remove voucher ${av.code}`}
+                    onClick={() =>
+                      dispatch(
+                        setSelectedShopVouchers({
+                          shopId: sv.shopId,
+                          voucherIds: [],
+                        }),
+                      )
+                    }
+                    className="p-0.5 text-gray-400 hover:text-[#ce2a32] transition-colors"
+                    aria-label={`Remove voucher ${sv.code}`}
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -533,17 +565,59 @@ const OrderSummary: FC<OrderSummaryProps> = ({
           </div>
         )}
 
+        {/* Selected items info */}
+        <div className="flex justify-between items-center mb-2 text-sm">
+          <span className="text-gray-600">Selected items</span>
+          <span className="font-medium">
+            {selectedItemIds.size} item{selectedItemIds.size !== 1 ? "s" : ""}
+          </span>
+        </div>
+
+        {/* Subtotal */}
+        <div className="flex justify-between items-center mb-2 text-sm">
+          <span className="text-gray-600">Subtotal</span>
+          <span className="font-medium">
+            {isCalculatingPreview ? (
+              <Loader2 className="w-4 h-4 animate-spin inline" />
+            ) : (
+              formatCurrency(cartPreview?.totalCartSubTotal || 0)
+            )}
+          </span>
+        </div>
+
+        {/* Shipping */}
+        <div className="flex justify-between items-center mb-2 text-sm">
+          <span className="text-gray-600">Shipping</span>
+          <span className="font-medium">
+            {isCalculatingPreview ? (
+              <Loader2 className="w-4 h-4 animate-spin inline" />
+            ) : (
+              formatCurrency(cartPreview?.totalShippingFee || 0)
+            )}
+          </span>
+        </div>
+
+        {/* Discount */}
+        {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (
+          <div className="flex justify-between items-center mb-2 text-sm">
+            <span className="text-gray-600">Discount</span>
+            <span className="font-medium text-green-600">
+              -{formatCurrency(cartPreview!.totalDiscountAmount)}
+            </span>
+          </div>
+        )}
+
         {/* Total */}
         <div className="flex justify-between items-end mb-2 mt-4 pt-3 border-t border-gray-200">
           <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">
             Estimated Total
           </span>
           <span className="text-xl font-black text-black">
-            {(checkoutSummary
-              ? checkoutSummary.finalTotal
-              : selectedTotal
-            ).toLocaleString()}
-            ₫
+            {isCalculatingPreview ? (
+              <Loader2 className="w-5 h-5 animate-spin inline" />
+            ) : (
+              formatCurrency(cartPreview?.finalTotalAmount || 0)
+            )}
           </span>
         </div>
 
@@ -555,16 +629,22 @@ const OrderSummary: FC<OrderSummaryProps> = ({
         <div className="space-y-3">
           <button
             onClick={onCheckout}
-            disabled={!hasSelection}
+            disabled={!hasSelection || isCalculatingPreview}
             className={`w-full h-12 text-sm font-bold uppercase tracking-widest transition-colors duration-200 rounded-sm ${
-              hasSelection
+              hasSelection && !isCalculatingPreview
                 ? "bg-black text-white hover:bg-[#ce2a32]"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
-            {hasSelection
-              ? `Proceed to Checkout (${selectedItemIds.size})`
-              : "Select Items to Checkout"}
+            {isCalculatingPreview ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Calculating...
+              </span>
+            ) : hasSelection ? (
+              `Proceed to Checkout (${selectedItemIds.size})`
+            ) : (
+              "Select Items to Checkout"
+            )}
           </button>
         </div>
       </div>
@@ -588,8 +668,14 @@ export default function CartPage() {
   const [updatingQuantityId, setUpdatingQuantityId] = useState<string | null>(
     null,
   );
-  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(
-    new Set(),
+  const quantityTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Global selection from Redux (single source of truth)
+  const selectedItemIdsArray = useAppSelector(
+    (state) => state.cart.selectedItemIds,
+  );
+  const selectedItemIds = useMemo(
+    () => new Set(selectedItemIdsArray),
+    [selectedItemIdsArray],
   );
 
   // ── Voucher modal state ──
@@ -612,28 +698,24 @@ export default function CartPage() {
   });
 
   // Toggle selection for a single item
-  const handleToggleSelect = useCallback((id: string) => {
-    setSelectedItemIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  }, []);
+  const handleToggleSelect = useCallback(
+    (id: string) => {
+      dispatch(toggleItemSelection(id));
+    },
+    [dispatch],
+  );
 
   // Select / deselect all
   const handleToggleSelectAll = useCallback(() => {
     if (!cart) return;
-    setSelectedItemIds((prev) => {
-      if (prev.size === cart.orderItems.length) {
-        return new Set();
-      }
-      return new Set(cart.orderItems.map((item) => item.orderItemId));
-    });
-  }, [cart]);
+    if (selectedItemIds.size === cart.orderItems.length) {
+      dispatch(setAllSelectedItems([]));
+    } else {
+      dispatch(
+        setAllSelectedItems(cart.orderItems.map((item) => item.orderItemId)),
+      );
+    }
+  }, [cart, selectedItemIds.size, dispatch]);
 
   // Select / deselect all items belonging to one shop
   const handleToggleShopSelect = useCallback(
@@ -641,18 +723,22 @@ export default function CartPage() {
       const shopItems =
         cart?.orderItems.filter((item) => item.shopId === shopId) ?? [];
       const shopItemIds = shopItems.map((item) => item.orderItemId);
-      setSelectedItemIds((prev) => {
-        const allSelected = shopItemIds.every((id) => prev.has(id));
-        const next = new Set(prev);
-        if (allSelected) {
-          shopItemIds.forEach((id) => next.delete(id));
-        } else {
-          shopItemIds.forEach((id) => next.add(id));
-        }
-        return next;
-      });
+      const allSelected = shopItemIds.every((id) => selectedItemIds.has(id));
+      if (allSelected) {
+        // Remove shop items from selection
+        const next = selectedItemIdsArray.filter(
+          (id) => !shopItemIds.includes(id),
+        );
+        dispatch(setAllSelectedItems(next));
+      } else {
+        // Add missing shop items into selection
+        const next = Array.from(
+          new Set([...selectedItemIdsArray, ...shopItemIds]),
+        );
+        dispatch(setAllSelectedItems(next));
+      }
     },
-    [cart],
+    [cart, selectedItemIds, selectedItemIdsArray, dispatch],
   );
 
   // Fetch cart from API
@@ -665,8 +751,10 @@ export default function CartPage() {
         if (res.success) {
           setCart(res.data);
           // Auto-select all items on load
-          setSelectedItemIds(
-            new Set(res.data.orderItems.map((item) => item.orderItemId)),
+          dispatch(
+            setAllSelectedItems(
+              res.data?.orderItems?.map((item) => item.orderItemId) || [],
+            ),
           );
         } else {
           setError(res.message || "Failed to load cart");
@@ -786,11 +874,11 @@ export default function CartPage() {
       if (res.success) {
         toast.success("Item removed from cart");
         // Remove from selection
-        setSelectedItemIds((prev) => {
-          const next = new Set(prev);
-          next.delete(orderItemId);
-          return next;
-        });
+        dispatch(
+          setAllSelectedItems(
+            selectedItemIdsArray.filter((id) => id !== orderItemId),
+          ),
+        );
         // Re-fetch cart to get updated totals
         const cartRes = await orderService.getCart();
         if (cartRes.success) {
@@ -804,20 +892,16 @@ export default function CartPage() {
     } finally {
       setRemovingId(null);
     }
-  }, []);
+  }, [dispatch, selectedItemIdsArray]);
 
-  // Update item quantity with optimistic UI
+  // Update item quantity with debounced DB write + instant optimistic UI
   const handleUpdateQuantity = useCallback(
     async (orderItemId: string, newQuantity: number) => {
-      // Validate
       if (!Number.isInteger(newQuantity) || newQuantity < 1 || newQuantity > 99)
         return;
       if (!cart) return;
 
-      // Save previous state for rollback
-      const previousCart = cart;
-
-      // Optimistic update
+      // 1. Instant optimistic UI update
       setCart((prev) => {
         if (!prev) return prev;
         return {
@@ -831,38 +915,41 @@ export default function CartPage() {
             };
           }),
           totalAmount: prev.orderItems.reduce((sum, item) => {
-            if (item.orderItemId === orderItemId) {
+            if (item.orderItemId === orderItemId)
               return sum + item.unitPrice * newQuantity;
-            }
             return sum + item.totalPrice;
           }, 0),
         };
       });
 
+      // 2. Block the preview hook immediately
       setUpdatingQuantityId(orderItemId);
-      try {
-        const res = await orderService.updateCartItemQuantity(
-          orderItemId,
-          newQuantity,
-        );
-        if (res.success) {
-          // Re-fetch to sync with server
-          const cartRes = await orderService.getCart();
-          if (cartRes.success) {
-            setCart(cartRes.data);
+
+      // 3. Debounce the actual DB write (600ms)
+      if (quantityTimerRef.current) clearTimeout(quantityTimerRef.current);
+      quantityTimerRef.current = setTimeout(async () => {
+        try {
+          const res = await orderService.updateCartItemQuantity(
+            orderItemId,
+            newQuantity,
+          );
+          if (res.success) {
+            // DB confirmed — unblock the preview hook. No extra getCart() needed.
+            setUpdatingQuantityId(null);
+          } else {
+            // Rollback: fetch authoritative state, then unblock
+            const cartRes = await orderService.getCart();
+            if (cartRes.success) setCart(cartRes.data);
+            toast.error(res.message || "Failed to update quantity");
+            setUpdatingQuantityId(null);
           }
-        } else {
-          // Revert on error
-          setCart(previousCart);
-          toast.error(res.message || "Failed to update quantity");
+        } catch {
+          const cartRes = await orderService.getCart();
+          if (cartRes.success) setCart(cartRes.data);
+          toast.error("Failed to update quantity");
+          setUpdatingQuantityId(null);
         }
-      } catch {
-        // Revert on error
-        setCart(previousCart);
-        toast.error("Failed to update quantity");
-      } finally {
-        setUpdatingQuantityId(null);
-      }
+      }, 600);
     },
     [cart],
   );
@@ -888,9 +975,9 @@ export default function CartPage() {
   }
 
   // Empty cart
-  if (!cart || cart.orderItems.length === 0) {
-    return <EmptyCart />;
-  }
+if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
+  return <EmptyCart />;
+}
 
   // Main cart content
   return (
@@ -996,26 +1083,28 @@ export default function CartPage() {
                   ))}
 
                   {/* Shop Voucher Footer */}
-                  <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50/50">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Ticket className="w-4 h-4 text-[#ce2a32]" />
-                      <span>Voucher của Shop</span>
+                  <div className="p-4 border-t border-gray-100 bg-gray-50/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Ticket className="w-4 h-4 text-[#ce2a32]" />
+                        <span>Voucher của Shop</span>
+                      </div>
+                      {vouchers.length > 0 ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleOpenShopVoucherModal(shopId, shopName)
+                          }
+                          className="text-sm font-medium text-[#ce2a32] hover:underline"
+                        >
+                          Chọn Hoặc Nhập Mã ({vouchers.length} mã khả dụng)
+                        </button>
+                      ) : (
+                        <span className="text-sm text-gray-400">
+                          Chọn Hoặc Nhập Mã
+                        </span>
+                      )}
                     </div>
-                    {vouchers.length > 0 ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleOpenShopVoucherModal(shopId, shopName)
-                        }
-                        className="text-sm font-medium text-[#ce2a32] hover:underline"
-                      >
-                        Chọn Hoặc Nhập Mã ({vouchers.length} mã khả dụng)
-                      </button>
-                    ) : (
-                      <span className="text-sm text-gray-400">
-                        Chọn Hoặc Nhập Mã
-                      </span>
-                    )}
                   </div>
                 </div>
               );
@@ -1028,6 +1117,7 @@ export default function CartPage() {
             selectedItemIds={selectedItemIds}
             onCheckout={handleCheckout}
             onOpenSystemVoucher={handleOpenSystemVoucherModal}
+            isUpdating={!!updatingQuantityId || !!removingId}
           />
         </div>
       </div>

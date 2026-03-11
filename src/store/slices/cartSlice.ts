@@ -1,6 +1,10 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { orderService } from "@/src/services/order.service";
-import { CartData } from "@/src/types/order.types";
+import {
+  CartData,
+  CartPreviewData,
+  CalculatePreviewPayload,
+} from "@/src/types/order.types";
 
 export interface CartItem {
   id: string;
@@ -73,6 +77,23 @@ export const updateServerCartItemQuantity = createAsyncThunk(
   },
 );
 
+// ─── Async Thunk: Calculate cart preview ────────────────
+export const calculateCartPreviewThunk = createAsyncThunk(
+  "cart/calculateCartPreview",
+  async (payload: CalculatePreviewPayload, { rejectWithValue }) => {
+    try {
+      const res = await orderService.calculateCartPreview(payload);
+      if (res.success) {
+        return res.data;
+      }
+      return rejectWithValue(res.message || "Failed to calculate preview");
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      return rejectWithValue(err.message || "Failed to calculate preview");
+    }
+  },
+);
+
 interface CartState {
   items: CartItem[];
   totalQuantity: number;
@@ -83,6 +104,11 @@ interface CartState {
   serverCart: CartData | null;
   serverCartLoading: boolean;
   serverCartError: string | null;
+  // Cart preview (calculate-preview API)
+  cartPreview: CartPreviewData | null;
+  isCalculatingPreview: boolean;
+  // Global selection (single source of truth shared by CartPage + CartSidebar)
+  selectedItemIds: string[];
 }
 
 // Load cart from localStorage
@@ -120,6 +146,9 @@ const initialState: CartState = {
   serverCart: null,
   serverCartLoading: false,
   serverCartError: null,
+  cartPreview: null,
+  isCalculatingPreview: false,
+  selectedItemIds: [],
 };
 
 const cartSlice = createSlice({
@@ -195,6 +224,25 @@ const cartSlice = createSlice({
       state.totalQuantity = totalQuantity;
       state.totalAmount = totalAmount;
     },
+
+    clearCartPreview(state) {
+      state.cartPreview = null;
+      state.isCalculatingPreview = false;
+    },
+
+    toggleItemSelection(state, action: PayloadAction<string>) {
+      const id = action.payload;
+      const index = state.selectedItemIds.indexOf(id);
+      if (index !== -1) {
+        state.selectedItemIds.splice(index, 1);
+      } else {
+        state.selectedItemIds.push(id);
+      }
+    },
+
+    setAllSelectedItems(state, action: PayloadAction<string[]>) {
+      state.selectedItemIds = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -220,6 +268,18 @@ const cartSlice = createSlice({
       })
       .addCase(removeServerCartItem.rejected, (state, action) => {
         state.serverCartError = action.payload as string;
+      })
+      // ── calculateCartPreview ──
+      .addCase(calculateCartPreviewThunk.pending, (state) => {
+        state.isCalculatingPreview = true;
+      })
+      .addCase(calculateCartPreviewThunk.fulfilled, (state, action) => {
+        state.isCalculatingPreview = false;
+        state.cartPreview = action.payload;
+      })
+      .addCase(calculateCartPreviewThunk.rejected, (state) => {
+        state.isCalculatingPreview = false;
+        state.cartPreview = null;
       });
   },
 });
@@ -232,6 +292,9 @@ export const {
   clearCart,
   recalculateTotals,
   setOrderNote,
+  clearCartPreview,
+  toggleItemSelection,
+  setAllSelectedItems,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
