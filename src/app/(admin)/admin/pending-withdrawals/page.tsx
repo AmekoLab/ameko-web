@@ -89,14 +89,15 @@ export default function PendingWithdrawalsPage() {
           <div>
             <h1 className="text-3xl font-black text-gray-800 mb-2 font-oswald uppercase flex items-center gap-3">
               <Banknote className="w-8 h-8" />
-              Yêu cầu rút tiền chờ duyệt
+              Pending Withdrawal Requests
             </h1>
             <p className="text-gray-500">
-              Quản lý các yêu cầu rút tiền đang chờ xử lý từ Shop.
+              Manage withdrawal requests currently pending from Shops.
             </p>
           </div>
           <span className="text-sm text-gray-500">
-            Tổng: <strong>{pendingPagination?.totalCount || 0}</strong> yêu cầu
+            Total: <strong>{pendingPagination?.totalCount || 0}</strong>{" "}
+            requests
           </span>
         </div>
 
@@ -104,7 +105,7 @@ export default function PendingWithdrawalsPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           {loadingPending && pendingWithdrawals.length === 0 ? (
             <div className="p-12 text-center text-gray-500">
-              Đang tải dữ liệu...
+              Loading data...
             </div>
           ) : pendingWithdrawals.length === 0 && !loadingPending ? (
             /* ─── Empty State ─────────────────────────── */
@@ -113,10 +114,10 @@ export default function PendingWithdrawalsPage() {
                 <Inbox className="h-8 w-8 text-gray-400" />
               </div>
               <h3 className="text-lg font-bold text-gray-700 font-oswald uppercase mb-1">
-                Không có yêu cầu nào
+                No requests
               </h3>
               <p className="text-sm text-gray-400 max-w-xs">
-                Hiện tại không có yêu cầu rút tiền nào đang chờ xử lý.
+                There are currently no withdrawal requests pending.
               </p>
             </div>
           ) : (
@@ -124,11 +125,11 @@ export default function PendingWithdrawalsPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-gray-100 text-gray-600 text-xs uppercase font-bold tracking-wider border-b border-gray-200">
-                    <th className="p-4">Ngày</th>
-                    <th className="p-4">Số tiền</th>
-                    <th className="p-4">Phí</th>
-                    <th className="p-4">Ngân hàng</th>
-                    <th className="p-4 text-center">Thao tác</th>
+                    <th className="p-4">Date</th>
+                    <th className="p-4">Amount</th>
+                    <th className="p-4">Fee</th>
+                    <th className="p-4">Bank</th>
+                    <th className="p-4 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -144,7 +145,7 @@ export default function PendingWithdrawalsPage() {
                           <div className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             {new Date(tx.createdAt).toLocaleDateString(
-                              "vi-VN",
+                              "en-US",
                               {
                                 day: "2-digit",
                                 month: "2-digit",
@@ -159,7 +160,7 @@ export default function PendingWithdrawalsPage() {
                         {/* Amount */}
                         <td className="p-4">
                           <span className="font-bold text-[#ce2a32] font-oswald text-base">
-                            {tx.amount.toLocaleString("vi-VN")}₫
+                            {tx.amount.toLocaleString("en-US")}
                           </span>
                         </td>
 
@@ -167,7 +168,7 @@ export default function PendingWithdrawalsPage() {
                         <td className="p-4">
                           <span className="text-sm text-gray-500 font-oswald">
                             {tx.feeAmount > 0
-                              ? `${tx.feeAmount.toLocaleString("vi-VN")}₫`
+                              ? `${tx.feeAmount.toLocaleString("en-US")}`
                               : "—"}
                           </span>
                         </td>
@@ -186,7 +187,7 @@ export default function PendingWithdrawalsPage() {
                                 <button
                                   onClick={() => handleCopy(bank.accountNumber)}
                                   className="p-0.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition"
-                                  title="Sao chép STK"
+                                  title="Copy Account Number"
                                 >
                                   <Copy className="w-3.5 h-3.5" />
                                 </button>
@@ -197,7 +198,7 @@ export default function PendingWithdrawalsPage() {
                             </div>
                           ) : (
                             <span className="text-xs text-gray-400 italic">
-                              Không có thông tin
+                              No information
                             </span>
                           )}
                         </td>
@@ -210,7 +211,7 @@ export default function PendingWithdrawalsPage() {
                                 handleOpenApproveModal(tx.id, tx.amount)
                               }
                               className="p-2 rounded-lg border border-green-200 bg-white hover:bg-green-50 hover:border-green-400 text-green-600 transition"
-                              title="Duyệt"
+                              title="Approve"
                             >
                               <CheckCircle className="w-4 h-4" />
                             </button>
@@ -219,7 +220,7 @@ export default function PendingWithdrawalsPage() {
                                 handleOpenRejectModal(tx.id, tx.amount)
                               }
                               className="p-2 rounded-lg border border-red-200 bg-white hover:bg-red-50 hover:border-red-400 text-red-600 transition"
-                              title="Từ chối"
+                              title="Reject"
                             >
                               <XCircle className="w-4 h-4" />
                             </button>
@@ -237,12 +238,12 @@ export default function PendingWithdrawalsPage() {
           {pendingPagination && pendingPagination.totalPages > 1 && (
             <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50">
               <p className="text-sm text-gray-500">
-                Trang{" "}
+                Page{" "}
                 <strong>
                   {pendingPagination.currentPage} /{" "}
                   {pendingPagination.totalPages}
                 </strong>{" "}
-                — {pendingPagination.totalCount} yêu cầu
+                — {pendingPagination.totalCount} requests
               </p>
               <div className="flex items-center gap-2">
                 <button

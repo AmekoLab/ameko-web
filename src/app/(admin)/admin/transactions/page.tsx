@@ -23,38 +23,38 @@ import Image from "next/image";
 // ─── Type badge config ───────────────────────────────────
 const TYPE_BADGE: Record<string, { label: string; className: string }> = {
   Withdrawal: {
-    label: "Rút tiền",
+    label: "Withdrawal",
     className: "bg-blue-100 text-blue-700",
   },
   OrderPayment: {
-    label: "Thanh toán",
+    label: "Payment",
     className: "bg-green-100 text-green-700",
   },
   ManualAdjustment: {
-    label: "Điều chỉnh",
+    label: "Adjustment",
     className: "bg-orange-100 text-orange-700",
   },
   RefundToWallet: {
-    label: "Hoàn tiền",
+    label: "Refund",
     className: "bg-purple-100 text-purple-700",
   },
   SalesPending: {
-    label: "Doanh thu chờ",
+    label: "Pending Revenue",
     className: "bg-yellow-100 text-yellow-700",
   },
 };
 
 const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   Paid: {
-    label: "Thành công",
+    label: "Success",
     className: "bg-green-100 text-green-700",
   },
   Failed: {
-    label: "Thất bại",
+    label: "Failed",
     className: "bg-red-100 text-red-700",
   },
   Pending: {
-    label: "Chờ xử lý",
+    label: "Pending",
     className: "bg-yellow-100 text-yellow-700",
   },
 };
@@ -83,7 +83,7 @@ function DescriptionCell({ parsed }: { parsed: ParsedTransactionInfo }) {
             : "bg-red-100 text-red-700"
         }`}
       >
-        {parsed.action === "APPROVED" ? "Duyệt" : "Từ chối"}
+        {parsed.action === "APPROVED" ? "Approved" : "Rejected"}
       </span>
 
       {/* Note / Reason */}
@@ -99,7 +99,7 @@ function DescriptionCell({ parsed }: { parsed: ParsedTransactionInfo }) {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline font-medium"
         >
-          <Eye className="w-3 h-3" /> Xem minh chứng
+          <Eye className="w-3 h-3" /> View evidence
         </a>
       )}
     </div>
@@ -171,15 +171,15 @@ export default function AdminTransactionsPage() {
           <div>
             <h1 className="text-3xl font-black text-gray-800 mb-2 font-oswald uppercase flex items-center gap-3">
               <Receipt className="w-8 h-8" />
-              Lịch sử giao dịch
+              Transaction History
             </h1>
             <p className="text-gray-500">
-              Xem toàn bộ giao dịch ví trên hệ thống.
+              View all wallet transactions in the system.
             </p>
           </div>
           <span className="text-sm text-gray-500">
-            Tổng: <strong>{transactionsPagination?.totalCount || 0}</strong>{" "}
-            giao dịch
+            Total: <strong>{transactionsPagination?.totalCount || 0}</strong>{" "}
+            transactions
           </span>
         </div>
 
@@ -187,7 +187,7 @@ export default function AdminTransactionsPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           {loadingTransactions && transactions.length === 0 ? (
             <div className="p-12 text-center text-gray-500">
-              Đang tải dữ liệu...
+              Loading data...
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -195,12 +195,12 @@ export default function AdminTransactionsPage() {
                 <thead>
                   <tr className="bg-gray-100 text-gray-600 text-xs uppercase font-bold tracking-wider border-b border-gray-200">
                     <th className="p-4">ID</th>
-                    <th className="p-4">Ngày</th>
-                    <th className="p-4">Loại</th>
-                    <th className="p-4">Số tiền</th>
-                    <th className="p-4">Phí</th>
-                    <th className="p-4">Trạng thái</th>
-                    <th className="p-4">Chi tiết</th>
+                    <th className="p-4">Date</th>
+                    <th className="p-4">Type</th>
+                    <th className="p-4">Amount</th>
+                    <th className="p-4">Fee</th>
+                    <th className="p-4">Status</th>
+                    <th className="p-4">Details</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -225,7 +225,7 @@ export default function AdminTransactionsPage() {
                           <div className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             {new Date(item.createdAt).toLocaleDateString(
-                              "vi-VN",
+                              "en-US",
                               {
                                 day: "2-digit",
                                 month: "2-digit",
@@ -264,7 +264,7 @@ export default function AdminTransactionsPage() {
                         <td className="p-4">
                           <span className="text-sm text-gray-500 font-oswald">
                             {item.feeAmount > 0
-                              ? `${item.feeAmount.toLocaleString("vi-VN")}₫`
+                              ? `${item.feeAmount.toLocaleString("en-US")}₫`
                               : "—"}
                           </span>
                         </td>
@@ -299,7 +299,7 @@ export default function AdminTransactionsPage() {
                         colSpan={7}
                         className="p-12 text-center text-gray-400"
                       >
-                        Không có giao dịch nào.
+                        No transactions found.
                       </td>
                     </tr>
                   )}
@@ -312,12 +312,12 @@ export default function AdminTransactionsPage() {
           {transactionsPagination && transactionsPagination.totalPages > 1 && (
             <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50">
               <p className="text-sm text-gray-500">
-                Trang{" "}
+                Page{" "}
                 <strong>
                   {transactionsPagination.currentPage} /{" "}
                   {transactionsPagination.totalPages}
                 </strong>{" "}
-                — {transactionsPagination.totalCount} giao dịch
+                — {transactionsPagination.totalCount} transactions
               </p>
               <div className="flex items-center gap-2">
                 <button

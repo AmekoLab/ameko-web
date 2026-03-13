@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import {
@@ -12,6 +13,9 @@ import {
   Activity,
   Loader2,
   AlertCircle,
+  ChevronUp,
+  ChevronDown,
+  Star,
 } from "lucide-react";
 import { use3DModel } from "@/src/hooks/3d/use3DModel";
 import { EnvironmentPreset, Model3DConfig } from "@/src/types/model.types";
@@ -41,9 +45,9 @@ const KeyboardViewer = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 animate-pulse">
-        <Box className="w-12 h-12 animate-bounce mb-4 text-white" />
-        <span className="text-xs font-bold uppercase tracking-widest text-white">
+      <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 animate-pulse">
+        <Box className="w-12 h-12 animate-bounce mb-4 text-[#f5d800]" />
+        <span className="text-xs font-black uppercase tracking-widest text-gray-400">
           Loading 3D Viewer...
         </span>
       </div>
@@ -58,56 +62,14 @@ const KeyboardViewer = dynamic(
  */
 
 interface ProductGalleryProps {
-  /**
-   * Product image URLs
-   */
   images: string[];
-
-  /**
-   * Product name for accessibility
-   */
   productName?: string;
-
-  /**
-   * Product ID for fetching 3D model
-   * TODO: When backend is ready, this will be used to fetch from API
-   * Currently uses hardcoded model from config
-   */
   productId: string;
-
-  /**
-   * Enable screenshot functionality in 3D viewer
-   * @default true
-   */
   enable3DScreenshot?: boolean;
-
-  /**
-   * Show FPS counter in 3D viewer
-   * @default false (set to true for development)
-   */
   enable3DFPS?: boolean;
-
-  /**
-   * Enable mobile gesture controls
-   * @default true
-   */
   enable3DGestures?: boolean;
-
-  /**
-   * Environment lighting preset
-   * @default "city"
-   */
   environmentPreset?: EnvironmentPreset;
-
-  /**
-   * Callback when 3D screenshot is taken
-   */
   on3DScreenshot?: (dataUrl: string) => void;
-
-  /**
-   * Direct 3D model URL (e.g. .glb file from API).
-   * When provided, creates a Model3DConfig directly instead of using use3DModel hook.
-   */
   view3DUrl?: string;
 }
 
@@ -133,17 +95,13 @@ export const ProductGallery = ({
   const [screenshotNotification, setScreenshotNotification] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  /**
-   * Fetch 3D model configuration
-   * Skipped when view3DUrl is provided (direct URL from API)
-   */
   const {
     modelConfig: hookModelConfig,
     isLoading: hookLoading,
     error: hookError,
     refetch: refetchModel,
   } = use3DModel(productId, {
-    enabled: !view3DUrl, // Skip hook when direct URL is provided
+    enabled: !view3DUrl,
     onSuccess: (config) => {
       console.log("✅ 3D Model loaded:", config);
     },
@@ -152,7 +110,6 @@ export const ProductGallery = ({
     },
   });
 
-  // Build Model3DConfig from direct URL if provided
   const directModelConfig: Model3DConfig | null = view3DUrl
     ? {
         id: productId,
@@ -164,24 +121,15 @@ export const ProductGallery = ({
       }
     : null;
 
-  // Use direct config if available, otherwise use hook config
   const modelConfig = directModelConfig || hookModelConfig;
   const isLoadingModel = view3DUrl ? false : hookLoading;
   const modelError = view3DUrl ? null : hookError;
-
-  // Check if 3D is available
   const is3DAvailable = modelConfig && !modelError;
 
-  /**
-   * Close modal handler
-   */
   const closeModal = useCallback(() => {
     setActiveModal(MODAL_TYPES.NONE);
   }, []);
 
-  /**
-   * Body scroll lock & keyboard handling
-   */
   useEffect(() => {
     if (activeModal !== MODAL_TYPES.NONE) {
       document.body.style.overflow = "hidden";
@@ -189,53 +137,32 @@ export const ProductGallery = ({
     } else {
       document.body.style.overflow = "unset";
     }
-
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [activeModal]);
 
-  /**
-   * Keyboard shortcuts
-   */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        closeModal();
-      }
+      if (e.key === "Escape") closeModal();
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [closeModal]);
 
-  /**
-   * Screenshot handler
-   */
   const handle3DScreenshot = useCallback(
     (dataUrl: string) => {
       setScreenshotNotification(true);
       setTimeout(() => setScreenshotNotification(false), 2000);
-
-      // Custom callback
       on3DScreenshot?.(dataUrl);
-
-      console.log("📸 Screenshot captured:", dataUrl.substring(0, 50) + "...");
     },
     [on3DScreenshot],
   );
 
-  /**
-   * 3D Error handler
-   */
   const handle3DError = useCallback((error: Error) => {
     console.error("❌ 3D Viewer Error:", error);
-    // TODO: Show toast notification
   }, []);
 
-  /**
-   * 3D Load handler
-   */
   const handle3DLoad = useCallback(() => {
     console.log("✅ 3D Model rendered successfully");
   }, []);
@@ -244,72 +171,66 @@ export const ProductGallery = ({
     <>
       {/* Screenshot Notification */}
       {screenshotNotification && (
-        <div className="fixed top-4 right-4 z-[10000] bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-in slide-in-from-top flex items-center gap-2">
+        <div className="fixed top-4 right-4 z-[10000] bg-[#f5d800] text-black px-4 py-2 shadow-2xl flex items-center gap-2">
           <Camera className="w-4 h-4" />
-          <span className="text-sm font-medium">Screenshot saved!</span>
+          <span className="text-sm font-black uppercase tracking-wider">Screenshot saved!</span>
         </div>
       )}
 
-      {/* MAIN GALLERY */}
-      <div className="flex flex-col-reverse lg:flex-row gap-3 w-full h-full select-none">
-        {/* Thumbnails */}
+      {/* MAIN GALLERY — Corsair cinematic layout */}
+      <div className="relative flex flex-col-reverse lg:flex-row w-full h-[600px] lg:h-[calc(100vh-104px)] select-none bg-[radial-gradient(circle_at_center,_#2a2c33_0%,_#111216_70%,_#0a0a0c_100%)] overflow-hidden">
+
+        {/* ── Absolute Breadcrumb Overlay ── */}
+        <div className="absolute top-6 left-6 lg:left-[136px] z-20 text-gray-500 text-[11px] font-medium tracking-wide pointer-events-none select-none hidden lg:block">
+          Home / Shop / <span className="text-gray-300">{productName}</span>
+        </div>
+
+        {/* ── Thumbnail Column ── */}
         <div
-          className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto scrollbar-hide shrink-0 lg:w-16 lg:h-[450px]"
+          className="flex lg:flex-col items-center gap-3 p-4 pt-4 lg:pt-16 lg:pl-10 lg:pr-4 overflow-x-auto lg:overflow-y-auto shrink-0 z-10 w-full lg:w-[120px] h-auto lg:h-full"
+          style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
           role="tablist"
           aria-label="Product images"
         >
-          {/* 3D View Button */}
+          {/* Up caret — desktop only */}
+          <ChevronUp className="hidden lg:block w-5 h-5 text-gray-500 hover:text-white cursor-pointer transition-colors shrink-0 mb-1" />
+
+          {/* 3D View Thumbnail */}
           <button
             onClick={() => {
               if (is3DAvailable) {
                 setActiveModal(MODAL_TYPES.THREE_D);
               } else if (modelError) {
-                // Retry on click
                 refetchModel();
               }
             }}
             disabled={isLoadingModel}
             className={`
-              relative w-16 h-16 shrink-0 rounded-lg overflow-hidden transition-all border flex flex-col items-center justify-center gap-1 shadow-md group
+              relative w-[72px] h-[72px] rounded-lg shrink-0 overflow-hidden transition-all duration-200 border-2
+              bg-gradient-to-br from-[#1a1a1a] to-black
+              flex flex-col items-center justify-center gap-1 group backdrop-blur-sm
               ${
                 is3DAvailable
-                  ? "bg-slate-900 text-white hover:bg-slate-800 border-transparent cursor-pointer"
+                  ? "border-[#f5d800]/40 text-[#f5d800] hover:border-[#f5d800] cursor-pointer"
                   : modelError
-                    ? "bg-red-900/30 text-red-400 border-red-600 cursor-pointer hover:bg-red-900/50"
-                    : "bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed"
+                    ? "border-red-600/40 text-red-400 cursor-pointer hover:border-red-500"
+                    : "border-transparent text-gray-600 cursor-not-allowed"
               }
             `}
             aria-label={
-              is3DAvailable
-                ? "Open 3D view"
-                : modelError
-                  ? "Retry loading 3D model"
-                  : "Loading 3D model"
+              is3DAvailable ? "Open 3D view" : modelError ? "Retry loading 3D model" : "Loading 3D model"
             }
             type="button"
-            title={
-              modelError
-                ? "Click to retry"
-                : isLoadingModel
-                  ? "Loading..."
-                  : undefined
-            }
           >
             {isLoadingModel ? (
-              <Loader2 className="w-6 h-6 animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : modelError ? (
-              <AlertCircle className="w-6 h-6" />
+              <AlertCircle className="w-5 h-5" />
             ) : (
-              <Box className="w-6 h-6 group-hover:scale-110 transition-transform" />
+              <Box className="w-5 h-5 group-hover:scale-110 transition-transform" />
             )}
-            <span className="text-[9px] font-bold uppercase">
-              {isLoadingModel
-                ? "Loading"
-                : modelError
-                  ? "Retry"
-                  : is3DAvailable
-                    ? "3D View"
-                    : "No 3D"}
+            <span className="text-[8px] font-black uppercase tracking-wider">
+              {isLoadingModel ? "Loading" : modelError ? "Retry" : is3DAvailable ? "3D" : "No 3D"}
             </span>
           </button>
 
@@ -319,13 +240,13 @@ export const ProductGallery = ({
               key={idx}
               onClick={() => setSelectedImage(img)}
               className={`
-      relative w-16 h-16 shrink-0 bg-[#f8f8f8] rounded-lg overflow-hidden transition-all border 
-      ${
-        selectedImage === img
-          ? "border-slate-900 ring-1 ring-slate-900/20 opacity-100"
-          : "border-transparent opacity-60 hover:opacity-100 hover:bg-gray-200"
-      }
-    `}
+                relative w-[72px] h-[72px] rounded-lg shrink-0 overflow-hidden transition-all duration-200 border-2
+                ${
+                  selectedImage === img
+                    ? "border-[#00f0ff] bg-black/40 opacity-100"
+                    : "border-transparent bg-black/20 hover:bg-black/40 opacity-50 hover:opacity-100"
+                }
+              `}
               role="tab"
               aria-selected={selectedImage === img}
               aria-label={`View image ${idx + 1}`}
@@ -335,16 +256,19 @@ export const ProductGallery = ({
                 src={img}
                 alt={`${productName} thumbnail ${idx + 1}`}
                 fill
-                className="object-contain p-1"
-                sizes="64px"
+                className="object-contain p-1.5"
+                sizes="72px"
               />
             </button>
           ))}
+
+          {/* Down caret — desktop only */}
+          <ChevronDown className="hidden lg:block w-5 h-5 text-gray-500 hover:text-white cursor-pointer transition-colors shrink-0 mt-1" />
         </div>
 
-        {/* Main Display */}
+        {/* ── Main Image Display ── */}
         <div
-          className="flex-1 relative aspect-square lg:aspect-auto lg:h-[450px] bg-[#f8f8f8] rounded-xl overflow-hidden group border border-transparent hover:border-gray-200 transition-colors cursor-zoom-in"
+          className="flex-1 relative w-full h-full flex items-center justify-center p-4 cursor-zoom-in group"
           onClick={() => setActiveModal(MODAL_TYPES.IMAGE)}
           role="button"
           tabIndex={0}
@@ -360,124 +284,136 @@ export const ProductGallery = ({
             src={selectedImage}
             alt={`${productName} main view`}
             fill
-            className="object-contain p-8 transition-transform duration-500 ease-out group-hover:scale-105"
+            className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.03] p-2 md:p-4"
             priority
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="(max-width: 768px) 100vw, 65vw"
+            style={{ filter: "drop-shadow(0 40px 50px rgba(0,0,0,0.8))" }}
           />
 
-          {/* 3D Button Overlay */}
+          {/* 3D Button Overlay — Corsair style */}
           {is3DAvailable && (
-            <div className="absolute top-4 right-4 z-10">
+            <div className="absolute top-6 right-6 z-20">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setActiveModal(MODAL_TYPES.THREE_D);
                 }}
-                className="flex items-center gap-2 bg-white/90 backdrop-blur shadow-sm border border-gray-200 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider text-slate-900 hover:bg-slate-900 hover:text-white transition-all transform hover:-translate-y-0.5"
+                className="flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:text-[#f5d800] hover:border-[#f5d800] transition-colors"
                 aria-label="Open 360° 3D view"
                 type="button"
               >
                 <Rotate3D className="w-4 h-4" />
-                <span>360° View</span>
+                360° View
               </button>
             </div>
           )}
 
-          {/* Zoom Hint */}
-          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            <div className="bg-white/80 backdrop-blur p-2 rounded-lg text-gray-500 shadow-sm flex items-center gap-2">
+          {/* Zoom hint */}
+          <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <div className="bg-black/60 backdrop-blur-md px-3 py-2 text-gray-400 flex items-center gap-2 border border-white/10">
               <ZoomIn className="w-4 h-4" />
-              <span className="text-xs font-bold">Click to Zoom</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Click to Zoom</span>
             </div>
           </div>
         </div>
+
+        {/* ── MORE FEATURES — bottom left absolute ── */}
+        <div className="absolute bottom-8 left-6 lg:left-10 z-20 flex items-center gap-3 text-[#f5d800] hover:text-[#ffe500] cursor-pointer transition-colors group/feat">
+          <div className="border-[1.5px] border-current p-0.5">
+            <Star className="w-4 h-4" />
+          </div>
+          <span className="text-[11px] font-black uppercase tracking-widest">
+            More Features
+          </span>
+        </div>
+
       </div>
 
       {/* FULLSCREEN MODAL */}
-      {activeModal !== MODAL_TYPES.NONE && (
-        <div
-          ref={modalRef}
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-sm animate-in fade-in duration-200"
-          role="dialog"
-          aria-modal="true"
-          aria-label={
-            activeModal === MODAL_TYPES.THREE_D ? "3D viewer" : "Image viewer"
-          }
-          tabIndex={-1}
-        >
-          {/* Close Button */}
-          <button
-            onClick={closeModal}
-            className="absolute top-6 right-6 z-50 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all group"
-            aria-label="Close viewer (ESC)"
-            type="button"
+      {activeModal !== MODAL_TYPES.NONE &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            ref={modalRef}
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/98 backdrop-blur-sm animate-in fade-in duration-200"
+            role="dialog"
+            aria-modal="true"
+            aria-label={
+              activeModal === MODAL_TYPES.THREE_D ? "3D viewer" : "Image viewer"
+            }
+            tabIndex={-1}
           >
-            <X className="w-8 h-8 group-hover:rotate-90 transition-transform" />
-          </button>
+            {/* Close Button */}
+            <button
+              onClick={closeModal}
+              className="absolute top-6 right-6 z-50 p-2 bg-white/10 hover:bg-white/20 text-white transition-all group border border-white/20"
+              aria-label="Close viewer (ESC)"
+              type="button"
+            >
+              <X className="w-8 h-8 group-hover:rotate-90 transition-transform" />
+            </button>
 
-          {/* Modal Content */}
-          <div className="w-full h-full relative flex items-center justify-center p-4">
-            {/* 3D VIEW */}
-            {activeModal === MODAL_TYPES.THREE_D && modelConfig && (
-              <>
-                {/* Header */}
-                <div className="absolute top-6 left-6 z-40 text-white pointer-events-none select-none">
-                  <h3 className="text-xl font-bold font-oswald uppercase tracking-widest">
-                    {modelConfig.name}
-                  </h3>
-                  <p className="text-white/50 text-xs">
-                    Drag to rotate • Scroll to zoom
-                  </p>
-                  {enable3DScreenshot && (
-                    <p className="text-white/30 text-[10px] mt-1 flex items-center gap-1">
-                      <Camera className="w-3 h-3" />
-                      Click camera icon to capture
+            {/* Modal Content */}
+            <div className="w-full h-full relative flex items-center justify-center p-4">
+              {/* 3D VIEW */}
+              {activeModal === MODAL_TYPES.THREE_D && modelConfig && (
+                <>
+                  <div className="absolute top-6 left-6 z-40 text-white pointer-events-none select-none">
+                    <h3 className="text-xl font-black uppercase tracking-widest">
+                      {modelConfig.name}
+                    </h3>
+                    <p className="text-white/50 text-xs">
+                      Drag to rotate • Scroll to zoom
                     </p>
-                  )}
-                  {enable3DFPS && (
-                    <p className="text-white/30 text-[10px] flex items-center gap-1">
-                      <Activity className="w-3 h-3" />
-                      Performance monitor active
-                    </p>
-                  )}
-                </div>
+                    {enable3DScreenshot && (
+                      <p className="text-white/30 text-[10px] mt-1 flex items-center gap-1">
+                        <Camera className="w-3 h-3" />
+                        Click camera icon to capture
+                      </p>
+                    )}
+                    {enable3DFPS && (
+                      <p className="text-white/30 text-[10px] flex items-center gap-1">
+                        <Activity className="w-3 h-3" />
+                        Performance monitor active
+                      </p>
+                    )}
+                  </div>
 
-                {/* 3D Viewer */}
-                <KeyboardViewer
-                  modelConfig={modelConfig}
-                  className="w-full h-full"
-                  // autoRotate={false}
-                  enableZoom={true}
-                  enableScreenshot={enable3DScreenshot}
-                  enableFPS={enable3DFPS}
-                  enableGestures={enable3DGestures}
-                  environmentPreset={environmentPreset}
-                  onScreenshot={handle3DScreenshot}
-                  onError={handle3DError}
-                  onLoad={handle3DLoad}
-                />
-              </>
-            )}
+                  <KeyboardViewer
+                    modelConfig={modelConfig}
+                    className="w-full h-full"
+                    enableZoom={true}
+                    enableScreenshot={enable3DScreenshot}
+                    enableFPS={enable3DFPS}
+                    enableGestures={enable3DGestures}
+                    environmentPreset={environmentPreset}
+                    onScreenshot={handle3DScreenshot}
+                    onError={handle3DError}
+                    onLoad={handle3DLoad}
+                  />
+                </>
+              )}
 
-            {/* IMAGE VIEW */}
-            {activeModal === MODAL_TYPES.IMAGE && (
-              <div className="relative w-full h-full max-w-5xl max-h-screen">
-                <Image
-                  src={selectedImage}
-                  alt={`${productName} fullscreen view`}
-                  fill
-                  className="object-contain"
-                  sizes="100vw"
-                  priority
-                />
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/50 text-xs font-medium">
-                  Press ESC to close
+              {/* IMAGE VIEW */}
+              {activeModal === MODAL_TYPES.IMAGE && (
+                <div className="relative w-full h-full max-w-5xl max-h-screen">
+                  <Image
+                    src={selectedImage}
+                    alt={`${productName} fullscreen view`}
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                    priority
+                  />
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/40 text-xs font-bold uppercase tracking-widest">
+                    Press ESC to close
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+              )}
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
   );
 };

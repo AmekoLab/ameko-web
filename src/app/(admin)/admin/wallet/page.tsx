@@ -21,10 +21,10 @@ import Image from "next/image";
 
 // ─── Status filter tabs ──────────────────────────────────
 const STATUS_TABS = [
-  { label: "Tất cả", value: "" },
-  { label: "Chờ duyệt", value: "Pending" },
-  { label: "Đã duyệt", value: "Paid" },
-  { label: "Từ chối", value: "Rejected" },
+  { label: "All", value: "" },
+  { label: "Pending", value: "Pending" },
+  { label: "Approved", value: "Paid" },
+  { label: "Rejected", value: "Rejected" },
 ];
 
 export default function AdminWalletPage() {
@@ -72,19 +72,19 @@ export default function AdminWalletPage() {
       case "Pending":
         return (
           <span className="inline-flex items-center gap-1 text-xs bg-yellow-100 text-yellow-700 px-2.5 py-1 rounded-full font-bold uppercase">
-            <Clock className="w-3 h-3" /> Chờ duyệt
+            <Clock className="w-3 h-3" /> Pending
           </span>
         );
       case "Paid":
         return (
           <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-bold uppercase">
-            <CheckCircle className="w-3 h-3" /> Đã duyệt
+            <CheckCircle className="w-3 h-3" /> Approved
           </span>
         );
       case "Rejected":
         return (
           <span className="inline-flex items-center gap-1 text-xs bg-red-100 text-red-700 px-2.5 py-1 rounded-full font-bold uppercase">
-            <XCircle className="w-3 h-3" /> Từ chối
+            <XCircle className="w-3 h-3" /> Rejected
           </span>
         );
       default:
@@ -104,14 +104,14 @@ export default function AdminWalletPage() {
           <div>
             <h1 className="text-3xl font-black text-gray-800 mb-2 font-oswald uppercase flex items-center gap-3">
               <Wallet className="w-8 h-8" />
-              Quản lý rút tiền
+              Withdrawal Management
             </h1>
             <p className="text-gray-500">
-              Duyệt hoặc từ chối các yêu cầu rút tiền từ Shop.
+              Approve or reject withdrawal requests from Shops.
             </p>
           </div>
           <span className="text-sm text-gray-500">
-            Tổng: <strong>{pagination?.totalCount || 0}</strong> yêu cầu
+            Total: <strong>{pagination?.totalCount || 0}</strong> requests
           </span>
         </div>
 
@@ -139,19 +139,19 @@ export default function AdminWalletPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           {loading && withdrawals.length === 0 ? (
             <div className="p-12 text-center text-gray-500">
-              Đang tải dữ liệu...
+              Loading data...
             </div>
           ) : (
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-100 text-gray-600 text-xs uppercase font-bold tracking-wider border-b border-gray-200">
                   <th className="p-4">Shop</th>
-                  <th className="p-4">Số tiền</th>
-                  <th className="p-4">Ngân hàng</th>
-                  <th className="p-4">Trạng thái</th>
-                  <th className="p-4">Ngày yêu cầu</th>
-                  <th className="p-4">Minh chứng</th>
-                  <th className="p-4 text-center">Thao tác</th>
+                  <th className="p-4">Amount</th>
+                  <th className="p-4">Bank</th>
+                  <th className="p-4">Status</th>
+                  <th className="p-4">Requested Date</th>
+                  <th className="p-4">Evidence</th>
+                  <th className="p-4 text-center">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -170,7 +170,7 @@ export default function AdminWalletPage() {
                       <div className="flex items-center gap-1.5">
                         <Banknote className="w-4 h-4 text-[#ce2a32]" />
                         <span className="font-bold text-[#ce2a32] font-oswald text-base">
-                          {item.amount.toLocaleString("vi-VN")}₫
+                          {item.amount.toLocaleString("en-US")}₫
                         </span>
                       </div>
                     </td>
@@ -211,7 +211,7 @@ export default function AdminWalletPage() {
                         <button
                           onClick={() => setPreviewImage(item.evidenceImageUrl)}
                           className="p-1.5 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 text-gray-500 hover:text-blue-600 transition"
-                          title="Xem minh chứng"
+                          title="View evidence"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -227,14 +227,14 @@ export default function AdminWalletPage() {
                           <button
                             onClick={() => setApproveTarget(item)}
                             className="p-2 rounded-lg border border-green-200 bg-white hover:bg-green-50 hover:border-green-400 text-green-600 transition"
-                            title="Duyệt"
+                            title="Approve"
                           >
                             <CheckCircle className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setRejectTarget(item)}
                             className="p-2 rounded-lg border border-red-200 bg-white hover:bg-red-50 hover:border-red-400 text-red-600 transition"
-                            title="Từ chối"
+                            title="Reject"
                           >
                             <XCircle className="w-4 h-4" />
                           </button>
@@ -251,7 +251,7 @@ export default function AdminWalletPage() {
                 {withdrawals.length === 0 && !loading && (
                   <tr>
                     <td colSpan={7} className="p-12 text-center text-gray-400">
-                      Không có yêu cầu rút tiền nào.
+                      No withdrawal requests found.
                     </td>
                   </tr>
                 )}
@@ -263,11 +263,11 @@ export default function AdminWalletPage() {
           {pagination && pagination.totalPages > 1 && (
             <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50">
               <p className="text-sm text-gray-500">
-                Trang{" "}
+                Page{" "}
                 <strong>
                   {pagination.currentPage} / {pagination.totalPages}
                 </strong>{" "}
-                — {pagination.totalCount} yêu cầu
+                — {pagination.totalCount} requests
               </p>
               <div className="flex items-center gap-2">
                 <button
