@@ -26,35 +26,35 @@ const STATUS_STYLES: Record<
   PendingTarget: {
     bg: "bg-orange-100",
     text: "text-orange-700",
-    label: "Chờ Shop xử lý",
+    label: "Waiting for Shop",
   },
-  OpenPool: { bg: "bg-blue-100", text: "text-blue-700", label: "Đang mở" },
+  OpenPool: { bg: "bg-blue-100", text: "text-blue-700", label: "Open" },
   Completed: {
     bg: "bg-green-100",
     text: "text-green-700",
-    label: "Hoàn thành",
+    label: "Completed",
   },
   Canceled: {
     bg: "bg-red-100",
     text: "text-red-700",
-    label: "Đã hủy",
+    label: "Canceled",
   },
   Quoted: {
     bg: "bg-purple-100",
     text: "text-purple-700",
-    label: "Đã báo giá",
+    label: "Quoted",
   },
 };
 
 const DEFAULT_STATUS = {
   bg: "bg-gray-100",
   text: "text-gray-700",
-  label: "Không xác định",
+  label: "Unknown",
 };
 
 // ─── Helpers ───────────────────────────────────────────────
 const formatVND = (amount: number): string =>
-  new Intl.NumberFormat("vi-VN").format(amount) + "đ";
+  new Intl.NumberFormat("vi-VN").format(amount) + "₫";
 
 const formatDate = (dateStr: string): string => {
   try {
@@ -105,7 +105,7 @@ export default function MyCommissionsPage() {
           <div className="flex items-center gap-3">
             <FileText className="w-7 h-7 text-[#ce2a32]" />
             <h1 className="text-2xl font-black text-gray-900">
-              Yêu cầu báo giá của tôi
+              My Quotation Requests
             </h1>
           </div>
           <button
@@ -113,7 +113,7 @@ export default function MyCommissionsPage() {
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium text-sm"
           >
             <PlusCircle className="w-5 h-5" />
-            Tạo yêu cầu mới
+            Create new request
           </button>
         </div>
 
@@ -133,17 +133,17 @@ export default function MyCommissionsPage() {
               <Inbox className="w-10 h-10 text-gray-400" />
             </div>
             <h2 className="text-lg font-bold text-gray-900 mb-1">
-              Bạn chưa có yêu cầu custom nào
+              You have no custom requests
             </h2>
             <p className="text-sm text-gray-500 max-w-sm mb-6">
-              Tạo yêu cầu đầu tiên của bạn để nhận báo giá từ các Shop.
+              Create your first request to receive quotations from Shops.
             </p>
             <button
               onClick={() => setIsCreateModalOpen(true)}
               className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium text-sm"
             >
               <PlusCircle className="w-5 h-5" />
-              Tạo yêu cầu mới
+              Create new request
             </button>
           </div>
         )}
@@ -192,13 +192,13 @@ export default function MyCommissionsPage() {
                         <Store className="w-3.5 h-3.5 text-gray-400" />
                         {req.targetedShopId ? (
                           <span>
-                            Gửi đến:{" "}
+                            Sent to:{" "}
                             <span className="font-medium text-gray-800">
                               {req.targetedShopName || "Shop"}
                             </span>
                           </span>
                         ) : (
-                          <span>Gửi lên: Chợ chung</span>
+                          <span>Sent to: Public Market</span>
                         )}
                       </div>
 
@@ -206,7 +206,7 @@ export default function MyCommissionsPage() {
                       <div className="flex items-center gap-1.5">
                         <Banknote className="w-3.5 h-3.5 text-gray-400" />
                         <span>
-                          Ngân sách:{" "}
+                          Budget:{" "}
                           <span className="font-medium text-gray-800">
                             {formatVND(req.minBudget)} -{" "}
                             {formatVND(req.maxBudget)}
@@ -217,7 +217,7 @@ export default function MyCommissionsPage() {
                       {/* Quantity */}
                       <div className="flex items-center gap-1.5">
                         <Hash className="w-3.5 h-3.5 text-gray-400" />
-                        <span>Số lượng: {req.quantity}</span>
+                        <span>Quantity: {req.quantity}</span>
                       </div>
 
                       {/* Date */}
@@ -232,7 +232,7 @@ export default function MyCommissionsPage() {
                       href={`/my-commissions/${req.commissionRequestId}`}
                       className="mt-4 w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-sm rounded-lg transition-colors text-center block"
                     >
-                      Xem chi tiết
+                      View Details
                     </Link>
                   </div>
                 </div>

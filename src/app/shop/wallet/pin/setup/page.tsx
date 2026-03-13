@@ -12,15 +12,15 @@ import { useRouter } from "next/navigation";
 // ─── Zod Schema ──────────────────────────────────────────
 const pinSetupSchema = z
   .object({
-    currentPassword: z.string().min(1, "Vui lòng nhập mật khẩu hiện tại"),
+    currentPassword: z.string().min(1, "Please enter your current password"),
     newPin: z
       .string()
-      .length(6, "Mã PIN phải gồm đúng 6 chữ số")
-      .regex(/^\d{6}$/, "Mã PIN chỉ được chứa số"),
-    confirmPin: z.string().min(1, "Vui lòng xác nhận mã PIN"),
+      .length(6, "PIN must be exactly 6 digits")
+      .regex(/^\d{6}$/, "PIN must contain only numbers"),
+    confirmPin: z.string().min(1, "Please confirm your PIN"),
   })
   .refine((data) => data.newPin === data.confirmPin, {
-    message: "Mã PIN xác nhận không khớp",
+    message: "Confirmation PIN does not match",
     path: ["confirmPin"],
   });
 
@@ -160,7 +160,7 @@ export default function PinSetupPage() {
                 <ShieldCheck className="h-6 w-6 text-white" />
               </div>
               <h1 className="text-xl font-black uppercase tracking-tight text-black font-oswald">
-                Thiết lập mã PIN rút tiền
+                Set up withdrawal PIN
               </h1>
             </div>
 
@@ -168,12 +168,12 @@ export default function PinSetupPage() {
               {/* Current Password */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Mật khẩu hiện tại
+                  Current Password
                 </label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    placeholder="Nhập mật khẩu tài khoản"
+                    placeholder="Enter your account password"
                     className={`w-full border-2 rounded-lg p-3 pr-12 outline-none transition-all ${
                       errors.currentPassword
                         ? "border-red-400 focus:border-red-500"
@@ -203,7 +203,7 @@ export default function PinSetupPage() {
               {/* New PIN */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Mã PIN mới (6 chữ số)
+                  New PIN (6 digits)
                 </label>
                 <PinInput
                   value={pinValue}
@@ -215,7 +215,7 @@ export default function PinSetupPage() {
               {/* Confirm PIN */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Xác nhận mã PIN
+                  Confirm PIN
                 </label>
                 <PinInput
                   value={confirmPinValue}
@@ -233,7 +233,7 @@ export default function PinSetupPage() {
                 {pinSetupLoading && (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 )}
-                {pinSetupLoading ? "Đang xử lý..." : "Xác nhận"}
+                {pinSetupLoading ? "Processing..." : "Confirm"}
               </button>
             </form>
           </div>
@@ -245,25 +245,25 @@ export default function PinSetupPage() {
             <div className="flex items-center gap-2 mb-4">
               <Info className="h-5 w-5 text-gray-500" />
               <h3 className="text-sm font-bold uppercase tracking-wide text-gray-700 font-oswald">
-                Lưu ý bảo mật
+                Security Notes
               </h3>
             </div>
 
             <ul className="space-y-3 text-sm text-gray-600 leading-relaxed">
               <li className="flex items-start gap-2">
                 <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[#ce2a32] flex-shrink-0" />
-                Mã PIN dùng để xác nhận các giao dịch rút tiền. Không chia sẻ mã
-                này với bất kỳ ai.
+                The PIN is used to confirm withdrawal transactions. Do not share
+                this PIN with anyone.
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[#ce2a32] flex-shrink-0" />
-                Chọn mã PIN không dễ đoán, tránh dùng ngày sinh hoặc số lặp lại
-                (123456, 000000...).
+                Choose a PIN that is not easy to guess, avoid using birth dates
+                or repeated numbers (123456, 000000...).
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[#ce2a32] flex-shrink-0" />
-                Nếu quên mã PIN, bạn có thể đặt lại thông qua xác minh tài
-                khoản.
+                If you forget your PIN, you can reset it through account
+                verification.
               </li>
             </ul>
           </div>

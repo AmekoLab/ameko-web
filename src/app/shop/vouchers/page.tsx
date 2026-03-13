@@ -183,14 +183,14 @@ export default function ShopVoucherPage() {
     <div className="mx-auto max-w-7xl">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-black uppercase tracking-tight text-black font-oswald">
-          Quản lý Voucher
+          Voucher Management
         </h1>
         <button
           type="button"
           onClick={() => setShowCreateForm(true)}
           className="inline-flex items-center gap-2 rounded-lg bg-[#ce2a32] px-4 py-2 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-[#b0242b] font-oswald"
         >
-          <Plus className="h-4 w-4" /> Tạo Voucher
+          <Plus className="h-4 w-4" /> Create Voucher
         </button>
       </div>
 
@@ -219,14 +219,14 @@ export default function ShopVoucherPage() {
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
             <tr>
-              <th className="px-4 py-3">Mã</th>
-              <th className="px-4 py-3">Tên &amp; Mô tả</th>
-              <th className="px-4 py-3">Loại</th>
-              <th className="px-4 py-3">Mức giảm</th>
-              <th className="px-4 py-3">Đơn tối thiểu</th>
-              <th className="px-4 py-3">Đã dùng</th>
-              <th className="px-4 py-3">Trạng thái</th>
-              <th className="px-4 py-3 text-right">Hành động</th>
+              <th className="px-4 py-3">Code</th>
+              <th className="px-4 py-3">Name & Description</th>
+              <th className="px-4 py-3">Type</th>
+              <th className="px-4 py-3">Discount</th>
+              <th className="px-4 py-3">Min Order</th>
+              <th className="px-4 py-3">Used</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3 text-right">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -242,7 +242,7 @@ export default function ShopVoucherPage() {
                       type="button"
                       onClick={() => copyToClipboard(v.code)}
                       className="text-gray-400 hover:text-gray-600 transition"
-                      title="Copy mã"
+                      title="Copy code"
                     >
                       <Copy className="h-3.5 w-3.5" />
                     </button>
@@ -289,7 +289,7 @@ export default function ShopVoucherPage() {
                       type="button"
                       onClick={() => handleViewDetails(v.id)}
                       className="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-blue-500 transition"
-                      title="Xem chi tiết"
+                      title="View details"
                     >
                       <Eye className="h-4 w-4" />
                     </button>
@@ -297,7 +297,7 @@ export default function ShopVoucherPage() {
                       type="button"
                       onClick={() => setEditingVoucher(v)}
                       className="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-blue-600 transition"
-                      title="Chỉnh sửa"
+                      title="Edit"
                     >
                       <Pencil className="h-4 w-4" />
                     </button>
@@ -307,7 +307,9 @@ export default function ShopVoucherPage() {
                       disabled={isExpired(v.endDate)}
                       className="rounded p-1.5 text-gray-400 hover:bg-gray-100 transition disabled:opacity-40 disabled:cursor-not-allowed"
                       title={
-                        v.status === "Active" ? "Tắt voucher" : "Bật voucher"
+                        v.status === "Active"
+                          ? "Disable voucher"
+                          : "Enable voucher"
                       }
                     >
                       {v.status === "Active" ? (
@@ -320,7 +322,7 @@ export default function ShopVoucherPage() {
                       type="button"
                       onClick={() => handleDelete(v)}
                       className="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-red-600 transition"
-                      title="Xoá"
+                      title="Delete"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -335,7 +337,7 @@ export default function ShopVoucherPage() {
                   colSpan={8}
                   className="py-12 text-center text-gray-400 text-sm"
                 >
-                  Không có voucher nào.
+                  No vouchers found.
                 </td>
               </tr>
             )}
@@ -346,7 +348,7 @@ export default function ShopVoucherPage() {
       {/* ── Pagination ── */}
       <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
         <span>
-          Trang {pagination.currentPage} / {pagination.totalPages} &middot;{" "}
+          Page {pagination.currentPage} / {pagination.totalPages} &middot;{" "}
           {pagination.totalCount} voucher
         </span>
         <div className="flex gap-2">

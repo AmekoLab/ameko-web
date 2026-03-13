@@ -14,10 +14,13 @@ import WarrantyTimeline from "@/src/components/Warranty/WarrantyTimeline";
 
 // ─── Zod Schema ────────────────────────────────────────────
 const adminDecisionSchema = z.object({
-  approve: z.boolean({ message: "Vui lòng chọn phán quyết" }),
+  approve: z.boolean({ message: "Please select a judgment" }),
   adminNote: z
     .string()
-    .min(5, "Vui lòng nhập lý do/ghi chú phân xử (ít nhất 5 ký tự)"),
+    .min(
+      5,
+      "Please enter a reason/note for the judgment (at least 5 characters)",
+    ),
 });
 
 type AdminDecisionFormValues = z.infer<typeof adminDecisionSchema>;
@@ -112,7 +115,7 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
         {/* Header */}
         <div className="sticky top-0 bg-white rounded-t-2xl border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
           <h2 className="text-lg font-bold text-gray-900">
-            Phân xử yêu cầu bảo hành
+            Judge warranty request
           </h2>
           <button
             onClick={handleClose}
@@ -127,7 +130,7 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
           {/* Customer's Claim */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wide">
-              Khách hàng yêu cầu
+              Customer request
             </h3>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
               <p className="text-sm font-bold text-gray-900">{issue.reason}</p>
@@ -148,14 +151,14 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
           {/* Shop's Defense */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wide">
-              Phản hồi của Shop
+              Shop's response
             </h3>
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
               {issue.shopResponse ? (
                 <p className="text-sm text-gray-700">{issue.shopResponse}</p>
               ) : (
                 <p className="text-sm text-gray-400 italic">
-                  Shop chưa có phản hồi.
+                  Shop has not responded yet.
                 </p>
               )}
             </div>
@@ -165,7 +168,7 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
           {issue.refundAmount > 0 && (
             <div className="flex items-center justify-between p-3 rounded-lg bg-red-50 border border-red-200">
               <span className="text-sm font-medium text-gray-700">
-                Số tiền hoàn yêu cầu
+                Requested refund amount
               </span>
               <span className="text-lg font-bold text-red-600">
                 {formatCurrency(issue.refundAmount)}
@@ -180,7 +183,7 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
         {/* Timeline Section */}
         <div className="px-6 py-5 border-b border-gray-100">
           <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
-            Lịch sử thao tác
+            Action history
           </h3>
           <WarrantyTimeline issueId={issue.id} />
         </div>
@@ -193,7 +196,7 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
           >
             {/* Decision Radio */}
             <div>
-              <label className={labelClass}>Phán quyết của Admin</label>
+              <label className={labelClass}>Admin's judgment</label>
               <Controller
                 name="approve"
                 control={control}
@@ -224,10 +227,10 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
                               : "text-gray-700"
                           }`}
                         >
-                          Đồng ý yêu cầu
+                          Approve request
                         </p>
                         <p className="text-xs text-gray-500 mt-0.5">
-                          Đồng ý yêu cầu của khách
+                          Approve customer's request
                         </p>
                       </div>
                     </button>
@@ -257,10 +260,10 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
                               : "text-gray-700"
                           }`}
                         >
-                          Bác bỏ, bảo vệ Shop
+                          Reject, protect Shop
                         </p>
                         <p className="text-xs text-gray-500 mt-0.5">
-                          Từ chối yêu cầu của khách
+                          Reject customer's request
                         </p>
                       </div>
                     </button>
@@ -275,13 +278,13 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
             {/* Admin Note */}
             <div>
               <label htmlFor="adminNote" className={labelClass}>
-                Ghi chú phán quyết
+                Judgment note
               </label>
               <textarea
                 id="adminNote"
                 rows={4}
                 {...register("adminNote")}
-                placeholder="Nhập lý do / ghi chú phân xử của Admin..."
+                placeholder="Enter Admin's reason/note for judgment..."
                 className={`w-full rounded-lg border px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 transition-colors resize-none ${
                   errors.adminNote
                     ? "border-red-300 focus:ring-red-200"
@@ -305,7 +308,7 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
                 disabled={isProcessingAdminDecision}
                 className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
               >
-                Hủy
+                Cancel
               </button>
               <button
                 type="submit"
@@ -315,24 +318,24 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
                 {isProcessingAdminDecision && (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 )}
-                Lưu Phán Quyết
+                Save Judgment
               </button>
             </div>
           </form>
         ) : (
           <div className="px-6 py-5">
             <h3 className="text-sm font-semibold text-gray-900 mb-2">
-              Phán quyết của Admin
+              Admin's judgment
             </h3>
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-wrap">
-              {issue.adminNote || "Không có ghi chú phân xử"}
+              {issue.adminNote || "No judgment note"}
             </div>
             <div className="flex justify-end mt-5">
               <button
                 onClick={handleClose}
                 className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                Đóng
+                Close
               </button>
             </div>
           </div>

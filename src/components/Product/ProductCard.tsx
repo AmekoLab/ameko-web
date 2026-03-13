@@ -24,13 +24,12 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
       : "/images/placeholder.png";
 
   const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault(); // Chặn việc nhảy trang khi bấm vào nút (vì nút nằm trong thẻ Link)
+    e.preventDefault();
     e.stopPropagation();
 
-    // 1. Bắn action thêm sản phẩm
     dispatch(
       addToCart({
-        id: product.id, // ID duy nhất của dòng item trong giỏ
+        id: product.id,
         productId: product.id,
         name: product.name,
         price: product.basePrice,
@@ -41,27 +40,49 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
       }),
     );
 
-    // 2. Mở Sidebar giỏ hàng
-    // dispatch(setCartOpen(true));
     toast.success(`${product.name} added to cart!`, {
       position: "top-right",
       theme: "dark",
     });
   };
 
+  // Badge colour logic
+  const badgeClass =
+    product.tag === "SALE"
+      ? "bg-[#f5d800] text-black"
+      : product.tag === "NEW"
+        ? "bg-black text-white"
+        : "bg-[#ce2a32] text-white";
+
   return (
-    <div className="group/card relative bg-white flex flex-col h-full w-full overflow-hidden transition-all duration-300 hover:shadow-2xl border border-transparent hover:border-gray-100 rounded-sm">
-      {/* 2. IMAGE AREA */}
+    <div className="group/card relative flex flex-col h-full w-full overflow-hidden rounded-none transition-all duration-300 border border-transparent">
+      {/* Yellow power-stripe — appears on hover at the very top */}
+      {/* <div className="absolute top-0 inset-x-0 h-[2px] bg-[#f5d800] opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 z-30" /> */}
+
+      {/* IMAGE AREA */}
+      {/* IMAGE AREA */}
       <Link
         href={href || `/shop/product/${product.slug}`}
-        className="relative block w-full aspect-square bg-[#f9f9f9] overflow-hidden shrink-0"
+        className="relative block w-full aspect-square overflow-hidden shrink-0"
+        style={{
+          // Đã đổi sang tone xám đen nguyên bản, không ám xanh
+          background:
+            "radial-gradient(ellipse at center, #242424 0%, #0f0f0f 100%)",
+        }}
       >
-        {/* Tag */}
+        {/* Diagonal stripe texture overlay */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, #222324ff 38%, #141415ff 70%)",
+          }}
+        />
+
+        {/* Badge */}
         {product.tag && (
           <span
-            className={`absolute top-4 left-4 z-10 text-[10px] font-bold text-white px-3 py-1 uppercase tracking-widest rounded-sm shadow-sm
-            ${product.tag === "NEW" ? "bg-[#ce2a32]" : "bg-black"}
-          `}
+            className={`absolute top-0 left-0 z-20 text-[11px] font-black uppercase tracking-wider px-3 py-1.5 rounded-none ${badgeClass}`}
           >
             {product.tag}
           </span>
@@ -72,54 +93,55 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
           src={thumbnail}
           alt={product.name}
           fill
-          className="object-contain p-8 transition-transform duration-500 group-hover/card:scale-110 mix-blend-multiply"
+          className="object-contain  relative z-10 transition-transform duration-500 ease-out group-hover/card:scale-[1.1]"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
         />
 
-        {/* Action Button (Hover) */}
-        <div className="absolute inset-x-4 bottom-4 translate-y-full opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100 transition-all duration-300 z-20">
+        {/* Slide-up ADD TO CART CTA */}
+        {/* <div className="absolute inset-x-0 bottom-0 z-20 translate-y-full opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100 transition-all duration-300 ease-out">
           <button
-            className="w-full flex items-center justify-center gap-2 bg-black text-white py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#ce2a32] transition-colors shadow-lg cursor-pointer"
             onClick={handleAddToCart}
+            className="w-full flex items-center justify-center gap-2 py-3 bg-[#f5d800] hover:bg-[#ffe500] text-black text-[11px] font-black uppercase tracking-[0.12em] transition-colors cursor-pointer"
+            aria-label={`Add ${product.name} to cart`}
           >
-            <ShoppingCart className="w-4 h-4" />
+            <ShoppingCart className="w-4 h-4 shrink-0" />
             <span>Add to Cart</span>
           </button>
-        </div>
+        </div> */}
       </Link>
 
-      {/* 3. INFO AREA */}
-      <div className="p-6 flex flex-col flex-grow">
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
-          {product.category}
-        </p>
+      {/* Thin separator */}
+      <div className="w-full h-px  shrink-0" />
 
-        {/* Name */}
-        <h3 className="text-sm font-black text-black uppercase leading-tight mb-2 group-hover/card:text-[#ce2a32] transition-colors min-h-[40px] line-clamp-2">
+      {/* INFO AREA */}
+      <div className="px-4 py-4 flex flex-col flex-grow">
+        {/* Product Name */}
+        <h3 className="text-[13px] font-bold text-white leading-snug uppercase tracking-wide line-clamp-2 min-h-[40px] mb-3 ">
           <Link href={href || `/shop/product/${product.slug}`}>
             {product.name}
           </Link>
         </h3>
 
-        <p className="text-sm font-bold text-gray-900 mb-4">
-          {new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "USD",
-          }).format(product.basePrice)}
-        </p>
+        {/* Price */}
+        <div className="mb-3">
+          <p className="text-[18px] font-black text-white leading-none">
+            {new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
+            }).format(product.basePrice)}
+          </p>
+        </div>
 
-        {/* Features */}
-        <ul className="space-y-1 mt-auto pt-4 border-t border-transparent group-hover/card:border-gray-100 transition-colors">
-          {(product.features || []).slice(0, 3).map((feature, index) => (
-            <li
-              key={index}
-              className="flex items-start gap-2 text-[11px] text-gray-500 leading-relaxed"
-            >
-              <span className="mt-1.5 w-1 h-1 bg-gray-300 rounded-full shrink-0" />
-              <span className="line-clamp-2">{feature}</span>
-            </li>
-          ))}
-        </ul>
+        {/* Always-visible Add to Cart text link */}
+        <button
+          onClick={handleAddToCart}
+          className="mt-auto flex items-center gap-2 text-[#f5d800] hover:text-[#ffe500] hover:underline text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer w-fit"
+        >
+          <ShoppingCart className="w-5 h-5 shrink-0" />
+          <span className="text-sm">Add to Cart</span>
+        </button>
       </div>
     </div>
   );

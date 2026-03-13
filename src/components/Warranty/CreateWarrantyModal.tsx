@@ -14,13 +14,13 @@ import { toast } from "react-toastify";
 
 // ─── Zod Schema ────────────────────────────────────────────
 const warrantySchema = z.object({
-  orderItemIds: z.array(z.string()).min(1, "Vui lòng chọn ít nhất 1 sản phẩm"),
+  orderItemIds: z.array(z.string()).min(1, "Please select at least 1 product"),
   type: z.number().refine((v) => v === 1 || v === 2, {
-    message: "Vui lòng chọn loại yêu cầu",
+    message: "Please select request type",
   }),
-  reason: z.string().min(1, "Vui lòng nhập lý do"),
-  description: z.string().min(10, "Mô tả phải có ít nhất 10 ký tự"),
-  evidenceUrl: z.string().url("Vui lòng tải lên hình ảnh minh chứng"),
+  reason: z.string().min(1, "Please enter a reason"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  evidenceUrl: z.string().url("Please upload evidence image"),
 });
 
 type WarrantyFormValues = z.infer<typeof warrantySchema>;
@@ -148,7 +148,7 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
         {/* Header */}
         <div className="sticky top-0 bg-white rounded-t-2xl border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
           <h2 className="text-lg font-bold text-gray-900">
-            Yêu cầu bảo hành / Trả hàng
+            Warranty / Return Request
           </h2>
           <button
             onClick={handleClose}
@@ -161,7 +161,7 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 space-y-5">
           {/* ── Product Selection ── */}
           <div>
-            <label className={labelClass}>Chọn sản phẩm có vấn đề</label>
+            <label className={labelClass}>Select problematic product</label>
             <Controller
               name="orderItemIds"
               control={control}
@@ -229,7 +229,7 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
                             {item.productName}
                           </p>
                           <p className="text-xs text-gray-500">
-                            SL: {item.quantity} ×{" "}
+                            Qty: {item.quantity} ×{" "}
                             {formatCurrency(item.unitPrice)}
                           </p>
                         </div>
@@ -246,7 +246,7 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
 
           {/* ── Request Type ── */}
           <div>
-            <label className={labelClass}>Loại yêu cầu</label>
+            <label className={labelClass}>Request type</label>
             <Controller
               name="type"
               control={control}
@@ -275,12 +275,12 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
                         )}
                       </div>
                       <span className="text-sm font-semibold text-gray-900">
-                        Trả hàng &amp; Hoàn tiền
+                        Return &amp; Refund
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 mt-1 ml-7">
-                      Yêu cầu gửi trả lại sản phẩm vật lý cho Shop trước khi
-                      được hoàn tiền.
+                      Request to return the physical product to the Shop before
+                      receiving a refund.
                     </p>
                   </button>
 
@@ -307,12 +307,12 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
                         )}
                       </div>
                       <span className="text-sm font-semibold text-gray-900">
-                        Bảo hành / Hoàn tiền ngay
+                        Warranty / Instant Refund
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 mt-1 ml-7">
-                      Không yêu cầu gửi trả hàng. Phù hợp cho đền bù lỗi nhỏ
-                      hoặc thỏa thuận riêng.
+                      No return required. Suitable for minor compensation or
+                      private agreement.
                     </p>
                   </button>
                 </div>
@@ -324,12 +324,12 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
           {/* ── Reason ── */}
           <div>
             <label htmlFor="reason" className={labelClass}>
-              Lý do khiếu nại
+              Complaint reason
             </label>
             <input
               id="reason"
               type="text"
-              placeholder="VD: Sản phẩm bị lỗi phím"
+              placeholder="E.g.: Product has key defect"
               className={inputClass}
               {...register("reason")}
             />
@@ -341,12 +341,12 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
           {/* ── Description ── */}
           <div>
             <label htmlFor="description" className={labelClass}>
-              Mô tả chi tiết tình trạng
+              Detailed issue description
             </label>
             <textarea
               id="description"
               rows={4}
-              placeholder="Mô tả chi tiết vấn đề bạn gặp phải (ít nhất 10 ký tự)..."
+              placeholder="Describe the issue in detail (at least 10 characters)..."
               className={inputClass + " resize-none"}
               {...register("description")}
             />
@@ -357,7 +357,7 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
 
           {/* ── Evidence Upload ── */}
           <div>
-            <label className={labelClass}>Hình ảnh minh chứng</label>
+            <label className={labelClass}>Evidence image</label>
             <div className="relative">
               {previewUrl ? (
                 <div className="relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
@@ -390,17 +390,17 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
                     <div className="flex flex-col items-center gap-2">
                       <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
                       <span className="text-sm text-gray-500">
-                        Đang tải lên...
+                        Uploading...
                       </span>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2">
                       <ImagePlus className="w-8 h-8 text-gray-400" />
                       <span className="text-sm text-gray-500">
-                        Nhấn để tải ảnh lên
+                        Click to upload image
                       </span>
                       <span className="text-xs text-gray-400">
-                        PNG, JPG tối đa 5MB
+                        PNG, JPG up to 5MB
                       </span>
                     </div>
                   )}
@@ -427,7 +427,7 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
               disabled={isSubmittingWarranty}
               className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
-              Hủy
+              Cancel
             </button>
             <button
               type="submit"
@@ -437,7 +437,7 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
               {isSubmittingWarranty && (
                 <Loader2 className="w-4 h-4 animate-spin" />
               )}
-              Gửi Yêu Cầu
+              Send Request
             </button>
           </div>
         </form>

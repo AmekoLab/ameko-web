@@ -13,15 +13,15 @@ import Image from "next/image";
 
 const commissionSchema = z
   .object({
-    title: z.string().min(1, "Tiêu đề không được để trống"),
-    description: z.string().min(1, "Mô tả không được để trống"),
-    quantity: z.number().min(1, "Số lượng tối thiểu là 1"),
-    minBudget: z.number().min(0, "Ngân sách tối thiểu phải >= 0"),
-    maxBudget: z.number().min(0, "Ngân sách tối đa phải >= 0"),
-    referenceImages: z.string().min(1, "Vui lòng tải lên ảnh tham khảo"),
+    title: z.string().min(1, "Title cannot be empty"),
+    description: z.string().min(1, "Description cannot be empty"),
+    quantity: z.number().min(1, "Minimum quantity is 1"),
+    minBudget: z.number().min(0, "Minimum budget must be >= 0"),
+    maxBudget: z.number().min(0, "Maximum budget must be >= 0"),
+    referenceImages: z.string().min(1, "Please upload a reference image"),
   })
   .refine((data) => data.maxBudget > data.minBudget, {
-    message: "Ngân sách tối đa phải lớn hơn ngân sách tối thiểu",
+    message: "Maximum budget must be greater than minimum budget",
     path: ["maxBudget"],
   });
 
@@ -126,8 +126,8 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
         <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
           <h3 className="text-base font-semibold text-gray-900">
             {targetedShopId
-              ? "Gửi yêu cầu báo giá"
-              : "Đăng yêu cầu lên Chợ chung"}
+              ? "Send quotation request"
+              : "Post request to Public Market"}
           </h3>
           <button
             onClick={handleClose}
@@ -145,11 +145,11 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tiêu đề <span className="text-red-500">*</span>
+              Title <span className="text-red-500">*</span>
             </label>
             <input
               {...register("title")}
-              placeholder="VD: Đặt bàn phím custom"
+              placeholder="E.g.: Order custom keyboard"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             {errors.title && (
@@ -162,12 +162,12 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Mô tả chi tiết <span className="text-red-500">*</span>
+              Detailed description <span className="text-red-500">*</span>
             </label>
             <textarea
               {...register("description")}
               rows={3}
-              placeholder="Mô tả yêu cầu của bạn..."
+              placeholder="Describe your request..."
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             />
             {errors.description && (
@@ -180,7 +180,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
           {/* Quantity */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Số lượng <span className="text-red-500">*</span>
+              Quantity <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
@@ -199,7 +199,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Ngân sách tối thiểu (VNĐ)
+                Minimum budget (VND)
               </label>
               <input
                 type="number"
@@ -216,7 +216,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Ngân sách tối đa (VNĐ)
+                Maximum budget (VND)
               </label>
               <input
                 type="number"
@@ -236,7 +236,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
           {/* Image Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Ảnh tham khảo <span className="text-red-500">*</span>
+              Reference image <span className="text-red-500">*</span>
             </label>
             <input
               ref={fileInputRef}
@@ -279,7 +279,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
                   <Upload className="w-8 h-8" />
                 )}
                 <span className="text-sm">
-                  {isUploading ? "Đang tải lên..." : "Nhấn để chọn ảnh"}
+                  {isUploading ? "Uploading..." : "Click to select image"}
                 </span>
               </button>
             )}
@@ -298,10 +298,10 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" /> Đang gửi...
+                <Loader2 className="w-4 h-4 animate-spin" /> Sending...
               </>
             ) : (
-              "Gửi yêu cầu"
+              "Send request"
             )}
           </button>
         </form>

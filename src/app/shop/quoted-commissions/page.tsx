@@ -47,13 +47,13 @@ const STATUS_MAP: Record<
   { label: string; bg: string; text: string; icon: React.ReactNode }
 > = {
   PendingUserDecision: {
-    label: "Đang chờ duyệt",
+    label: "Pending approval",
     bg: "bg-amber-50 border-amber-200",
     text: "text-amber-700",
     icon: <Timer className="w-3.5 h-3.5" />,
   },
   Accepted: {
-    label: "Đã được chốt",
+    label: "Confirmed",
     bg: "bg-emerald-50 border-emerald-200",
     text: "text-emerald-700",
     icon: <CheckCircle2 className="w-3.5 h-3.5" />,
@@ -177,9 +177,7 @@ const EditQuoteModal = ({ quote, onClose, onSuccess }: EditQuoteModalProps) => {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
-            <h3 className="text-lg font-bold text-gray-900">
-              Cập nhật báo giá
-            </h3>
+            <h3 className="text-lg font-bold text-gray-900">Update Quote</h3>
             <p className="text-xs text-gray-500 mt-0.5 font-mono">
               #{quote.commissionRequestId.slice(0, 8)}
             </p>
@@ -197,7 +195,7 @@ const EditQuoteModal = ({ quote, onClose, onSuccess }: EditQuoteModalProps) => {
           {/* Price */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Mức giá đề xuất (VND) <span className="text-red-500">*</span>
+              Proposed Price (VND) <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
@@ -211,7 +209,7 @@ const EditQuoteModal = ({ quote, onClose, onSuccess }: EditQuoteModalProps) => {
                 className="w-full border border-gray-300 rounded-xl pl-10 pr-14 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors"
               />
               <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-semibold">
-                VNĐ
+                VND
               </span>
             </div>
             {errors.price && (
@@ -222,28 +220,27 @@ const EditQuoteModal = ({ quote, onClose, onSuccess }: EditQuoteModalProps) => {
           {/* Estimated Days */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Thời gian hoàn thành dự kiến{" "}
-              <span className="text-red-500">*</span>
+              Estimated Completion Time <span className="text-red-500">*</span>
             </label>
             <select
               value={estimatedDays}
               onChange={(e) => setEstimatedDays(e.target.value)}
               className="w-full border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white appearance-none cursor-pointer"
             >
-              <option value="3">3 ngày</option>
-              <option value="5">5 ngày</option>
-              <option value="7">7 ngày</option>
-              <option value="10">10 ngày</option>
-              <option value="14">14 ngày</option>
-              <option value="21">21 ngày</option>
-              <option value="30">30 ngày</option>
+              <option value="3">3 days</option>
+              <option value="5">5 days</option>
+              <option value="7">7 days</option>
+              <option value="10">10 days</option>
+              <option value="14">14 days</option>
+              <option value="21">21 days</option>
+              <option value="30">30 days</option>
             </select>
           </div>
 
           {/* Note */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Lời nhắn / Chi tiết vật tư <span className="text-red-500">*</span>
+              Message / Material Details <span className="text-red-500">*</span>
             </label>
             <textarea
               value={note}
@@ -254,7 +251,9 @@ const EditQuoteModal = ({ quote, onClose, onSuccess }: EditQuoteModalProps) => {
             {errors.note ? (
               <p className="text-xs text-red-500 mt-1">{errors.note}</p>
             ) : (
-              <p className="text-xs text-gray-400 mt-1">Tối thiểu 10 ký tự.</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Minimum 10 characters.
+              </p>
             )}
           </div>
 
@@ -267,12 +266,12 @@ const EditQuoteModal = ({ quote, onClose, onSuccess }: EditQuoteModalProps) => {
             {isUpdatingQuote ? (
               <>
                 <Loader2 className="w-4.5 h-4.5 animate-spin" />
-                Đang cập nhật...
+                Updating...
               </>
             ) : (
               <>
                 <Send className="w-4.5 h-4.5" />
-                Cập nhật báo giá
+                Update Quote
               </>
             )}
           </button>
@@ -302,10 +301,10 @@ export default function ShopQuotesPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-black text-gray-900 tracking-tight">
-            Lịch sử báo giá của tôi
+            My Quotation History
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            Xem lại tất cả các báo giá bạn đã gửi cho khách hàng
+            Review all quotes you have sent to customers
           </p>
         </div>
 
@@ -325,7 +324,7 @@ export default function ShopQuotesPage() {
               <Loader2 className="w-7 h-7 text-red-400" />
             </div>
             <h2 className="text-lg font-bold text-gray-900 mb-1.5">
-              Không thể tải dữ liệu
+              Unable to load data
             </h2>
             <p className="text-sm text-gray-500 mb-5 max-w-sm">{error}</p>
             <button
@@ -333,7 +332,7 @@ export default function ShopQuotesPage() {
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-full transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
-              Thử lại
+              Retry
             </button>
           </div>
         )}
@@ -345,11 +344,11 @@ export default function ShopQuotesPage() {
               <Inbox className="w-7 h-7 text-gray-400" />
             </div>
             <h2 className="text-lg font-bold text-gray-900 mb-1.5">
-              Bạn chưa gửi báo giá nào
+              You haven't sent any quotes
             </h2>
             <p className="text-sm text-gray-500 max-w-sm">
-              Hãy truy cập Chợ yêu cầu Custom để tìm và gửi báo giá cho khách
-              hàng.
+              Visit the Custom Request Market to find and send quotes to
+              customers.
             </p>
           </div>
         )}
@@ -383,7 +382,7 @@ export default function ShopQuotesPage() {
                     </p>
                     <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1.5">
                       <Clock className="w-3.5 h-3.5 text-gray-400" />
-                      Hoàn thành trong: {quote.estimatedDays} ngày
+                      Complete in: {quote.estimatedDays} days
                     </p>
                   </div>
 
@@ -402,8 +401,8 @@ export default function ShopQuotesPage() {
                       )}
                     </div>
                     <div className="text-xs text-gray-400 space-y-0.5 lg:text-right">
-                      <p>Ngày gửi: {formatDate(quote.createdAt)}</p>
-                      <p>Hết hạn: {formatDate(quote.expiredAt)}</p>
+                      <p>Sent: {formatDate(quote.createdAt)}</p>
+                      <p>Expires: {formatDate(quote.expiredAt)}</p>
                     </div>
                   </div>
                 </div>

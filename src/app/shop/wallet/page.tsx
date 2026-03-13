@@ -39,13 +39,13 @@ export default function WalletPage() {
 
           {/* Title */}
           <h2 className="text-2xl font-black uppercase tracking-tight text-black font-oswald mb-3">
-            Kích hoạt ví của bạn
+            Activate your wallet
           </h2>
 
           {/* Description */}
           <p className="text-gray-500 mb-8 text-sm leading-relaxed">
-            Khởi tạo ví để bắt đầu quản lý số dư và thực hiện các giao dịch trên
-            nền tảng.
+            Initialize your wallet to start managing your balance and making
+            transactions on the platform.
           </p>
 
           {/* CTA Button */}
@@ -53,7 +53,7 @@ export default function WalletPage() {
             onClick={() => dispatch(initializeWallet())}
             className="w-full rounded-lg bg-[#ce2a32] px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-[#b0242b] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-oswald"
           >
-            Khởi tạo ví ngay
+            Initialize wallet now
           </button>
         </div>
       </div>
@@ -73,7 +73,7 @@ export default function WalletPage() {
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-black uppercase tracking-tight text-black font-oswald mb-6">
-        Ví của tôi
+        My Wallet
       </h1>
 
       {/* ─── PIN Security Alert ──────────────────────── */}
@@ -82,14 +82,14 @@ export default function WalletPage() {
           <ShieldAlert className="h-6 w-6 text-yellow-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm font-semibold text-yellow-800">
-              Bảo mật ví chưa hoàn thiện! Bạn cần thiết lập mã PIN để có thể
-              thực hiện rút tiền.
+              Wallet security is incomplete! You need to set up a PIN to be able
+              to withdraw money.
             </p>
             <Link
               href="/shop/wallet/pin/setup"
               className="mt-2 inline-block text-sm font-bold uppercase tracking-wide text-[#ce2a32] hover:underline font-oswald"
             >
-              Thiết lập ngay →
+              Set up now →
             </Link>
           </div>
         </div>
@@ -102,7 +102,7 @@ export default function WalletPage() {
           </div>
           <div>
             <p className="text-sm text-gray-500 uppercase tracking-wide font-oswald">
-              Số dư hiện tại
+              Current Balance
             </p>
             <p className="text-3xl font-black text-[#ce2a32] font-oswald">
               {details?.balance?.toLocaleString("vi-VN") ?? 0}
@@ -110,7 +110,7 @@ export default function WalletPage() {
               <span className="text-lg ml-1">₫</span>
             </p>
             <p className="text-sm text-gray-500 mt-1">
-              Số dư đang chờ xử lý:{" "}
+              Pending balance:{" "}
               <button
                 type="button"
                 onClick={() => setIsHeldOpen(true)}
@@ -129,7 +129,7 @@ export default function WalletPage() {
             onClick={() => setIsWithdrawOpen(true)}
             className="rounded-lg bg-black px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-gray-900 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed font-oswald"
           >
-            Rút tiền
+            Withdraw
           </button>
 
           {hasPin && (
@@ -137,7 +137,7 @@ export default function WalletPage() {
               onClick={() => setIsChangePinOpen(true)}
               className="rounded-lg border-2 border-gray-300 px-6 py-3 text-sm font-bold uppercase tracking-wider text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50 active:scale-[0.98] font-oswald"
             >
-              Đổi PIN
+              Change PIN
             </button>
           )}
         </div>

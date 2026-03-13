@@ -24,23 +24,23 @@ import ShopReviewModal from "@/src/components/Warranty/ShopReviewModal";
 const PAGE_SIZE = 10;
 
 const STATUS_STYLES: Record<string, { bg: string; label: string }> = {
-  InProgress: { bg: "bg-yellow-100 text-yellow-800", label: "Chờ xử lý" },
-  AwaitingReturn: { bg: "bg-blue-100 text-blue-800", label: "Chờ trả hàng" },
-  ShopAccepted: { bg: "bg-teal-100 text-teal-800", label: "Đã chấp nhận" },
-  Rejected: { bg: "bg-red-100 text-red-800", label: "Đã từ chối" },
+  InProgress: { bg: "bg-yellow-100 text-yellow-800", label: "Pending" },
+  AwaitingReturn: { bg: "bg-blue-100 text-blue-800", label: "Awaiting Return" },
+  ShopAccepted: { bg: "bg-teal-100 text-teal-800", label: "Accepted" },
+  Rejected: { bg: "bg-red-100 text-red-800", label: "Rejected" },
   AdminReviewing: {
     bg: "bg-purple-100 text-purple-800",
-    label: "Admin xem xét",
+    label: "Admin Reviewing",
   },
-  Completed: { bg: "bg-green-100 text-green-800", label: "Hoàn tất" },
-  AutoCancelled: { bg: "bg-gray-100 text-gray-600", label: "Tự động hủy" },
-  Returning: { bg: "bg-blue-100 text-blue-800", label: "Đang trả hàng" },
-  Returned: { bg: "bg-blue-200 text-blue-900", label: "Đã trả hàng" },
+  Completed: { bg: "bg-green-100 text-green-800", label: "Completed" },
+  AutoCancelled: { bg: "bg-gray-100 text-gray-600", label: "Auto Cancelled" },
+  Returning: { bg: "bg-blue-100 text-blue-800", label: "Returning" },
+  Returned: { bg: "bg-blue-200 text-blue-900", label: "Returned" },
 };
 
 const TYPE_LABELS: Record<string, string> = {
-  ReturnRequest: "Trả hàng / Hoàn tiền",
-  CancelRequest: "Hủy đơn",
+  ReturnRequest: "Return / Refund",
+  CancelRequest: "Order Cancellation",
 };
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -104,11 +104,9 @@ const TableSkeleton: FC = () => (
 const EmptyState: FC = () => (
   <div className="flex flex-col items-center justify-center py-20 text-center">
     <ShieldCheck className="w-16 h-16 text-gray-300 mb-5" strokeWidth={1} />
-    <h2 className="text-xl font-bold text-gray-900 mb-2">
-      Chưa có yêu cầu nào
-    </h2>
+    <h2 className="text-xl font-bold text-gray-900 mb-2">No requests yet</h2>
     <p className="text-gray-500 max-w-sm">
-      Shop chưa nhận được yêu cầu bảo hành hoặc trả hàng nào từ khách hàng.
+      The shop has not received any warranty or return requests from customers.
     </p>
   </div>
 );
@@ -192,11 +190,11 @@ const TableRow: FC<RowProps> = ({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-blue-600 px-3.5 py-2 rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
           >
             <Eye className="w-4 h-4" />
-            Xem &amp; Xử lý
+            View & Process
           </button>
         ) : request.status === 5 ? (
           <span className="text-gray-500 text-sm italic">
-            Đang chờ khách gửi hàng
+            Waiting for customer to send item
           </span>
         ) : request.status === 6 ? (
           <button
@@ -205,7 +203,7 @@ const TableRow: FC<RowProps> = ({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-green-600 px-3.5 py-2 rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <CheckCircle className="w-4 h-4" />
-            Xác nhận đã nhận hàng
+            Confirm item received
           </button>
         ) : (
           <button
@@ -213,7 +211,7 @@ const TableRow: FC<RowProps> = ({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 border border-gray-300 px-3.5 py-2 rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap"
           >
             <FileText className="w-4 h-4" />
-            Xem chi tiết
+            View details
           </button>
         )}
       </td>
@@ -241,7 +239,7 @@ const Pagination: FC<PaginationProps> = ({ current, total, onChange }) => {
         <ChevronLeft className="w-4 h-4" />
       </button>
       <span className="text-sm text-gray-600 px-3">
-        Trang <span className="font-semibold text-gray-900">{current}</span> /{" "}
+        Page <span className="font-semibold text-gray-900">{current}</span> /{" "}
         {total}
       </span>
       <button
@@ -311,7 +309,7 @@ const ShopWarrantyDashboard: FC = () => {
   return (
     <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-12 lg:py-20">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        Quản lý yêu cầu bảo hành & Trả hàng
+        Warranty & Return Request Management
       </h1>
 
       {shopWarrantyList.length === 0 ? (
@@ -323,25 +321,25 @@ const ShopWarrantyDashboard: FC = () => {
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Khách hàng
+                    Customer
                   </th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Loại
+                    Type
                   </th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Lý do
+                    Reason
                   </th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Số tiền hoàn
+                    Refund Amount
                   </th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Ngày tạo
+                    Created Date
                   </th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Trạng thái
+                    Status
                   </th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Hành động
+                    Action
                   </th>
                 </tr>
               </thead>

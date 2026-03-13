@@ -90,17 +90,17 @@ const EmptyHistory: FC = () => (
   <div className="flex flex-col items-center justify-center py-24 text-center">
     <Package className="w-20 h-20 text-gray-300 mb-6" strokeWidth={1} />
     <h2 className="text-2xl font-bold text-gray-900 mb-2">
-      Bạn chưa có đơn hàng nào
+      You have no orders yet
     </h2>
     <p className="text-gray-500 mb-8 max-w-sm">
-      Hãy khám phá bộ sưu tập bàn phím cơ và phụ kiện của chúng tôi!
+      Explore our collection of mechanical keyboards and accessories!
     </p>
     <Link
       href="/shop/all-products"
       className="inline-flex items-center gap-2 bg-[#ce2a32] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#b52429] transition-colors"
     >
       <ShoppingBag className="w-5 h-5" />
-      Mua sắm ngay
+      Shop now
     </Link>
   </div>
 );
@@ -150,14 +150,14 @@ const OrderItemRow: FC<OrderItemRowProps> = ({
         (hasActiveWarranty ? (
           <span className="inline-flex items-center text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-md font-medium whitespace-nowrap">
             <ShieldAlert className="w-4 h-4 mr-1" />
-            Đã yêu cầu bảo hành
+            Warranty Requested
           </span>
         ) : (
           <button
             onClick={onWarrantyClick}
             className="text-sm text-blue-600 border border-blue-600 px-3 py-1 rounded hover:bg-blue-50 whitespace-nowrap"
           >
-            Yêu cầu bảo hành
+            Request Warranty
           </button>
         ))}
     </div>
@@ -225,9 +225,7 @@ const OrderCard: FC<OrderCardProps> = ({
             />
           ))
         ) : (
-          <p className="py-4 text-sm text-gray-400 italic">
-            Không có sản phẩm nào
-          </p>
+          <p className="py-4 text-sm text-gray-400 italic">No products</p>
         )}
       </div>
 
@@ -238,7 +236,7 @@ const OrderCard: FC<OrderCardProps> = ({
           {formatDate(order.createdAt)}
         </span>
         <div className="text-right">
-          <span className="text-xs text-gray-500">Tổng cộng: </span>
+          <span className="text-xs text-gray-500">Total: </span>
           <span className="text-base font-bold text-[#ce2a32]">
             {formatCurrency(order.totalAmount)}
           </span>
@@ -291,7 +289,7 @@ const MyPaymentsPage: FC = () => {
   return (
     <div className="max-w-[1000px] mx-auto px-4 md:px-8 py-12 lg:py-20">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        Lịch sử đơn hàng
+        My Payment History
       </h1>
 
       {orderGroups.length === 0 ? (
@@ -304,7 +302,7 @@ const MyPaymentsPage: FC = () => {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <span className="font-medium text-gray-700">
-                    Đơn #{group.orderGroupId.slice(0, 8).toUpperCase()}
+                    Order #{group.orderGroupId.slice(0, 8).toUpperCase()}
                   </span>
                   <span>•</span>
                   <span>{formatDate(group.createdAt)}</span>

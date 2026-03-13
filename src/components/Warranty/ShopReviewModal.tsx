@@ -15,10 +15,10 @@ import WarrantyTimeline from "@/src/components/Warranty/WarrantyTimeline";
 
 // ─── Zod Schema ────────────────────────────────────────────
 const shopReviewSchema = z.object({
-  approve: z.boolean({ message: "Vui lòng chọn quyết định" }),
+  approve: z.boolean({ message: "Please select a decision" }),
   shopResponse: z
     .string()
-    .min(5, "Vui lòng nhập phản hồi cho khách hàng (ít nhất 5 ký tự)"),
+    .min(5, "Please enter a response for the customer (at least 5 characters)"),
 });
 
 type ShopReviewFormValues = z.infer<typeof shopReviewSchema>;
@@ -118,7 +118,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
         {/* Header */}
         <div className="sticky top-0 bg-white rounded-t-2xl border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
           <h2 className="text-lg font-bold text-gray-900">
-            Xem xét yêu cầu bảo hành
+            Review warranty request
           </h2>
           <button
             onClick={handleClose}
@@ -145,7 +145,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
             )}
             <div>
               <p className="text-sm font-semibold text-gray-900">
-                {issue.customerName || "Khách hàng"}
+                {issue.customerName || "Customer"}
               </p>
               <p className="text-xs text-gray-500 flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
@@ -176,7 +176,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
           {issue.refundAmount > 0 && (
             <div className="flex items-center justify-between p-3 rounded-lg bg-white border border-gray-200">
               <span className="text-sm text-gray-600">
-                Số tiền hoàn yêu cầu
+                Requested refund amount
               </span>
               <span className="text-lg font-bold text-[#ce2a32]">
                 {formatCurrency(issue.refundAmount)}
@@ -191,7 +191,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
         {/* Timeline Section */}
         <div className="px-6 py-5 border-b border-gray-100">
           <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
-            Lịch sử thao tác
+            Action history
           </h3>
           <WarrantyTimeline issueId={issue.id} />
         </div>
@@ -204,7 +204,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
           >
             {/* ── Decision Radio ── */}
             <div>
-              <label className={labelClass}>Quyết định của Shop</label>
+              <label className={labelClass}>Shop's decision</label>
               <Controller
                 name="approve"
                 control={control}
@@ -235,10 +235,10 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                               : "text-gray-700"
                           }`}
                         >
-                          Đồng ý
+                          Approve
                         </p>
                         <p className="text-xs text-gray-500 mt-0.5">
-                          Chấp nhận yêu cầu
+                          Accept request
                         </p>
                       </div>
                     </button>
@@ -268,10 +268,10 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                               : "text-gray-700"
                           }`}
                         >
-                          Từ chối
+                          Reject
                         </p>
                         <p className="text-xs text-gray-500 mt-0.5">
-                          Từ chối yêu cầu
+                          Reject request
                         </p>
                       </div>
                     </button>
@@ -286,12 +286,12 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
             {/* ── Shop Response ── */}
             <div>
               <label htmlFor="shopResponse" className={labelClass}>
-                Phản hồi cho khách hàng
+                Response to customer
               </label>
               <textarea
                 id="shopResponse"
                 rows={4}
-                placeholder="Nhập hướng dẫn trả hàng hoặc lý do từ chối..."
+                placeholder="Enter return instructions or reason for rejection..."
                 className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors resize-none"
                 {...register("shopResponse")}
               />
@@ -308,7 +308,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                 disabled={isReviewingWarranty}
                 className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
-                Hủy
+                Cancel
               </button>
               <button
                 type="submit"
@@ -322,24 +322,24 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                 {isReviewingWarranty && (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 )}
-                Xác nhận phán quyết
+                Confirm decision
               </button>
             </div>
           </form>
         ) : (
           <div className="px-6 py-5">
             <h3 className="text-sm font-semibold text-gray-900 mb-2">
-              Phản hồi của Shop
+              Shop's response
             </h3>
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-wrap">
-              {issue.shopResponse || "Không có phản hồi"}
+              {issue.shopResponse || "No response"}
             </div>
             <div className="flex justify-end mt-5">
               <button
                 onClick={handleClose}
                 className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Đóng
+                Close
               </button>
             </div>
           </div>

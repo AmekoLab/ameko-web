@@ -21,11 +21,11 @@ function fmtVND(n: number): string {
 function fmtDiscount(v: Voucher): string {
   if (v.discountType === "Percentage") {
     const cap = v.maxDiscountAmount
-      ? ` (tối đa ${fmtVND(v.maxDiscountAmount)})`
+      ? ` (max ${fmtVND(v.maxDiscountAmount)})`
       : "";
-    return `Giảm ${v.value}%${cap}`;
+    return `Discount ${v.value}%${cap}`;
   }
-  return `Giảm ${fmtVND(v.value)}`;
+  return `Discount ${fmtVND(v.value)}`;
 }
 
 /** Format end date */
@@ -114,7 +114,7 @@ const VoucherCard: FC<VoucherCardProps> = ({
         {/* Almost gone badge */}
         {isAlmostGone && eligible && (
           <span className="mt-1.5 text-[9px] font-bold bg-white/20 px-1.5 py-0.5 rounded-sm uppercase">
-            Sắp hết
+            Almost gone
           </span>
         )}
       </div>
@@ -140,7 +140,7 @@ const VoucherCard: FC<VoucherCardProps> = ({
           {/* Min order */}
           {voucher.minOrderValue > 0 && (
             <p className="text-[11px] text-gray-400 mt-1">
-              Đơn tối thiểu {fmtVND(voucher.minOrderValue)}
+              Min order {fmtVND(voucher.minOrderValue)}
             </p>
           )}
         </div>
@@ -150,7 +150,7 @@ const VoucherCard: FC<VoucherCardProps> = ({
           <div className="min-w-0">
             <div className="flex items-center gap-1 text-[11px] text-gray-400">
               <Clock className="w-3 h-3 shrink-0" />
-              <span>HSD: {fmtDate(voucher.endDate)}</span>
+              <span>Expiry: {fmtDate(voucher.endDate)}</span>
             </div>
             {/* Progress bar */}
             {voucher.usageLimit > 0 && voucher.usageLimit < 2147483647 && (
@@ -169,7 +169,7 @@ const VoucherCard: FC<VoucherCardProps> = ({
               isApplied ? (
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#ce2a32] bg-[#ce2a32]/10 px-1.5 py-0.5 rounded-sm uppercase whitespace-nowrap">
                   <CheckCircle2 className="w-3 h-3" />
-                  Đang áp dụng
+                  Applied
                 </span>
               ) : (
                 <input
@@ -191,7 +191,9 @@ const VoucherCard: FC<VoucherCardProps> = ({
         {!eligible && (
           <div className="flex items-center gap-1 mt-1.5 text-[11px] text-orange-500">
             <AlertCircle className="w-3 h-3 shrink-0" />
-            <span>Mua thêm {fmtVND(remainingAmount)} để sử dụng mã này</span>
+            <span>
+              Spend {fmtVND(remainingAmount)} more to use this voucher
+            </span>
           </div>
         )}
       </div>
@@ -264,16 +266,13 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
     });
   }, [vouchers, currentSubtotal]);
 
-  const handleToggle = useCallback(
-    (id: string) => {
-      setLocalSelectedIds((prev) => {
-        // Radio: one at a time; clicking selected one deselects
-        if (prev.has(id)) return new Set();
-        return new Set([id]);
-      });
-    },
-    [],
-  );
+  const handleToggle = useCallback((id: string) => {
+    setLocalSelectedIds((prev) => {
+      // Radio: one at a time; clicking selected one deselects
+      if (prev.has(id)) return new Set();
+      return new Set([id]);
+    });
+  }, []);
 
   const handleConfirm = useCallback(() => {
     const selectedVouchers = vouchers.filter((v) => localSelectedIds.has(v.id));
@@ -285,16 +284,16 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
   const handleApplyCode = useCallback(() => {
     const code = codeInput.trim().toUpperCase();
     if (!code) return;
-    const found = vouchers.find(
-      (v) => v.code.toUpperCase() === code,
-    );
+    const found = vouchers.find((v) => v.code.toUpperCase() === code);
     if (!found) {
-      setCodeError("Mã không hợp lệ hoặc không có trong danh sách.");
+      setCodeError("Invalid code or not found in the list.");
       return;
     }
     const eligible = currentSubtotal >= found.minOrderValue;
     if (!eligible) {
-      setCodeError(`Đơn hàng chưa đạt tối thiểu ${fmtVND(found.minOrderValue)}.`);
+      setCodeError(
+        `Order does not meet minimum ${fmtVND(found.minOrderValue)}.`,
+      );
       return;
     }
     setCodeError(null);
@@ -328,7 +327,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
           <div>
             <h3 className="font-bold text-base text-gray-900">{title}</h3>
             <p className="text-xs text-gray-400 mt-0.5">
-              {eligibleCount}/{vouchers.length} mã khả dụng
+              {eligibleCount}/{vouchers.length} voucher(s) available
             </p>
           </div>
           <button
@@ -351,8 +350,8 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                 setCodeInput(e.target.value.toUpperCase());
                 setCodeError(null);
               }}
-              onKeyDown={(e) => e.key === 'Enter' && handleApplyCode()}
-              placeholder="Nhập mã Voucher"
+              onKeyDown={(e) => e.key === "Enter" && handleApplyCode()}
+              placeholder="Enter voucher code"
               className="w-full pl-9 pr-20 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-[#ce2a32] focus:ring-1 focus:ring-[#ce2a32]/30 outline-none transition placeholder:text-gray-400"
             />
             <button
@@ -365,12 +364,14 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
             >
-              Áp dụng
+              Apply
             </button>
           </div>
           {/* Inline error for manual code */}
           {codeError && (
-            <p className="mt-1.5 text-xs text-red-500 font-medium">{codeError}</p>
+            <p className="mt-1.5 text-xs text-red-500 font-medium">
+              {codeError}
+            </p>
           )}
         </div>
 
@@ -379,7 +380,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
           {sortedVouchers.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-gray-400">
               <Ticket className="w-10 h-10 opacity-20 mb-3" />
-              <p className="text-sm">Không có mã giảm giá nào</p>
+              <p className="text-sm">No vouchers available</p>
             </div>
           ) : (
             sortedVouchers.map((v) => {
@@ -412,8 +413,8 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-gray-500">
               {localSelectedIds.size > 0
-                ? `Đã chọn ${localSelectedIds.size} mã`
-                : "Chưa chọn mã nào"}
+                ? `Selected ${localSelectedIds.size} voucher(s)`
+                : "No voucher selected"}
             </span>
             {localSelectedIds.size > 0 && (
               <button
@@ -421,7 +422,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                 onClick={() => setLocalSelectedIds(new Set())}
                 className="text-xs text-[#ce2a32] hover:underline"
               >
-                Bỏ chọn tất cả
+                Deselect all
               </button>
             )}
           </div>
@@ -430,7 +431,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
               onClick={handleConfirm}
               className="flex-1 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 bg-[#ce2a32] text-white hover:bg-[#a82028]"
             >
-              Xác nhận
+              Confirm
             </button>
           </div>
         </div>

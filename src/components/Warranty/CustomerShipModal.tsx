@@ -14,8 +14,8 @@ import WarrantyTimeline from "@/src/components/Warranty/WarrantyTimeline";
 
 // ─── Zod Schema ────────────────────────────────────────────
 const customerShipSchema = z.object({
-  evidenceUrl: z.string().url("Vui lòng tải lên ảnh chụp hóa đơn vận chuyển"),
-  comment: z.string().min(1, "Vui lòng nhập ghi chú hoặc mã vận đơn"),
+  evidenceUrl: z.string().url("Please upload a photo of the shipping invoice"),
+  comment: z.string().min(1, "Please enter a note or tracking code"),
 });
 
 type CustomerShipFormValues = z.infer<typeof customerShipSchema>;
@@ -117,7 +117,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
         {/* Header */}
         <div className="sticky top-0 bg-white rounded-t-2xl border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
           <h2 className="text-lg font-bold text-gray-900">
-            Gửi Thông Tin Trả Hàng
+            Submit Return Information
           </h2>
           <button
             onClick={handleClose}
@@ -130,21 +130,21 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 space-y-5">
           {/* Subtext */}
           <p className="text-sm text-gray-500">
-            Vui lòng chụp lại hóa đơn gửi hàng từ bưu cục hoặc ghi rõ mã vận đơn
-            để Shop có thể đối soát.
+            Please take a photo of the shipping invoice from the post office or
+            clearly write the tracking code so the Shop can verify.
           </p>
 
           {/* Timeline Section */}
           <div className="border border-gray-200 rounded-lg p-4">
             <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
-              Lịch sử thao tác
+              Action history
             </h3>
             <WarrantyTimeline issueId={issueId} />
           </div>
 
           {/* ── Evidence Upload ── */}
           <div>
-            <label className={labelClass}>Ảnh hóa đơn vận chuyển</label>
+            <label className={labelClass}>Shipping invoice image</label>
             <div className="relative">
               {previewUrl ? (
                 <div className="relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
@@ -177,17 +177,17 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
                     <div className="flex flex-col items-center gap-2">
                       <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
                       <span className="text-sm text-gray-500">
-                        Đang tải lên...
+                        Uploading...
                       </span>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2">
                       <ImagePlus className="w-8 h-8 text-gray-400" />
                       <span className="text-sm text-gray-500">
-                        Nhấn để tải ảnh lên
+                        Click to upload image
                       </span>
                       <span className="text-xs text-gray-400">
-                        PNG, JPG tối đa 5MB
+                        PNG, JPG up to 5MB
                       </span>
                     </div>
                   )}
@@ -209,12 +209,12 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
           {/* ── Comment ── */}
           <div>
             <label htmlFor="comment" className={labelClass}>
-              Ghi chú / Mã vận đơn
+              Note / Tracking code
             </label>
             <textarea
               id="comment"
               rows={4}
-              placeholder="Ví dụ: Mình gửi qua Giao Hàng Tiết Kiệm, mã vận đơn là..."
+              placeholder="E.g.: I shipped via Giao Hàng Tiết Kiệm, tracking code is..."
               className={inputClass + " resize-none"}
               {...register("comment")}
             />
@@ -231,7 +231,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
               disabled={isSubmittingShipment}
               className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
-              Hủy
+              Cancel
             </button>
             <button
               type="submit"
@@ -241,7 +241,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
               {isSubmittingShipment && (
                 <Loader2 className="w-4 h-4 animate-spin" />
               )}
-              Gửi Minh Chứng
+              Submit Evidence
             </button>
           </div>
         </form>
