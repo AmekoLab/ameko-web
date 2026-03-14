@@ -93,19 +93,19 @@ const changePinSchema = z
   .object({
     oldPin: z
       .string()
-      .length(6, "Mã PIN phải gồm đúng 6 chữ số")
-      .regex(/^\d{6}$/, "Mã PIN chỉ được chứa số"),
+      .length(6, "PIN must be exactly 6 digits")
+      .regex(/^\d{6}$/, "PIN must contain only numbers"),
     newPin: z
       .string()
-      .length(6, "Mã PIN phải gồm đúng 6 chữ số")
-      .regex(/^\d{6}$/, "Mã PIN chỉ được chứa số"),
+      .length(6, "PIN must be exactly 6 digits")
+      .regex(/^\d{6}$/, "PIN must contain only numbers"),
     confirmNewPin: z
       .string()
-      .length(6, "Mã PIN phải gồm đúng 6 chữ số")
-      .regex(/^\d{6}$/, "Mã PIN chỉ được chứa số"),
+      .length(6, "PIN must be exactly 6 digits")
+      .regex(/^\d{6}$/, "PIN must contain only numbers"),
   })
   .refine((data) => data.newPin === data.confirmNewPin, {
-    message: "Mã PIN xác nhận không khớp",
+    message: "Confirmation PIN does not match",
     path: ["confirmNewPin"],
   });
 
@@ -183,7 +183,7 @@ export default function ChangePinModal({
               <KeyRound className="h-5 w-5 text-white" />
             </div>
             <h2 className="text-lg font-black uppercase tracking-tight text-black font-oswald">
-              Đổi Mã PIN Rút Tiền
+              Change Withdrawal PIN
             </h2>
           </div>
           <button
@@ -198,7 +198,7 @@ export default function ChangePinModal({
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
           {/* Old PIN */}
           <PinInput
-            label="Mã PIN hiện tại"
+            label="Current PIN"
             value={oldPinValue}
             onChange={(val) => {
               setOldPinValue(val);
@@ -209,7 +209,7 @@ export default function ChangePinModal({
 
           {/* New PIN */}
           <PinInput
-            label="Mã PIN mới"
+            label="New PIN"
             value={newPinValue}
             onChange={(val) => {
               setNewPinValue(val);
@@ -220,7 +220,7 @@ export default function ChangePinModal({
 
           {/* Confirm New PIN */}
           <PinInput
-            label="Xác nhận mã PIN mới"
+            label="Confirm New PIN"
             value={confirmPinValue}
             onChange={(val) => {
               setConfirmPinValue(val);
@@ -236,7 +236,7 @@ export default function ChangePinModal({
             className="w-full rounded-lg bg-[#ce2a32] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-[#b0242b] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-oswald flex items-center justify-center gap-2"
           >
             {isChangingPin && <Loader2 className="h-4 w-4 animate-spin" />}
-            {isChangingPin ? "Đang xử lý..." : "Đổi mã PIN"}
+            {isChangingPin ? "Processing..." : "Change PIN"}
           </button>
         </form>
       </div>

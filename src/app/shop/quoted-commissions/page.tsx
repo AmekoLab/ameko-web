@@ -136,10 +136,10 @@ const EditQuoteModal = ({ quote, onClose, onSuccess }: EditQuoteModalProps) => {
     const quotedPrice = Number(price);
 
     if (!quotedPrice || quotedPrice <= 0) {
-      newErrors.price = "Vui lòng nhập mức giá hợp lệ";
+      newErrors.price = "Please enter a valid price";
     }
     if (!note.trim() || note.trim().length < 10) {
-      newErrors.note = "Vui lòng nhập ít nhất 10 ký tự";
+      newErrors.note = "Please enter at least 10 characters";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -394,7 +394,7 @@ export default function ShopQuotesPage() {
                         <button
                           onClick={() => setEditingQuote(quote)}
                           className="w-8 h-8 rounded-lg border border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-colors"
-                          title="Chỉnh sửa báo giá"
+                          title="Edit quote"
                         >
                           <Pencil className="w-3.5 h-3.5 text-gray-500" />
                         </button>

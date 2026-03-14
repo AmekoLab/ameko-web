@@ -28,8 +28,8 @@ export const BrandNew: FC = () => {
   }, []);
 
   return (
-    <section className="w-full py-12 ">
-      <div className="max-w-[1920px] mx-auto px-4 lg:px-8 relative">
+    <section className="w-full py-12 bg-black ">
+      <div className="max-w-[1920px] mx-auto px-4 lg:px-8 relative ">
         {/* --- HEADER --- */}
         <div className="mb-8">
           <motion.div
@@ -38,7 +38,7 @@ export const BrandNew: FC = () => {
             viewport={{ once: true }}
             className="space-y-2"
           >
-            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-black">
+            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-white">
               Brand New
             </h2>
             <div className="h-1 w-12 bg-[#ce2a32]"></div>

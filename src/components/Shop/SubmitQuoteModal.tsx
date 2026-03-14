@@ -9,9 +9,9 @@ import { AppDispatch, RootState } from "@/src/store/index";
 import { submitCommissionQuote } from "@/src/store/slices/commissionSlice";
 
 const quoteSchema = z.object({
-  quotedPrice: z.number().gt(0, "Giá báo không hợp lệ"),
-  estimatedDays: z.number().min(1, "Số ngày dự kiến ít nhất là 1"),
-  shopNotes: z.string().min(10, "Vui lòng nhập chi tiết lời nhắn cho khách"),
+  quotedPrice: z.number().gt(0, "Invalid quoted price"),
+  estimatedDays: z.number().min(1, "Estimated days must be at least 1"),
+  shopNotes: z.string().min(10, "Please enter detailed notes for the customer"),
 });
 
 type QuoteFormData = z.infer<typeof quoteSchema>;
@@ -87,7 +87,9 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
-          <h3 className="text-base font-semibold text-gray-900">Gửi báo giá</h3>
+          <h3 className="text-base font-semibold text-gray-900">
+            Submit Quote
+          </h3>
           <button
             onClick={handleClose}
             className="p-1 hover:bg-gray-100 rounded-full transition-colors"
@@ -101,7 +103,7 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
           {/* Quoted Price */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Giá báo <span className="text-red-500">*</span>
+              Quoted Price <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -112,7 +114,7 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
-                VNĐ
+                VND
               </span>
             </div>
             {errors.quotedPrice && (
@@ -125,7 +127,7 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
           {/* Estimated Days */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Thời gian dự kiến <span className="text-red-500">*</span>
+              Estimated Days <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -136,7 +138,7 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
-                Ngày
+                Days
               </span>
             </div>
             {errors.estimatedDays && (
@@ -149,12 +151,12 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
           {/* Shop Notes */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Lời nhắn cho khách <span className="text-red-500">*</span>
+              Notes for Customer <span className="text-red-500">*</span>
             </label>
             <textarea
               {...register("shopNotes")}
               rows={4}
-              placeholder="Mô tả chi tiết báo giá, thời gian, vật liệu..."
+              placeholder="Describe quote details, time, materials..."
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             />
             {errors.shopNotes && (
@@ -171,7 +173,7 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
               onClick={handleClose}
               className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm rounded-lg transition-colors"
             >
-              Hủy
+              Cancel
             </button>
             <button
               type="submit"
@@ -180,10 +182,10 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
             >
               {isSubmittingQuote ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Đang gửi...
+                  <Loader2 className="w-4 h-4 animate-spin" /> Sending...
                 </>
               ) : (
-                "Gửi Báo Giá"
+                "Submit Quote"
               )}
             </button>
           </div>

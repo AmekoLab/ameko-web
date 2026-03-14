@@ -214,14 +214,10 @@ export default function ShopProfilePage() {
     if (!currentShop) return;
 
     const isActive = currentShop.status === 1; // 1: Active
-    const actionName = isActive ? "tạm đóng cửa" : "mở cửa lại";
+    const actionName = isActive ? "temporarily close" : "reopen";
 
-    // Hộp thoại xác nhận
-    if (
-      !window.confirm(
-        `Bạn có chắc chắn muốn ${actionName} gian hàng này không?`,
-      )
-    ) {
+    // Confirmation dialog
+    if (!window.confirm(`Are you sure you want to ${actionName} this shop?`)) {
       return;
     }
 
@@ -229,15 +225,15 @@ export default function ShopProfilePage() {
     try {
       if (isActive) {
         await dispatch(deactivateShop()).unwrap();
-        toast.success("Gian hàng đã tạm nghỉ bán.");
+        toast.success("Shop has been temporarily closed.");
       } else {
         await dispatch(reactivateShop()).unwrap();
-        toast.success("Gian hàng đã mở bán trở lại.");
+        toast.success("Shop has been reopened.");
       }
-      // Load lại thông tin shop để Badge cập nhật status mới nhất
+      // Reload shop info so Badge updates to latest status
       dispatch(fetchCurrentShop());
     } catch (error: any) {
-      toast.error(error || `Lỗi khi ${actionName} gian hàng.`);
+      toast.error(error || `Error when trying to ${actionName} the shop.`);
     } finally {
       setIsToggling(false);
     }

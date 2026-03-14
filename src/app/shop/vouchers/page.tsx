@@ -86,7 +86,7 @@ function DiscountDisplay({ voucher }: { voucher: Voucher }) {
         <span className="font-semibold">{voucher.value}%</span>
         {voucher.maxDiscountAmount != null && (
           <span className="ml-1 text-xs text-gray-500">
-            (Tối đa {formatVND(voucher.maxDiscountAmount)})
+            (Max {formatVND(voucher.maxDiscountAmount)})
           </span>
         )}
       </div>
@@ -141,14 +141,14 @@ export default function ShopVoucherPage() {
 
   const handleDelete = async (voucher: Voucher) => {
     const confirmed = window.confirm(
-      `Bạn có chắc chắn muốn xóa mã giảm giá "${voucher.code}" không?`,
+      `Are you sure you want to delete the voucher "${voucher.code}"?`,
     );
     if (!confirmed) return;
     try {
       const result = await dispatch(deleteVoucherThunk(voucher.id)).unwrap();
       toast.success(result.message || "Voucher deleted successfully");
     } catch (err: unknown) {
-      toast.error(typeof err === "string" ? err : "Xoá voucher thất bại");
+      toast.error(typeof err === "string" ? err : "Failed to delete voucher");
     }
   };
 
@@ -159,9 +159,7 @@ export default function ShopVoucherPage() {
       ).unwrap();
       toast.success(result.message || "Voucher status updated successfully");
     } catch (err: unknown) {
-      toast.error(
-        typeof err === "string" ? err : "Cập nhật trạng thái thất bại",
-      );
+      toast.error(typeof err === "string" ? err : "Failed to update status");
     }
   };
 

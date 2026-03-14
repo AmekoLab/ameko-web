@@ -33,7 +33,7 @@ export const PromoSection: FC<{ data: PromoData }> = ({ data }) => {
   };
 
   return (
-    <section className="relative w-full h-[500px] md:h-[650px] overflow-hidden group">
+    <section className="relative w-full h-[500px] md:h-[650px] overflow-hidden group ">
       {/* 1. BACKGROUND IMAGE */}
       <div className="absolute inset-0 w-full h-full z-0">
         <Image
@@ -55,26 +55,26 @@ export const PromoSection: FC<{ data: PromoData }> = ({ data }) => {
 
         <div
           className={`absolute inset-0 z-10 
-          ${
-            data.position === "left"
-              ? "bg-gradient-to-r from-black/80 via-transparent to-transparent"
-              : ""
-          }
-          ${
-            data.position === "right"
-              ? "bg-gradient-to-l from-black/80 via-transparent to-transparent"
-              : ""
-          }
-          ${data.position === "center" ? "bg-black/30" : ""}
-          ${data.theme === "light" ? "opacity-30" : "opacity-80"} 
-        `}
+            ${
+              data.position === "left"
+                ? "bg-gradient-to-r from-black via-transparent to-transparent"
+                : ""
+            }
+            ${
+              data.position === "right"
+                ? "bg-gradient-to-l from-black via-transparent to-transparent"
+                : ""
+            }
+            ${data.position === "center" ? "bg-black" : ""}
+            ${data.theme === "light" ? "opacity-30" : "opacity-80"} 
+          `}
         />
       </div>
 
       {/* 2. TEXT CONTENT */}
       <div
         className={`relative z-20 w-full h-full max-w-[1920px] mx-auto flex flex-col justify-center ${getPositionClasses(
-          data.position
+          data.position,
         )}`}
       >
         <div className="max-w-2xl w-full">
