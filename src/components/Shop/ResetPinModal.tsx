@@ -93,16 +93,16 @@ const resetPinSchema = z
   .object({
     otp: z
       .string()
-      .length(6, "Mã OTP phải gồm đúng 6 chữ số")
-      .regex(/^\d{6}$/, "Mã OTP chỉ được chứa số"),
+      .length(6, "OTP must be exactly 6 digits")
+      .regex(/^\d{6}$/, "OTP must contain only numbers"),
     newPin: z
       .string()
-      .length(6, "Mã PIN mới phải gồm đúng 6 chữ số")
-      .regex(/^\d{6}$/, "Mã PIN chỉ được chứa số"),
+      .length(6, "New PIN must be exactly 6 digits")
+      .regex(/^\d{6}$/, "PIN must contain only numbers"),
     confirmNewPin: z.string(),
   })
   .refine((data) => data.newPin === data.confirmNewPin, {
-    message: "Mã PIN xác nhận không khớp",
+    message: "Confirmation PIN does not match",
     path: ["confirmNewPin"],
   });
 
@@ -218,7 +218,7 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
               <Key className="h-5 w-5 text-white" />
             </div>
             <h2 className="text-lg font-black uppercase tracking-tight text-black font-oswald">
-              Đặt lại mã PIN
+              Reset PIN
             </h2>
           </div>
           <button
@@ -239,11 +239,10 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
                   <Mail className="h-8 w-8 text-blue-500" />
                 </div>
                 <h3 className="text-base font-bold text-gray-800 mb-2">
-                  Xác minh qua Email
+                  Verify via Email
                 </h3>
                 <p className="text-sm text-gray-500 leading-relaxed">
-                  Chúng tôi sẽ gửi một mã OTP gồm 6 chữ số đến email đăng ký của
-                  bạn.
+                  We will send a 6-digit OTP code to your registered email.
                 </p>
               </div>
 
@@ -256,7 +255,7 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
                 {isRequestingOtp && (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 )}
-                {isRequestingOtp ? "Đang gửi..." : "Gửi mã xác nhận"}
+                {isRequestingOtp ? "Sending..." : "Send verification code"}
               </button>
             </div>
           )}
@@ -269,7 +268,7 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
                   <div className="flex items-center gap-1.5">
                     <Mail className="w-4 h-4 text-gray-500" />
-                    Mã OTP
+                    OTP Code
                   </div>
                 </label>
                 <PinInput
@@ -282,7 +281,7 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
                 <div className="flex justify-center mt-3">
                   {cooldown > 0 ? (
                     <span className="text-xs text-gray-400">
-                      Gửi lại mã sau{" "}
+                      Resend code in{" "}
                       <strong className="text-gray-600">{cooldown}s</strong>
                     </span>
                   ) : (
@@ -293,7 +292,7 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
                       className="flex items-center gap-1 text-xs font-medium text-[#ce2a32] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <RefreshCw className="w-3 h-3" />
-                      {isRequestingOtp ? "Đang gửi..." : "Gửi lại mã"}
+                      {isRequestingOtp ? "Sending..." : "Resend code"}
                     </button>
                   )}
                 </div>
@@ -304,7 +303,7 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
                   <div className="flex items-center gap-1.5">
                     <Lock className="w-4 h-4 text-gray-500" />
-                    Mã PIN mới
+                    New PIN
                   </div>
                 </label>
                 <PinInput
@@ -320,7 +319,7 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
                   <div className="flex items-center gap-1.5">
                     <Lock className="w-4 h-4 text-gray-500" />
-                    Xác nhận PIN mới
+                    Confirm New PIN
                   </div>
                 </label>
                 <PinInput
@@ -338,7 +337,7 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
                 className="w-full rounded-lg bg-[#ce2a32] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-[#b0242b] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-oswald flex items-center justify-center gap-2"
               >
                 {isResettingPin && <Loader2 className="h-4 w-4 animate-spin" />}
-                {isResettingPin ? "Đang xử lý..." : "Đặt lại mã PIN"}
+                {isResettingPin ? "Processing..." : "Reset PIN"}
               </button>
             </form>
           )}

@@ -19,17 +19,17 @@ const createVoucherSchema = z
   .object({
     code: z
       .string()
-      .min(1, "Mã voucher không được để trống")
-      .max(30, "Tối đa 30 ký tự"),
-    name: z.string().min(1, "Tên voucher không được để trống"),
-    description: z.string().min(1, "Mô tả không được để trống"),
-    discountType: z.string().min(1, "Chọn loại giảm giá"),
-    value: z.string().min(1, "Giá trị không được để trống"),
+      .min(1, "Voucher code cannot be empty")
+      .max(30, "Maximum 30 characters"),
+    name: z.string().min(1, "Voucher name cannot be empty"),
+    description: z.string().min(1, "Description cannot be empty"),
+    discountType: z.string().min(1, "Select discount type"),
+    value: z.string().min(1, "Value cannot be empty"),
     maxDiscountAmount: z.string().optional(),
-    minOrderValue: z.string().min(1, "Không được để trống"),
-    usageLimit: z.string().min(1, "Không được để trống"),
-    startDate: z.string().min(1, "Chọn ngày bắt đầu"),
-    endDate: z.string().min(1, "Chọn ngày kết thúc"),
+    minOrderValue: z.string().min(1, "Cannot be empty"),
+    usageLimit: z.string().min(1, "Cannot be empty"),
+    startDate: z.string().min(1, "Select start date"),
+    endDate: z.string().min(1, "Select end date"),
     allowStacking: z.boolean(),
   })
   .refine(
@@ -41,7 +41,7 @@ const createVoucherSchema = z
       return true;
     },
     {
-      message: "Giá trị không hợp lệ (phần trăm tối đa 100%)",
+      message: "Invalid value (percentage max 100%)",
       path: ["value"],
     },
   )
@@ -50,7 +50,7 @@ const createVoucherSchema = z
       if (!data.startDate || !data.endDate) return true;
       return new Date(data.endDate) > new Date(data.startDate);
     },
-    { message: "Ngày kết thúc phải sau ngày bắt đầu", path: ["endDate"] },
+    { message: "End date must be after start date", path: ["endDate"] },
   );
 
 type CreateVoucherFormValues = z.infer<typeof createVoucherSchema>;
@@ -118,11 +118,11 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
       const result = await dispatch(
         createPromotionVoucherThunk(payload),
       ).unwrap();
-      toast.success(result.message || "Tạo voucher thành công!");
+      toast.success(result.message || "Voucher created successfully!");
       reset();
       onClose();
     } catch (err: unknown) {
-      toast.error(typeof err === "string" ? err : "Tạo voucher thất bại");
+      toast.error(typeof err === "string" ? err : "Failed to create voucher");
     }
   };
 
@@ -140,7 +140,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-xl font-black uppercase tracking-tight font-oswald">
-            Tạo Voucher Khuyến Mãi
+            Create Promotion Voucher
           </h2>
           <button
             type="button"
@@ -155,19 +155,19 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           {/* ── Row 1: Code + Name ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>Mã Voucher</label>
+              <label className={labelCls}>Voucher Code</label>
               <input
                 {...register("code")}
-                placeholder="VD: SALE20"
+                placeholder="Eg: SALE20"
                 className={`${inputCls} uppercase`}
               />
               {errors.code && <p className={errCls}>{errors.code.message}</p>}
             </div>
             <div>
-              <label className={labelCls}>Tên Voucher</label>
+              <label className={labelCls}>Voucher Name</label>
               <input
                 {...register("name")}
-                placeholder="VD: Giảm 20% mùa Tết"
+                placeholder="Eg: 20% Off for New Year"
                 className={inputCls}
               />
               {errors.name && <p className={errCls}>{errors.name.message}</p>}
@@ -176,11 +176,11 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
 
           {/* ── Description ── */}
           <div>
-            <label className={labelCls}>Mô tả</label>
+            <label className={labelCls}>Description</label>
             <textarea
               {...register("description")}
               rows={2}
-              placeholder="Mô tả ngắn gọn về voucher..."
+              placeholder="Brief description about the voucher..."
               className={inputCls}
             />
             {errors.description && (
@@ -191,22 +191,22 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           {/* ── Row 2: Discount Type + Value ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>Loại giảm giá</label>
+              <label className={labelCls}>Discount Type</label>
               <select {...register("discountType")} className={inputCls}>
                 <option value={String(DiscountType.Percentage)}>
-                  Giảm theo %
+                  Percentage Discount
                 </option>
                 <option value={String(DiscountType.FixedAmount)}>
-                  Giảm số tiền cố định
+                  Fixed Amount Discount
                 </option>
               </select>
             </div>
             <div>
               <label className={labelCls}>
-                Giá trị{" "}
+                Value{" "}
                 {discountType === String(DiscountType.Percentage)
                   ? "(%)"
-                  : "(VNĐ)"}
+                  : "(VND)"}
               </label>
               <input
                 type="number"
@@ -221,11 +221,11 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           {/* ── Max Discount (only for Percentage) ── */}
           {discountType === String(DiscountType.Percentage) && (
             <div>
-              <label className={labelCls}>Giảm tối đa (VNĐ)</label>
+              <label className={labelCls}>Max Discount (VND)</label>
               <input
                 type="number"
                 {...register("maxDiscountAmount")}
-                placeholder="VD: 100000"
+                placeholder="Eg: 100000"
                 className={inputCls}
               />
               {errors.maxDiscountAmount && (
@@ -237,7 +237,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           {/* ── Row 3: Min Order + Usage Limit ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>Đơn tối thiểu (VNĐ)</label>
+              <label className={labelCls}>Minimum Order (VND)</label>
               <input
                 type="number"
                 {...register("minOrderValue")}
@@ -249,7 +249,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               )}
             </div>
             <div>
-              <label className={labelCls}>Giới hạn sử dụng</label>
+              <label className={labelCls}>Usage Limit</label>
               <input
                 type="number"
                 {...register("usageLimit")}
@@ -265,7 +265,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           {/* ── Row 4: Dates ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>Ngày bắt đầu</label>
+              <label className={labelCls}>Start Date</label>
               <input
                 type="datetime-local"
                 {...register("startDate")}
@@ -276,7 +276,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               )}
             </div>
             <div>
-              <label className={labelCls}>Ngày kết thúc</label>
+              <label className={labelCls}>End Date</label>
               <input
                 type="datetime-local"
                 {...register("endDate")}
@@ -297,7 +297,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               className="h-4 w-4 rounded border-gray-300 text-[#ce2a32] focus:ring-[#ce2a32]"
             />
             <label htmlFor="allowStacking" className="text-sm text-gray-700">
-              Cho phép áp dụng cùng voucher khác
+              Allow stacking with other vouchers
             </label>
           </div>
 
@@ -308,7 +308,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               onClick={onClose}
               className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
             >
-              Huỷ
+              Cancel
             </button>
             <button
               type="submit"
@@ -318,7 +318,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               {isCreatingVoucher && (
                 <Loader2 className="h-4 w-4 animate-spin" />
               )}
-              Tạo Voucher
+              Create Voucher
             </button>
           </div>
         </form>

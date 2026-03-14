@@ -83,7 +83,7 @@ const CommissionCard = ({ request, onClick }: CommissionCardProps) => (
 
       {/* Quantity badge */}
       <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-700 text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm">
-        SL: {request.quantity}
+        Qty: {request.quantity}
       </span>
     </div>
 
@@ -238,7 +238,7 @@ const CommissionModal = ({
               <span className="text-gray-300">·</span>
               <span className="flex items-center gap-1.5">
                 <Hash className="w-4 h-4" />
-                SL: {request.quantity}
+                Qty: {request.quantity}
               </span>
             </div>
 
@@ -275,14 +275,14 @@ const CommissionModal = ({
                 <Info className="w-8 h-8 text-gray-400" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">
-                Đây là yêu cầu do bạn tạo
+                This is your own request
               </h3>
               <p className="text-sm text-gray-500 max-w-xs">
-                Bạn không thể gửi báo giá cho yêu cầu của chính mình.
+                You cannot send a quotation for your own request.
               </p>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-500 rounded-md text-sm font-medium mt-4">
                 <Info className="w-4 h-4" />
-                Chỉ xem
+                View only
               </div>
             </div>
           ) : (
@@ -290,11 +290,11 @@ const CommissionModal = ({
               {/* Form Header */}
               <div className="mb-6">
                 <h3 className="text-lg font-bold text-gray-900">
-                  Gửi báo giá cho khách hàng
+                  Send quotation to customer
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
-                  Đưa ra mức giá cạnh tranh và mô tả chi tiết vật tư bạn sẽ sử
-                  dụng.
+                  Offer a competitive price and describe in detail the materials
+                  you will use.
                 </p>
               </div>
 
@@ -305,8 +305,7 @@ const CommissionModal = ({
                 {/* Proposed Price */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Mức giá đề xuất (VND){" "}
-                    <span className="text-red-500">*</span>
+                    Proposed price (VND) <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
@@ -321,18 +320,23 @@ const CommissionModal = ({
                       className="w-full border border-gray-300 rounded-xl pl-10 pr-14 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white"
                     />
                     <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-semibold">
-                      VNĐ
+                      VND
                     </span>
                   </div>
                   {errors.price && (
-                    <p className="text-xs text-red-500 mt-1">{errors.price}</p>
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.price.replace(
+                        "Vui lòng nhập mức giá hợp lệ",
+                        "Please enter a valid price",
+                      )}
+                    </p>
                   )}
                 </div>
 
                 {/* Estimated Time */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Thời gian hoàn thành dự kiến{" "}
+                    Estimated completion time{" "}
                     <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -340,34 +344,40 @@ const CommissionModal = ({
                     onChange={(e) => setEstimatedDays(e.target.value)}
                     className="w-full border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white appearance-none cursor-pointer"
                   >
-                    <option value="3">3 ngày</option>
-                    <option value="5">5 ngày</option>
-                    <option value="7">7 ngày</option>
-                    <option value="10">10 ngày</option>
-                    <option value="14">14 ngày</option>
-                    <option value="21">21 ngày</option>
-                    <option value="30">30 ngày</option>
+                    <option value="3">3 days</option>
+                    <option value="5">5 days</option>
+                    <option value="7">7 days</option>
+                    <option value="10">10 days</option>
+                    <option value="14">14 days</option>
+                    <option value="21">21 days</option>
+                    <option value="30">30 days</option>
                   </select>
                 </div>
 
                 {/* Note / Details */}
                 <div className="flex-1 flex flex-col">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Lời nhắn / Chi tiết vật tư{" "}
+                    Message / Material details{" "}
                     <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     rows={5}
-                    placeholder="Mô tả chi tiết switch, keycap, mod bạn sẽ sử dụng...&#10;Ví dụ: Gateron Oil King lubed, GMK Olivia clone, foam mod, tape mod..."
+                    placeholder="Describe in detail the switch, keycap, mod you will use...\nE.g.: Gateron Oil King lubed, GMK Olivia clone, foam mod, tape mod..."
                     className="w-full flex-1 min-h-[120px] border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white resize-none"
                   />
                   {errors.note ? (
-                    <p className="text-xs text-red-500 mt-1.5">{errors.note}</p>
+                    <p className="text-xs text-red-500 mt-1.5">
+                      {errors.note.replace(
+                        "Vui lòng nhập ít nhất 10 ký tự",
+                        "Please enter at least 10 characters",
+                      )}
+                    </p>
                   ) : (
                     <p className="text-xs text-gray-400 mt-1.5">
-                      Tối thiểu 10 ký tự. Hãy mô tả rõ để khách hàng tin tưởng.
+                      Minimum 10 characters. Please describe clearly to build
+                      customer trust.
                     </p>
                   )}
                 </div>
@@ -381,12 +391,12 @@ const CommissionModal = ({
                   {isSubmittingQuote ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Đang gửi...
+                      Sending...
                     </>
                   ) : (
                     <>
                       <Send className="w-5 h-5" />
-                      Gửi báo giá
+                      Send quotation
                     </>
                   )}
                 </button>
@@ -423,27 +433,27 @@ export default function CommissionPoolPage() {
         {/* Hero Banner */}
         <div className="w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl p-8 mb-8 shadow-md flex flex-col items-center text-center">
           <h2 className="text-3xl font-bold text-white">
-            Bạn có ý tưởng phím cơ độc lạ?
+            Do you have a unique mechanical keyboard idea?
           </h2>
           <p className="text-white opacity-90 mt-2">
-            Đăng yêu cầu ngay để nhận báo giá từ hàng chục Shop uy tín trên hệ
-            thống.
+            Post your request now to receive quotations from dozens of reputable
+            Shops on the system.
           </p>
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="mt-6 bg-white text-purple-600 font-bold rounded-full px-8 py-3 hover:bg-gray-100 transition shadow-lg cursor-pointer"
           >
-            Đăng Yêu Cầu Lên Chợ
+            Post Request to Market
           </button>
         </div>
 
         {/* Header */}
         <div className="mb-10">
           <h1 className="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight">
-            Chợ yêu cầu Custom
+            Custom Request Market
           </h1>
           <p className="text-sm text-gray-500 mt-1.5">
-            Khám phá các yêu cầu đặt phím custom từ cộng đồng
+            Explore custom keyboard requests from the community
           </p>
         </div>
 
@@ -463,7 +473,7 @@ export default function CommissionPoolPage() {
               <Loader2 className="w-8 h-8 text-red-400" />
             </div>
             <h2 className="text-lg font-bold text-gray-900 mb-2">
-              Không thể tải dữ liệu
+              Unable to load data
             </h2>
             <p className="text-sm text-gray-500 mb-6 max-w-sm">{error}</p>
             <button
@@ -471,7 +481,7 @@ export default function CommissionPoolPage() {
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-full transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
-              Thử lại
+              Retry
             </button>
           </div>
         )}
@@ -483,11 +493,11 @@ export default function CommissionPoolPage() {
               <Inbox className="w-8 h-8 text-gray-400" />
             </div>
             <h2 className="text-lg font-bold text-gray-900 mb-2">
-              Chưa có yêu cầu nào
+              No requests yet
             </h2>
             <p className="text-sm text-gray-500 max-w-sm">
-              Hiện tại chưa có yêu cầu đặt phím custom nào trong chợ chung. Hãy
-              quay lại sau nhé!
+              There are currently no custom keyboard requests in the public
+              market. Please check back later!
             </p>
           </div>
         )}

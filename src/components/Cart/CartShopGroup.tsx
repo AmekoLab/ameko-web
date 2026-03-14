@@ -41,17 +41,17 @@ export default function CartShopGroup({
         <h3 className="text-sm font-bold text-gray-900">{shopName}</h3>
 
         {isFetching ? (
-          <span className="text-xs text-gray-400">Đang tải...</span>
+          <span className="text-xs text-gray-400">Loading...</span>
         ) : voucherCount > 0 ? (
           <button
             type="button"
             className="inline-flex items-center gap-1.5 text-xs font-medium text-[#ce2a32] hover:underline"
           >
             <Ticket className="h-3.5 w-3.5" />
-            {voucherCount} voucher khả dụng
+            {voucherCount} available voucher{voucherCount > 1 ? "s" : ""}
           </button>
         ) : (
-          <span className="text-xs text-gray-400">Không có voucher</span>
+          <span className="text-xs text-gray-400">No voucher</span>
         )}
       </div>
 

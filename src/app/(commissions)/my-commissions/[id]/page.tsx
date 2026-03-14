@@ -36,24 +36,24 @@ const STATUS_STYLES: Record<
   PendingTarget: {
     bg: "bg-orange-100",
     text: "text-orange-700",
-    label: "Chờ Shop xử lý",
+    label: "Waiting for Shop",
   },
-  Quoted: { bg: "bg-blue-100", text: "text-blue-700", label: "Đã có báo giá" },
-  OpenPool: { bg: "bg-blue-100", text: "text-blue-700", label: "Đang mở" },
+  Quoted: { bg: "bg-blue-100", text: "text-blue-700", label: "Quoted" },
+  OpenPool: { bg: "bg-blue-100", text: "text-blue-700", label: "Open" },
   Completed: {
     bg: "bg-green-100",
     text: "text-green-700",
-    label: "Hoàn thành",
+    label: "Completed",
   },
   Canceled: {
     bg: "bg-red-100",
     text: "text-red-700",
-    label: "Đã hủy",
+    label: "Canceled",
   },
   TargetRejected: {
     bg: "bg-red-100",
     text: "text-red-700",
-    label: "Shop đã từ chối",
+    label: "Shop rejected",
   },
 };
 
@@ -64,26 +64,26 @@ const QUOTE_STATUS_STYLES: Record<
   PendingUserDecision: {
     bg: "bg-yellow-100",
     text: "text-yellow-700",
-    label: "Chờ bạn quyết định",
+    label: "Waiting for your decision",
   },
   Accepted: {
     bg: "bg-green-100",
     text: "text-green-700",
-    label: "Đã chấp nhận",
+    label: "Accepted",
   },
-  Rejected: { bg: "bg-red-100", text: "text-red-700", label: "Đã từ chối" },
-  Expired: { bg: "bg-gray-100", text: "text-gray-700", label: "Đã hết hạn" },
+  Rejected: { bg: "bg-red-100", text: "text-red-700", label: "Rejected" },
+  Expired: { bg: "bg-gray-100", text: "text-gray-700", label: "Expired" },
 };
 
 const DEFAULT_STATUS = {
   bg: "bg-gray-100",
   text: "text-gray-700",
-  label: "Không xác định",
+  label: "Unknown",
 };
 
 // ─── Helpers ───────────────────────────────────────────────
 const formatVND = (amount: number): string =>
-  new Intl.NumberFormat("vi-VN").format(amount) + "đ";
+  new Intl.NumberFormat("vi-VN").format(amount) + "₫";
 
 const formatDate = (dateStr: string): string => {
   try {
@@ -130,7 +130,7 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
             <p className="font-semibold text-gray-900 text-sm">
               {quote.shopName || "Shop"}
             </p>
-            <p className="text-xs text-gray-500">Báo giá</p>
+            <p className="text-xs text-gray-500">Quotation</p>
           </div>
         </div>
         <span
@@ -143,20 +143,20 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
       {/* Body: Details grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
         <div>
-          <p className="text-xs text-gray-500 mb-0.5">Giá báo</p>
+          <p className="text-xs text-gray-500 mb-0.5">Quoted Price</p>
           <p className="text-xl font-bold text-[#ce2a32]">
             {formatVND(quote.quotedPrice)}
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-0.5">Thời gian dự kiến</p>
+          <p className="text-xs text-gray-500 mb-0.5">Estimated Time</p>
           <p className="text-sm font-medium text-gray-900 flex items-center gap-1.5">
             <Clock className="w-4 h-4 text-gray-400" />
-            {quote.estimatedDays} ngày
+            {quote.estimatedDays} days
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-0.5">Hạn chót</p>
+          <p className="text-xs text-gray-500 mb-0.5">Deadline</p>
           <p className="text-sm font-medium text-gray-900 flex items-center gap-1.5">
             <Calendar className="w-4 h-4 text-gray-400" />
             {formatDate(quote.expiredAt)}
@@ -167,7 +167,7 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
       {/* Shop Notes */}
       {quote.shopNotes && (
         <div className="bg-gray-50 border-l-4 border-gray-300 rounded-r-lg px-4 py-3 mb-4">
-          <p className="text-xs text-gray-500 mb-1">Lời nhắn từ Shop:</p>
+          <p className="text-xs text-gray-500 mb-1">Message from Shop:</p>
           <p className="text-sm text-gray-700 italic leading-relaxed">
             {quote.shopNotes}
           </p>
@@ -183,18 +183,18 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
         >
           {isAccepting ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" /> Đang xử lý...
+              <Loader2 className="w-4 h-4 animate-spin" /> Processing...
             </>
           ) : (
             <>
-              <CheckCircle className="w-4 h-4" /> Chấp nhận báo giá
+              <CheckCircle className="w-4 h-4" /> Accept quotation
             </>
           )}
         </button>
       )}
       {isAccepted && (
         <div className="w-full py-2.5 bg-green-50 text-green-700 font-semibold text-sm rounded-lg flex items-center justify-center gap-2 border border-green-200">
-          <CheckCircle className="w-4 h-4" /> Đã chọn báo giá này
+          <CheckCircle className="w-4 h-4" /> This quotation was selected
         </div>
       )}
     </div>
@@ -229,18 +229,18 @@ const ConfirmAcceptModal = ({
           <CheckCircle className="w-7 h-7 text-green-600" />
         </div>
         <h3 className="text-lg font-bold text-gray-900 mb-2">
-          Xác nhận chấp nhận báo giá
+          Confirm Accept Quotation
         </h3>
         <p className="text-sm text-gray-500 mb-6">
-          Bạn có chắc chắn muốn chấp nhận mức giá này? Đơn hàng sẽ được tạo ngay
-          sau khi xác nhận.
+          Are you sure you want to accept this price? The order will be created
+          immediately after confirmation.
         </p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
             className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm rounded-lg transition-colors"
           >
-            Hủy
+            Cancel
           </button>
           <button
             onClick={onConfirm}
@@ -250,7 +250,7 @@ const ConfirmAcceptModal = ({
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              "Xác nhận"
+              "Confirm"
             )}
           </button>
         </div>
@@ -324,7 +324,7 @@ export default function CommissionDetailPage() {
       <div className="bg-[#FAFAFA] min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-10 h-10 text-[#ce2a32] animate-spin" />
-          <p className="text-sm text-gray-500">Đang tải chi tiết...</p>
+          <p className="text-sm text-gray-500">Loading details...</p>
         </div>
       </div>
     );
@@ -453,7 +453,7 @@ export default function CommissionDetailPage() {
               <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
                 <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
                 <p className="text-sm font-semibold text-red-700">
-                  Yêu cầu này đã bị hủy
+                  This request has been canceled
                 </p>
               </div>
             )}
@@ -494,7 +494,7 @@ export default function CommissionDetailPage() {
               {currentRequest.targetedShopId ? (
                 <div className="flex items-center gap-2 text-sm">
                   <Store className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600">Gửi đến:</span>
+                  <span className="text-gray-600">Sent to:</span>
                   <span className="font-medium text-gray-900">
                     {currentRequest.targetedShopName || "Shop"}
                   </span>
@@ -502,14 +502,14 @@ export default function CommissionDetailPage() {
               ) : (
                 <div className="flex items-center gap-2 text-sm">
                   <Store className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600">Gửi lên: Chợ chung</span>
+                  <span className="text-gray-600">Sent to: Public Market</span>
                 </div>
               )}
 
               {/* Quantity */}
               <div className="flex items-center gap-2 text-sm">
                 <Hash className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-600">Số lượng:</span>
+                <span className="text-gray-600">Quantity:</span>
                 <span className="font-medium text-gray-900">
                   {currentRequest.quantity}
                 </span>
@@ -518,7 +518,7 @@ export default function CommissionDetailPage() {
               {/* Budget */}
               <div className="flex items-center gap-2 text-sm">
                 <Banknote className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-600">Ngân sách:</span>
+                <span className="text-gray-600">Budget:</span>
                 <span className="font-medium text-gray-900">
                   {formatVND(currentRequest.minBudget)} –{" "}
                   {formatVND(currentRequest.maxBudget)}
@@ -528,7 +528,7 @@ export default function CommissionDetailPage() {
               {/* Date */}
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-600">Ngày tạo:</span>
+                <span className="text-gray-600">Created date:</span>
                 <span className="font-medium text-gray-900">
                   {formatDate(currentRequest.createdAt)}
                 </span>
@@ -538,7 +538,7 @@ export default function CommissionDetailPage() {
             {/* Description */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                Mô tả yêu cầu
+                Request Description
               </h3>
               <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
                 {currentRequest.description}
@@ -554,11 +554,11 @@ export default function CommissionDetailPage() {
               >
                 {isCanceling ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Đang hủy...
+                    <Loader2 className="w-4 h-4 animate-spin" /> Canceling...
                   </>
                 ) : (
                   <>
-                    <XCircle className="w-4 h-4" /> Hủy yêu cầu
+                    <XCircle className="w-4 h-4" /> Cancel request
                   </>
                 )}
               </button>
@@ -573,11 +573,11 @@ export default function CommissionDetailPage() {
               >
                 {isPublishingToPool ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Đang đăng...
+                    <Loader2 className="w-4 h-4 animate-spin" /> Publishing...
                   </>
                 ) : (
                   <>
-                    <Globe className="w-4 h-4" /> Đăng lên Chợ chung
+                    <Globe className="w-4 h-4" /> Publish to Public Market
                   </>
                 )}
               </button>
@@ -587,7 +587,7 @@ export default function CommissionDetailPage() {
           {/* ── Right Column: Quotes / Bids (col-span-2) ── */}
           <div className="lg:col-span-2">
             <h2 className="text-lg font-bold text-gray-900 mb-5">
-              Báo giá từ Shop
+              Quotations from Shop
             </h2>
 
             {currentRequest.quotes.length === 0 ? (
@@ -597,10 +597,10 @@ export default function CommissionDetailPage() {
                   <Clock className="w-8 h-8 text-orange-400" />
                 </div>
                 <h3 className="text-base font-semibold text-gray-900 mb-1">
-                  Chưa có báo giá nào
+                  No quotations yet
                 </h3>
                 <p className="text-sm text-gray-500 max-w-xs">
-                  Vui lòng đợi shop phản hồi...
+                  Please wait for shop response...
                 </p>
               </div>
             ) : (

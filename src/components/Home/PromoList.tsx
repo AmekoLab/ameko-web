@@ -49,7 +49,7 @@ const PROMOS: PromoData[] = [
 
 export const PromoList: FC = () => {
   return (
-    <div className="flex flex-col w-full gap-6 my-4 md:my-8">
+    <div className="flex flex-col w-full gap-6 my-4 md:my-8 bg-black">
       {PROMOS.map((promo) => (
         <PromoSection key={promo.id} data={promo} />
       ))}

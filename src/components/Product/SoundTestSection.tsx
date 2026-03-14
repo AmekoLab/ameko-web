@@ -7,36 +7,41 @@ interface SoundTestProps {
 
 export const SoundTestSection = ({ videoUrl, description }: SoundTestProps) => {
   return (
-    <div className="relative w-screen left-[50%] right-[50%] -ml-[50vw] -mr-[50vw] bg-[#0a0a0a] text-white py-24 mt-32 group overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-primary opacity-5 blur-[150px] rounded-full pointer-events-none"></div>
+    <div className="relative w-screen left-[50%] right-[50%] -ml-[50vw] -mr-[50vw] bg-[#0a0a0a] text-white py-8 group overflow-hidden">
+      {/* Yellow glow orb */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[#f5d800]/5 blur-[150px] pointer-events-none" />
 
       <div className="max-w-[1280px] mx-auto px-4 lg:px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Text Content bên trái */}
+          {/* Text Content */}
           <div className="text-left">
-            <h2 className="text-4xl lg:text-6xl font-black uppercase tracking-tighter mb-6 font-oswald leading-none">
+            {/* Eyebrow */}
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#f5d800] mb-3">
+              Sound Test
+            </p>
+            <h2 className="text-4xl lg:text-6xl font-black uppercase tracking-tighter mb-6 leading-none">
               Experience
               <br />
               The Sound.
             </h2>
-            <p className="text-gray-400 text-xl mb-10 max-w-md leading-relaxed">
+            <p className="text-gray-400 text-base mb-10 max-w-md leading-relaxed">
               {description}
             </p>
-            {/* Sound Wave Animation */}
-            <div className="flex items-end gap-1 h-16 opacity-60">
+
+            {/* Sound Wave Animation — yellow bars */}
+            <div className="flex items-end gap-1 h-16 opacity-70">
               {[...Array(20)].map((_, i) => (
                 <div
                   key={i}
-                  className="w-1.5 bg-primary rounded-t-sm animate-sound-wave"
+                  className="w-1.5 bg-[#f5d800] animate-sound-wave"
                   style={{ animationDelay: `-${i * 0.15}s` }}
                 />
               ))}
             </div>
           </div>
 
-          {/* Video bên phải - Style phẳng, không viền */}
-          <div className="relative w-full aspect-video bg-black shadow-2xl shadow-primary/20">
+          {/* Video */}
+          <div className="relative w-full aspect-video bg-black shadow-2xl shadow-[#f5d800]/10 border border-white/10">
             <iframe
               width="100%"
               height="100%"
@@ -45,7 +50,7 @@ export const SoundTestSection = ({ videoUrl, description }: SoundTestProps) => {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="w-full h-full"
-            ></iframe>
+            />
           </div>
         </div>
       </div>

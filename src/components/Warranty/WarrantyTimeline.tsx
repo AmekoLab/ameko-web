@@ -31,14 +31,14 @@ const ROLE_STYLES: Record<
 };
 
 const ACTION_LABELS: Record<string, string> = {
-  Create: "Tạo yêu cầu",
-  ShopApprove: "Shop đã duyệt",
-  ShopReject: "Shop đã từ chối",
-  AdminDecision: "Admin phân xử",
-  UserShippedReturn: "Khách đã gửi hàng",
-  ShopReceivedReturn: "Shop đã nhận hàng",
-  AutoCancel: "Tự động hủy",
-  Completed: "Hoàn tất",
+  Create: "Request created",
+  ShopApprove: "Shop approved",
+  ShopReject: "Shop rejected",
+  AdminDecision: "Admin decision",
+  UserShippedReturn: "Customer shipped return",
+  ShopReceivedReturn: "Shop received return",
+  AutoCancel: "Auto canceled",
+  Completed: "Completed",
 };
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -113,7 +113,7 @@ const WarrantyTimeline: FC<WarrantyTimelineProps> = ({ issueId }) => {
   if (history.length === 0) {
     return (
       <p className="text-sm text-gray-400 italic text-center py-6">
-        Chưa có lịch sử thao tác
+        No action history yet
       </p>
     );
   }

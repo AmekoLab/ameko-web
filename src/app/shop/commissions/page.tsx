@@ -23,25 +23,25 @@ const STATUS_STYLES: Record<
   PendingTarget: {
     bg: "bg-orange-100",
     text: "text-orange-700",
-    label: "Chờ phản hồi",
+    label: "Waiting for response",
   },
-  OpenPool: { bg: "bg-blue-100", text: "text-blue-700", label: "Đang mở" },
+  OpenPool: { bg: "bg-blue-100", text: "text-blue-700", label: "Open" },
   Completed: {
     bg: "bg-green-100",
     text: "text-green-700",
-    label: "Hoàn thành",
+    label: "Completed",
   },
 };
 
 const DEFAULT_STATUS = {
   bg: "bg-gray-100",
   text: "text-gray-700",
-  label: "Không xác định",
+  label: "Unknown",
 };
 
 // ─── Helpers ───────────────────────────────────────────────
 const formatVND = (amount: number): string =>
-  new Intl.NumberFormat("vi-VN").format(amount) + "đ";
+  new Intl.NumberFormat("vi-VN").format(amount) + "₫";
 
 const formatDateTime = (dateStr: string): string => {
   try {
@@ -103,9 +103,9 @@ export default function ShopTargetedRequestsPage() {
       />
       {/* Page Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-black text-gray-900">Yêu cầu chỉ định</h1>
+        <h1 className="text-2xl font-black text-gray-900">Targeted Requests</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Các yêu cầu báo giá từ khách hàng gửi đến shop của bạn
+          Quotation requests sent by customers to your shop
         </p>
       </div>
 
@@ -125,11 +125,11 @@ export default function ShopTargetedRequestsPage() {
             <Inbox className="w-10 h-10 text-gray-400" />
           </div>
           <h2 className="text-lg font-bold text-gray-900 mb-1">
-            Hiện tại chưa có yêu cầu chỉ định nào
+            There are currently no targeted requests
           </h2>
           <p className="text-sm text-gray-500 max-w-sm">
-            Khi khách hàng gửi yêu cầu báo giá đến shop của bạn, chúng sẽ xuất
-            hiện ở đây.
+            When customers send quotation requests to your shop, they will
+            appear here.
           </p>
         </div>
       )}
@@ -167,7 +167,7 @@ export default function ShopTargetedRequestsPage() {
                           {req.title}
                         </h3>
                         <p className="text-xs text-gray-500 mt-0.5">
-                          SL: {req.quantity}
+                          Qty: {req.quantity}
                         </p>
                       </div>
                       <span
@@ -182,7 +182,7 @@ export default function ShopTargetedRequestsPage() {
                       <div className="flex items-center gap-1.5">
                         <User className="w-3.5 h-3.5 text-gray-400" />
                         <span className="font-medium text-gray-800">
-                          {req.userName || "Khách hàng"}
+                          {req.userName || "Customer"}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
@@ -210,10 +210,10 @@ export default function ShopTargetedRequestsPage() {
                       }
                       className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-lg transition-colors"
                     >
-                      <FileEdit className="w-4 h-4" /> Xem & Báo giá
+                      <FileEdit className="w-4 h-4" /> View & Quote
                     </button>
                     <button className="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-red-50 text-red-600 font-semibold text-sm rounded-lg transition-colors border border-red-200">
-                      <XCircle className="w-4 h-4" /> Từ chối
+                      <XCircle className="w-4 h-4" /> Reject
                     </button>
                   </div>
                 </div>

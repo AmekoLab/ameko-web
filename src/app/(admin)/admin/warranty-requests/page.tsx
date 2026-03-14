@@ -20,33 +20,33 @@ import AdminDecisionModal from "@/src/components/Admin/AdminDecisionModal";
 const PAGE_SIZE = 10;
 
 const STATUS_OPTIONS: { value: number | undefined; label: string }[] = [
-  { value: undefined, label: "Tất cả" },
+  { value: undefined, label: "All" },
   { value: 0, label: "Pending" },
-  { value: 1, label: "InProgress" },
-  { value: 2, label: "ShopAccepted" },
+  { value: 1, label: "In Progress" },
+  { value: 2, label: "Shop Accepted" },
   { value: 3, label: "Rejected" },
-  { value: 4, label: "AutoCancelled" },
-  { value: 5, label: "AwaitingReturn" },
+  { value: 4, label: "Auto Cancelled" },
+  { value: 5, label: "Awaiting Return" },
   { value: 6, label: "Returning" },
   { value: 7, label: "Returned" },
   { value: 8, label: "Completed" },
 ];
 
 const STATUS_BADGE: Record<number, { bg: string; label: string }> = {
-  0: { bg: "bg-orange-100 text-orange-800", label: "Chờ duyệt" },
-  1: { bg: "bg-yellow-100 text-yellow-800", label: "Đang xử lý" },
-  2: { bg: "bg-teal-100 text-teal-800", label: "Shop chấp nhận" },
-  3: { bg: "bg-red-100 text-red-800", label: "Đã từ chối" },
-  4: { bg: "bg-gray-100 text-gray-600", label: "Tự động hủy" },
-  5: { bg: "bg-blue-100 text-blue-800", label: "Chờ trả hàng" },
-  6: { bg: "bg-indigo-100 text-indigo-800", label: "Đang trả hàng" },
-  7: { bg: "bg-cyan-100 text-cyan-800", label: "Đã trả hàng" },
-  8: { bg: "bg-green-100 text-green-800", label: "Hoàn tất" },
+  0: { bg: "bg-orange-100 text-orange-800", label: "Pending" },
+  1: { bg: "bg-yellow-100 text-yellow-800", label: "In Progress" },
+  2: { bg: "bg-teal-100 text-teal-800", label: "Shop Accepted" },
+  3: { bg: "bg-red-100 text-red-800", label: "Rejected" },
+  4: { bg: "bg-gray-100 text-gray-600", label: "Auto Cancelled" },
+  5: { bg: "bg-blue-100 text-blue-800", label: "Awaiting Return" },
+  6: { bg: "bg-indigo-100 text-indigo-800", label: "Returning" },
+  7: { bg: "bg-cyan-100 text-cyan-800", label: "Returned" },
+  8: { bg: "bg-green-100 text-green-800", label: "Completed" },
 };
 
 // ─── Helpers ───────────────────────────────────────────────
 const formatCurrency = (amount: number): string =>
-  new Intl.NumberFormat("vi-VN", {
+  new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "VND",
   }).format(amount);
@@ -105,12 +105,9 @@ const TableSkeleton: FC = () => (
 const EmptyState: FC = () => (
   <div className="flex flex-col items-center justify-center py-20 text-center">
     <ShieldCheck className="w-16 h-16 text-gray-300 mb-5" strokeWidth={1} />
-    <h2 className="text-xl font-bold text-gray-900 mb-2">
-      Không có yêu cầu nào
-    </h2>
+    <h2 className="text-xl font-bold text-gray-900 mb-2">No requests found</h2>
     <p className="text-gray-500 max-w-sm">
-      Không tìm thấy yêu cầu bảo hành hoặc trả hàng nào phù hợp với bộ lọc hiện
-      tại.
+      No warranty or return requests match the current filter.
     </p>
   </div>
 );
@@ -209,7 +206,7 @@ const TableRow: FC<RowProps> = ({ request, onDecisionClick }) => {
           className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-purple-600 px-3.5 py-2 rounded-lg hover:bg-purple-700 transition-colors whitespace-nowrap"
         >
           <Eye className="w-4 h-4" />
-          Xem &amp; Phân xử
+          View & Decide
         </button>
       </td>
     </tr>
@@ -236,7 +233,7 @@ const Pagination: FC<PaginationProps> = ({ current, total, onChange }) => {
         <ChevronLeft className="w-4 h-4" />
       </button>
       <span className="text-sm text-gray-600 px-3">
-        Trang <span className="font-semibold text-gray-900">{current}</span> /{" "}
+        Page <span className="font-semibold text-gray-900">{current}</span> /{" "}
         {total}
       </span>
       <button
@@ -332,7 +329,7 @@ const AdminWarrantyDashboard: FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <h1 className="text-3xl font-bold text-gray-900">
-          Quản lý Bảo hành & Trả hàng
+          Warranty & Return Management
         </h1>
         <StatusFilter value={statusFilter} onChange={setStatusFilter} />
       </div>
@@ -348,25 +345,25 @@ const AdminWarrantyDashboard: FC = () => {
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Mã đơn / Ngày
+                    ID / Date
                   </th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Khách hàng
+                    Customer
                   </th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Loại & Lý do
+                    Type & Reason
                   </th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Số tiền
+                    Amount
                   </th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Trạng thái
+                    Status
                   </th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Phản hồi
+                    Response
                   </th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Hành động
+                    Action
                   </th>
                 </tr>
               </thead>

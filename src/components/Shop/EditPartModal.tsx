@@ -36,15 +36,15 @@ function buildKitSpecifications(
   return {
     recipe: { switch: switchCount, stabilizer: stabilizerCount },
     workflow: [
-      { step: "case", title: "Chọn Vỏ", quantity: 1 },
-      { step: "plate", title: "Chọn Plate", quantity: 1 },
-      { step: "switch", title: "Chọn Switch", quantity: switchCount },
+      { step: "case", title: "Select Case", quantity: 1 },
+      { step: "plate", title: "Select Plate", quantity: 1 },
+      { step: "switch", title: "Select Switch", quantity: switchCount },
       {
         step: "stabilizer",
-        title: "Chọn Stabilizer",
+        title: "Select Stabilizer",
         quantity: stabilizerCount,
       },
-      { step: "keycap", title: "Chọn Keycap", quantity: 1 },
+      { step: "keycap", title: "Select Keycap", quantity: 1 },
     ],
   };
 }

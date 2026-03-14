@@ -21,7 +21,7 @@ import Image from "next/image";
 
 // ─── Zod Schema ──────────────────────────────────────────
 const rejectSchema = z.object({
-  reason: z.string().min(1, "Vui lòng nhập lý do từ chối"),
+  reason: z.string().min(1, "Please enter a reason for rejection"),
 });
 
 type RejectFormData = z.infer<typeof rejectSchema>;
@@ -132,7 +132,7 @@ export default function RejectWithdrawalModal({
               <XCircle className="h-5 w-5 text-white" />
             </div>
             <h2 className="text-lg font-black uppercase tracking-tight text-black font-oswald">
-              Từ chối yêu cầu rút tiền
+              Reject withdrawal request
             </h2>
           </div>
           <button
@@ -156,7 +156,7 @@ export default function RejectWithdrawalModal({
               </div>
               <div className="text-right">
                 <p className="text-xs text-gray-500 uppercase tracking-wide font-oswald mb-0.5">
-                  Số tiền
+                  Amount
                 </p>
                 <p className="text-2xl font-black text-[#ce2a32] font-oswald">
                   {amount.toLocaleString("vi-VN")}
@@ -171,11 +171,11 @@ export default function RejectWithdrawalModal({
             <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-sm font-semibold text-amber-800">
-                Hoàn tiền tự động
+                Auto refund
               </p>
               <p className="text-xs text-amber-700 mt-0.5">
-                Từ chối yêu cầu này sẽ tự động hoàn lại số tiền rút vào ví của
-                Shop.
+                Rejecting this request will automatically refund the withdrawal
+                amount to the Shop's wallet.
               </p>
             </div>
           </div>
@@ -183,11 +183,11 @@ export default function RejectWithdrawalModal({
           {/* Reason */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Lý do từ chối <span className="text-red-500">*</span>
+              Reason for rejection <span className="text-red-500">*</span>
             </label>
             <textarea
               rows={3}
-              placeholder="Nhập lý do từ chối..."
+              placeholder="Enter reason for rejection..."
               className={`w-full border-2 rounded-lg p-3 outline-none transition-all resize-none ${
                 errors.reason
                   ? "border-red-400 focus:border-red-500"
@@ -205,9 +205,9 @@ export default function RejectWithdrawalModal({
           {/* Evidence Image Upload (optional) */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Ảnh minh chứng{" "}
+              Evidence image{" "}
               <span className="text-xs text-gray-400 font-normal">
-                (không bắt buộc)
+                (optional)
               </span>
             </label>
 
@@ -222,10 +222,10 @@ export default function RejectWithdrawalModal({
                 </div>
                 <div className="text-center">
                   <p className="text-sm font-medium text-gray-600">
-                    Nhấn để tải ảnh lên
+                    Click to upload image
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    PNG, JPG tối đa 5MB
+                    PNG, JPG up to 5MB
                   </p>
                 </div>
               </button>
@@ -244,7 +244,7 @@ export default function RejectWithdrawalModal({
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                     <div className="flex items-center gap-2 text-white text-sm font-medium">
                       <Loader2 className="h-5 w-5 animate-spin" />
-                      Đang tải lên...
+                      Uploading...
                     </div>
                   </div>
                 )}
@@ -263,7 +263,7 @@ export default function RejectWithdrawalModal({
                   className="absolute bottom-2 right-2 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-white transition-colors shadow-sm border border-gray-200"
                 >
                   <ImageIcon className="h-3.5 w-3.5 inline mr-1" />
-                  Đổi ảnh
+                  Change image
                 </button>
               </div>
             )}
@@ -284,7 +284,7 @@ export default function RejectWithdrawalModal({
             className="w-full rounded-lg bg-red-600 px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-red-700 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-oswald flex items-center justify-center gap-2"
           >
             {rejectLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {rejectLoading ? "Đang xử lý..." : "Từ chối & Hoàn tiền"}
+            {rejectLoading ? "Processing..." : "Reject & Refund"}
           </button>
         </form>
       </div>

@@ -214,7 +214,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
           <div className="flex items-center gap-2">
             <Ticket className="w-5 h-5 text-[#ce2a32]" />
             <h3 className="font-bold text-base text-gray-900">
-              Chi tiết Voucher
+              Voucher Details
             </h3>
           </div>
           <button
@@ -239,7 +239,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
               }`}
             >
               <Info className="w-4 h-4" />
-              Thông tin chung
+              General Information
             </button>
             <button
               type="button"
@@ -251,7 +251,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
               }`}
             >
               <History className="w-4 h-4" />
-              Lịch sử sử dụng
+              Usage History
             </button>
           </div>
         )}
@@ -261,12 +261,12 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400">
               <Loader2 className="w-8 h-8 animate-spin mb-3" />
-              <p className="text-sm">Đang tải chi tiết...</p>
+              <p className="text-sm">Loading details...</p>
             </div>
           ) : !voucher ? (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400">
               <Ticket className="w-10 h-10 opacity-20 mb-3" />
-              <p className="text-sm">Không tìm thấy voucher</p>
+              <p className="text-sm">Voucher not found</p>
             </div>
           ) : (
             <>
@@ -276,32 +276,32 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                   {/* Section A: Định danh */}
                   <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">
-                      Định danh
+                      Identification
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                       <div className="sm:col-span-2">
                         <CopiableField label="ID" value={voucher.id} mono />
                       </div>
                       <CopiableField
-                        label="Mã Voucher"
+                        label="Voucher Code"
                         value={voucher.code}
                         mono
                       />
-                      <DetailRow label="Tên">{voucher.name}</DetailRow>
-                      <DetailRow label="Loại">
+                      <DetailRow label="Name">{voucher.name}</DetailRow>
+                      <DetailRow label="Type">
                         <span
                           className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${typeColor(voucher.type)}`}
                         >
                           {voucher.type}
                         </span>
                       </DetailRow>
-                      <DetailRow label="Người tạo">
+                      <DetailRow label="Creator">
                         {voucher.creatorName}
                       </DetailRow>
                       {voucher.targetUserId && (
                         <div className="sm:col-span-2">
                           <CopiableField
-                            label="Người nhận chỉ định"
+                            label="Designated Recipient"
                             value={voucher.targetUserId}
                             mono
                           />
@@ -313,7 +313,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                   {/* Section B: Giá trị & Điều kiện */}
                   <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">
-                      Giá trị &amp; Điều kiện
+                      Value & Conditions
                     </h4>
                     {voucher.description && (
                       <p className="text-sm text-gray-700 leading-relaxed mb-3">
@@ -321,12 +321,12 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                       </p>
                     )}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
-                      <DetailRow label="Hình thức giảm">
+                      <DetailRow label="Discount Type">
                         {voucher.discountType === "Percentage"
-                          ? "Phần trăm (%)"
-                          : "Số tiền cố định (₫)"}
+                          ? "Percentage (%)"
+                          : "Fixed Amount (₫)"}
                       </DetailRow>
-                      <DetailRow label="Mức giảm">
+                      <DetailRow label="Discount">
                         {voucher.discountType === "Percentage" ? (
                           <span className="text-lg font-bold text-[#ce2a32]">
                             {voucher.value}%
@@ -338,11 +338,11 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                         )}
                       </DetailRow>
                       {voucher.maxDiscountAmount != null && (
-                        <DetailRow label="Giảm tối đa">
+                        <DetailRow label="Max Discount">
                           {fmtVND(voucher.maxDiscountAmount)}
                         </DetailRow>
                       )}
-                      <DetailRow label="Đơn tối thiểu">
+                      <DetailRow label="Minimum Order">
                         {fmtVND(voucher.minOrderValue)}
                       </DetailRow>
                     </div>
@@ -351,16 +351,16 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                   {/* Section C: Thời gian & Giới hạn */}
                   <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">
-                      Thời gian &amp; Giới hạn
+                      Time & Limit
                     </h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
-                      <DetailRow label="Ngày bắt đầu">
+                      <DetailRow label="Start Date">
                         {fmtDate(voucher.startDate)}
                       </DetailRow>
-                      <DetailRow label="Ngày kết thúc">
+                      <DetailRow label="End Date">
                         {fmtDate(voucher.endDate)}
                       </DetailRow>
-                      <DetailRow label="Trạng thái">
+                      <DetailRow label="Status">
                         <span
                           className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusColor(voucher.status)}`}
                         >
@@ -370,7 +370,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                     </div>
                     <div className="mt-4">
                       <p className="text-xs text-gray-500 mb-2">
-                        Tiến độ sử dụng
+                        Usage Progress
                       </p>
                       <div className="flex items-center gap-3">
                         <div className="flex-1 h-2.5 bg-white rounded-full overflow-hidden border border-gray-200">
@@ -389,19 +389,19 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                   {/* Section D: Chính sách cộng dồn */}
                   <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">
-                      Chính sách cộng dồn
+                      Stacking Policy
                     </h4>
                     <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                      <DetailRow label="Được cộng dồn">
+                      <DetailRow label="Stackable">
                         {voucher.isStackable ? (
                           <span className="text-green-600 font-semibold">
-                            Có
+                            Yes
                           </span>
                         ) : (
-                          <span className="text-gray-500">Không</span>
+                          <span className="text-gray-500">No</span>
                         )}
                       </DetailRow>
-                      <DetailRow label="Chính sách">
+                      <DetailRow label="Policy">
                         {voucher.stackingPolicy}
                       </DetailRow>
                     </div>
@@ -415,11 +415,11 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                   {isFetchingUsage ? (
                     <div className="flex items-center justify-center py-8 text-gray-400">
                       <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                      <span className="text-sm">Đang tải...</span>
+                      <span className="text-sm">Loading...</span>
                     </div>
                   ) : usageHistory.length === 0 ? (
                     <p className="text-sm text-gray-400 text-center py-6">
-                      Chưa có lượt sử dụng nào.
+                      No usage yet.
                     </p>
                   ) : (
                     <>
@@ -428,15 +428,15 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                           <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
                             <tr>
                               <th className="px-4 py-2.5 w-[170px]">
-                                Ngày dùng
+                                Used Date
                               </th>
-                              <th className="px-4 py-2.5">Khách hàng</th>
-                              <th className="px-4 py-2.5">Mã đơn</th>
+                              <th className="px-4 py-2.5">Customer</th>
+                              <th className="px-4 py-2.5">Order Code</th>
                               <th className="px-4 py-2.5 text-right">
-                                Giá trị đơn
+                                Order Value
                               </th>
                               <th className="px-4 py-2.5 text-right">
-                                Đã giảm
+                                Discount Applied
                               </th>
                             </tr>
                           </thead>
@@ -467,7 +467,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                                         )
                                       }
                                       className="shrink-0 p-0.5 rounded hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition"
-                                      title="Copy mã đơn"
+                                      title="Copy order code"
                                     >
                                       <Copy className="w-3 h-3" />
                                     </button>
@@ -489,7 +489,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                       {usagePagination && usagePagination.totalPages > 1 && (
                         <div className="flex items-center justify-between mt-4 text-sm text-gray-500">
                           <span>
-                            Trang {usagePagination.currentPage} /{" "}
+                            Page {usagePagination.currentPage} /{" "}
                             {usagePagination.totalPages}
                           </span>
                           <div className="flex gap-2">
@@ -503,7 +503,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                               }
                               className="inline-flex items-center gap-1 rounded-lg border bg-white px-3 py-1.5 font-medium transition hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                              <ChevronLeft className="h-4 w-4" /> Trước
+                              <ChevronLeft className="h-4 w-4" /> Previous
                             </button>
                             <button
                               type="button"
@@ -515,7 +515,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                               }
                               className="inline-flex items-center gap-1 rounded-lg border bg-white px-3 py-1.5 font-medium transition hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                              Sau <ChevronRight className="h-4 w-4" />
+                              Next <ChevronRight className="h-4 w-4" />
                             </button>
                           </div>
                         </div>
@@ -534,7 +534,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
             onClick={onClose}
             className="w-full py-2.5 text-sm font-bold uppercase tracking-wider rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
           >
-            Đóng
+            Close
           </button>
         </div>
       </div>

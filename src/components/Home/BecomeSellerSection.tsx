@@ -6,9 +6,9 @@ import { ArrowRight, Users, TrendingUp } from "lucide-react";
 
 export const BecomeSellerSection = () => {
   return (
-    <section className="relative w-full py-24 bg-black text-white overflow-hidden border-t border-white/10">
+    <section className="relative w-full pt-20 pb-26 lg:pb-40 px-4 lg:px-8 bg-black text-white overflow-hidden ">
       {/* Background Decor */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#1a1a1a] to-transparent opacity-50 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#151515] to-transparent opacity-50 pointer-events-none" />
 
       <div className="max-w-[1920px] mx-auto px-4 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -71,7 +71,7 @@ export const BecomeSellerSection = () => {
             />
 
             {/* Floating Badge */}
-            <div className="absolute bottom-8 left-8 bg-black/60 backdrop-blur-md border border-white/10 p-5 rounded-xl max-w-xs shadow-2xl">
+            <div className="absolute bottom-8 left-8 bg-[#0d0d0d]/80 backdrop-blur-md border border-white/10 p-5 rounded-xl max-w-xs shadow-2xl">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-2 h-2 rounded-full bg-[#ce2a32] animate-pulse" />
                 <span className="text-xs font-bold uppercase tracking-wider text-gray-300">

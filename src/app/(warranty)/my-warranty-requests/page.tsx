@@ -40,8 +40,8 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 const TYPE_LABELS: Record<string, string> = {
-  ReturnRequest: "Trả hàng / Hoàn tiền",
-  CancelRequest: "Yêu cầu hủy đơn",
+  ReturnRequest: "Return / Refund",
+  CancelRequest: "Order Cancellation Request",
 };
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -96,12 +96,10 @@ const WarrantySkeleton: FC = () => (
 const EmptyWarranties: FC = () => (
   <div className="flex flex-col items-center justify-center py-24 text-center">
     <ShieldCheck className="w-20 h-20 text-gray-300 mb-6" strokeWidth={1} />
-    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-      Chưa có yêu cầu nào
-    </h2>
+    <h2 className="text-2xl font-bold text-gray-900 mb-2">No requests yet</h2>
     <p className="text-gray-500 max-w-sm">
-      Bạn chưa gửi yêu cầu bảo hành hoặc trả hàng nào. Yêu cầu mới sẽ xuất hiện
-      tại đây.
+      You have not submitted any warranty or return requests. New requests will
+      appear here.
     </p>
   </div>
 );
@@ -162,7 +160,7 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
         {/* Refund Amount */}
         {request.refundAmount > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Số tiền hoàn:</span>
+            <span className="text-sm text-gray-600">Refund Amount:</span>
             <span className="text-base font-bold text-[#ce2a32]">
               {formatCurrency(request.refundAmount)}
             </span>
@@ -174,7 +172,7 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
           <div className="relative w-full h-40 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
             <Image
               src={request.evidenceUrl}
-              alt="Minh chứng"
+              alt="Evidence"
               fill
               className="object-contain"
             />
@@ -187,7 +185,7 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
             <Info className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
             <div className="min-w-0">
               <p className="text-xs font-semibold text-gray-600 mb-0.5">
-                Phản hồi từ Shop
+                Shop Response
               </p>
               <p className="text-sm text-gray-700 break-words">
                 {request.shopResponse}
@@ -202,7 +200,7 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
             <Info className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
             <div className="min-w-0">
               <p className="text-xs font-semibold text-blue-600 mb-0.5">
-                Ghi chú từ Admin
+                Admin Note
               </p>
               <p className="text-sm text-blue-700 break-words">
                 {request.adminNote}
@@ -216,7 +214,7 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
       <div className="flex items-center gap-3 px-5 py-3 border-t border-gray-100 bg-gray-50/50">
         <button className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
           <Eye className="w-4 h-4" />
-          Xem chi tiết
+          View Details
         </button>
 
         {showWithdraw && (
@@ -226,7 +224,7 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 bg-white border border-red-300 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
           >
             <Undo2 className="w-4 h-4" />
-            Rút lại yêu cầu
+            Withdraw Request
           </button>
         )}
 
@@ -236,7 +234,7 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 bg-white border border-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
           >
             <Pencil className="w-4 h-4" />
-            Sửa yêu cầu
+            Edit Request
           </button>
         )}
 
@@ -246,7 +244,7 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Truck className="w-4 h-4" />
-            Gửi thông tin trả hàng
+            Send Return Info
           </button>
         )}
       </div>
@@ -274,7 +272,7 @@ const Pagination: FC<PaginationProps> = ({ current, total, onChange }) => {
         <ChevronLeft className="w-4 h-4" />
       </button>
       <span className="text-sm text-gray-600 px-3">
-        Trang <span className="font-semibold text-gray-900">{current}</span> /{" "}
+        Page <span className="font-semibold text-gray-900">{current}</span> /{" "}
         {total}
       </span>
       <button
@@ -350,7 +348,7 @@ const MyWarrantiesPage: FC = () => {
   return (
     <div className="max-w-[900px] mx-auto px-4 md:px-8 py-12 lg:py-20">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        Yêu cầu bảo hành & Trả hàng
+        Warranty & Return Requests
       </h1>
 
       {warrantyList.length === 0 ? (

@@ -12,11 +12,11 @@ import { Voucher, VoucherStatus } from "@/src/services/voucher.service";
 // ─── Zod Schema ──────────────────────────────────────────
 
 const updateVoucherSchema = z.object({
-  name: z.string().min(1, "Tên voucher không được để trống"),
-  description: z.string().min(1, "Mô tả không được để trống"),
-  endDate: z.string().min(1, "Chọn ngày kết thúc"),
-  usageLimit: z.string().min(1, "Không được để trống"),
-  status: z.string().min(1, "Chọn trạng thái"),
+  name: z.string().min(1, "Voucher name cannot be empty"),
+  description: z.string().min(1, "Description cannot be empty"),
+  endDate: z.string().min(1, "Select end date"),
+  usageLimit: z.string().min(1, "Cannot be empty"),
+  status: z.string().min(1, "Select status"),
 });
 
 type UpdateVoucherFormValues = z.infer<typeof updateVoucherSchema>;
@@ -81,10 +81,10 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
           },
         }),
       ).unwrap();
-      toast.success(result.message || "Cập nhật voucher thành công!");
+      toast.success(result.message || "Voucher updated successfully!");
       onClose();
     } catch (err: unknown) {
-      toast.error(typeof err === "string" ? err : "Cập nhật voucher thất bại");
+      toast.error(typeof err === "string" ? err : "Failed to update voucher");
     }
   };
 
@@ -99,7 +99,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-xl font-black uppercase tracking-tight font-oswald">
-            Cập nhật Voucher
+            Update Voucher
           </h2>
           <button
             type="button"
@@ -126,14 +126,14 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Name */}
           <div>
-            <label className={labelCls}>Tên Voucher</label>
+            <label className={labelCls}>Voucher Name</label>
             <input {...register("name")} className={inputCls} />
             {errors.name && <p className={errCls}>{errors.name.message}</p>}
           </div>
 
           {/* Description */}
           <div>
-            <label className={labelCls}>Mô tả</label>
+            <label className={labelCls}>Description</label>
             <textarea
               {...register("description")}
               rows={2}
@@ -146,7 +146,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
 
           {/* End Date */}
           <div>
-            <label className={labelCls}>Ngày kết thúc</label>
+            <label className={labelCls}>End Date</label>
             <input
               type="datetime-local"
               {...register("endDate")}
@@ -160,7 +160,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
           {/* Usage Limit + Status row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>Giới hạn sử dụng</label>
+              <label className={labelCls}>Usage Limit</label>
               <input
                 type="number"
                 {...register("usageLimit")}
@@ -171,7 +171,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
               )}
             </div>
             <div>
-              <label className={labelCls}>Trạng thái</label>
+              <label className={labelCls}>Status</label>
               <select {...register("status")} className={inputCls}>
                 <option value={String(VoucherStatus.Active)}>Active</option>
                 <option value={String(VoucherStatus.Disabled)}>Disabled</option>
@@ -186,7 +186,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
               onClick={onClose}
               className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
             >
-              Huỷ
+              Cancel
             </button>
             <button
               type="submit"
@@ -196,7 +196,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
               {isUpdatingVoucher && (
                 <Loader2 className="h-4 w-4 animate-spin" />
               )}
-              Lưu thay đổi
+              Save Changes
             </button>
           </div>
         </form>

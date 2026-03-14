@@ -31,7 +31,7 @@ export default function ProductLayout({
 }) {
   return (
     <div
-      className={`flex flex-col min-h-screen bg-[#f0f2f5] ${inter.className} ${oswald.variable}`}
+      className={`flex flex-col min-h-screen bg-[#000] ${inter.className} ${oswald.variable}`}
     >
       <LayoutWrapper>
         <div className={`${oswald.className} sticky top-0 z-40`}>

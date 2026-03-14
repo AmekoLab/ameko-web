@@ -87,7 +87,7 @@ export const BuilderCTA: FC = () => {
               className="relative aspect-square md:aspect-[4/3]"
             >
               <Image
-                src="https://res.cloudinary.com/doezwafgz/image/upload/v1765554095/Blossom-Honey-IK-Falcon-1_egmmas.png"
+                src="https://res.cloudinary.com/doezwafgz/image/upload/v1773519922/home5_uukgy0.jpg"
                 alt="Keyboard Builder Preview"
                 fill
                 className="object-contain drop-shadow-2xl"

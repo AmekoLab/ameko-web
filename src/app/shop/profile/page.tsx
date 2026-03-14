@@ -219,16 +219,16 @@ export default function ShopProfilePage() {
     try {
       if (isCurrentlyActive) {
         await dispatch(deactivateShop()).unwrap();
-        toast.success("Gian hàng đã tạm nghỉ bán.");
+        toast.success("Shop has been temporarily closed.");
       } else {
         await dispatch(reactivateShop()).unwrap();
-        toast.success("Gian hàng đã mở bán trở lại.");
+        toast.success("Shop has been reopened.");
       }
-      // Gọi API tải lại thông tin shop để nhận biến isActive mới nhất
+      // Reload shop info to get latest isActive
       dispatch(fetchCurrentShop());
-      setIsConfirmModalOpen(false); // Đóng Modal khi thành công
+      setIsConfirmModalOpen(false); // Close modal on success
     } catch (error: any) {
-      toast.error(error || "Thao tác thất bại. Vui lòng thử lại.");
+      toast.error(error || "Action failed. Please try again.");
     } finally {
       setIsToggling(false);
     }
@@ -286,12 +286,14 @@ export default function ShopProfilePage() {
 
             {/* Tiêu đề & Nội dung */}
             <h3 className="text-xl font-bold text-gray-900 mb-2">
-              {currentShop?.isActive ? "Tạm nghỉ bán?" : "Mở cửa trở lại?"}
+              {currentShop?.isActive
+                ? "Close shop temporarily?"
+                : "Reopen shop?"}
             </h3>
             <p className="text-sm text-gray-500 mb-6">
               {currentShop?.isActive
-                ? "Gian hàng của bạn sẽ bị ẩn. Khách hàng không thể xem hoặc mua sản phẩm từ bạn cho đến khi mở lại."
-                : "Gian hàng của bạn sẽ hiển thị trở lại. Khách hàng có thể tiếp tục xem và mua sắm bình thường."}
+                ? "Your shop will be hidden. Customers cannot view or purchase products until you reopen."
+                : "Your shop will be visible again. Customers can continue to view and shop as usual."}
             </p>
 
             {/* Cụm Nút Hành Động */}
@@ -302,7 +304,7 @@ export default function ShopProfilePage() {
                 disabled={isToggling}
                 className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors disabled:opacity-70"
               >
-                Hủy bỏ
+                Cancel
               </button>
               <button
                 type="button"
@@ -317,7 +319,7 @@ export default function ShopProfilePage() {
                 {isToggling ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
-                  "Xác nhận"
+                  "Confirm"
                 )}
               </button>
             </div>
@@ -358,7 +360,7 @@ export default function ShopProfilePage() {
                 {currentShop.status === 1 && currentShop.isActive
                   ? "Active"
                   : currentShop.status === 1 && !currentShop.isActive
-                    ? "Inactive (Nghỉ Bán)"
+                    ? "Inactive (Closed)"
                     : currentShop.status === 0
                       ? "Pending"
                       : currentShop.status === 3

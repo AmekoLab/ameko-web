@@ -73,6 +73,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
   }, [dispatch, isAuthenticated, followingIds.length]);
 
   // --- THÊM: Hàm xử lý mở Popup ---
+  // --- ADD: Open Popup Handler ---
   const openFollowsModal = (title: "Followers" | "Following") => {
     setFollowsModalState({
       isOpen: true,
@@ -81,6 +82,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
   };
 
   // --- THÊM: Hàm xử lý đóng Popup ---
+  // --- ADD: Close Popup Handler ---
   const closeFollowsModal = () => {
     setFollowsModalState((prev) => ({ ...prev, isOpen: false }));
   };
@@ -183,7 +185,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
               </div>
 
-              {/* Followers: Bấm vào mở Modal Followers */}
+              {/* Followers: Click to open Followers Modal */}
               <div
                 className="cursor-pointer hover:opacity-70 transition-opacity"
                 onClick={() => openFollowsModal("Followers")}
@@ -194,7 +196,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                 <span className="text-gray-800">followers</span>
               </div>
 
-              {/* Following: Bấm vào mở Modal Following */}
+              {/* Following: Click to open Following Modal */}
               <div
                 className="cursor-pointer hover:opacity-70 transition-opacity"
                 onClick={() => openFollowsModal("Following")}
@@ -218,7 +220,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
               </Link>
             ) : (
               <>
-                {/* NÚT FOLLOW */}
+                {/* FOLLOW BUTTON */}
                 <button
                   onClick={handleToggleFollow}
                   disabled={isLoading}
@@ -237,13 +239,13 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                   )}
                 </button>
 
-                {/* Dropdown: Đặt Phím Custom */}
+                {/* Dropdown: Set Custom Key */}
                 <div className="relative">
                   <button
                     onClick={() => setIsDropdownOpen((prev) => !prev)}
                     className="flex items-center gap-2 px-6 py-2 bg-[#ce2a32] text-white hover:bg-[#b02028] font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm"
                   >
-                    Đặt Phím Custom <ChevronDown className="w-4 h-4" />
+                    Set Custom Key <ChevronDown className="w-4 h-4" />
                   </button>
 
                   {isDropdownOpen && (
@@ -253,7 +255,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                         className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                         onClick={() => setIsDropdownOpen(false)}
                       >
-                        <Wrench className="w-4 h-4" /> Tự thiết kế cấu hình
+                        <Wrench className="w-4 h-4" /> Customize Configuration
                       </Link>
                       <button
                         onClick={() => {
@@ -262,7 +264,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                         }}
                         className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors w-full text-left"
                       >
-                        <FileText className="w-4 h-4" /> Gửi yêu cầu báo giá
+                        <FileText className="w-4 h-4" /> Send Quotation Request
                       </button>
                     </div>
                   )}

@@ -7,9 +7,9 @@ export const Logo: FC = () => (
     <Image
       src="https://res.cloudinary.com/doezwafgz/image/upload/v1768359101/logo-removebg-preview_1_updhae.png"
       alt="AMEKO Logo"
-      className="h-16 w-auto"
-      width={200}
-      height={50}
+      className="h-20 w-auto "
+      width={250}
+      height={100}
     />
   </Link>
 );

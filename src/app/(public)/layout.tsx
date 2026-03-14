@@ -26,7 +26,7 @@ export default function PublicLayout({
 }) {
   return (
     <div
-      className={`flex flex-col min-h-screen bg-[#f0f2f5] ${font.className}`}
+      className={`flex flex-col min-h-screen bg-black ${font.className}`}
     >
       <LayoutWrapper>
         <Header />

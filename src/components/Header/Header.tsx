@@ -69,6 +69,8 @@ export const Header: FC = () => {
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const { currentShop } = useAppSelector((state) => state.shop);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const lastScrollY = useRef(0);
+  const [isVisible, setIsVisible] = useState(true);
 
   // Compute cart item count from server cart
   const cartItemCount = serverCart?.orderItems
@@ -93,6 +95,34 @@ export const Header: FC = () => {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Hide on scroll-down, reveal on scroll-up (Corsair-style)
+  useEffect(() => {
+    const THRESHOLD = 6; // px — ignore tiny jitter
+    const onScroll = () => {
+      const currentY = window.scrollY;
+      const delta = currentY - lastScrollY.current;
+
+      if (Math.abs(delta) < THRESHOLD) return;
+
+      if (currentY <= 0) {
+        // Always show at very top
+        setIsVisible(true);
+      } else if (delta > 0) {
+        // Scrolling DOWN → hide
+        setIsVisible(false);
+        setMobileOpen(false); // close drawer when header hides
+      } else {
+        // Scrolling UP → reveal
+        setIsVisible(true);
+      }
+
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const handleLogout = async () => {
@@ -180,199 +210,334 @@ export const Header: FC = () => {
   // };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="w-full max-w-[1920px] mx-auto">
-        <div className="flex justify-end items-center h-10 space-x-6 pr-4 bg-white text-xs font-medium border-b border-gray-100 lg:border-none">
-          {/* 4. GỌI HÀM RENDER */}
-          {/* {renderDashboardButton()} */}
-
-          {/* User Dropdown */}
-          {isAuthenticated && user ? (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-2 hover:text-[#ce2a32] transition-colors focus:outline-none"
+    <header
+      className={`sticky top-0 z-50 w-full bg-black transform-gpu transition-transform duration-500 ease-out ${
+        isVisible ? "translate-y-0" : "-translate-y-full"
+      }`}
+    >
+      {/* ═══════════════════════════════════════════
+          ROW 1 — UTILITY BAR  (same as Corsair top strip)
+          Left: icon links  |  Center: promo carousel  |  Right: flag + auth
+      ═══════════════════════════════════════════ */}
+      <div className="bg-black border-b border-white/10">
+        <div className="w-full max-w-[1920px] mx-auto flex items-center h-10 px-4 lg:px-6">
+          {/* ── LEFT: icon-style quick links (social / app icons placeholder) ── */}
+          {/* <div className="flex items-center gap-0 flex-shrink-0">
+            {[
+              <svg
+                key="a"
+                className="w-4 h-4"
+                fill="currentColor"
+                viewBox="0 0 24 24"
               >
-                {user.image ? (
-                  <div className="relative w-6 h-6">
-                    <Image
-                      src={user.image}
-                      alt="avatar"
-                      fill
-                      className="rounded-full object-cover border border-gray-200"
-                    />
-                  </div>
-                ) : (
-                  <span className="text-lg">👤</span>
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V9h2v7zm4 0h-2V9h2v7z" />
+              </svg>,
+              <svg
+                key="b"
+                className="w-4 h-4"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+              </svg>,
+              <svg
+                key="c"
+                className="w-4 h-4"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <circle cx="12" cy="12" r="10" />
+              </svg>,
+              <svg
+                key="d"
+                className="w-4 h-4"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M3 3h18v18H3z" />
+              </svg>,
+            ].map((icon, i, arr) => (
+              <span key={i} className="flex items-center">
+                <button className="p-2 text-gray-500 hover:text-white transition-colors">
+                  {icon}
+                </button>
+                {i < arr.length - 1 && (
+                  <span className="text-white/20 text-xs select-none">|</span>
                 )}
-                <span className="font-bold truncate max-w-[100px]">
-                  Hi, {user.firstName || user.username}
-                </span>
-              </button>
+              </span>
+            ))}
+          </div> */}
 
-              {userDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-gray-900 font-bold truncate">
-                      {user.email}
-                    </p>
-                    <p className="text-[10px] text-gray-500 uppercase">
-                      {user.role}
-                    </p>
-                  </div>
-
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
-                    onClick={() => setUserDropdownOpen(false)}
-                  >
-                    Account Settings
-                  </Link>
-
-                  <Link
-                    href="/orders"
-                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
-                    onClick={() => setUserDropdownOpen(false)}
-                  >
-                    {/* <Package className="w-4 h-4" /> */}
-                    My Orders
-                  </Link>
-
-                  {/* Nếu là Admin */}
-                  {user.role === "Admin" && (
-                    <Link
-                      href="/admin/dashboard"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32] font-bold"
-                      onClick={() => setUserDropdownOpen(false)}
-                    >
-                      Admin Dashboard
-                    </Link>
-                  )}
-
-                  {/* Nếu là Shop Active (và không phải Admin) */}
-                  {currentShop?.status === ShopStatus.Active &&
-                    user.role !== "Admin" && (
-                      <Link
-                        href="/shop/dashboard"
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
-                        onClick={() => setUserDropdownOpen(false)}
-                      >
-                        Shop Dashboard
-                      </Link>
-                    )}
-
-                  {currentShop?.status === ShopStatus.Active &&
-                    user.role !== "Admin" && (
-                      <Link
-                        href={`/profile/shop/${currentShop.id}`}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
-                        onClick={() => setUserDropdownOpen(false)}
-                      >
-                        View My Store
-                      </Link>
-                    )}
-
-                  {currentShop?.status === ShopStatus.Active &&
-                    user.role !== "Admin" && (
-                      <Link
-                        href={`/shop/wallet`}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
-                        onClick={() => setUserDropdownOpen(false)}
-                      >
-                        View My Wallet
-                      </Link>
-                    )}
-                  {user.role !== "Admin" && (
-                    <Link
-                      href={`/my-commissions`}
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
-                      onClick={() => setUserDropdownOpen(false)}
-                    >
-                      View My Custom Requests
-                    </Link>
-                  )}
-
-                  {user.role !== "Admin" && (
-                    <Link
-                      href={`/my-payments`}
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
-                      onClick={() => setUserDropdownOpen(false)}
-                    >
-                      View My Payment History
-                    </Link>
-                  )}
-
-                  {user.role !== "Admin" && (
-                    <Link
-                      href={`/my-warranty-requests`}
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#ce2a32]"
-                      onClick={() => setUserDropdownOpen(false)}
-                    >
-                      View My Warranty Requests
-                    </Link>
-                  )}
-
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <Link
-              href="/login"
-              className="text-gray-600 hover:text-black uppercase tracking-wider"
-            >
-              Login / Register
-            </Link>
-          )}
-
-          <button
-            onClick={handleOpenCart}
-            className="flex items-center gap-2 text-gray-800 font-medium hover:text-[#ce2a32] transition-colors"
-          >
-            <CartIcon /> Cart ({cartItemCount})
-          </button>
-          <CountrySelector />
-        </div>
-
-        {/* --- MAIN BAR --- */}
-        <div className="flex h-16 items-center justify-between px-4 lg:px-8">
-          <div className="flex-shrink-0">
-            <Logo />
-          </div>
-          <div className="hidden lg:flex justify-center flex-1 mx-8">
-            <Nav />
-          </div>
-          <div className="flex items-center gap-4 justify-end">
-            <div className="hidden lg:block w-64">
-              <SearchBar />
-            </div>
-            <button
-              className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-md"
-              onClick={() => setMobileOpen(!mobileOpen)}
-            >
-              {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+          {/* ── CENTER: promo carousel ── */}
+          <div className="flex-1 flex items-center justify-center gap-3 min-w-0 ml-30">
+            <button className="text-gray-400 hover:text-white transition-colors flex-shrink-0">
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            <p className="text-sm text-white font-medium tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">
+              Free shipping on orders over $50 &nbsp;
+              <Link
+                href="/shop/all-products"
+                className="text-[#f0c040] uppercase tracking-widest cursor-pointer hover:underline"
+              >
+                Shop Now
+              </Link>
+            </p>
+            <button className="text-gray-400 hover:text-white transition-colors flex-shrink-0">
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
             </button>
           </div>
+
+          {/* ── RIGHT: flag + auth ── */}
+          <div className="flex items-center flex-shrink-0">
+            {/* Country flag */}
+            <div className="mr-3">
+              <CountrySelector />
+            </div>
+
+            {isAuthenticated && user ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className="flex items-center gap-1.5 px-3 text-[11px] text-gray-300 hover:text-white uppercase tracking-widest font-semibold transition-colors focus:outline-none border-l border-white/20"
+                >
+                  {user.image ? (
+                    <div className="relative w-4 h-4">
+                      <Image
+                        src={user.image}
+                        alt="avatar"
+                        fill
+                        className="rounded-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                  )}
+                  {user.firstName || user.username}
+                </button>
+
+                {userDropdownOpen && (
+                  <div className="absolute right-0 mt-1 w-52 bg-[#111] border border-white/15 shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
+                    <div className="px-4 py-2.5 border-b border-white/10">
+                      <p className="text-white font-bold truncate text-xs">
+                        {user.email}
+                      </p>
+                      <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-0.5">
+                        {user.role}
+                      </p>
+                    </div>
+                    {[
+                      {
+                        href: "/profile",
+                        label: "Account Settings",
+                        show: true,
+                      },
+                      { href: "/orders", label: "My Orders", show: true },
+                      {
+                        href: "/admin/dashboard",
+                        label: "Admin Dashboard",
+                        show: user.role === "Admin",
+                      },
+                      {
+                        href: "/shop/dashboard",
+                        label: "Shop Dashboard",
+                        show:
+                          currentShop?.status === ShopStatus.Active &&
+                          user.role !== "Admin",
+                      },
+                      {
+                        href: `/profile/shop/${currentShop?.id}`,
+                        label: "View My Store",
+                        show:
+                          currentShop?.status === ShopStatus.Active &&
+                          user.role !== "Admin",
+                      },
+                      {
+                        href: "/shop/wallet",
+                        label: "My Wallet",
+                        show:
+                          currentShop?.status === ShopStatus.Active &&
+                          user.role !== "Admin",
+                      },
+                      {
+                        href: "/my-commissions",
+                        label: "Custom Requests",
+                        show: user.role !== "Admin",
+                      },
+                      {
+                        href: "/my-payments",
+                        label: "Payment History",
+                        show: user.role !== "Admin",
+                      },
+                      {
+                        href: "/my-warranty-requests",
+                        label: "Warranty Requests",
+                        show: user.role !== "Admin",
+                      },
+                    ]
+                      .filter((item) => item.show)
+                      .map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="block px-4 py-2 text-[11px] text-gray-300 hover:bg-white/5 hover:text-white uppercase tracking-wider transition-colors"
+                          onClick={() => setUserDropdownOpen(false)}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    <div className="border-t border-white/10 mt-1">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-[11px] text-[#ce2a32] hover:bg-white/5 uppercase tracking-wider transition-colors"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="px-3 text-[11px] text-gray-300 hover:text-white uppercase tracking-widest font-semibold transition-colors border-l border-white/20"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  className="px-3 text-[11px] text-gray-300 hover:text-white uppercase tracking-widest font-semibold transition-colors border-l border-white/20"
+                >
+                  Join Us
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════
+          ROW 2 — MAIN NAV BAR
+          Logo left  |  Nav centered  |  Search icon + Cart icon right
+      ═══════════════════════════════════════════ */}
+      <div className="w-full max-w-[1920px] mx-auto flex h-[68px] items-center px-4 lg:px-6">
+        {/* Logo */}
+        <div className="flex-shrink-0 mr-10 drop-shadow-[0_0_30px_rgba(255,255,255,20)]">
+          <Logo />
         </div>
 
-        {/* --- MOBILE DRAWER --- */}
-        {mobileOpen && (
-          <div className="lg:hidden border-t border-gray-100 bg-white absolute w-full left-0 shadow-lg h-[calc(100vh-64px)] overflow-y-auto z-50">
-            <div className="p-4 space-y-6">
-              <SearchBar />
-              <Nav
-                orientation="vertical"
-                onNavigate={() => setMobileOpen(false)}
+        {/* Nav — full-width centered, large bold uppercase items */}
+        <nav className="hidden lg:flex flex-1 items-center justify-center h-full">
+          <Nav />
+        </nav>
+
+        {/* Right icons: Search + Cart */}
+        <div className="flex items-center gap-1 ml-auto">
+          {/* Search icon */}
+          <button
+            className="p-2.5 text-white hover:text-gray-300 transition-colors"
+            aria-label="Search"
+            onClick={() => router.push("/search")}
+          >
+            <svg
+              className="w-[22px] h-[22px]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={1.8}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
               />
-            </div>
-          </div>
-        )}
+            </svg>
+          </button>
+
+          {/* Cart icon */}
+          <button
+            onClick={handleOpenCart}
+            className="relative p-2.5 text-white hover:text-gray-300 transition-colors"
+            aria-label="Cart"
+          >
+            <svg
+              className="w-[22px] h-[22px]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={1.8}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+              />
+            </svg>
+            {cartItemCount > 0 && (
+              <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-[#ce2a32] text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
+                {cartItemCount}
+              </span>
+            )}
+          </button>
+
+          {/* Mobile hamburger */}
+          <button
+            className="lg:hidden p-2.5 text-white hover:text-gray-300 transition-colors"
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
+        </div>
       </div>
+
+      {/* ── MOBILE DRAWER ── */}
+      {mobileOpen && (
+        <div className="lg:hidden border-t border-white/10 bg-[#0d0d0d] absolute w-full left-0 shadow-2xl h-[calc(100vh-108px)] overflow-y-auto z-50">
+          <div className="p-4 space-y-6">
+            <SearchBar />
+            <Nav
+              orientation="vertical"
+              onNavigate={() => setMobileOpen(false)}
+            />
+          </div>
+        </div>
+      )}
     </header>
   );
 };

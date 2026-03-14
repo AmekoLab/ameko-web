@@ -17,8 +17,8 @@ export const Nav: FC<Props> = ({ onNavigate, orientation = "horizontal" }) => {
       <ul
         className={
           orientation === "horizontal"
-            ? "flex items-center space-x-6"
-            : "flex flex-col space-y-4"
+            ? "flex items-center space-x-20 xl:space-x-24"
+            : "flex flex-col space-y-6"
         }
       >
         {NAV_ITEMS.map((item) => (
@@ -26,7 +26,7 @@ export const Nav: FC<Props> = ({ onNavigate, orientation = "horizontal" }) => {
             <a
               href={item.href}
               onClick={onNavigate}
-              className="text-md text-black hover:text-gray-400 focus:text-gray-400 transition-colors "
+              className="text-sm uppercase tracking-widest text-white hover:text-[#f0c040] transition-colors"
             >
               {item.label}
             </a>

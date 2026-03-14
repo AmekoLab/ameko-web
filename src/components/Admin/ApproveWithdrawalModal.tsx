@@ -13,7 +13,7 @@ import Image from "next/image";
 
 // ─── Zod Schema ──────────────────────────────────────────
 const approveSchema = z.object({
-  reason: z.string().min(1, "Vui lòng nhập lý do"),
+  reason: z.string().min(1, "Please enter a reason"),
 });
 
 type ApproveFormData = z.infer<typeof approveSchema>;
@@ -51,7 +51,7 @@ export default function ApproveWithdrawalModal({
   } = useForm<ApproveFormData>({
     resolver: zodResolver(approveSchema),
     defaultValues: {
-      reason: "Đã chuyển khoản thành công",
+      reason: "Transfer successful",
     },
   });
 
@@ -128,7 +128,7 @@ export default function ApproveWithdrawalModal({
               <CheckCircle className="h-5 w-5 text-white" />
             </div>
             <h2 className="text-lg font-black uppercase tracking-tight text-black font-oswald">
-              Duyệt yêu cầu rút tiền
+              Approve withdrawal request
             </h2>
           </div>
           <button
@@ -144,7 +144,7 @@ export default function ApproveWithdrawalModal({
           {/* Transfer Amount Display */}
           <div className="bg-red-50 rounded-xl p-5 text-center border border-red-100">
             <p className="text-xs text-gray-500 uppercase tracking-wide font-oswald mb-1">
-              Số tiền cần chuyển
+              Amount to transfer
             </p>
             <p className="text-3xl font-black text-[#ce2a32] font-oswald">
               {amount.toLocaleString("vi-VN")}
@@ -155,11 +155,11 @@ export default function ApproveWithdrawalModal({
           {/* Reason */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Lý do duyệt
+              Approval reason
             </label>
             <textarea
               rows={3}
-              placeholder="Nhập lý do..."
+              placeholder="Enter reason..."
               className={`w-full border-2 rounded-lg p-3 outline-none transition-all resize-none ${
                 errors.reason
                   ? "border-red-400 focus:border-red-500"
@@ -177,7 +177,7 @@ export default function ApproveWithdrawalModal({
           {/* Evidence Image Upload */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Ảnh minh chứng chuyển khoản
+              Transfer evidence image
             </label>
 
             {!imagePreview ? (
@@ -191,10 +191,10 @@ export default function ApproveWithdrawalModal({
                 </div>
                 <div className="text-center">
                   <p className="text-sm font-medium text-gray-600">
-                    Nhấn để tải ảnh lên
+                    Click to upload image
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    PNG, JPG tối đa 5MB
+                    PNG, JPG up to 5MB
                   </p>
                 </div>
               </button>
@@ -213,7 +213,7 @@ export default function ApproveWithdrawalModal({
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                     <div className="flex items-center gap-2 text-white text-sm font-medium">
                       <Loader2 className="h-5 w-5 animate-spin" />
-                      Đang tải lên...
+                      Uploading...
                     </div>
                   </div>
                 )}
@@ -232,7 +232,7 @@ export default function ApproveWithdrawalModal({
                   className="absolute bottom-2 right-2 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-white transition-colors shadow-sm border border-gray-200"
                 >
                   <ImageIcon className="h-3.5 w-3.5 inline mr-1" />
-                  Đổi ảnh
+                  Change image
                 </button>
               </div>
             )}
@@ -253,7 +253,7 @@ export default function ApproveWithdrawalModal({
             className="w-full rounded-lg bg-green-600 px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-green-700 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-oswald flex items-center justify-center gap-2"
           >
             {approveLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {approveLoading ? "Đang xử lý..." : "Xác nhận duyệt"}
+            {approveLoading ? "Processing..." : "Confirm approval"}
           </button>
         </form>
       </div>
