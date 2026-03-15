@@ -140,7 +140,7 @@ export const PromoGridSection: FC<PromoGridSectionProps> = ({
           style={{ gap: "14px", background: "#0d0f12" }}
         >
           {/* ── COL 1: HERO — full-bleed image, text overlaid at bottom ── */}
-          <div className="relative overflow-hidden group min-h-[480px] lg:min-h-[800px]">
+          <div className="relative overflow-hidden group min-h-[480px] lg:min-h-[700px]">
             <Image
               src={heroCard.imageSrc}
               alt={heroCard.title}
