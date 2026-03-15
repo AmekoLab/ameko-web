@@ -17,7 +17,8 @@ interface HeroVideoProps {
 // ─── DEFAULT MOCK DATA ────────────────────────────────────────────────────────
 
 const defaults = {
-  videoSrc: "https://res.cloudinary.com/doezwafgz/video/upload/v1773517076/Galleon_homepage-hero_desktop_wurhlq.mp4",
+  videoSrc:
+    "https://res.cloudinary.com/doezwafgz/video/upload/v1773517076/Galleon_homepage-hero_desktop_wurhlq.mp4",
   title: "AMEKO",
   subtitle: "DESIGN YOUR DREAM KEYBOARD",
   ctaText: "START CUSTOMIZING",
@@ -50,7 +51,7 @@ export const HeroVideoSection: FC<HeroVideoProps> = ({
   }, []);
 
   return (
-   <section className="relative w-full h-[80vh] min-h-[500px] lg:min-h-[700px] overflow-hidden bg-black">
+    <section className="relative w-full h-[60vh] min-h-[500px] lg:min-h-[500px] overflow-hidden bg-black">
       {/* ── BACKGROUND VIDEO ──────────────────────────────────────────── */}
       <video
         ref={videoRef}

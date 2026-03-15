@@ -66,16 +66,13 @@ export const SplitPromoSection: FC<SplitPromoSectionProps> = ({
 }) => {
   return (
     <section className="w-full bg-black text-white py-6 overflow-hidden">
-      {/* 💡 SỬA 1: Gỡ bỏ max-w-[1920px] và padding (px-4) để tràn viền 100% ngang */}
       <div className="w-full">
-        {/* 💡 SỬA 2: Dùng gap-1 hoặc gap-2 để khe hở giữa 2 ảnh mỏng lại, ngầu hơn */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 lg:gap-2">
           {cards.map((card, index) => (
             <Link
               key={index}
               href={card.ctaHref}
-              // 💡 SỬA 3 (Tùy chọn): Nếu muốn nó cao full màn hình luôn, đổi h-[700px] thành h-screen
-              className="relative w-full h-[500px] lg:h-[800px] bg-[#151515] overflow-hidden group cursor-pointer block"
+              className="relative w-full h-[500px] lg:h-[500px] bg-[#151515] overflow-hidden group cursor-pointer block"
             >
               {/* Background Image */}
               <Image
