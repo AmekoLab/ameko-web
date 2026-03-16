@@ -54,7 +54,7 @@ const SidebarComponentRow: FC<{ component: OrderItemComponent }> = ({
   component,
 }) => (
   <div className="flex items-center gap-2 py-1.5">
-    <div className="relative w-8 h-8 bg-gray-50 shrink-0 rounded overflow-hidden border border-gray-100">
+    <div className="relative w-8 h-8 bg-[#202030] shrink-0 rounded-sm overflow-hidden border border-[#1e2126]">
       {component.partImageUrl ? (
         <Image
           src={component.partImageUrl}
@@ -64,13 +64,13 @@ const SidebarComponentRow: FC<{ component: OrderItemComponent }> = ({
           className="object-contain p-0.5"
         />
       ) : (
-        <div className="w-full h-full bg-gray-100" />
+        <div className="w-full h-full bg-[#151515]" />
       )}
     </div>
-    <span className="text-xs text-gray-600 capitalize truncate flex-1">
+    <span className="text-xs text-gray-300 capitalize truncate flex-1">
       {component.partName}
     </span>
-    <span className="text-[10px] text-gray-400 shrink-0">
+    <span className="text-[10px] font-bold text-gray-500 shrink-0">
       ×{component.quantity}
     </span>
   </div>
@@ -107,7 +107,9 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
 
     return (
       <div
-        className={`flex flex-col gap-1 p-3 rounded-lg transition-colors ${selected ? "bg-red-50/40" : ""}`}
+        className={`flex flex-col gap-1 p-3 rounded-sm border border-transparent transition-colors ${
+          selected ? "bg-[#202030]/50 border-[#1e2126]" : "hover:bg-[#151515]"
+        }`}
       >
         <div className="flex gap-3">
           {/* Checkbox */}
@@ -116,13 +118,13 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
               type="checkbox"
               checked={selected}
               onChange={() => onToggleSelect(item.orderItemId)}
-              className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
+              className="w-4 h-4 accent-[#f5d800] cursor-pointer"
               aria-label={`Select ${item.productName}`}
             />
           </div>
 
           {/* Image */}
-          <div className="relative w-20 h-20 shrink-0 border border-gray-100 rounded-sm bg-[#f9f9f9]">
+          <div className="relative w-20 h-20 shrink-0 border border-[#1e2126] rounded-sm bg-[#151515]">
             {displayImage ? (
               <Image
                 src={displayImage}
@@ -132,7 +134,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <ShoppingBag className="w-6 h-6 text-gray-200" />
+                <ShoppingBag className="w-6 h-6 text-gray-600" />
               </div>
             )}
           </div>
@@ -140,30 +142,30 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
           {/* Info */}
           <div className="flex-1 flex flex-col min-w-0">
             <div className="flex justify-between items-start mb-1">
-              <span className="text-sm font-bold text-black line-clamp-2 pr-4 leading-tight capitalize">
+              <span className="text-[13px] font-bold text-white line-clamp-2 pr-4 leading-snug uppercase tracking-wide">
                 {item.productName}
               </span>
-              <span className="text-sm font-bold text-gray-900 shrink-0">
+              <span className="text-[13px] font-bold text-[#f5d800] shrink-0">
                 {item.totalPrice.toLocaleString()}₫
               </span>
             </div>
 
             {/* Quantity & Remove */}
             <div className="flex items-center gap-2 mb-1">
-              <div className="flex items-center gap-0 border border-gray-200 rounded">
+              <div className="flex items-center gap-0 border border-[#1e2126] rounded-sm bg-[#151515]">
                 <button
                   onClick={() =>
                     onUpdateQuantity(item.orderItemId, item.quantity - 1)
                   }
                   disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
-                  className="w-6 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-6 h-7 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#202030] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Decrease quantity"
                 >
                   <Minus className="w-3 h-3" />
                 </button>
-                <span className="w-7 h-7 flex items-center justify-center text-xs font-bold text-gray-700 border-x border-gray-200 tabular-nums">
+                <span className="w-7 h-7 flex items-center justify-center text-xs font-bold text-white border-x border-[#1e2126] tabular-nums">
                   {updatingQuantity ? (
-                    <Loader2 className="w-3 h-3 animate-spin text-gray-400" />
+                    <Loader2 className="w-3 h-3 animate-spin text-gray-500" />
                   ) : (
                     item.quantity
                   )}
@@ -173,7 +175,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
                     onUpdateQuantity(item.orderItemId, item.quantity + 1)
                   }
                   disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
-                  className="w-6 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-6 h-7 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#202030] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Increase quantity"
                 >
                   <Plus className="w-3 h-3" />
@@ -182,7 +184,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
               <button
                 onClick={() => onRemove(item.orderItemId)}
                 disabled={removing}
-                className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-40"
+                className="text-gray-500 hover:text-red-500 transition-colors disabled:opacity-40 ml-auto"
                 aria-label={`Remove ${item.productName}`}
               >
                 {removing ? (
@@ -197,7 +199,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
             {isCustom && (
               <button
                 onClick={() => setExpanded(!expanded)}
-                className="flex items-center gap-1 text-[11px] text-[#ce2a32] hover:underline w-fit mt-auto"
+                className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors w-fit mt-auto"
               >
                 {expanded ? (
                   <>
@@ -216,7 +218,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
 
         {/* Expanded component list */}
         {isCustom && expanded && (
-          <div className="ml-6 pl-3 border-l-2 border-gray-100 mt-1 space-y-0">
+          <div className="ml-6 pl-3 border-l-2 border-[#1e2126] mt-2 space-y-0.5">
             {item.orderItemComponents.map((comp) => (
               <SidebarComponentRow key={comp.partId} component={comp} />
             ))}
@@ -576,7 +578,7 @@ export const CartSidebar: FC = memo(() => {
       {/* SIDEBAR CONTENT */}
       <div
         ref={sidebarRef}
-        className={`fixed top-0 right-0 h-full w-full md:w-[420px] bg-white z-[70] shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
+        className={`fixed top-0 right-0 h-full w-full md:w-[420px] bg-black border-l border-[#1e2126] z-[70] shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
           isCartOpen ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
@@ -584,46 +586,46 @@ export const CartSidebar: FC = memo(() => {
         aria-labelledby="cart-title"
       >
         {/* HEADER */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+        <div className="flex items-center justify-between p-6 border-b border-[#1e2126]">
           <div className="flex items-baseline gap-3">
             <h2
               id="cart-title"
-              className="text-xl font-bold font-oswald uppercase tracking-wide"
+              className="text-xl font-black font-oswald uppercase tracking-wider text-white"
             >
               Your Cart
             </h2>
             <Link
               href="/cart"
               onClick={handleClose}
-              className="text-xs text-gray-500 underline hover:text-black transition-colors"
+              className="text-xs font-bold tracking-widest uppercase text-gray-500 hover:text-white transition-colors"
             >
               View cart
             </Link>
           </div>
           <button
             onClick={handleClose}
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1 hover:bg-[#202030] rounded-full transition-colors text-gray-400 hover:text-white"
             aria-label="Close cart"
           >
-            <X className="w-6 h-6 text-gray-500" />
+            <X className="w-6 h-6 " />
           </button>
         </div>
 
         {/* BODY (Scrollable) */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {serverCartLoading ? (
-            <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-3">
+            <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-3">
               <Loader2 className="w-8 h-8 animate-spin" />
-              <p className="text-sm">Loading cart...</p>
+              <p className="text-sm font-bold uppercase tracking-widest text-[#f5d800] mt-4">Loading cart...</p>
             </div>
           ) : items.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-4">
+            <div className="h-full flex flex-col items-center justify-center text-gray-600 space-y-4">
               <ShoppingBag className="w-12 h-12 opacity-20" />
-              <p>Your cart is currently empty.</p>
+              <p className="font-medium text-gray-400">Your cart is currently empty.</p>
               <Link
                 href="/shop/all-products"
                 onClick={handleClose}
-                className="bg-black text-white px-6 py-2 text-sm font-bold uppercase hover:bg-gray-900 transition-colors inline-block text-center"
+                className="bg-[#f5d800] text-black px-6 py-3 text-xs font-black uppercase tracking-widest hover:bg-[#ffe500] transition-colors inline-block text-center rounded-sm mt-2"
               >
                 Start Shopping
               </Link>
@@ -639,9 +641,9 @@ export const CartSidebar: FC = memo(() => {
               return (
                 <div key={shopId} className="space-y-0">
                   {/* Shop Header */}
-                  <div className="flex items-center gap-2 px-1 py-2 border-b border-gray-100">
+                  <div className="flex items-center gap-2 px-1 py-2 border-b border-[#1e2126]">
                     <Store className="w-4 h-4 text-gray-500 shrink-0" />
-                    <span className="text-xs font-semibold text-gray-700 truncate">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-gray-400 truncate">
                       {shopName}
                     </span>
                   </div>
@@ -665,11 +667,11 @@ export const CartSidebar: FC = memo(() => {
                   </div>
 
                   {/* Shop Voucher Footer */}
-                  <div className="px-1 py-2 border-t border-gray-100">
+                  <div className="px-1 py-2 border-t border-[#1e2126] mt-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <Ticket className="w-3.5 h-3.5 text-[#ce2a32]" />
-                        <span>Voucher của Shop</span>
+                        <Ticket className="w-3.5 h-3.5 text-[#f5d800]" />
+                        <span className="font-bold uppercase tracking-wider text-[10px]">Shop Voucher</span>
                       </div>
                       {shopVouchers.length > 0 ? (
                         <button
@@ -677,17 +679,17 @@ export const CartSidebar: FC = memo(() => {
                           onClick={() =>
                             handleOpenShopVoucherModal(shopId, shopName)
                           }
-                          className="text-xs font-medium text-[#ce2a32] hover:underline"
+                          className="text-[10px] font-black uppercase tracking-widest text-[#f5d800] hover:text-[#ffe500] hover:underline transition-colors"
                         >
-                          Chọn mã ({shopVouchers.length})
+                          Select code ({shopVouchers.length})
                         </button>
                       ) : (
-                        <span className="text-xs text-gray-400">Nhập mã</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Enter Code</span>
                       )}
                     </div>
                     {/* Shop voucher error */}
                     {shopPreview?.shopVoucherError && (
-                      <p className="text-red-500 text-[11px] mt-1 font-medium">
+                      <p className="text-red-500 text-[10px] mt-1 font-bold uppercase tracking-wide">
                         {shopPreview.shopVoucherError}
                       </p>
                     )}
@@ -700,7 +702,7 @@ export const CartSidebar: FC = memo(() => {
 
         {/* FOOTER */}
         {items.length > 0 && (
-          <div className="border-t border-gray-100 p-6 space-y-4 bg-white">
+          <div className="border-t border-[#1e2126] p-6 space-y-4 bg-[#0a0a0a]">
             {/* Ameko Platform Voucher button */}
             {systemVouchers.length > 0 && (
               <div>
@@ -709,14 +711,16 @@ export const CartSidebar: FC = memo(() => {
                   tabIndex={0}
                   onClick={handleOpenSystemVoucherModal}
                   onKeyDown={(e) => e.key === 'Enter' && handleOpenSystemVoucherModal()}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 border border-dashed border-[#ce2a32]/40 rounded-sm text-sm text-[#ce2a32] hover:bg-red-50/40 transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-between gap-2 px-3 py-3 border border-dashed border-gray-600 rounded-sm text-sm text-gray-300 hover:border-[#f5d800] hover:text-[#f5d800] transition-colors cursor-pointer bg-[#151515]"
                 >
-                  <Ticket className="w-4 h-4 shrink-0" />
-                  <span className="font-medium">
-                    {selectedSystemVoucherIds.length > 0
-                      ? `Đã chọn ${selectedSystemVoucherIds.length} mã toàn sàn`
-                      : `Chọn mã giảm giá toàn sàn (${systemVouchers.length} mã khả dụng)`}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <Ticket className="w-4 h-4 shrink-0" />
+                    <span className="font-bold text-[11px] uppercase tracking-wider">
+                      {selectedSystemVoucherIds.length > 0
+                        ? `Selected ${selectedSystemVoucherIds.length} system voucher(s)`
+                        : `Platform Voucher (${systemVouchers.length} available)`}
+                    </span>
+                  </div>
                   {selectedSystemVoucherIds.length > 0 && (
                     <button
                       type="button"
@@ -724,7 +728,7 @@ export const CartSidebar: FC = memo(() => {
                         e.stopPropagation();
                         dispatch(setSelectedSystemVouchers([]));
                       }}
-                      className="ml-auto p-0.5 text-gray-400 hover:text-[#ce2a32]"
+                      className="p-1 text-gray-500 hover:text-red-500 transition-colors"
                       aria-label="Remove system voucher"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -733,7 +737,7 @@ export const CartSidebar: FC = memo(() => {
                 </div>
                 {/* System voucher error */}
                 {cartPreview?.systemVoucherError && (
-                  <p className="text-red-500 text-[11px] mt-1 font-medium px-1">
+                  <p className="text-red-500 text-[10px] uppercase font-bold tracking-wider mt-1 px-1">
                     {cartPreview.systemVoucherError}
                   </p>
                 )}
@@ -749,19 +753,19 @@ export const CartSidebar: FC = memo(() => {
                     selectedItemIds.size === items.length && items.length > 0
                   }
                   onChange={handleToggleSelectAll}
-                  className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
+                  className="w-4 h-4 accent-[#f5d800] cursor-pointer"
                   aria-label="Select all items"
                 />
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <span className="text-[11px] font-black text-white uppercase tracking-widest">
                   Select All ({items.length})
                 </span>
               </label>
-              <span className="text-xs text-gray-400">
+              <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                 {selectedItemIds.size} selected
               </span>
             </div>
 
-            <p className="text-gray-400 text-xs">
+            <p className="text-gray-500 text-[10px] uppercase tracking-widest">
               Shipping & taxes calculated at checkout
             </p>
 
@@ -770,9 +774,9 @@ export const CartSidebar: FC = memo(() => {
               Object.values(selectedShopVoucherIdsMap).some(
                 (v) => v && v.length > 0,
               )) && (
-              <div className="space-y-1.5 py-2 border-t border-gray-100">
-                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-                  Voucher đã chọn
+              <div className="space-y-1.5 py-2 border-t border-[#1e2126]">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  Applied Vouchers
                 </span>
 
                 {/* System voucher */}
@@ -790,22 +794,22 @@ export const CartSidebar: FC = memo(() => {
                     const systemDiscountAmount =
                       (cartPreview?.totalDiscountAmount || 0) - totalShopDiscount;
                     return (
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5">
-                          <Ticket className="w-3 h-3 text-green-500" />
-                          <span className="text-gray-600 font-medium">{sv.code}</span>
-                          <span className="text-gray-400">(System)</span>
+                      <div className="flex items-center justify-between text-[11px] font-bold">
+                        <div className="flex items-center gap-1.5 pt-1">
+                          <Ticket className="w-3 h-3 text-[#f5d800]" />
+                          <span className="text-white uppercase tracking-wider">{sv.code}</span>
+                          <span className="text-gray-500 uppercase tracking-wider">(System)</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           {systemDiscountAmount > 0 && (
-                            <span className="text-green-600 font-medium">
+                            <span className="text-green-500">
                               -{formatCurrency(systemDiscountAmount)}
                             </span>
                           )}
                           <button
                             type="button"
                             onClick={() => dispatch(setSelectedSystemVouchers([]))}
-                            className="p-0.5 text-gray-400 hover:text-[#ce2a32]"
+                            className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                             aria-label="Remove system voucher"
                           >
                             <X className="w-3 h-3" />
@@ -833,20 +837,20 @@ export const CartSidebar: FC = memo(() => {
                       return (
                         <div
                           key={shopId}
-                          className="flex items-center justify-between text-xs"
+                          className="flex items-center justify-between text-[11px] font-bold"
                         >
-                          <div className="flex items-center gap-1.5">
-                            <Ticket className="w-3 h-3 text-green-500" />
-                            <span className="text-gray-600 font-medium">
+                          <div className="flex items-center gap-1.5 pt-1">
+                            <Ticket className="w-3 h-3 text-[#f5d800]" />
+                            <span className="text-white uppercase tracking-wider">
                               {voucher.code}
                             </span>
-                            <span className="text-gray-400">
+                            <span className="text-gray-500 uppercase tracking-wider">
                               ({shopPreview?.shopName ?? shopId})
                             </span>
                           </div>
                           <div className="flex items-center gap-1.5">
                             {(shopPreview?.shopDiscountAmount ?? 0) > 0 && (
-                              <span className="text-green-600 font-medium">
+                              <span className="text-green-500">
                                 -{formatCurrency(shopPreview!.shopDiscountAmount)}
                               </span>
                             )}
@@ -860,7 +864,7 @@ export const CartSidebar: FC = memo(() => {
                                   }),
                                 )
                               }
-                              className="p-0.5 text-gray-400 hover:text-[#ce2a32]"
+                              className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                               aria-label={`Remove voucher ${voucher.code}`}
                             >
                               <X className="w-3 h-3" />
@@ -873,9 +877,9 @@ export const CartSidebar: FC = memo(() => {
 
                 {/* Total discount */}
                 {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (
-                  <div className="flex items-center justify-between text-xs pt-1 border-t border-dashed border-gray-100">
-                    <span className="text-gray-500 font-medium">Tổng giảm</span>
-                    <span className="text-green-600 font-bold">
+                  <div className="flex items-center justify-between text-[11px] font-bold pt-2 border-t border-[#1e2126] mt-2">
+                    <span className="text-gray-400 uppercase tracking-widest">Total Discount</span>
+                    <span className="text-green-500">
                       -{formatCurrency(cartPreview!.totalDiscountAmount)}
                     </span>
                   </div>
@@ -888,16 +892,16 @@ export const CartSidebar: FC = memo(() => {
               <button
                 onClick={handleCheckout}
                 disabled={!hasSelection || isCalculatingPreview}
-                className={`w-full py-3.5 px-4 flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest transition-colors ${
+                className={`w-full py-4 px-4 flex items-center justify-center gap-2 text-[13px] font-black uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 ${
                   hasSelection && !isCalculatingPreview
-                    ? "bg-[#1a1a1a] hover:bg-black text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    ? "bg-[#f5d800] text-black hover:bg-[#ffe500] shadow-[0_0_15px_rgba(245,216,0,0.3)]"
+                    : "bg-[#202030] text-gray-500 cursor-not-allowed border border-[#1e2126]"
                 }`}
               >
                 <ShoppingBag className="w-4 h-4" />
                 {isCalculatingPreview ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Calculating...
+                    <Loader2 className="w-4 h-4 animate-spin" /> Processing...
                   </>
                 ) : hasSelection ? (
                   `Checkout • ${formatCurrency(cartPreview?.finalTotalAmount || 0)}`

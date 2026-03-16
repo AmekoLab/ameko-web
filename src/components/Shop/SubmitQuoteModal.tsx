@@ -111,7 +111,7 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
                 {...register("quotedPrice", { valueAsNumber: true })}
                 min={0}
                 placeholder="1000000"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className=" text-black w-full border border-gray-300 rounded-lg px-3 py-2 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
                 VND
@@ -135,7 +135,7 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
                 {...register("estimatedDays", { valueAsNumber: true })}
                 min={1}
                 placeholder="7"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className=" text-black w-full border border-gray-300 rounded-lg px-3 py-2 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
                 Days
@@ -157,7 +157,7 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
               {...register("shopNotes")}
               rows={4}
               placeholder="Describe quote details, time, materials..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className=" text-black w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             />
             {errors.shopNotes && (
               <p className="text-xs text-red-500 mt-1">

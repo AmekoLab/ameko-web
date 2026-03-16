@@ -127,7 +127,7 @@ export default function CheckStockModal({
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Type part name to search..."
               autoFocus
-              className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+              className="text-black w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
             />
           </div>
           {selectedIds.size > 0 && (

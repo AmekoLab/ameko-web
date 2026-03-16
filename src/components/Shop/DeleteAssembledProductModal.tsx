@@ -121,7 +121,7 @@ export default function DeleteAssembledProductModal({
               onChange={(e) => setConfirmText(e.target.value)}
               disabled={deleting}
               placeholder={product.name}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition disabled:opacity-50 disabled:bg-gray-50"
+              className="text-black w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition disabled:opacity-50 disabled:bg-gray-50"
             />
           </div>
         </div>

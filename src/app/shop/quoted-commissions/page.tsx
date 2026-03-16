@@ -48,14 +48,14 @@ const STATUS_MAP: Record<
 > = {
   PendingUserDecision: {
     label: "Pending approval",
-    bg: "bg-amber-50 border-amber-200",
-    text: "text-amber-700",
+    bg: "bg-[#f5d800]/10 border border-[#f5d800]/20",
+    text: "text-[#f5d800]",
     icon: <Timer className="w-3.5 h-3.5" />,
   },
   Accepted: {
     label: "Confirmed",
-    bg: "bg-emerald-50 border-emerald-200",
-    text: "text-emerald-700",
+    bg: "bg-green-500/10 border border-green-500/20",
+    text: "text-green-400",
     icon: <CheckCircle2 className="w-3.5 h-3.5" />,
   },
 };
@@ -63,14 +63,14 @@ const STATUS_MAP: Record<
 const StatusBadge = ({ status }: { status: string }) => {
   const config = STATUS_MAP[status] || {
     label: status,
-    bg: "bg-gray-50 border-gray-200",
-    text: "text-gray-600",
+    bg: "bg-[#202030] border border-[#1e2126]",
+    text: "text-gray-400",
     icon: null,
   };
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${config.bg} ${config.text}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-[10px] uppercase font-black tracking-widest border ${config.bg} ${config.text}`}
     >
       {config.icon}
       {config.label}
@@ -80,19 +80,19 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 // ─── Skeleton Row ──────────────────────────────────────────
 const SkeletonRow = () => (
-  <div className="bg-white border border-gray-100 rounded-xl p-5 mb-4 animate-pulse">
+  <div className="bg-[#151515] border border-[#1e2126] rounded-sm p-5 mb-4 animate-pulse">
     <div className="flex flex-col lg:flex-row lg:items-center gap-4">
       <div className="flex-1 space-y-2">
-        <div className="h-4 bg-gray-200 rounded w-32" />
-        <div className="h-3 bg-gray-100 rounded w-3/4" />
+        <div className="h-4 bg-[#202030] rounded-sm w-32" />
+        <div className="h-3 bg-[#202030] rounded-sm w-3/4" />
       </div>
       <div className="flex-1 space-y-2">
-        <div className="h-5 bg-gray-200 rounded w-28" />
-        <div className="h-3 bg-gray-100 rounded w-36" />
+        <div className="h-5 bg-[#202030] rounded-sm w-28" />
+        <div className="h-3 bg-[#202030] rounded-sm w-36" />
       </div>
       <div className="flex flex-col items-end space-y-2">
-        <div className="h-6 bg-gray-200 rounded-full w-28" />
-        <div className="h-3 bg-gray-100 rounded w-24" />
+        <div className="h-6 bg-[#202030] rounded-sm w-28" />
+        <div className="h-3 bg-[#202030] rounded-sm w-24" />
       </div>
     </div>
   </div>
@@ -206,7 +206,7 @@ const EditQuoteModal = ({ quote, onClose, onSuccess }: EditQuoteModalProps) => {
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 min={1}
-                className="w-full border border-gray-300 rounded-xl pl-10 pr-14 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors"
+                className="text-black w-full border border-gray-300 rounded-xl pl-10 pr-14 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors"
               />
               <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-semibold">
                 VND
@@ -225,7 +225,7 @@ const EditQuoteModal = ({ quote, onClose, onSuccess }: EditQuoteModalProps) => {
             <select
               value={estimatedDays}
               onChange={(e) => setEstimatedDays(e.target.value)}
-              className="w-full border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white appearance-none cursor-pointer"
+              className="text-black w-full border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white appearance-none cursor-pointer"
             >
               <option value="3">3 days</option>
               <option value="5">5 days</option>
@@ -246,7 +246,7 @@ const EditQuoteModal = ({ quote, onClose, onSuccess }: EditQuoteModalProps) => {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               rows={4}
-              className="w-full border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors resize-none"
+              className= "text-black w-full border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors resize-none"
             />
             {errors.note ? (
               <p className="text-xs text-red-500 mt-1">{errors.note}</p>
@@ -296,14 +296,14 @@ export default function ShopQuotesPage() {
   }, [dispatch]);
 
   return (
-    <div className="bg-gray-50/50 min-h-screen">
+    <div className="bg-black min-h-screen">
       <div className="max-w-5xl mx-auto py-8 px-4">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight">
+        <div className="mb-8 border-b border-[#1e2126] pb-4">
+          <h1 className="text-3xl font-oswald font-black text-white uppercase tracking-widest">
             My Quotation History
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-[11px] font-bold text-gray-400 mt-2 uppercase tracking-widest">
             Review all quotes you have sent to customers
           </p>
         </div>
@@ -319,17 +319,17 @@ export default function ShopQuotesPage() {
 
         {/* Error */}
         {!loadingShopQuotes && error && (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
-              <Loader2 className="w-7 h-7 text-red-400" />
+          <div className="flex flex-col items-center justify-center py-20 text-center bg-[#151515] border border-[#1e2126] rounded-sm">
+            <div className="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
+              <Loader2 className="w-7 h-7 text-red-500" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900 mb-1.5">
+            <h2 className="text-[13px] font-black uppercase tracking-widest text-white mb-1.5">
               Unable to load data
             </h2>
-            <p className="text-sm text-gray-500 mb-5 max-w-sm">{error}</p>
+            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-5 max-w-sm">{error}</p>
             <button
               onClick={() => dispatch(fetchShopQuotes())}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-full transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#202030] border border-[#1e2126] hover:bg-[#303040] hover:text-[#f5d800] hover:border-[#f5d800] text-gray-400 text-[11px] font-black uppercase tracking-widest rounded-sm transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               Retry
@@ -339,14 +339,14 @@ export default function ShopQuotesPage() {
 
         {/* Empty */}
         {!loadingShopQuotes && !error && shopQuotes.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-              <Inbox className="w-7 h-7 text-gray-400" />
+          <div className="flex flex-col items-center justify-center py-20 text-center bg-[#151515] border border-[#1e2126] rounded-sm">
+            <div className="w-14 h-14 rounded-full bg-black border border-[#1e2126] flex items-center justify-center mb-4">
+              <Inbox className="w-7 h-7 text-[#f5d800]" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900 mb-1.5">
+            <h2 className="text-[13px] font-black uppercase tracking-widest text-white mb-1.5">
               You haven't sent any quotes
             </h2>
-            <p className="text-sm text-gray-500 max-w-sm">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 max-w-sm">
               Visit the Custom Request Market to find and send quotes to
               customers.
             </p>
@@ -359,50 +359,50 @@ export default function ShopQuotesPage() {
             {shopQuotes.map((quote) => (
               <div
                 key={quote.commissionQuoteId}
-                className="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow p-5 mb-4"
+                className="bg-[#151515] border border-[#1e2126] rounded-sm hover:border-[#f5d800]/50 transition-colors p-5 mb-4"
               >
                 <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                   {/* Column 1: Request Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
-                      <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                      <span className="font-mono">
+                    <div className="flex items-center gap-3 text-[13px] font-black text-white tracking-widest uppercase">
+                      <FileText className="w-4 h-4 text-[#f5d800] flex-shrink-0" />
+                      <span>
                         #{quote.commissionRequestId.slice(0, 8)}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-1">
+                    <p className="text-[11px] font-bold tracking-widest uppercase text-gray-500 mt-2 line-clamp-1">
                       {quote.shopNotes}
                     </p>
                   </div>
 
                   {/* Column 2: Quote Details */}
                   <div className="flex-1">
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-[15px] font-black text-[#f5d800] tracking-wider">
                       {formatVND(quote.quotedPrice)}
                     </p>
-                    <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-gray-400" />
-                      Complete in: {quote.estimatedDays} days
+                    <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mt-2 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-gray-500" />
+                      Complete in: <span className="text-white">{quote.estimatedDays} days</span>
                     </p>
                   </div>
 
                   {/* Column 3: Status & Dates */}
-                  <div className="flex flex-col lg:items-end gap-2">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-col lg:items-end gap-3">
+                    <div className="flex items-center gap-3">
                       <StatusBadge status={quote.status} />
                       {quote.status === "PendingUserDecision" && (
                         <button
                           onClick={() => setEditingQuote(quote)}
-                          className="w-8 h-8 rounded-lg border border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-colors"
+                          className="w-8 h-8 rounded-sm border border-[#1e2126] bg-black hover:bg-[#202030] hover:border-[#f5d800] hover:text-[#f5d800] flex items-center justify-center transition-colors shrink-0 text-gray-500"
                           title="Edit quote"
                         >
-                          <Pencil className="w-3.5 h-3.5 text-gray-500" />
+                          <Pencil className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
-                    <div className="text-xs text-gray-400 space-y-0.5 lg:text-right">
-                      <p>Sent: {formatDate(quote.createdAt)}</p>
-                      <p>Expires: {formatDate(quote.expiredAt)}</p>
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 space-y-1 lg:text-right">
+                      <p>Sent: <span className="text-gray-400">{formatDate(quote.createdAt)}</span></p>
+                      <p>Expires: <span className="text-gray-400">{formatDate(quote.expiredAt)}</span></p>
                     </div>
                   </div>
                 </div>

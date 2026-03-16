@@ -261,6 +261,26 @@ export const acceptCommissionQuote = createAsyncThunk(
   },
 );
 
+export const rejectCommissionRequest = createAsyncThunk(
+  "commission/rejectRequest",
+  async (requestId: string, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await commissionService.rejectCommissionRequest(requestId);
+      if (response.success) {
+        toast.success("Đã từ chối yêu cầu thành công!");
+        dispatch(fetchCommissionDetail(requestId));
+        return;
+      }
+      return rejectWithValue(response.message || "Từ chối yêu cầu thất bại");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Lỗi khi từ chối yêu cầu";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  },
+);
+
 const commissionSlice = createSlice({
   name: "commission",
   initialState,

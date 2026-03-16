@@ -47,16 +47,16 @@ export default function Sidebar({ role = "staff" }) {
   if (role === "shop") menu = [...menu, ...shopMenu];
 
   return (
-    <aside className="bg-white w-64 h-[calc(100vh-64px)] shadow-md sticky top-16 overflow-auto">
+    <aside className="bg-black border-r border-[#1e2126] w-64 h-[calc(100vh-64px)] sticky top-16 overflow-auto">
       <nav className="flex flex-col p-4 gap-2">
         {menu.map((item) => (
           <Link
             key={item.path}
             href={item.path}
-            className={`p-3 rounded-lg hover:bg-primary-100 transition ${
+            className={`p-3 rounded-sm transition-colors text-[11px] uppercase tracking-widest flex items-center ${
               active === item.name.toLowerCase()
-                ? "bg-primary-200 font-semibold"
-                : ""
+                ? "bg-[#f5d800] text-black font-black shadow-[0_0_10px_rgba(245,216,0,0.2)]"
+                : "text-gray-400 font-bold hover:bg-[#151515] hover:text-white"
             }`}
             onClick={() => setActive(item.name.toLowerCase())}
           >

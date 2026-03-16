@@ -24,18 +24,18 @@ import ShopReviewModal from "@/src/components/Warranty/ShopReviewModal";
 const PAGE_SIZE = 10;
 
 const STATUS_STYLES: Record<string, { bg: string; label: string }> = {
-  InProgress: { bg: "bg-yellow-100 text-yellow-800", label: "Pending" },
-  AwaitingReturn: { bg: "bg-blue-100 text-blue-800", label: "Awaiting Return" },
-  ShopAccepted: { bg: "bg-teal-100 text-teal-800", label: "Accepted" },
-  Rejected: { bg: "bg-red-100 text-red-800", label: "Rejected" },
+  InProgress: { bg: "bg-[#f5d800]/10 text-[#f5d800] border border-[#f5d800]/20", label: "Pending" },
+  AwaitingReturn: { bg: "bg-blue-500/10 text-blue-400 border border-blue-500/20", label: "Awaiting Return" },
+  ShopAccepted: { bg: "bg-teal-500/10 text-teal-400 border border-teal-500/20", label: "Accepted" },
+  Rejected: { bg: "bg-red-500/10 text-red-500 border border-red-500/20", label: "Rejected" },
   AdminReviewing: {
-    bg: "bg-purple-100 text-purple-800",
+    bg: "bg-purple-500/10 text-purple-400 border border-purple-500/20",
     label: "Admin Reviewing",
   },
-  Completed: { bg: "bg-green-100 text-green-800", label: "Completed" },
-  AutoCancelled: { bg: "bg-gray-100 text-gray-600", label: "Auto Cancelled" },
-  Returning: { bg: "bg-blue-100 text-blue-800", label: "Returning" },
-  Returned: { bg: "bg-blue-200 text-blue-900", label: "Returned" },
+  Completed: { bg: "bg-green-500/10 text-green-400 border border-green-500/20", label: "Completed" },
+  AutoCancelled: { bg: "bg-gray-500/10 text-gray-500 border border-gray-500/20", label: "Auto Cancelled" },
+  Returning: { bg: "bg-blue-500/10 text-blue-400 border border-blue-500/20", label: "Returning" },
+  Returned: { bg: "bg-blue-400/10 text-blue-300 border border-blue-400/20", label: "Returned" },
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -60,7 +60,7 @@ const formatDate = (dateStr: string): string => {
 
 const getStatus = (statusName: string): { bg: string; label: string } =>
   STATUS_STYLES[statusName] || {
-    bg: "bg-gray-100 text-gray-800",
+    bg: "bg-gray-500/10 text-gray-500 border border-gray-500/20",
     label: statusName,
   };
 
@@ -69,31 +69,31 @@ const getTypeLabel = (typeName: string): string =>
 
 // ─── Table Skeleton ────────────────────────────────────────
 const TableSkeleton: FC = () => (
-  <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-12 lg:py-20 animate-pulse">
-    <div className="h-10 w-80 bg-gray-200 rounded mb-8" />
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-12 lg:py-20 animate-pulse bg-black min-h-screen">
+    <div className="h-10 w-80 bg-[#1e2126] rounded-sm mb-8" />
+    <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
       {/* Header row */}
-      <div className="grid grid-cols-7 gap-4 px-6 py-4 border-b border-gray-200 bg-gray-50">
+      <div className="grid grid-cols-7 gap-4 px-6 py-4 border-b border-[#1e2126] bg-black">
         {Array.from({ length: 7 }).map((_, i) => (
-          <div key={i} className="h-4 bg-gray-200 rounded w-full" />
+          <div key={i} className="h-4 bg-[#1e2126] rounded-sm w-full" />
         ))}
       </div>
       {/* Body rows */}
       {[1, 2, 3, 4, 5].map((i) => (
         <div
           key={i}
-          className="grid grid-cols-7 gap-4 px-6 py-4 border-b border-gray-100"
+          className="grid grid-cols-7 gap-4 px-6 py-4 border-b border-[#1e2126] bg-[#151515]"
         >
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gray-200" />
-            <div className="h-4 w-20 bg-gray-200 rounded" />
+            <div className="w-8 h-8 rounded-full bg-[#1e2126]" />
+            <div className="h-4 w-20 bg-[#1e2126] rounded-sm" />
           </div>
-          <div className="h-4 w-24 bg-gray-200 rounded" />
-          <div className="h-4 w-32 bg-gray-200 rounded" />
-          <div className="h-4 w-20 bg-gray-200 rounded" />
-          <div className="h-4 w-28 bg-gray-200 rounded" />
-          <div className="h-6 w-20 bg-gray-200 rounded-full" />
-          <div className="h-8 w-24 bg-gray-200 rounded-lg" />
+          <div className="h-4 w-24 bg-[#1e2126] rounded-sm" />
+          <div className="h-4 w-32 bg-[#1e2126] rounded-sm" />
+          <div className="h-4 w-20 bg-[#1e2126] rounded-sm" />
+          <div className="h-4 w-28 bg-[#1e2126] rounded-sm" />
+          <div className="h-6 w-20 bg-[#1e2126] rounded-sm" />
+          <div className="h-8 w-24 bg-[#1e2126] rounded-sm" />
         </div>
       ))}
     </div>
@@ -102,10 +102,14 @@ const TableSkeleton: FC = () => (
 
 // ─── Empty State ───────────────────────────────────────────
 const EmptyState: FC = () => (
-  <div className="flex flex-col items-center justify-center py-20 text-center">
-    <ShieldCheck className="w-16 h-16 text-gray-300 mb-5" strokeWidth={1} />
-    <h2 className="text-xl font-bold text-gray-900 mb-2">No requests yet</h2>
-    <p className="text-gray-500 max-w-sm">
+  <div className="flex flex-col items-center justify-center py-20 text-center bg-[#151515] rounded-sm border border-[#1e2126]">
+    <div className="w-16 h-16 rounded-full bg-black border border-[#1e2126] flex items-center justify-center mb-5">
+      <ShieldCheck className="w-8 h-8 text-[#f5d800]" />
+    </div>
+    <h2 className="text-[13px] font-black uppercase tracking-widest text-white mb-2">
+      No requests yet
+    </h2>
+    <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 max-w-sm">
       The shop has not received any warranty or return requests from customers.
     </p>
   </div>
@@ -128,7 +132,7 @@ const TableRow: FC<RowProps> = ({
   const status = getStatus(request.statusName);
 
   return (
-    <tr className="border-b border-gray-100 hover:bg-gray-50/60 transition-colors">
+    <tr className="border-b border-[#1e2126] hover:bg-[#202030] transition-colors">
       {/* Customer */}
       <td className="px-5 py-3.5">
         <div className="flex items-center gap-2.5">
@@ -138,46 +142,46 @@ const TableRow: FC<RowProps> = ({
               alt={request.customerName || ""}
               width={32}
               height={32}
-              className="rounded-full object-cover"
+              className="rounded-full object-cover border border-[#1e2126]"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-              <User className="w-4 h-4 text-gray-400" />
+            <div className="w-8 h-8 rounded-full bg-black border border-[#1e2126] flex items-center justify-center">
+              <User className="w-4 h-4 text-gray-500" />
             </div>
           )}
-          <span className="text-sm font-medium text-gray-900 truncate max-w-[120px]">
+          <span className="text-[11px] font-black uppercase tracking-widest text-white truncate max-w-[120px]">
             {request.customerName || "N/A"}
           </span>
         </div>
       </td>
       {/* Type */}
       <td className="px-5 py-3.5">
-        <span className="text-sm text-gray-700">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
           {getTypeLabel(request.typeName)}
         </span>
       </td>
       {/* Reason */}
       <td className="px-5 py-3.5">
-        <span className="text-sm text-gray-700 line-clamp-2">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 line-clamp-2">
           {request.reason}
         </span>
       </td>
       {/* Refund Amount */}
       <td className="px-5 py-3.5">
-        <span className="text-sm font-bold text-gray-900">
+        <span className="text-[11px] font-black uppercase tracking-widest text-[#f5d800]">
           {formatCurrency(request.refundAmount)}
         </span>
       </td>
       {/* Date */}
       <td className="px-5 py-3.5">
-        <span className="text-sm text-gray-500 whitespace-nowrap">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 whitespace-nowrap">
           {formatDate(request.createdAt)}
         </span>
       </td>
       {/* Status */}
       <td className="px-5 py-3.5">
         <span
-          className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${status.bg}`}
+          className={`inline-block text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-sm whitespace-nowrap ${status.bg}`}
         >
           {status.label}
         </span>
@@ -187,31 +191,31 @@ const TableRow: FC<RowProps> = ({
         {request.status === 1 ? (
           <button
             onClick={() => onReviewClick(request)}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-blue-600 px-3.5 py-2 rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-black bg-[#f5d800] px-3.5 py-2 rounded-sm hover:bg-[#ffe500] transition-colors whitespace-nowrap shadow-[0_0_15px_rgba(245,216,0,0.3)]"
           >
-            <Eye className="w-4 h-4" />
+            <Eye className="w-3.5 h-3.5 text-black" />
             View & Process
           </button>
         ) : request.status === 5 ? (
-          <span className="text-gray-500 text-sm italic">
-            Waiting for customer to send item
+          <span className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+            Wait Return
           </span>
         ) : request.status === 6 ? (
           <button
             onClick={() => onConfirmReceive(request.id)}
             disabled={isConfirmingReceipt}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-green-600 px-3.5 py-2 rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white bg-green-600 px-3.5 py-2 rounded-sm hover:bg-green-700 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <CheckCircle className="w-4 h-4" />
-            Confirm item received
+            <CheckCircle className="w-3.5 h-3.5" />
+            Confirm Rcpt
           </button>
         ) : (
           <button
             onClick={() => onReviewClick(request)}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 border border-gray-300 px-3.5 py-2 rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-gray-400 bg-black border border-[#1e2126] px-3.5 py-2 rounded-sm hover:bg-[#202030] hover:text-white transition-colors whitespace-nowrap"
           >
-            <FileText className="w-4 h-4" />
-            View details
+            <FileText className="w-3.5 h-3.5" />
+            View Info
           </button>
         )}
       </td>
@@ -230,25 +234,26 @@ const Pagination: FC<PaginationProps> = ({ current, total, onChange }) => {
   if (total <= 1) return null;
 
   return (
-    <div className="flex items-center justify-center gap-2 py-5">
-      <button
-        disabled={current <= 1}
-        onClick={() => onChange(current - 1)}
-        className="p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-      >
-        <ChevronLeft className="w-4 h-4" />
-      </button>
-      <span className="text-sm text-gray-600 px-3">
-        Page <span className="font-semibold text-gray-900">{current}</span> /{" "}
-        {total}
+    <div className="flex items-center justify-between py-5 text-[10px] font-black uppercase tracking-widest text-gray-500">
+      <span className="text-gray-400">
+        Page <span className="text-white">{current}</span> / {total}
       </span>
-      <button
-        disabled={current >= total}
-        onClick={() => onChange(current + 1)}
-        className="p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-      >
-        <ChevronRight className="w-4 h-4" />
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          disabled={current <= 1}
+          onClick={() => onChange(current - 1)}
+          className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] text-gray-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+        </button>
+        <button
+          disabled={current >= total}
+          onClick={() => onChange(current + 1)}
+          className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] text-gray-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          <ChevronRight className="w-3.5 h-3.5" />
+        </button>
+      </div>
     </div>
   );
 };
@@ -307,69 +312,67 @@ const ShopWarrantyDashboard: FC = () => {
   if (loadingShopWarranties) return <TableSkeleton />;
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-12 lg:py-20">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        Warranty & Return Request Management
-      </h1>
-
-      {shopWarrantyList.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px]">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Customer
-                  </th>
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Type
-                  </th>
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Reason
-                  </th>
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Refund Amount
-                  </th>
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Created Date
-                  </th>
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {shopWarrantyList.map((req) => (
-                  <TableRow
-                    key={req.id}
-                    request={req}
-                    onReviewClick={handleReviewClick}
-                    onConfirmReceive={handleConfirmReceive}
-                    isConfirmingReceipt={isConfirmingReceipt}
-                  />
-                ))}
-              </tbody>
-            </table>
+    <div className="p-8 bg-black min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-end mb-6 border-b border-[#1e2126] pb-4">
+          <div>
+            <h1 className="text-3xl font-oswald font-black text-white mb-2 uppercase tracking-widest flex items-center gap-3">
+              <ShieldCheck className="w-8 h-8 text-[#f5d800]" />
+              Warranty Requests
+            </h1>
+            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+              Manage return & warranty requests from customers.
+            </p>
           </div>
-          <Pagination
-            current={shopPagination.current}
-            total={shopPagination.total}
-            onChange={handlePageChange}
-          />
         </div>
-      )}
 
-      <ShopReviewModal
-        isOpen={reviewModalOpen}
-        onClose={() => setReviewModalOpen(false)}
-        issue={selectedIssue}
-        onSuccess={handleReviewSuccess}
-      />
+        {shopWarrantyList.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-white">
+                <thead>
+                  <tr className="bg-black border-b border-[#1e2126] text-[10px] font-black uppercase tracking-widest text-gray-500">
+                    <th className="px-5 py-4">Customer</th>
+                    <th className="px-5 py-4">Type</th>
+                    <th className="px-5 py-4 max-w-[200px]">Reason</th>
+                    <th className="px-5 py-4">Refund Amount</th>
+                    <th className="px-5 py-4">Created Date</th>
+                    <th className="px-5 py-4">Status</th>
+                    <th className="px-5 py-4 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#1e2126]">
+                  {shopWarrantyList.map((req) => (
+                    <TableRow
+                      key={req.id}
+                      request={req}
+                      onReviewClick={handleReviewClick}
+                      onConfirmReceive={handleConfirmReceive}
+                      isConfirmingReceipt={isConfirmingReceipt}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="px-5">
+              <Pagination
+                current={shopPagination.current}
+                total={shopPagination.total}
+                onChange={handlePageChange}
+              />
+            </div>
+          </div>
+        )}
+
+        <ShopReviewModal
+          isOpen={reviewModalOpen}
+          onClose={() => setReviewModalOpen(false)}
+          issue={selectedIssue}
+          onSuccess={handleReviewSuccess}
+        />
+      </div>
     </div>
   );
 };

@@ -6,36 +6,72 @@ import { ShoppingCart } from "lucide-react";
 
 export const ProductCard: FC<{ product: Product }> = ({ product }) => {
   return (
-    <Link href={`/shop/assembled-product/${product.id}`} className="block">
-      <div className="bg-white rounded-sm border border-gray-100 hover:shadow-md transition-shadow group cursor-pointer">
-        <div className="relative aspect-square bg-gray-100 overflow-hidden">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-          {product.status !== "In Stock" && (
-            <div className="absolute top-2 left-2 bg-black text-white text-[9px] font-bold uppercase px-2 py-1 tracking-wider">
-              {product.status}
-            </div>
-          )}
-        </div>
-        <div className="p-3">
-          <p className="text-xs text-gray-500 font-bold uppercase mb-1">
-            {product.category}
-          </p>
-          <h3 className="text-sm font-medium text-gray-900 line-clamp-2 min-h-[40px] mb-2 group-hover:text-[#ce2a32] transition-colors">
+    <div className="group/card relative flex flex-col h-full w-full overflow-hidden rounded-none transition-all duration-300 border border-transparent">
+      {/* IMAGE AREA */}
+      <Link
+        href={`/shop/assembled-product/${product.id}`}
+        className="relative block w-full aspect-square overflow-hidden shrink-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, #242424 0%, #0f0f0f 100%)",
+        }}
+      >
+        {/* Diagonal stripe texture overlay */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, #222324ff 38%, #141415ff 70%)",
+          }}
+        />
+
+        {/* Badge */}
+        {product.status !== "In Stock" && (
+          <span className="absolute top-0 left-0 z-20 text-[11px] font-black uppercase tracking-wider px-3 py-1.5 rounded-none bg-black text-white">
+            {product.status}
+          </span>
+        )}
+
+        {/* Product Image */}
+        <Image
+          src={product.image || "/images/placeholder.png"}
+          alt={product.name}
+          fill
+          className="object-contain relative z-10 transition-transform duration-500 ease-out group-hover/card:scale-[1.1]"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+        />
+      </Link>
+
+      {/* Thin separator */}
+      <div className="w-full h-px shrink-0" />
+
+      {/* INFO AREA */}
+      <div className="px-4 py-4 flex flex-col flex-grow">
+        {/* Category */}
+        <p className="text-[10px] text-gray-500 font-bold uppercase mb-1 tracking-wider">
+          {product.category}
+        </p>
+
+        {/* Product Name */}
+        <h3 className="text-[13px] font-bold text-white leading-snug uppercase tracking-wide line-clamp-2 min-h-[40px] mb-3">
+          <Link href={`/shop/assembled-product/${product.id}`}>
             {product.name}
-          </h3>
-          <div className="flex justify-between items-center">
-            <span className="font-bold text-black">{product.price}</span>
-            <button className="p-1.5 bg-gray-100 rounded-sm hover:bg-[#ce2a32] hover:text-white transition-colors">
-              <ShoppingCart className="w-4 h-4" />
-            </button>
-          </div>
+          </Link>
+        </h3>
+
+        {/* Price */}
+        <div className="mb-3">
+          <p className="text-[18px] font-black text-white leading-none">
+            {product.price}
+          </p>
         </div>
+
+        {/* Always-visible Add to Cart text link */}
+        <button className="mt-auto flex items-center gap-2 text-[#f5d800] hover:text-[#ffe500] hover:underline text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer w-fit">
+          <ShoppingCart className="w-5 h-5 shrink-0" />
+          <span className="text-sm">Add to Cart</span>
+        </button>
       </div>
-    </Link>
+    </div>
   );
 };

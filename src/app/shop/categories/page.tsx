@@ -98,25 +98,25 @@ export default function ShopCategoriesPage() {
   ];
 
   return (
-    <div className="p-8 bg-[#f0f2f5] min-h-screen">
+    <div className="p-8 bg-black min-h-screen">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-end mb-6">
+        <div className="flex justify-between items-end mb-6 border-b border-[#1e2126] pb-4">
           <div>
-            <h1 className="text-3xl font-black text-gray-800 mb-2 font-oswald uppercase flex items-center gap-3">
-              <FolderTree className="w-8 h-8" />
+            <h1 className="text-3xl font-oswald font-black text-white mb-2 uppercase tracking-widest flex items-center gap-3">
+              <FolderTree className="w-8 h-8 text-[#f5d800]" />
               Category Management
             </h1>
-            <p className="text-gray-500">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
               Manage your shop categories. Use global categories as parents for
               your private sub-categories.
             </p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition shrink-0"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#f5d800] text-black text-[11px] font-black uppercase tracking-widest rounded-sm hover:bg-[#ffe500] transition shrink-0 shadow-[0_0_15px_rgba(245,216,0,0.3)]"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-black" />
             Add Category
           </button>
         </div>
@@ -127,30 +127,30 @@ export default function ShopCategoriesPage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2 text-sm font-bold rounded-lg transition ${
+              className={`px-5 py-2 text-[11px] font-black uppercase tracking-widest rounded-sm border transition-colors ${
                 activeTab === tab.key
-                  ? "bg-gray-800 text-white"
-                  : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                  ? "bg-[#f5d800] text-black border-[#f5d800] shadow-[0_0_10px_rgba(245,216,0,0.2)]"
+                  : "bg-[#151515] text-gray-400 border-[#1e2126] hover:bg-[#202030] hover:text-white"
               }`}
             >
               {tab.label}
-              <span className="ml-2 text-xs opacity-70">({tab.count})</span>
+              <span className="ml-2 text-[10px] tracking-widest opacity-70">({tab.count})</span>
             </button>
           ))}
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
           {loading ? (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500">
               Loading categories...
             </div>
           ) : categoryTree.roots.length === 0 ? (
-            <div className="p-12 text-center text-gray-400">
+            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500">
               No categories found.
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-[#1e2126]">
               {categoryTree.roots.map((root) => (
                 <CategoryRow
                   key={root.id}
@@ -240,17 +240,17 @@ function CategoryRow({
   return (
     <div>
       <div
-        className={`flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors ${
-          depth > 0 ? "bg-gray-50/50" : ""
-        } ${isPrivate ? "border-l-4 border-l-amber-400" : ""}`}
+        className={`flex items-center gap-3 px-5 py-4 hover:bg-[#202030] transition-colors border-b border-[#1e2126] ${
+          depth > 0 ? "bg-[#0f0f0f]" : "bg-[#151515]"
+        } ${isPrivate ? "border-l-4 border-l-[#f5d800]" : "border-l-4 border-l-transparent"}`}
         style={{ paddingLeft: `${20 + depth * 32}px` }}
       >
         {/* Expand/collapse toggle */}
         <button
           onClick={() => hasChildren && setExpanded(!expanded)}
-          className={`p-1 rounded transition ${
+          className={`p-1 rounded-sm transition-colors ${
             hasChildren
-              ? "hover:bg-gray-200 text-gray-600 cursor-pointer"
+              ? "hover:bg-[#202030] text-gray-400 hover:text-white cursor-pointer"
               : "text-transparent cursor-default"
           }`}
         >
@@ -263,30 +263,30 @@ function CategoryRow({
 
         {/* Icon */}
         <div
-          className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-            isPrivate ? "bg-amber-50" : "bg-blue-50"
+          className={`w-8 h-8 rounded-sm shrink-0 border border-[#1e2126] flex items-center justify-center ${
+            isPrivate ? "bg-[#f5d800]/10" : "bg-black"
           }`}
         >
           {depth === 0 ? (
             <Layers
-              className={`w-4 h-4 ${isPrivate ? "text-amber-600" : "text-blue-600"}`}
+              className={`w-4 h-4 ${isPrivate ? "text-[#f5d800]" : "text-gray-400"}`}
             />
           ) : (
             <Tag
-              className={`w-4 h-4 ${isPrivate ? "text-amber-400" : "text-blue-400"}`}
+              className={`w-4 h-4 ${isPrivate ? "text-[#f5d800]" : "text-gray-400"}`}
             />
           )}
         </div>
 
         {/* Name + Slug */}
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-gray-900 truncate">{category.name}</p>
-          <p className="text-xs text-gray-400 truncate">{category.slug}</p>
+          <p className="font-black text-[13px] text-white uppercase tracking-wider truncate">{category.name}</p>
+          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest truncate">{category.slug}</p>
         </div>
 
         {/* Type badge */}
         {isPrivate ? (
-          <span className="flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded font-bold uppercase shrink-0">
+          <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest bg-[#f5d800]/10 text-[#f5d800] border border-[#f5d800]/20 px-2 py-0.5 rounded-sm shrink-0">
             <Lock className="w-3 h-3" />
             Private
             {isOwn && (
@@ -294,14 +294,14 @@ function CategoryRow({
             )}
           </span>
         ) : (
-          <span className="flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold uppercase shrink-0">
+          <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest bg-[#202030] text-gray-400 border border-[#1e2126] px-2 py-0.5 rounded-sm shrink-0">
             <Globe className="w-3 h-3" />
             Global
           </span>
         )}
 
         {/* Stats */}
-        <div className="flex items-center gap-4 text-xs text-gray-500 shrink-0">
+        <div className="flex items-center gap-4 text-[11px] font-black uppercase tracking-widest text-gray-500 shrink-0">
           <span className="flex items-center gap-1" title="Sub-categories">
             <Layers className="w-3 h-3" />
             {category.subCategoryCount}
@@ -314,10 +314,10 @@ function CategoryRow({
 
         {/* Active status */}
         <span
-          className={`text-xs px-2 py-0.5 rounded font-bold uppercase shrink-0 ${
+          className={`text-[10px] px-2 py-0.5 rounded-sm font-black uppercase tracking-widest shrink-0 border ${
             category.isActive
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
+              ? "bg-[#202030] text-white border-white/10"
+              : "bg-red-500/10 text-red-500 border-red-500/20"
           }`}
         >
           {category.isActive ? "Active" : "Inactive"}
@@ -327,10 +327,10 @@ function CategoryRow({
         {isOwn && (
           <button
             onClick={() => onEdit(category)}
-            className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50 hover:border-blue-300 text-gray-500 hover:text-blue-600 transition shrink-0"
+            className="p-1.5 rounded-sm border border-[#1e2126] bg-black hover:bg-[#202030] hover:border-[#f5d800] text-gray-500 hover:text-[#f5d800] transition shrink-0"
             title="Edit category"
           >
-            <Pencil className="w-4 h-4" />
+            <Pencil className="w-3.5 h-3.5" />
           </button>
         )}
 
@@ -338,10 +338,10 @@ function CategoryRow({
         {isOwn && (
           <button
             onClick={() => onDelete(category)}
-            className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-red-50 hover:border-red-300 text-gray-500 hover:text-red-600 transition shrink-0"
+            className="p-1.5 rounded-sm border border-[#1e2126] bg-black hover:bg-[#202030] hover:border-red-500 text-gray-500 hover:text-red-500 transition shrink-0"
             title="Delete category"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         )}
       </div>

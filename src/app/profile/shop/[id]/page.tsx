@@ -51,7 +51,7 @@ export default async function ProfilePage({ params }: PageProps) {
     }
 
     return (
-      <div className="bg-[#FAFAFA] min-h-screen">
+      <div className="bg-black min-h-screen text-white">
         <div className="max-w-[1280px] mx-auto px-2 lg:px-2">
           {/* Truyền trực tiếp dữ liệu ShopPublicProfile vào component */}
           <ProfileHeader profile={shop} />

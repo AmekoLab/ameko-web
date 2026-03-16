@@ -28,7 +28,7 @@ export default function ProfileLayout({
 }) {
   return (
     <div
-      className={`flex flex-col min-h-screen bg-[#f0f2f5] ${inter.className} ${oswald.variable}`}
+      className={`flex flex-col min-h-screen bg-black ${inter.className} ${oswald.variable}`}
     >
       <LayoutWrapper>
         <div className={`${oswald.className} sticky top-0 z-40`}>

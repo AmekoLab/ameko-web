@@ -131,7 +131,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
   // ── Label + Input helpers ──
   const labelCls = "block text-sm font-semibold text-gray-700 mb-1";
   const inputCls =
-    "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#ce2a32] focus:ring-1 focus:ring-[#ce2a32] outline-none transition";
+    " text-black w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#ce2a32] focus:ring-1 focus:ring-[#ce2a32] outline-none transition";
   const errCls = "mt-1 text-xs text-red-500";
 
   return (
