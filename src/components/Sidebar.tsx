@@ -15,7 +15,7 @@ export default function Sidebar({ role = "staff" }) {
     { name: "Users", path: "/admin/users" },
     { name: "Shops", path: "/admin/shop" },
     { name: "Categories", path: "/admin/categories" },
-    { name: "Settings", path: "/admin/settings" },
+    // { name: "Settings", path: "/admin/settings" },
     { name: "Wallet", path: "/admin/wallet" },
     { name: "Pending Withdrawals", path: "/admin/pending-withdrawals" },
     { name: "Transactions", path: "/admin/transactions" },

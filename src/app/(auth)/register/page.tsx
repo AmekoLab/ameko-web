@@ -125,11 +125,11 @@ export default function RegisterPage() {
           {step === 1 && (
             <form
               onSubmit={handleSubmit(onRegisterSubmit)}
-              className="space-y-3"
+              className="space-y-3 text-black"
             >
               <InputField
                 label="Full Name"
-                placeholder="Ex: Dat Nguyen"
+                placeholder="Ex: Full Name"
                 registration={register("fullName", {
                   required: "Name is required",
                 })}

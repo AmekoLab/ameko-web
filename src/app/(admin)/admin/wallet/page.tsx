@@ -71,25 +71,25 @@ export default function AdminWalletPage() {
     switch (status) {
       case "Pending":
         return (
-          <span className="inline-flex items-center gap-1 text-xs bg-yellow-100 text-yellow-700 px-2.5 py-1 rounded-full font-bold uppercase">
-            <Clock className="w-3 h-3" /> Pending
+          <span className="inline-flex items-center gap-1.5 text-[10px] bg-[#f5d800]/10 text-[#f5d800] border border-[#f5d800]/20 px-2.5 py-1 rounded-sm font-black uppercase tracking-widest">
+            <Clock className="w-3.5 h-3.5" /> Pending
           </span>
         );
       case "Paid":
         return (
-          <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-bold uppercase">
-            <CheckCircle className="w-3 h-3" /> Approved
+          <span className="inline-flex items-center gap-1.5 text-[10px] bg-green-500/10 text-green-400 border border-green-500/20 px-2.5 py-1 rounded-sm font-black uppercase tracking-widest">
+            <CheckCircle className="w-3.5 h-3.5" /> Approved
           </span>
         );
       case "Rejected":
         return (
-          <span className="inline-flex items-center gap-1 text-xs bg-red-100 text-red-700 px-2.5 py-1 rounded-full font-bold uppercase">
-            <XCircle className="w-3 h-3" /> Rejected
+          <span className="inline-flex items-center gap-1.5 text-[10px] bg-red-500/10 text-red-500 border border-red-500/20 px-2.5 py-1 rounded-sm font-black uppercase tracking-widest">
+            <XCircle className="w-3.5 h-3.5" /> Rejected
           </span>
         );
       default:
         return (
-          <span className="text-xs bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full font-bold uppercase">
+          <span className="text-[10px] bg-gray-500/10 text-gray-500 border border-gray-500/20 px-2.5 py-1 rounded-sm font-black uppercase tracking-widest">
             {status}
           </span>
         );
@@ -97,21 +97,21 @@ export default function AdminWalletPage() {
   };
 
   return (
-    <div className="p-8 bg-[#f0f2f5] min-h-screen">
+    <div className="p-8 bg-black min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-end mb-6">
+        <div className="flex justify-between items-end mb-6 border-b border-[#1e2126] pb-4">
           <div>
-            <h1 className="text-3xl font-black text-gray-800 mb-2 font-oswald uppercase flex items-center gap-3">
-              <Wallet className="w-8 h-8" />
+            <h1 className="text-3xl font-oswald font-black text-white mb-2 uppercase tracking-widest flex items-center gap-3">
+              <Wallet className="w-8 h-8 text-[#f5d800]" />
               Withdrawal Management
             </h1>
-            <p className="text-gray-500">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
               Approve or reject withdrawal requests from Shops.
             </p>
           </div>
-          <span className="text-sm text-gray-500">
-            Total: <strong>{pagination?.totalCount || 0}</strong> requests
+          <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+            Total: <strong className="text-white">{pagination?.totalCount || 0}</strong> requests
           </span>
         </div>
 
@@ -124,10 +124,10 @@ export default function AdminWalletPage() {
                 setStatusFilter(tab.value);
                 setCurrentPage(1);
               }}
-              className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${
+              className={`px-5 py-2 text-[11px] font-black uppercase tracking-widest rounded-sm border transition-colors ${
                 statusFilter === tab.value
-                  ? "bg-black text-white"
-                  : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                  ? "bg-[#f5d800] text-black border-[#f5d800] shadow-[0_0_10px_rgba(245,216,0,0.2)]"
+                  : "bg-[#151515] text-gray-400 border-[#1e2126] hover:bg-[#202030] hover:text-white"
               }`}
             >
               {tab.label}
@@ -136,15 +136,15 @@ export default function AdminWalletPage() {
         </div>
 
         {/* TABLE */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
           {loading && withdrawals.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500">
               Loading data...
             </div>
           ) : (
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-gray-100 text-gray-600 text-xs uppercase font-bold tracking-wider border-b border-gray-200">
+                <tr className="bg-black text-gray-500 text-[10px] uppercase font-black tracking-widest border-b border-[#1e2126]">
                   <th className="p-4">Shop</th>
                   <th className="p-4">Amount</th>
                   <th className="p-4">Bank</th>
@@ -154,33 +154,33 @@ export default function AdminWalletPage() {
                   <th className="p-4 text-center">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-[#1e2126]">
                 {withdrawals.map((item) => (
                   <tr
                     key={item.paymentId}
-                    className="hover:bg-gray-50 transition-colors"
+                    className="hover:bg-[#202030] transition-colors"
                   >
                     {/* Shop */}
                     <td className="p-4">
-                      <p className="font-bold text-gray-900">{item.shopName}</p>
+                      <p className="font-black text-[13px] text-white uppercase tracking-wider">{item.shopName}</p>
                     </td>
 
                     {/* Amount */}
                     <td className="p-4">
                       <div className="flex items-center gap-1.5">
-                        <Banknote className="w-4 h-4 text-[#ce2a32]" />
-                        <span className="font-bold text-[#ce2a32] font-oswald text-base">
+                        <Banknote className="w-4 h-4 text-[#f5d800]" />
+                        <span className="font-black text-[#f5d800] tracking-wider text-[13px]">
                           {item.amount.toLocaleString("en-US")}₫
                         </span>
                       </div>
                     </td>
 
                     {/* Bank */}
-                    <td className="p-4 text-sm">
-                      <p className="font-semibold text-gray-800">
+                    <td className="p-4 space-y-1">
+                      <p className="font-black text-[11px] text-gray-300 uppercase tracking-widest">
                         {item.bankName}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                         {item.bankAccountNumber} - {item.bankAccountName}
                       </p>
                     </td>
@@ -189,9 +189,9 @@ export default function AdminWalletPage() {
                     <td className="p-4">{renderStatusBadge(item.status)}</td>
 
                     {/* Date */}
-                    <td className="p-4 text-sm text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
+                    <td className="p-4">
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                        <Calendar className="w-3.5 h-3.5" />
                         {new Date(item.requestedAt).toLocaleDateString(
                           "vi-VN",
                           {
@@ -210,13 +210,13 @@ export default function AdminWalletPage() {
                       {item.evidenceImageUrl ? (
                         <button
                           onClick={() => setPreviewImage(item.evidenceImageUrl)}
-                          className="p-1.5 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 text-gray-500 hover:text-blue-600 transition"
+                          className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] hover:border-[#f5d800] text-gray-500 hover:text-[#f5d800] transition"
                           title="View evidence"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                       ) : (
-                        <span className="text-xs text-gray-400">—</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600 italic">—</span>
                       )}
                     </td>
 
@@ -226,21 +226,21 @@ export default function AdminWalletPage() {
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => setApproveTarget(item)}
-                            className="p-2 rounded-lg border border-green-200 bg-white hover:bg-green-50 hover:border-green-400 text-green-600 transition"
+                            className="p-1.5 border border-[#1e2126] bg-[#151515] hover:bg-green-500/10 text-gray-500 hover:text-green-500 hover:border-green-500/50 rounded-sm transition shadow-sm"
                             title="Approve"
                           >
                             <CheckCircle className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setRejectTarget(item)}
-                            className="p-2 rounded-lg border border-red-200 bg-white hover:bg-red-50 hover:border-red-400 text-red-600 transition"
+                            className="p-1.5 border border-[#1e2126] bg-[#151515] hover:bg-red-500/10 text-gray-500 hover:text-red-500 hover:border-red-500/50 rounded-sm transition shadow-sm"
                             title="Reject"
                           >
                             <XCircle className="w-4 h-4" />
                           </button>
                         </div>
                       ) : (
-                        <p className="text-xs text-gray-400 text-center">
+                        <p className="text-[10px] uppercase font-bold tracking-widest text-gray-500 text-center">
                           {item.reason || "—"}
                         </p>
                       )}
@@ -250,7 +250,7 @@ export default function AdminWalletPage() {
 
                 {withdrawals.length === 0 && !loading && (
                   <tr>
-                    <td colSpan={7} className="p-12 text-center text-gray-400">
+                    <td colSpan={7} className="p-12 text-center text-[10px] font-bold uppercase tracking-widest text-gray-600 italic">
                       No withdrawal requests found.
                     </td>
                   </tr>
@@ -261,10 +261,10 @@ export default function AdminWalletPage() {
 
           {/* Pagination */}
           {pagination && pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50">
-              <p className="text-sm text-gray-500">
+            <div className="flex items-center justify-between p-4 border-t border-[#1e2126] bg-black">
+              <p className="text-[10px] uppercase font-bold tracking-widest text-gray-500">
                 Page{" "}
-                <strong>
+                <strong className="text-white">
                   {pagination.currentPage} / {pagination.totalPages}
                 </strong>{" "}
                 — {pagination.totalCount} requests
@@ -275,7 +275,7 @@ export default function AdminWalletPage() {
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={!pagination.hasPreviousPage}
-                  className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="p-2 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] disabled:opacity-40 disabled:cursor-not-allowed transition text-gray-400 hover:text-white"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -286,7 +286,7 @@ export default function AdminWalletPage() {
                     )
                   }
                   disabled={!pagination.hasNextPage}
-                  className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="p-2 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] disabled:opacity-40 disabled:cursor-not-allowed transition text-gray-400 hover:text-white"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -323,7 +323,7 @@ export default function AdminWalletPage() {
       {previewImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setPreviewImage(null)}
           />
           <div className="relative max-w-2xl w-full mx-4">
@@ -332,13 +332,13 @@ export default function AdminWalletPage() {
               alt="Evidence"
               width={800}
               height={600}
-              className="w-full h-auto rounded-2xl shadow-2xl object-contain"
+              className="w-full h-auto rounded-sm shadow-2xl object-contain border border-[#1e2126]"
             />
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute top-3 right-3 bg-white/90 rounded-full p-2 hover:bg-white transition shadow"
+              className="absolute top-3 right-3 bg-black/80 border border-[#1e2126] hover:border-[#f5d800]/50 rounded-sm p-2 hover:bg-[#202030] transition shadow"
             >
-              <XCircle className="w-5 h-5 text-gray-700" />
+              <XCircle className="w-5 h-5 text-gray-400 hover:text-[#f5d800]" />
             </button>
           </div>
         </div>
