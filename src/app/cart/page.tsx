@@ -53,38 +53,38 @@ const ROUTES = {
 
 // ─── Loading Skeleton ──────────────────────────────────────
 const CartSkeleton: FC = () => (
-  <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-black">
     <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 lg:py-12 animate-pulse">
-      <div className="h-8 w-48 bg-gray-200 rounded mb-8" />
+      <div className="h-8 w-48 bg-[#202030] rounded-sm mb-8" />
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1 space-y-4">
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="bg-white rounded-lg shadow-sm p-4 space-y-4"
+              className="bg-[#151515] rounded-sm border border-[#1e2126] p-4 space-y-4"
             >
               <div className="flex gap-3">
-                <div className="w-5 h-5 bg-gray-200 rounded" />
-                <div className="w-5 h-5 bg-gray-200 rounded" />
-                <div className="h-5 w-32 bg-gray-200 rounded" />
+                <div className="w-5 h-5 bg-[#202030] rounded-sm" />
+                <div className="w-5 h-5 bg-[#202030] rounded-sm" />
+                <div className="h-5 w-32 bg-[#202030] rounded-sm" />
               </div>
               <div className="flex gap-3 items-center">
-                <div className="w-5 h-5 bg-gray-200 rounded" />
-                <div className="w-20 h-20 bg-gray-200 rounded" />
+                <div className="w-5 h-5 bg-[#202030] rounded-sm" />
+                <div className="w-20 h-20 bg-[#202030] rounded-sm" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 w-3/4 bg-gray-200 rounded" />
-                  <div className="h-4 w-1/2 bg-gray-200 rounded" />
+                  <div className="h-4 w-3/4 bg-[#202030] rounded-sm" />
+                  <div className="h-4 w-1/2 bg-[#202030] rounded-sm" />
                 </div>
-                <div className="h-4 w-20 bg-gray-200 rounded" />
+                <div className="h-4 w-20 bg-[#202030] rounded-sm" />
               </div>
             </div>
           ))}
         </div>
         <div className="w-full lg:w-[380px] shrink-0">
-          <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
-            <div className="h-6 w-40 bg-gray-200 rounded" />
-            <div className="h-10 w-full bg-gray-200 rounded" />
-            <div className="h-12 w-full bg-gray-200 rounded" />
+          <div className="bg-[#151515] border border-[#1e2126] rounded-sm p-6 space-y-4">
+            <div className="h-6 w-40 bg-[#202030] rounded-sm" />
+            <div className="h-10 w-full bg-[#202030] rounded-sm" />
+            <div className="h-12 w-full bg-[#202030] rounded-sm" />
           </div>
         </div>
       </div>
@@ -95,17 +95,17 @@ const CartSkeleton: FC = () => (
 // ─── Empty Cart ────────────────────────────────────────────
 const EmptyCart: FC = () => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
-    <ShoppingBag className="w-16 h-16 text-gray-200 mb-6" />
-    <h1 className="text-3xl font-oswald font-bold text-black mb-4 uppercase">
+    <ShoppingBag className="w-16 h-16 text-[#f5d800] opacity-50 mb-6" />
+    <h1 className="text-3xl font-oswald font-black text-white mb-4 uppercase tracking-widest">
       Your Cart is Empty
     </h1>
-    <p className="text-gray-500 mb-8 max-w-md">
+    <p className="text-gray-400 mb-8 max-w-md font-medium text-sm">
       Looks like you haven&apos;t added anything yet. Browse our collection to
-      find your perfect keyboard setup.
+      find your perfect custom build.
     </p>
     <Link
       href={ROUTES.SHOP}
-      className="bg-black text-white px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-[#ce2a32] transition-colors duration-200"
+      className="bg-[#f5d800] text-black px-8 py-3 text-sm font-black uppercase tracking-widest hover:bg-[#ffe500] transition-colors duration-200 rounded-sm shadow-[0_0_15px_rgba(245,216,0,0.3)]"
     >
       Continue Shopping
     </Link>
@@ -114,9 +114,9 @@ const EmptyCart: FC = () => (
 
 // ─── Component Row (inside accordion) ──────────────────────
 const ComponentRow: FC<{ component: OrderItemComponent }> = ({ component }) => (
-  <div className="flex items-center gap-3 py-3 pl-4 border-l-2 border-gray-200">
+  <div className="flex items-center gap-3 py-3 pl-4 border-l border-[#1e2126]">
     {/* Part image */}
-    <div className="relative w-12 h-12 bg-gray-50 shrink-0 border border-gray-100 rounded overflow-hidden">
+    <div className="relative w-12 h-12 bg-[#202030] shrink-0 border border-[#1e2126] rounded-sm overflow-hidden">
       {component.partImageUrl ? (
         <Image
           src={component.partImageUrl}
@@ -126,7 +126,7 @@ const ComponentRow: FC<{ component: OrderItemComponent }> = ({ component }) => (
           className="object-contain p-1"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">
+        <div className="w-full h-full flex items-center justify-center text-gray-500 text-[10px] font-bold uppercase tracking-widest">
           N/A
         </div>
       )}
@@ -134,14 +134,14 @@ const ComponentRow: FC<{ component: OrderItemComponent }> = ({ component }) => (
 
     {/* Part info */}
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-medium text-gray-800 truncate capitalize">
+      <p className="text-sm font-bold text-gray-300 truncate uppercase tracking-wide">
         {component.partName}
       </p>
-      <p className="text-xs text-gray-400">Qty: {component.quantity}</p>
+      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Qty: {component.quantity}</p>
     </div>
 
     {/* Part price */}
-    <span className="text-sm text-gray-600 tabular-nums shrink-0">
+    <span className="text-[13px] font-bold text-gray-400 tabular-nums shrink-0">
       {component.partPriceSnapshot > 0
         ? `${component.partPriceSnapshot.toLocaleString()}₫`
         : "Included"}
@@ -180,8 +180,8 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
   return (
     <div
-      className={`border-b border-gray-100 last:border-b-0 transition-colors ${
-        selected ? "bg-[#fff0f1]" : ""
+      className={`border-b border-[#1e2126] last:border-b-0 transition-colors ${
+        selected ? "bg-[#202030]/30" : "hover:bg-[#151515]"
       }`}
     >
       {/* Main row */}
@@ -192,37 +192,37 @@ const CartItemCard: FC<CartItemCardProps> = ({
             type="checkbox"
             checked={selected}
             onChange={() => onToggleSelect(item.orderItemId)}
-            className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
+            className="w-4 h-4 accent-[#f5d800] cursor-pointer"
             aria-label={`Select ${item.productName}`}
           />
         </div>
 
         {/* Image */}
-        <div className="relative w-20 h-20 shrink-0 rounded border border-gray-200 overflow-hidden bg-white">
+        <div className="relative w-20 h-20 shrink-0 rounded-sm border border-[#1e2126] overflow-hidden bg-[#151515]">
           {displayImage ? (
             <Image
               src={displayImage}
               alt={item.productName}
               fill
               sizes="80px"
-              className="object-cover p-1"
+              className="object-contain p-2"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-gray-300" />
+              <ShoppingBag className="w-6 h-6 text-gray-600" />
             </div>
           )}
         </div>
 
         {/* Product Details */}
         <div className="flex-1 min-w-0 pr-2">
-          <p className="text-sm text-gray-800 line-clamp-2 capitalize leading-snug">
+          <p className="text-[13px] font-black text-white line-clamp-2 uppercase tracking-wider leading-snug">
             {item.productName}
           </p>
           {isCustom && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1 text-xs text-[#ce2a32] hover:underline mt-1.5 w-fit"
+              className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors mt-1.5 w-fit"
             >
               {expanded ? (
                 <>
@@ -238,23 +238,23 @@ const CartItemCard: FC<CartItemCardProps> = ({
           )}
           {/* Mobile: price, qty, action */}
           <div className="md:hidden flex items-center gap-3 mt-2">
-            <span className="text-sm font-semibold text-[#ce2a32]">
+            <span className="text-sm font-bold text-[#f5d800]">
               {item.totalPrice.toLocaleString()}₫
             </span>
-            <div className="flex items-center border border-gray-300 rounded ml-auto">
+            <div className="flex items-center border border-[#1e2126] bg-[#151515] rounded-sm ml-auto">
               <button
                 onClick={() =>
                   onUpdateQuantity(item.orderItemId, item.quantity - 1)
                 }
                 disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
-                className="w-7 h-7 flex items-center justify-center text-gray-500 disabled:opacity-30"
+                className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label="Decrease quantity"
               >
                 <Minus className="w-3 h-3" />
               </button>
-              <span className="w-8 h-7 flex items-center justify-center text-xs font-semibold border-x border-gray-300 tabular-nums">
+              <span className="w-8 h-7 flex items-center justify-center text-xs font-bold text-white border-x border-[#1e2126] tabular-nums">
                 {updatingQuantity ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
+                  <Loader2 className="w-3 h-3 animate-spin text-gray-500" />
                 ) : (
                   item.quantity
                 )}
@@ -264,7 +264,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
                   onUpdateQuantity(item.orderItemId, item.quantity + 1)
                 }
                 disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
-                className="w-7 h-7 flex items-center justify-center text-gray-500 disabled:opacity-30"
+                className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label="Increase quantity"
               >
                 <Plus className="w-3 h-3" />
@@ -273,7 +273,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
             <button
               onClick={() => onRemove(item.orderItemId)}
               disabled={removing}
-              className="text-gray-400 hover:text-red-500 disabled:opacity-40"
+              className="text-gray-500 hover:text-red-500 transition-colors disabled:opacity-40"
               aria-label={`Remove ${item.productName}`}
             >
               {removing ? (
@@ -287,27 +287,27 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
         {/* Desktop: Unit Price */}
         <div className="hidden md:flex w-28 justify-center shrink-0">
-          <span className="text-sm text-gray-500">
+          <span className="text-[13px] font-bold text-gray-400 uppercase tracking-widest">
             {item.unitPrice.toLocaleString()}₫
           </span>
         </div>
 
         {/* Desktop: Quantity */}
         <div className="hidden md:flex w-32 justify-center shrink-0">
-          <div className="flex items-center border border-gray-300 rounded">
+          <div className="flex items-center border border-[#1e2126] bg-[#151515] rounded-sm">
             <button
               onClick={() =>
                 onUpdateQuantity(item.orderItemId, item.quantity - 1)
               }
               disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
-              className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Decrease quantity"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
-            <span className="w-10 h-8 flex items-center justify-center text-sm font-medium text-gray-700 border-x border-gray-300 tabular-nums">
+            <span className="w-10 h-8 flex items-center justify-center text-[13px] font-bold text-white border-x border-[#1e2126] tabular-nums">
               {updatingQuantity ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-500" />
               ) : (
                 item.quantity
               )}
@@ -317,7 +317,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
                 onUpdateQuantity(item.orderItemId, item.quantity + 1)
               }
               disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
-              className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Increase quantity"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -327,7 +327,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
         {/* Desktop: Total Price */}
         <div className="hidden md:flex w-28 justify-center shrink-0">
-          <span className="text-sm font-semibold text-[#ce2a32]">
+          <span className="text-[14px] font-black text-[#f5d800] uppercase tracking-widest">
             {item.totalPrice.toLocaleString()}₫
           </span>
         </div>
@@ -337,7 +337,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
           <button
             onClick={() => onRemove(item.orderItemId)}
             disabled={removing}
-            className="p-1.5 text-gray-400 hover:text-red-500 transition-colors disabled:opacity-40"
+            className="p-1.5 text-gray-500 hover:text-red-500 transition-colors disabled:opacity-40"
             aria-label={`Remove ${item.productName}`}
           >
             {removing ? (
@@ -351,8 +351,8 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
       {/* Accordion: Component list for custom builds */}
       {isCustom && expanded && (
-        <div className="mx-4 mb-4 ml-[7.5rem] bg-gray-50/80 rounded-lg p-3">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+        <div className="mx-4 mb-4 ml-[7.5rem] bg-black border border-[#1e2126] rounded-sm p-3">
+          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 px-4">
             Build Components
           </p>
           {item.orderItemComponents.map((comp) => (
@@ -453,40 +453,40 @@ const OrderSummary: FC<OrderSummaryProps> = ({
 
   return (
     <div className="w-full lg:w-[380px] shrink-0">
-      <div className="bg-white rounded-lg shadow-sm p-6 sticky top-28">
-        <h3 className="font-oswald font-bold text-lg uppercase mb-4 border-b border-gray-200 pb-2">
+      <div className="bg-black border border-[#1e2126] rounded-sm p-6 sticky top-28">
+        <h3 className="font-oswald font-black text-white text-lg uppercase tracking-widest mb-4 border-b border-[#1e2126] pb-2">
           Order Summary
         </h3>
 
         {/* Ameko Platform Voucher */}
-        <div className="mb-3 p-3 rounded-lg border border-gray-100 bg-gray-50/50">
+        <div className="mb-3 p-3 rounded-sm border border-[#1e2126] bg-[#151515] transition-colors hover:border-[#f5d800]">
           <button
             type="button"
             onClick={onOpenSystemVoucher}
             className="w-full flex items-center justify-between cursor-pointer group"
           >
             <div className="flex items-center gap-2">
-              <Ticket className="w-5 h-5 text-[#ce2a32]" />
-              <span className="font-medium text-gray-800">Ameko Voucher</span>
+              <Ticket className="w-5 h-5 text-[#f5d800]" />
+              <span className="font-bold text-[13px] text-white uppercase tracking-wider">Ameko Voucher</span>
             </div>
             <div className="flex items-center gap-1">
               {selectedSystemIds.length > 0 ? (
-                <span className="text-sm font-medium text-[#ce2a32]">
-                  Đã chọn {selectedSystemIds.length} mã
+                <span className="text-[11px] font-bold text-[#f5d800] uppercase tracking-widest">
+                  Selected {selectedSystemIds.length}
                 </span>
               ) : availableSystemVouchersCount > 0 ? (
-                <span className="text-sm font-medium text-[#ce2a32]">
-                  Chọn mã (Có {availableSystemVouchersCount} mã)
+                <span className="text-[11px] font-bold text-[#f5d800] uppercase tracking-widest">
+                  Available ({availableSystemVouchersCount})
                 </span>
               ) : (
-                <span className="text-sm text-gray-500">Chọn hoặc nhập mã</span>
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Select</span>
               )}
-              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+              <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
             </div>
           </button>
           {/* System voucher error */}
           {cartPreview?.systemVoucherError && (
-            <p className="text-red-500 text-[11px] mt-1.5 font-medium">
+            <p className="text-red-500 text-[10px] uppercase font-bold tracking-wider mt-1.5 px-1">
               {cartPreview.systemVoucherError}
             </p>
           )}
@@ -494,31 +494,31 @@ const OrderSummary: FC<OrderSummaryProps> = ({
 
         {/* Applied Vouchers Breakdown */}
         {hasAppliedVouchers && (
-          <div className="mb-4 space-y-1.5 py-2 border-t border-dashed border-gray-100">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+          <div className="mb-4 space-y-1.5 py-2 border-t border-[#1e2126]">
+            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 px-1">
               Applied Vouchers
             </p>
 
             {/* System voucher row */}
             {selectedSystemVoucherCode && (
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5">
-                  <Ticket className="w-3 h-3 text-green-500" />
-                  <span className="text-gray-600 font-medium">
+              <div className="flex items-center justify-between text-[11px] font-bold">
+                <div className="flex items-center gap-1.5 pt-1">
+                  <Ticket className="w-3 h-3 text-[#f5d800]" />
+                  <span className="text-white uppercase tracking-wider">
                     {selectedSystemVoucherCode.code}
                   </span>
-                  <span className="text-gray-400">(System)</span>
+                  <span className="text-gray-500 uppercase tracking-wider">(System)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   {systemDiscountAmount > 0 && (
-                    <span className="text-green-600 font-medium">
+                    <span className="text-green-500">
                       -{formatCurrency(systemDiscountAmount)}
                     </span>
                   )}
                   <button
                     type="button"
                     onClick={() => dispatch(setSelectedSystemVouchers([]))}
-                    className="p-0.5 text-gray-400 hover:text-[#ce2a32] transition-colors"
+                    className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                     aria-label="Remove system voucher"
                   >
                     <X className="w-3 h-3" />
@@ -531,16 +531,16 @@ const OrderSummary: FC<OrderSummaryProps> = ({
             {selectedShopVouchers.map((sv) => (
               <div
                 key={sv.shopId}
-                className="flex items-center justify-between text-xs"
+                className="flex items-center justify-between text-[11px] font-bold"
               >
-                <div className="flex items-center gap-1.5">
-                  <Ticket className="w-3 h-3 text-green-500" />
-                  <span className="text-gray-600 font-medium">{sv.code}</span>
-                  <span className="text-gray-400">({sv.shopName})</span>
+                <div className="flex items-center gap-1.5 pt-1">
+                  <Ticket className="w-3 h-3 text-[#f5d800]" />
+                  <span className="text-white uppercase tracking-wider">{sv.code}</span>
+                  <span className="text-gray-500 uppercase tracking-wider">({sv.shopName})</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   {sv.discountAmount > 0 && (
-                    <span className="text-green-600 font-medium">
+                    <span className="text-green-500">
                       -{formatCurrency(sv.discountAmount)}
                     </span>
                   )}
@@ -554,7 +554,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
                         }),
                       )
                     }
-                    className="p-0.5 text-gray-400 hover:text-[#ce2a32] transition-colors"
+                    className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                     aria-label={`Remove voucher ${sv.code}`}
                   >
                     <X className="w-3 h-3" />
@@ -566,17 +566,17 @@ const OrderSummary: FC<OrderSummaryProps> = ({
         )}
 
         {/* Selected items info */}
-        <div className="flex justify-between items-center mb-2 text-sm">
-          <span className="text-gray-600">Selected items</span>
-          <span className="font-medium">
+        <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
+          <span>Selected items</span>
+          <span className="text-white">
             {selectedItemIds.size} item{selectedItemIds.size !== 1 ? "s" : ""}
           </span>
         </div>
 
         {/* Subtotal */}
-        <div className="flex justify-between items-center mb-2 text-sm">
-          <span className="text-gray-600">Subtotal</span>
-          <span className="font-medium">
+        <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
+          <span>Subtotal</span>
+          <span className="text-white">
             {isCalculatingPreview ? (
               <Loader2 className="w-4 h-4 animate-spin inline" />
             ) : (
@@ -586,9 +586,9 @@ const OrderSummary: FC<OrderSummaryProps> = ({
         </div>
 
         {/* Shipping */}
-        <div className="flex justify-between items-center mb-2 text-sm">
-          <span className="text-gray-600">Shipping</span>
-          <span className="font-medium">
+        <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
+          <span>Shipping</span>
+          <span className="text-white">
             {isCalculatingPreview ? (
               <Loader2 className="w-4 h-4 animate-spin inline" />
             ) : (
@@ -599,20 +599,20 @@ const OrderSummary: FC<OrderSummaryProps> = ({
 
         {/* Discount */}
         {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (
-          <div className="flex justify-between items-center mb-2 text-sm">
-            <span className="text-gray-600">Discount</span>
-            <span className="font-medium text-green-600">
+          <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
+            <span>Discount</span>
+            <span className="text-green-500">
               -{formatCurrency(cartPreview!.totalDiscountAmount)}
             </span>
           </div>
         )}
 
         {/* Total */}
-        <div className="flex justify-between items-end mb-2 mt-4 pt-3 border-t border-gray-200">
-          <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">
+        <div className="flex justify-between items-end mb-2 mt-4 pt-3 border-t border-[#1e2126]">
+          <span className="text-[13px] font-black text-white uppercase tracking-widest">
             Estimated Total
           </span>
-          <span className="text-xl font-black text-black">
+          <span className="text-xl font-black text-[#f5d800]">
             {isCalculatingPreview ? (
               <Loader2 className="w-5 h-5 animate-spin inline" />
             ) : (
@@ -621,7 +621,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
           </span>
         </div>
 
-        <p className="text-xs text-gray-400 mb-6 text-right">
+        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-6 text-right">
           Taxes and shipping calculated at checkout
         </p>
 
@@ -630,20 +630,20 @@ const OrderSummary: FC<OrderSummaryProps> = ({
           <button
             onClick={onCheckout}
             disabled={!hasSelection || isCalculatingPreview}
-            className={`w-full h-12 text-sm font-bold uppercase tracking-widest transition-colors duration-200 rounded-sm ${
+            className={`w-full py-4 text-[13px] font-black uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 ${
               hasSelection && !isCalculatingPreview
-                ? "bg-black text-white hover:bg-[#ce2a32]"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                ? "bg-[#f5d800] text-black hover:bg-[#ffe500] shadow-[0_0_15px_rgba(245,216,0,0.3)]"
+                : "bg-[#202030] text-gray-500 cursor-not-allowed border border-[#1e2126]"
             }`}
           >
             {isCalculatingPreview ? (
               <span className="flex items-center justify-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" /> Calculating...
+                <Loader2 className="w-4 h-4 animate-spin" /> Processing...
               </span>
             ) : hasSelection ? (
-              `Proceed to Checkout (${selectedItemIds.size})`
+              `Checkout Now (${selectedItemIds.size})`
             ) : (
-              "Select Items to Checkout"
+              "Select Items"
             )}
           </button>
         </div>
@@ -981,16 +981,16 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
 
   // Main cart content
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-black">
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 lg:py-12">
         {/* Header */}
         <header className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl md:text-3xl font-oswald font-bold uppercase tracking-wide text-gray-900">
+          <h1 className="text-2xl md:text-3xl font-oswald font-black uppercase tracking-widest text-white">
             Your Cart
           </h1>
           <Link
             href={ROUTES.SHOP}
-            className="hidden md:flex items-center gap-2 text-sm text-gray-500 hover:text-[#ce2a32] transition-colors"
+            className="hidden md:flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Continue Shopping
           </Link>
@@ -1000,7 +1000,7 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
           {/* Product List */}
           <div className="flex-1 space-y-4">
             {/* Column Header (Desktop) */}
-            <div className="hidden md:flex items-center bg-white rounded-lg shadow-sm px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+            <div className="hidden md:flex items-center bg-[#151515] border border-[#1e2126] rounded-sm px-4 py-3 text-[11px] font-black text-gray-400 uppercase tracking-widest">
               <div className="flex items-center gap-3 shrink-0">
                 <input
                   type="checkbox"
@@ -1009,19 +1009,19 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
                     cart.orderItems.length > 0
                   }
                   onChange={handleToggleSelectAll}
-                  className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
+                  className="w-4 h-4 accent-[#f5d800] cursor-pointer"
                   aria-label="Select all items"
                 />
               </div>
-              <span className="flex-1 ml-3">Sản Phẩm</span>
-              <span className="w-28 text-center">Đơn Giá</span>
-              <span className="w-32 text-center">Số Lượng</span>
-              <span className="w-28 text-center">Số Tiền</span>
-              <span className="w-10 text-center">Thao Tác</span>
+              <span className="flex-1 ml-3">Product</span>
+              <span className="w-28 text-center">Price</span>
+              <span className="w-32 text-center">Quantity</span>
+              <span className="w-28 text-center">Total</span>
+              <span className="w-10 text-center">Action</span>
             </div>
 
             {/* Mobile: Select All */}
-            <div className="md:hidden flex items-center gap-2 bg-white rounded-lg shadow-sm px-4 py-3">
+            <div className="md:hidden flex items-center gap-2 bg-[#151515] border border-[#1e2126] rounded-sm px-4 py-3">
               <input
                 type="checkbox"
                 checked={
@@ -1029,11 +1029,11 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
                   cart.orderItems.length > 0
                 }
                 onChange={handleToggleSelectAll}
-                className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
+                className="w-4 h-4 accent-[#f5d800] cursor-pointer"
                 aria-label="Select all items"
               />
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Chọn Tất Cả ({cart.orderItems.length})
+              <span className="text-[11px] font-black text-white uppercase tracking-widest">
+                Select All ({cart.orderItems.length})
               </span>
             </div>
 
@@ -1050,22 +1050,22 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
               return (
                 <div
                   key={shopId}
-                  className="bg-white rounded-lg shadow-sm overflow-hidden"
+                  className="bg-[#151515] border border-[#1e2126] rounded-sm overflow-hidden"
                 >
                   {/* Shop Header */}
-                  <div className="flex items-center p-4 border-b border-gray-100">
+                  <div className="flex items-center p-4 border-b border-[#1e2126]">
                     <input
                       type="checkbox"
                       checked={allShopSelected}
                       onChange={() => handleToggleShopSelect(shopId)}
-                      className="w-4 h-4 accent-[#ce2a32] cursor-pointer shrink-0"
+                      className="w-4 h-4 accent-[#f5d800] cursor-pointer shrink-0"
                       aria-label={`Select all from ${shopName}`}
                     />
-                    <Store className="w-[18px] h-[18px] text-gray-600 ml-3" />
-                    <span className="font-semibold text-gray-800 ml-2 truncate">
+                    <Store className="w-[18px] h-[18px] text-gray-500 ml-3" />
+                    <span className="text-[13px] font-black text-white ml-2 truncate uppercase tracking-widest">
                       {shopName}
                     </span>
-                    <ChevronRight className="w-4 h-4 text-gray-400 ml-1 shrink-0" />
+                    <ChevronRight className="w-4 h-4 text-gray-500 ml-1 shrink-0" />
                   </div>
 
                   {/* Product Rows */}
@@ -1083,11 +1083,11 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
                   ))}
 
                   {/* Shop Voucher Footer */}
-                  <div className="p-4 border-t border-gray-100 bg-gray-50/50">
+                  <div className="p-4 border-t border-[#1e2126] bg-black">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Ticket className="w-4 h-4 text-[#ce2a32]" />
-                        <span>Voucher của Shop</span>
+                      <div className="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                        <Ticket className="w-4 h-4 text-[#f5d800]" />
+                        <span>Shop Voucher</span>
                       </div>
                       {vouchers.length > 0 ? (
                         <button
@@ -1095,13 +1095,13 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
                           onClick={() =>
                             handleOpenShopVoucherModal(shopId, shopName)
                           }
-                          className="text-sm font-medium text-[#ce2a32] hover:underline"
+                          className="text-[11px] font-black text-[#f5d800] hover:text-[#ffe500] hover:underline uppercase tracking-widest transition-colors"
                         >
-                          Chọn Hoặc Nhập Mã ({vouchers.length} mã khả dụng)
+                          Select or enter code ({vouchers.length} available)
                         </button>
                       ) : (
-                        <span className="text-sm text-gray-400">
-                          Chọn Hoặc Nhập Mã
+                        <span className="text-[11px] font-bold text-gray-600 uppercase tracking-widest">
+                          Select or enter code
                         </span>
                       )}
                     </div>

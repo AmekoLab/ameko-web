@@ -82,41 +82,41 @@ export default function PendingWithdrawalsPage() {
   };
 
   return (
-    <div className="p-8 bg-[#f0f2f5] min-h-screen">
+    <div className="p-8 bg-black min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-end mb-6">
+        <div className="flex justify-between items-end mb-6 border-b border-[#1e2126] pb-4">
           <div>
-            <h1 className="text-3xl font-black text-gray-800 mb-2 font-oswald uppercase flex items-center gap-3">
-              <Banknote className="w-8 h-8" />
+            <h1 className="text-3xl font-oswald font-black text-white mb-2 uppercase tracking-widest flex items-center gap-3">
+              <Banknote className="w-8 h-8 text-[#f5d800]" />
               Pending Withdrawal Requests
             </h1>
-            <p className="text-gray-500">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
               Manage withdrawal requests currently pending from Shops.
             </p>
           </div>
-          <span className="text-sm text-gray-500">
-            Total: <strong>{pendingPagination?.totalCount || 0}</strong>{" "}
+          <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+            Total: <strong className="text-white">{pendingPagination?.totalCount || 0}</strong>{" "}
             requests
           </span>
         </div>
 
         {/* TABLE */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
           {loadingPending && pendingWithdrawals.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500">
               Loading data...
             </div>
           ) : pendingWithdrawals.length === 0 && !loadingPending ? (
             /* ─── Empty State ─────────────────────────── */
             <div className="p-16 flex flex-col items-center justify-center text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 mb-4">
-                <Inbox className="h-8 w-8 text-gray-400" />
+              <div className="flex h-16 w-16 items-center justify-center rounded-sm bg-black border border-[#1e2126] mb-4">
+                <Inbox className="h-8 w-8 text-gray-500" />
               </div>
-              <h3 className="text-lg font-bold text-gray-700 font-oswald uppercase mb-1">
+              <h3 className="text-base font-black text-white font-oswald uppercase tracking-widest mb-1">
                 No requests
               </h3>
-              <p className="text-sm text-gray-400 max-w-xs">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 max-w-xs">
                 There are currently no withdrawal requests pending.
               </p>
             </div>
@@ -124,7 +124,7 @@ export default function PendingWithdrawalsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-gray-100 text-gray-600 text-xs uppercase font-bold tracking-wider border-b border-gray-200">
+                  <tr className="bg-black text-gray-500 text-[10px] uppercase font-black tracking-widest border-b border-[#1e2126]">
                     <th className="p-4">Date</th>
                     <th className="p-4">Amount</th>
                     <th className="p-4">Fee</th>
@@ -132,18 +132,18 @@ export default function PendingWithdrawalsPage() {
                     <th className="p-4 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-[#1e2126]">
                   {pendingWithdrawals.map((tx: TransactionItem) => {
                     const bank = parseBankDetails(tx.description);
                     return (
                       <tr
                         key={tx.id}
-                        className="hover:bg-gray-50 transition-colors"
+                        className="hover:bg-[#202030] transition-colors"
                       >
                         {/* Date */}
-                        <td className="p-4 text-sm text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
+                        <td className="p-4 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5" />
                             {new Date(tx.createdAt).toLocaleDateString(
                               "en-US",
                               {
@@ -159,14 +159,14 @@ export default function PendingWithdrawalsPage() {
 
                         {/* Amount */}
                         <td className="p-4">
-                          <span className="font-bold text-[#ce2a32] font-oswald text-base">
+                          <span className="font-black text-[#f5d800] tracking-wider text-[13px]">
                             {tx.amount.toLocaleString("en-US")}
                           </span>
                         </td>
 
                         {/* Fee */}
                         <td className="p-4">
-                          <span className="text-sm text-gray-500 font-oswald">
+                          <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                             {tx.feeAmount > 0
                               ? `${tx.feeAmount.toLocaleString("en-US")}`
                               : "—"}
@@ -176,28 +176,28 @@ export default function PendingWithdrawalsPage() {
                         {/* Bank Details */}
                         <td className="p-4">
                           {bank ? (
-                            <div className="space-y-0.5">
-                              <p className="text-xs text-gray-500 font-medium">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
                                 {bank.bankName}
                               </p>
-                              <div className="flex items-center gap-1.5">
-                                <span className="font-bold text-gray-900 text-sm font-mono">
+                              <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-white">
+                                <span>
                                   {bank.accountNumber}
                                 </span>
                                 <button
                                   onClick={() => handleCopy(bank.accountNumber)}
-                                  className="p-0.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition"
+                                  className="p-1 rounded-sm bg-black border border-[#1e2126] hover:bg-[#202030] text-gray-500 hover:text-[#f5d800] hover:border-[#f5d800]/50 transition-colors"
                                   title="Copy Account Number"
                                 >
-                                  <Copy className="w-3.5 h-3.5" />
+                                  <Copy className="w-3 h-3" />
                                 </button>
                               </div>
-                              <p className="text-xs text-gray-600">
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
                                 {bank.accountName}
                               </p>
                             </div>
                           ) : (
-                            <span className="text-xs text-gray-400 italic">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600 italic">
                               No information
                             </span>
                           )}
@@ -210,7 +210,7 @@ export default function PendingWithdrawalsPage() {
                               onClick={() =>
                                 handleOpenApproveModal(tx.id, tx.amount)
                               }
-                              className="p-2 rounded-lg border border-green-200 bg-white hover:bg-green-50 hover:border-green-400 text-green-600 transition"
+                              className="p-1.5 border border-[#1e2126] bg-[#151515] hover:bg-green-500/10 text-gray-500 hover:text-green-500 hover:border-green-500/50 rounded-sm transition shadow-sm"
                               title="Approve"
                             >
                               <CheckCircle className="w-4 h-4" />
@@ -219,7 +219,7 @@ export default function PendingWithdrawalsPage() {
                               onClick={() =>
                                 handleOpenRejectModal(tx.id, tx.amount)
                               }
-                              className="p-2 rounded-lg border border-red-200 bg-white hover:bg-red-50 hover:border-red-400 text-red-600 transition"
+                              className="p-1.5 border border-[#1e2126] bg-[#151515] hover:bg-red-500/10 text-gray-500 hover:text-red-500 hover:border-red-500/50 rounded-sm transition shadow-sm"
                               title="Reject"
                             >
                               <XCircle className="w-4 h-4" />
@@ -236,10 +236,10 @@ export default function PendingWithdrawalsPage() {
 
           {/* Pagination */}
           {pendingPagination && pendingPagination.totalPages > 1 && (
-            <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50">
-              <p className="text-sm text-gray-500">
+            <div className="flex items-center justify-between p-4 border-t border-[#1e2126] bg-black">
+              <p className="text-[10px] uppercase font-bold tracking-widest text-gray-500">
                 Page{" "}
-                <strong>
+                <strong className="text-white">
                   {pendingPagination.currentPage} /{" "}
                   {pendingPagination.totalPages}
                 </strong>{" "}
@@ -249,7 +249,7 @@ export default function PendingWithdrawalsPage() {
                 <button
                   onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
                   disabled={!pendingPagination.hasPreviousPage}
-                  className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="p-2 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] disabled:opacity-40 disabled:cursor-not-allowed transition text-gray-400 hover:text-white"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -260,7 +260,7 @@ export default function PendingWithdrawalsPage() {
                     )
                   }
                   disabled={!pendingPagination.hasNextPage}
-                  className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="p-2 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] disabled:opacity-40 disabled:cursor-not-allowed transition text-gray-400 hover:text-white"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

@@ -19,6 +19,7 @@ import {
   User,
   CheckCircle2,
   UploadCloud,
+  Loader2,
 } from "lucide-react";
 
 interface ImageUploadProps {
@@ -60,11 +61,10 @@ const ImageUpload = ({
     if (file) setPreview(URL.createObjectURL(file));
   };
 
-  // Styles riêng cho Banner và Logo
   const containerClass =
     type === "banner"
-      ? "w-full h-48 md:h-64 rounded-t-2xl bg-gray-100 border-2 border-dashed border-gray-300 relative overflow-hidden group hover:border-gray-400 transition-all"
-      : "w-32 h-32 md:w-40 md:h-40 rounded-full bg-white border-4 border-white shadow-lg relative overflow-hidden group cursor-pointer hover:brightness-95 transition-all";
+      ? "w-full h-48 md:h-64 rounded-t-sm bg-black border border-[#1e2126] border-dashed relative overflow-hidden group hover:border-[#f5d800] transition-all"
+      : "w-32 h-32 md:w-40 md:h-40 rounded-full bg-black border-4 border-[#151515] shadow-lg relative overflow-hidden group cursor-pointer hover:border-[#f5d800] transition-all";
 
   return (
     <div className="relative">
@@ -82,7 +82,7 @@ const ImageUpload = ({
           accept="image/*"
           className="absolute inset-0 opacity-0 cursor-pointer z-20"
           {...register(name)}
-          onChange={(e) => {
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             register(name).onChange(e);
             handleChange(e);
           }}
@@ -91,17 +91,18 @@ const ImageUpload = ({
         {preview ? (
           <Image src={preview} alt="Preview" fill className="object-cover" />
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 z-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 z-10">
             <Camera
-              className={`${type === "banner" ? "w-8 h-8" : "w-6 h-6"} mb-2`}
+              className={`${type === "banner" ? "w-8 h-8" : "w-6 h-6"} mb-2 ${isDragging ? "text-[#f5d800]" : ""}`}
             />
             {type === "banner" && (
-              <span className="text-sm font-medium">Drag Banner Here</span>
+              <span className="text-[11px] font-bold uppercase tracking-widest text-center px-4">
+                Drag or click to upload banner
+              </span>
             )}
           </div>
         )}
 
-        {/* Hover Overlay Icon */}
         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
           <UploadCloud className="text-white w-8 h-8" />
         </div>
@@ -154,21 +155,23 @@ export default function RegisterShopPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f3f4f6] py-10 px-4">
+    <div className="py-6 px-2 md:px-0 relative">
       <div className="max-w-5xl mx-auto">
         {/* HEADER TEXT */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-black font-oswald uppercase text-gray-900">
-            Merchant Registration
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Complete the application to start doing business on Ameko.
-          </p>
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#1e2126] pb-4">
+          <div>
+            <h1 className="text-3xl font-black font-oswald uppercase tracking-widest text-white">
+              Merchant Registration
+            </h1>
+            <p className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mt-2">
+              Complete the application to start doing business on Ameko.
+            </p>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* --- SECTION 1: VISUAL IDENTITY  --- */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
+          <div className="bg-[#151515] rounded-sm shadow-sm border border-[#1e2126]">
             {/* 1. Banner Area */}
             <div className="relative">
               <ImageUpload
@@ -206,16 +209,16 @@ export default function RegisterShopPage() {
                   />
                   <input
                     {...register("shopName")}
-                    className="form-input text-lg font-bold"
-                    placeholder=" Shop Name..."
+                    className="form-input text-[13px] font-black uppercase tracking-wider text-white"
+                    placeholder="SHOP NAME..."
                   />
                 </div>
                 <div>
                   <InputLabel label="Slogan / Bio" />
                   <input
                     {...register("bio")}
-                    className="form-input"
-                    placeholder=" Short slogan or description..."
+                    className="form-input text-[13px] font-bold text-white"
+                    placeholder="Short slogan or description..."
                   />
                 </div>
               </div>
@@ -223,10 +226,10 @@ export default function RegisterShopPage() {
           </div>
 
           {/* --- SECTION 2: CONTACT & ADDRESS --- */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
-            <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
-              <User className="text-[#ce2a32]" />
-              <h3 className="text-lg font-bold text-gray-800 uppercase">
+          <div className="bg-[#151515] rounded-sm shadow-sm border border-[#1e2126] p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-6 border-b border-[#1e2126] pb-4">
+              <User className="text-[#f5d800] w-5 h-5" />
+              <h3 className="text-[13px] font-black text-white tracking-widest uppercase">
                 Contact Details
               </h3>
             </div>
@@ -240,7 +243,7 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("contactEmail")}
-                  className="form-input"
+                  className="form-input text-[13px] font-bold text-white tracking-wider"
                   placeholder="email@domain.com"
                 />
               </div>
@@ -252,7 +255,7 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("phoneNumber")}
-                  className="form-input"
+                  className="form-input text-[13px] font-bold text-white tracking-wider"
                   placeholder="09xxx..."
                 />
               </div>
@@ -264,8 +267,8 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("taxCode")}
-                  className="form-input"
-                  placeholder="Tax Code"
+                  className="form-input text-[13px] font-bold text-white tracking-wider"
+                  placeholder="TAX CODE..."
                 />
               </div>
               <div className="md:col-span-3">
@@ -276,7 +279,7 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("address")}
-                  className="form-input"
+                  className="form-input text-[13px] font-bold text-white tracking-wider"
                   placeholder="Warehouse pickup address..."
                 />
               </div>
@@ -284,10 +287,10 @@ export default function RegisterShopPage() {
           </div>
 
           {/* --- SECTION 3: BANKING & LEGAL --- */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
-            <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
-              <CreditCard className="text-[#ce2a32]" />
-              <h3 className="text-lg font-bold text-gray-800 uppercase">
+          <div className="bg-[#151515] rounded-sm shadow-sm border border-[#1e2126] p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-6 border-b border-[#1e2126] pb-4">
+              <CreditCard className="text-[#f5d800] w-5 h-5" />
+              <h3 className="text-[13px] font-black text-white tracking-widest uppercase">
                 Banking Information
               </h3>
             </div>
@@ -301,8 +304,8 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("citizenId")}
-                  className="form-input"
-                  placeholder="Số CCCD"
+                  className="form-input text-[13px] font-bold text-white tracking-wider"
+                  placeholder="CITIZEN ID"
                 />
               </div>
               <div>
@@ -313,8 +316,8 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("bankName")}
-                  className="form-input"
-                  placeholder="Bank Name"
+                  className="form-input text-[13px] font-bold text-white tracking-wider"
+                  placeholder="BANK NAME"
                 />
               </div>
               <div>
@@ -325,8 +328,8 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("bankAccountNumber")}
-                  className="form-input font-mono"
-                  placeholder="Account Number"
+                  className="form-input font-mono text-[13px] font-bold text-white tracking-wider"
+                  placeholder="ACCOUNT NUMBER"
                 />
               </div>
               <div>
@@ -337,8 +340,8 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("bankAccountName")}
-                  className="form-input uppercase"
-                  placeholder="Account Holder Name"
+                  className="form-input uppercase text-[13px] font-bold text-white tracking-wider"
+                  placeholder="ACCOUNT HOLDER NAME"
                 />
               </div>
             </div>
@@ -349,13 +352,16 @@ export default function RegisterShopPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-black font-oswald uppercase tracking-widest rounded-lg hover:bg-[#ce2a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-70 disabled:cursor-not-allowed w-full md:w-auto"
+              className="group relative inline-flex items-center justify-center px-8 py-4 text-[13px] font-black text-black transition-all duration-200 bg-[#f5d800] uppercase tracking-widest rounded-sm hover:bg-[#ffe500] focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed w-full md:w-auto shadow-[0_0_15px_rgba(245,216,0,0.3)] disabled:shadow-none"
             >
               {loading ? (
-                <span className="flex items-center gap-2">Processing...</span>
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  PROCESSING...
+                </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  Submit Application <CheckCircle2 className="w-5 h-5" />
+                  SUBMIT APPLICATION <CheckCircle2 className="w-5 h-5" />
                 </span>
               )}
             </button>
@@ -367,20 +373,18 @@ export default function RegisterShopPage() {
         .form-input {
           width: 100%;
           padding: 0.75rem 1rem;
-          border-radius: 0.5rem;
-          border: 1px solid #e5e7eb;
-          background-color: #f9fafb;
-          font-size: 0.95rem;
+          border-radius: 2px;
+          border: 1px solid #1e2126;
+          background-color: black;
           transition: all 0.2s;
           outline: none;
         }
-        .form-input:focus {
-          border-color: #ce2a32;
-          background-color: #fff;
-          box-shadow: 0 0 0 4px rgba(206, 42, 50, 0.1);
+        .form-input:focus:not(:disabled) {
+          border-color: #f5d800;
+          box-shadow: 0 0 0 1px rgba(245, 216, 0, 0.3);
         }
         .form-input::placeholder {
-          color: #9ca3af;
+          color: #4b5563;
         }
       `}</style>
     </div>
@@ -397,12 +401,12 @@ const InputLabel = ({
   error?: string;
   required?: boolean;
 }) => (
-  <div className="flex justify-between mb-1.5 items-end">
-    <label className="text-sm font-bold text-gray-700">
-      {label} {required && <span className="text-[#ce2a32]">*</span>}
+  <div className="flex justify-between mb-2 items-end">
+    <label className="text-[11px] font-black uppercase tracking-widest text-gray-400">
+      {label} {required && <span className="text-[#f5d800]">*</span>}
     </label>
     {error && (
-      <span className="text-[#ce2a32] text-xs font-semibold animate-pulse">
+      <span className="text-red-500 text-[10px] font-black uppercase tracking-widest animate-pulse">
         {error}
       </span>
     )}

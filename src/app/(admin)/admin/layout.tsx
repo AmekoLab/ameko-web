@@ -31,7 +31,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <LayoutWrapper>
       <AuthWrapper allowedRoles={["Admin"]}>
         <div
-          className={`flex flex-col min-h-screen bg-[#f0f2f5] ${inter.className} ${oswald.variable}`}
+          className={`flex flex-col min-h-screen bg-black ${inter.className} ${oswald.variable}`}
         >
           <div className={`${oswald.className} sticky top-0 z-50 w-full`}>
             <Header />
@@ -40,7 +40,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <div className="flex flex-1 min-h-0">
             {/* Main Content */}
             <Sidebar role="admin" />
-            <main className="flex-1 p-6 bg-gray-100 overflow-auto">
+            <main className="flex-1 p-6 bg-black overflow-auto">
               {children}
             </main>
           </div>

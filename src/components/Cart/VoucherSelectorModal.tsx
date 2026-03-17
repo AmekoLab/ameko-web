@@ -84,14 +84,14 @@ const VoucherCard: FC<VoucherCardProps> = ({
 
   return (
     <div
-      className={`flex rounded-lg overflow-hidden border transition-all ${
+      className={`flex rounded-sm overflow-hidden border transition-all ${
         !eligible
-          ? "opacity-50 grayscale border-gray-200 cursor-not-allowed"
+          ? "opacity-50 grayscale border-[#1e2126] cursor-not-allowed"
           : isApplied
-            ? "border-[#ce2a32] ring-1 ring-[#ce2a32]/30 bg-red-50/40 shadow-sm cursor-pointer"
+            ? "border-[#f5d800] ring-1 ring-[#f5d800]/30 bg-[#f5d800]/10 shadow-sm cursor-pointer"
             : selected
-              ? "border-[#ce2a32] ring-1 ring-[#ce2a32]/30 shadow-sm"
-              : "border-gray-200 hover:border-[#ce2a32]/40 cursor-pointer"
+              ? "border-[#f5d800] ring-1 ring-[#f5d800]/30 shadow-sm"
+              : "border-[#1e2126] hover:border-[#f5d800]/40 cursor-pointer"
       }`}
       onClick={() => eligible && onToggle(voucher.id)}
       role="button"
@@ -99,21 +99,21 @@ const VoucherCard: FC<VoucherCardProps> = ({
       aria-disabled={!eligible}
     >
       {/* ── Left Ticket Part ── */}
-      <div className="relative w-[100px] shrink-0 bg-gradient-to-br from-[#ce2a32] to-[#a82028] flex flex-col items-center justify-center p-3 text-white">
+      <div className="relative w-[100px] shrink-0 bg-gradient-to-br from-[#f5d800] to-[#d4b900] flex flex-col items-center justify-center p-3 text-black">
         {/* Dashed "tear-off" edge */}
-        <div className="absolute top-0 right-0 h-full w-0 border-r-2 border-dashed border-white/30" />
+        <div className="absolute top-0 right-0 h-full w-0 border-r-2 border-dashed border-black/20" />
         {/* Scalloped circles */}
-        <div className="absolute -right-[6px] top-3 w-3 h-3 bg-white rounded-full" />
-        <div className="absolute -right-[6px] bottom-3 w-3 h-3 bg-white rounded-full" />
+        <div className="absolute -right-[6px] top-3 w-3 h-3 bg-black rounded-full border-l border-[#1e2126]" />
+        <div className="absolute -right-[6px] bottom-3 w-3 h-3 bg-black rounded-full border-l border-[#1e2126]" />
 
         <Ticket className="w-6 h-6 mb-1.5 opacity-80" />
-        <span className="text-[10px] font-bold uppercase tracking-wider text-center leading-tight">
+        <span className="text-[10px] font-black uppercase tracking-widest text-center leading-tight">
           {brandLabel}
         </span>
 
         {/* Almost gone badge */}
         {isAlmostGone && eligible && (
-          <span className="mt-1.5 text-[9px] font-bold bg-white/20 px-1.5 py-0.5 rounded-sm uppercase">
+          <span className="mt-1.5 text-[9px] font-black bg-black/10 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">
             Almost gone
           </span>
         )}
@@ -121,25 +121,25 @@ const VoucherCard: FC<VoucherCardProps> = ({
 
       {/* ── Right Content Part ── */}
       <div
-        className={`flex-1 p-3 flex flex-col justify-between min-w-0 ${isApplied ? "bg-red-50/40" : "bg-white"}`}
+        className={`flex-1 p-3 flex flex-col justify-between min-w-0 ${isApplied ? "bg-[#f5d800]/5" : "bg-[#151515]"}`}
       >
         <div>
           {/* Title + Applied badge */}
           <div className="flex items-center justify-between gap-1">
-            <p className="text-sm font-bold text-gray-900 truncate">
+            <p className="text-[13px] font-black text-white truncate uppercase tracking-widest">
               {fmtDiscount(voucher)}
             </p>
             {isApplied && (
-              <CheckCircle2 className="w-4 h-4 text-[#ce2a32] shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-[#f5d800] shrink-0" />
             )}
           </div>
           {/* Description */}
-          <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
+          <p className="text-[11px] font-bold text-gray-400 mt-0.5 line-clamp-1 uppercase tracking-wider">
             {voucher.description || voucher.name}
           </p>
           {/* Min order */}
           {voucher.minOrderValue > 0 && (
-            <p className="text-[11px] text-gray-400 mt-1">
+            <p className="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-wider">
               Min order {fmtVND(voucher.minOrderValue)}
             </p>
           )}
@@ -147,16 +147,16 @@ const VoucherCard: FC<VoucherCardProps> = ({
 
         <div className="mt-2 flex items-end justify-between gap-2">
           {/* Expiry + progress */}
-          <div className="min-w-0">
-            <div className="flex items-center gap-1 text-[11px] text-gray-400">
+          <div className="min-w-0 mt-1">
+            <div className="flex items-center gap-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
               <Clock className="w-3 h-3 shrink-0" />
               <span>Expiry: {fmtDate(voucher.endDate)}</span>
             </div>
             {/* Progress bar */}
             {voucher.usageLimit > 0 && voucher.usageLimit < 2147483647 && (
-              <div className="mt-1 w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+              <div className="mt-1.5 w-full h-1 bg-black rounded-full overflow-hidden border border-[#1e2126]">
                 <div
-                  className="h-full bg-[#ce2a32]/60 rounded-full transition-all"
+                  className="h-full bg-[#f5d800] rounded-full transition-all"
                   style={{ width: `${progress * 100}%` }}
                 />
               </div>
@@ -167,7 +167,7 @@ const VoucherCard: FC<VoucherCardProps> = ({
           <div className="shrink-0">
             {eligible ? (
               isApplied ? (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#ce2a32] bg-[#ce2a32]/10 px-1.5 py-0.5 rounded-sm uppercase whitespace-nowrap">
+                <span className="inline-flex items-center gap-1 text-[10px] font-black text-[#f5d800] bg-[#f5d800]/10 px-1.5 py-0.5 rounded-sm uppercase tracking-widest whitespace-nowrap">
                   <CheckCircle2 className="w-3 h-3" />
                   Applied
                 </span>
@@ -177,12 +177,12 @@ const VoucherCard: FC<VoucherCardProps> = ({
                   name="voucher-selection"
                   checked={selected}
                   readOnly
-                  className="w-4 h-4 accent-[#ce2a32] cursor-pointer"
+                  className="w-4 h-4 accent-[#f5d800] cursor-pointer"
                   aria-label={`Select ${voucher.name}`}
                 />
               )
             ) : (
-              <Tag className="w-4 h-4 text-gray-300" />
+              <Tag className="w-4 h-4 text-gray-600" />
             )}
           </div>
         </div>
@@ -319,30 +319,30 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-[80] flex items-end md:items-center justify-center bg-black/50 transition-opacity"
+      className="fixed inset-0 z-[80] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity"
     >
-      <div className="w-full md:max-w-[480px] max-h-[85vh] md:max-h-[80vh] bg-white md:rounded-xl rounded-t-xl flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300">
+      <div className="w-full md:max-w-[480px] max-h-[85vh] md:max-h-[80vh] bg-black md:rounded-sm rounded-t-sm border border-[#1e2126] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300">
         {/* ── Header ── */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#1e2126] bg-[#151515]">
           <div>
-            <h3 className="font-bold text-base text-gray-900">{title}</h3>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <h3 className="font-oswald font-black uppercase tracking-widest text-lg text-white">{title}</h3>
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">
               {eligibleCount}/{vouchers.length} voucher(s) available
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1.5 hover:bg-[#202030] rounded-sm transition-colors"
             aria-label="Close"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-400 hover:text-white" />
           </button>
         </div>
 
         {/* ── Code Input ── */}
-        <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50">
+        <div className="px-5 py-3 border-b border-[#1e2126] bg-black">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
             <input
               type="text"
               value={codeInput}
@@ -352,16 +352,16 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
               }}
               onKeyDown={(e) => e.key === "Enter" && handleApplyCode()}
               placeholder="Enter voucher code"
-              className="w-full pl-9 pr-20 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-[#ce2a32] focus:ring-1 focus:ring-[#ce2a32]/30 outline-none transition placeholder:text-gray-400"
+              className="w-full pl-9 pr-24 py-3 text-[11px] font-bold uppercase tracking-widest border border-[#1e2126] bg-[#151515] text-white rounded-sm focus:border-[#f5d800] focus:ring-1 focus:ring-[#f5d800]/30 outline-none transition placeholder:text-gray-600"
             />
             <button
               type="button"
               disabled={!codeInput.trim()}
               onClick={handleApplyCode}
-              className={`absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 text-xs font-bold uppercase rounded-md transition-colors ${
+              className={`absolute right-1.5 top-1/2 -translate-y-1/2 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-sm transition-colors ${
                 codeInput.trim()
-                  ? "bg-[#ce2a32] text-white hover:bg-[#a82028]"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  ? "bg-[#f5d800] text-black hover:bg-[#ffe500]"
+                  : "bg-[#202030] text-gray-500 cursor-not-allowed border border-[#1e2126]"
               }`}
             >
               Apply
@@ -369,7 +369,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
           </div>
           {/* Inline error for manual code */}
           {codeError && (
-            <p className="mt-1.5 text-xs text-red-500 font-medium">
+            <p className="mt-2 text-[10px] font-bold text-red-500 uppercase tracking-wider">
               {codeError}
             </p>
           )}
@@ -409,9 +409,9 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
         </div>
 
         {/* ── Footer ── */}
-        <div className="px-5 py-4 border-t border-gray-100 bg-white">
+        <div className="px-5 py-4 border-t border-[#1e2126] bg-[#151515]">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs text-gray-500">
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
               {localSelectedIds.size > 0
                 ? `Selected ${localSelectedIds.size} voucher(s)`
                 : "No voucher selected"}
@@ -420,7 +420,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
               <button
                 type="button"
                 onClick={() => setLocalSelectedIds(new Set())}
-                className="text-xs text-[#ce2a32] hover:underline"
+                className="text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-red-500 transition-colors"
               >
                 Deselect all
               </button>
@@ -429,9 +429,9 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
           <div className="flex gap-2">
             <button
               onClick={handleConfirm}
-              className="flex-1 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 bg-[#ce2a32] text-white hover:bg-[#a82028]"
+              className="w-full py-4 text-[13px] font-black uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 flex items-center justify-center gap-2 bg-[#f5d800] text-black hover:bg-[#ffe500] shadow-[0_0_15px_rgba(245,216,0,0.3)]"
             >
-              Confirm
+              Confirm Selection
             </button>
           </div>
         </div>

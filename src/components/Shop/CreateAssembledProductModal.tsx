@@ -1,16 +1,19 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, Loader2, Plus, Trash2 } from "lucide-react";
+import { X, Loader2, Plus, Trash2, Upload, Box, CheckCircle } from "lucide-react";
+import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { createAssembledProduct } from "@/src/store/slices/assembledProductsSlice";
 import { fetchParts } from "@/src/store/slices/partsSlice";
 import { fetchCurrentShop } from "@/src/store/slices/shopSlice";
 import { PartItem } from "@/src/types/part.types";
 import { toast } from "react-toastify";
+import { uploadImage } from "@/src/utils/uploadImage";
+import { uploadGlb } from "@/src/utils/uploadGlb";
 
 // --- ZOD SCHEMA ---
 const detailSchema = z.object({
@@ -88,11 +91,23 @@ export default function CreateAssembledProductModal({
     return groups;
   }, [parts]);
 
+  // --- Image & 3D upload states ---
+  const [isUploading1, setIsUploading1] = useState(false);
+  const [isUploading2, setIsUploading2] = useState(false);
+  const [isUploading3, setIsUploading3] = useState(false);
+  const [isUploading3D, setIsUploading3D] = useState(false);
+  const fileRef1 = useRef<HTMLInputElement>(null);
+  const fileRef2 = useRef<HTMLInputElement>(null);
+  const fileRef3 = useRef<HTMLInputElement>(null);
+  const fileRef3D = useRef<HTMLInputElement>(null);
+
   const {
     register,
     handleSubmit,
     control,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<CreateFormValues>({
     resolver: zodResolver(createAssembledProductSchema),
@@ -115,6 +130,33 @@ export default function CreateAssembledProductModal({
       ],
     },
   });
+
+  const watchedImage1 = watch("image1");
+  const watchedImage2 = watch("image2");
+  const watchedImage3 = watch("image3");
+  const watchedView3D = watch("view3DUrl");
+
+  // --- Image upload handlers ---
+  const makeFileChangeHandler =
+    (
+      field: "image1" | "image2" | "image3",
+      setUploading: (v: boolean) => void,
+      ref: React.MutableRefObject<HTMLInputElement | null>,
+    ) =>
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setUploading(true);
+      try {
+        const url = await uploadImage(file);
+        setValue(field, url, { shouldValidate: true });
+      } catch {
+        toast.error("Image upload failed, please try again");
+      } finally {
+        setUploading(false);
+        if (ref.current) ref.current.value = "";
+      }
+    };
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -163,6 +205,10 @@ export default function CreateAssembledProductModal({
   const handleReset = () => {
     reset();
     setActiveTab("basic");
+    if (fileRef1.current) fileRef1.current.value = "";
+    if (fileRef2.current) fileRef2.current.value = "";
+    if (fileRef3.current) fileRef3.current.value = "";
+    if (fileRef3D.current) fileRef3D.current.value = "";
   };
 
   const handleClose = () => {
@@ -175,7 +221,7 @@ export default function CreateAssembledProductModal({
   if (!isOpen) return null;
 
   const inputClass =
-    "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
+    "text-black w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
   const labelClass = "block text-sm font-semibold text-gray-700 mb-1";
   const errorClass = "text-xs text-red-500 mt-1";
 
@@ -190,6 +236,33 @@ export default function CreateAssembledProductModal({
     { key: "basic" as const, label: "Basic Info" },
     { key: "specs" as const, label: "Specifications" },
     { key: "components" as const, label: "Components" },
+  ];
+
+  const imageFields = [
+    {
+      label: "Image 1",
+      field: "image1" as const,
+      ref: fileRef1,
+      isUploading: isUploading1,
+      setUploading: setIsUploading1,
+      watched: watchedImage1,
+    },
+    {
+      label: "Image 2",
+      field: "image2" as const,
+      ref: fileRef2,
+      isUploading: isUploading2,
+      setUploading: setIsUploading2,
+      watched: watchedImage2,
+    },
+    {
+      label: "Image 3",
+      field: "image3" as const,
+      ref: fileRef3,
+      isUploading: isUploading3,
+      setUploading: setIsUploading3,
+      watched: watchedImage3,
+    },
   ];
 
   return (
@@ -294,51 +367,122 @@ export default function CreateAssembledProductModal({
                 )}
               </div>
 
-              {/* Image URLs */}
+              {/* Image Uploads */}
               <div className="space-y-3">
-                <p className="text-sm font-bold text-gray-700">Image URLs</p>
+                <p className="text-sm font-bold text-gray-700">Product Images</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
-                      Image 1
-                    </label>
-                    <input
-                      {...register("image1")}
-                      className={inputClass}
-                      placeholder="https://..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
-                      Image 2
-                    </label>
-                    <input
-                      {...register("image2")}
-                      className={inputClass}
-                      placeholder="https://..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
-                      Image 3
-                    </label>
-                    <input
-                      {...register("image3")}
-                      className={inputClass}
-                      placeholder="https://..."
-                    />
-                  </div>
+                  {imageFields.map(({ label, field, ref, isUploading, setUploading, watched }) => (
+                    <div key={field}>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">
+                        {label}
+                      </label>
+                      {/* Hidden file input */}
+                      <input
+                        ref={ref}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={makeFileChangeHandler(field, setUploading, ref)}
+                      />
+                      {watched ? (
+                        /* Preview state */
+                        <div className="relative w-full h-28 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                          <Image
+                            src={watched}
+                            alt={label}
+                            fill
+                            className="object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setValue(field, "", { shouldValidate: true })}
+                            className="absolute top-1.5 right-1.5 p-0.5 bg-black/60 hover:bg-black/80 rounded-full text-white transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        /* Empty / Loading state */
+                        <button
+                          type="button"
+                          disabled={isUploading}
+                          onClick={() => ref.current?.click()}
+                          className="w-full h-28 border border-dashed border-gray-300 bg-gray-50 rounded-lg flex flex-col items-center justify-center gap-1.5 text-gray-400 hover:border-blue-400 hover:text-blue-500 transition-colors disabled:opacity-50"
+                        >
+                          {isUploading ? (
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                          ) : (
+                            <Upload className="w-6 h-6" />
+                          )}
+                          <span className="text-xs">
+                            {isUploading ? "Uploading..." : "Click to upload"}
+                          </span>
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* 3D Model URL */}
+              {/* 3D Model Upload */}
               <div>
-                <label className={labelClass}>3D Model URL (.glb)</label>
+                <label className={labelClass}>3D Model (.glb)</label>
+                {/* Hidden file input */}
                 <input
-                  {...register("view3DUrl")}
-                  className={inputClass}
-                  placeholder="https://...model.glb"
+                  ref={fileRef3D}
+                  type="file"
+                  accept=".glb"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setIsUploading3D(true);
+                    try {
+                      const url = await uploadGlb(file);
+                      setValue("view3DUrl", url, { shouldValidate: true });
+                    } catch {
+                      toast.error("3D model upload failed, please try again");
+                    } finally {
+                      setIsUploading3D(false);
+                      if (fileRef3D.current) fileRef3D.current.value = "";
+                    }
+                  }}
                 />
+                {watchedView3D ? (
+                  /* Uploaded state */
+                  <div className="relative w-full h-20 rounded-lg border border-green-300 bg-green-50 flex items-center justify-center gap-3 px-4">
+                    <Box className="w-6 h-6 text-green-600 shrink-0" />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm font-semibold text-green-700">3D Model Uploaded</span>
+                      <span className="text-xs text-green-500 truncate max-w-[200px]">{watchedView3D.split("/").pop()}</span>
+                    </div>
+                    <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
+                    <button
+                      type="button"
+                      onClick={() => setValue("view3DUrl", "", { shouldValidate: true })}
+                      className="absolute top-1.5 right-1.5 p-0.5 bg-black/60 hover:bg-black/80 rounded-full text-white transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  /* Empty / Loading state */
+                  <button
+                    type="button"
+                    disabled={isUploading3D}
+                    onClick={() => fileRef3D.current?.click()}
+                    className="w-full h-20 border border-dashed border-gray-300 bg-gray-50 rounded-lg flex flex-col items-center justify-center gap-1.5 text-gray-400 hover:border-blue-400 hover:text-blue-500 transition-colors disabled:opacity-50"
+                  >
+                    {isUploading3D ? (
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                    ) : (
+                      <Box className="w-6 h-6" />
+                    )}
+                    <span className="text-xs">
+                      {isUploading3D ? "Uploading..." : "Click to upload .glb"}
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
           )}

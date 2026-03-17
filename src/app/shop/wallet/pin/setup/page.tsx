@@ -86,7 +86,7 @@ function PinInput({
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             onPaste={handlePaste}
-            className={`w-12 h-14 text-center text-xl font-bold rounded-lg border-2 outline-none transition-all ${
+            className={` w-12 h-14 text-center text-xl font-bold rounded-lg border-2 outline-none transition-all ${
               error
                 ? "border-red-400 focus:border-red-500"
                 : "border-gray-300 focus:border-black"
@@ -174,7 +174,7 @@ export default function PinSetupPage() {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your account password"
-                    className={`w-full border-2 rounded-lg p-3 pr-12 outline-none transition-all ${
+                    className={`text-black w-full border-2 rounded-lg p-3 pr-12 outline-none transition-all ${
                       errors.currentPassword
                         ? "border-red-400 focus:border-red-500"
                         : "border-gray-300 focus:border-black"
@@ -201,7 +201,7 @@ export default function PinSetupPage() {
               </div>
 
               {/* New PIN */}
-              <div>
+              <div className="text-black">
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
                   New PIN (6 digits)
                 </label>
@@ -209,15 +209,16 @@ export default function PinSetupPage() {
                   value={pinValue}
                   onChange={onPinChange}
                   error={errors.newPin?.message}
+                
                 />
               </div>
 
               {/* Confirm PIN */}
-              <div>
+              <div className="text-black">
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
                   Confirm PIN
                 </label>
-                <PinInput
+                <PinInput 
                   value={confirmPinValue}
                   onChange={onConfirmPinChange}
                   error={errors.confirmPin?.message}

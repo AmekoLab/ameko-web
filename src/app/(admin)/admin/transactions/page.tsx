@@ -24,63 +24,63 @@ import Image from "next/image";
 const TYPE_BADGE: Record<string, { label: string; className: string }> = {
   Withdrawal: {
     label: "Withdrawal",
-    className: "bg-blue-100 text-blue-700",
+    className: "bg-blue-500/10 text-blue-400 border border-blue-500/20",
   },
   OrderPayment: {
     label: "Payment",
-    className: "bg-green-100 text-green-700",
+    className: "bg-green-500/10 text-green-400 border border-green-500/20",
   },
   ManualAdjustment: {
     label: "Adjustment",
-    className: "bg-orange-100 text-orange-700",
+    className: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
   },
   RefundToWallet: {
     label: "Refund",
-    className: "bg-purple-100 text-purple-700",
+    className: "bg-purple-500/10 text-purple-400 border border-purple-500/20",
   },
   SalesPending: {
     label: "Pending Revenue",
-    className: "bg-yellow-100 text-yellow-700",
+    className: "bg-[#f5d800]/10 text-[#f5d800] border border-[#f5d800]/20",
   },
 };
 
 const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   Paid: {
     label: "Success",
-    className: "bg-green-100 text-green-700",
+    className: "bg-green-500/10 text-green-400 border border-green-500/20",
   },
   Failed: {
     label: "Failed",
-    className: "bg-red-100 text-red-700",
+    className: "bg-red-500/10 text-red-500 border border-red-500/20",
   },
   Pending: {
     label: "Pending",
-    className: "bg-yellow-100 text-yellow-700",
+    className: "bg-[#f5d800]/10 text-[#f5d800] border border-[#f5d800]/20",
   },
 };
 
 // ─── Description renderer ────────────────────────────────
 function DescriptionCell({ parsed }: { parsed: ParsedTransactionInfo }) {
   if (!parsed.rawDescription) {
-    return <span className="text-xs text-gray-400 italic">—</span>;
+    return <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600 italic">—</span>;
   }
 
   if (!parsed.isManualAction) {
     return (
-      <p className="text-xs text-gray-600 leading-relaxed max-w-xs truncate">
+      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 leading-relaxed max-w-xs truncate">
         {parsed.rawDescription}
       </p>
     );
   }
 
   return (
-    <div className="space-y-1 max-w-xs">
+    <div className="space-y-1.5 max-w-xs">
       {/* Action tag */}
       <span
-        className={`inline-block text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
+        className={`inline-block text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm border ${
           parsed.action === "APPROVED"
-            ? "bg-green-100 text-green-700"
-            : "bg-red-100 text-red-700"
+            ? "bg-green-500/10 text-green-400 border-green-500/20"
+            : "bg-red-500/10 text-red-500 border-red-500/20"
         }`}
       >
         {parsed.action === "APPROVED" ? "Approved" : "Rejected"}
@@ -88,7 +88,7 @@ function DescriptionCell({ parsed }: { parsed: ParsedTransactionInfo }) {
 
       {/* Note / Reason */}
       {parsed.note && (
-        <p className="text-xs text-gray-600 truncate">{parsed.note}</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 truncate">{parsed.note}</p>
       )}
 
       {/* Proof thumbnail */}
@@ -97,9 +97,9 @@ function DescriptionCell({ parsed }: { parsed: ParsedTransactionInfo }) {
           href={parsed.proofUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline font-medium"
+          className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-blue-400 hover:text-blue-300 hover:underline transition-colors"
         >
-          <Eye className="w-3 h-3" /> View evidence
+          <Eye className="w-3.5 h-3.5" /> View evidence
         </a>
       )}
     </div>
@@ -131,14 +131,14 @@ export default function AdminTransactionsPage() {
     const config = TYPE_BADGE[type];
     if (!config) {
       return (
-        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-bold">
+        <span className="text-[10px] font-black uppercase tracking-widest bg-gray-500/10 text-gray-500 border border-gray-500/20 px-2.5 py-1 rounded-sm">
           {type}
         </span>
       );
     }
     return (
       <span
-        className={`text-xs px-2 py-0.5 rounded-full font-bold ${config.className}`}
+        className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-sm ${config.className}`}
       >
         {config.label}
       </span>
@@ -149,14 +149,14 @@ export default function AdminTransactionsPage() {
     const config = STATUS_BADGE[status];
     if (!config) {
       return (
-        <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-bold uppercase">
+        <span className="text-[10px] font-black uppercase tracking-widest bg-gray-500/10 text-gray-500 border border-gray-500/20 px-2.5 py-1 rounded-sm">
           {status}
         </span>
       );
     }
     return (
       <span
-        className={`text-xs px-2 py-0.5 rounded-full font-bold uppercase ${config.className}`}
+        className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-sm ${config.className}`}
       >
         {config.label}
       </span>
@@ -164,36 +164,36 @@ export default function AdminTransactionsPage() {
   };
 
   return (
-    <div className="p-8 bg-[#f0f2f5] min-h-screen">
+    <div className="p-8 bg-black min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-end mb-6">
+        <div className="flex justify-between items-end mb-6 border-b border-[#1e2126] pb-4">
           <div>
-            <h1 className="text-3xl font-black text-gray-800 mb-2 font-oswald uppercase flex items-center gap-3">
-              <Receipt className="w-8 h-8" />
+            <h1 className="text-3xl font-oswald font-black text-white mb-2 uppercase tracking-widest flex items-center gap-3">
+              <Receipt className="w-8 h-8 text-[#f5d800]" />
               Transaction History
             </h1>
-            <p className="text-gray-500">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
               View all wallet transactions in the system.
             </p>
           </div>
-          <span className="text-sm text-gray-500">
-            Total: <strong>{transactionsPagination?.totalCount || 0}</strong>{" "}
+          <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+            Total: <strong className="text-white">{transactionsPagination?.totalCount || 0}</strong>{" "}
             transactions
           </span>
         </div>
 
         {/* TABLE */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
           {loadingTransactions && transactions.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500">
               Loading data...
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-gray-100 text-gray-600 text-xs uppercase font-bold tracking-wider border-b border-gray-200">
+                  <tr className="bg-black text-gray-500 text-[10px] uppercase font-black tracking-widest border-b border-[#1e2126]">
                     <th className="p-4">ID</th>
                     <th className="p-4">Date</th>
                     <th className="p-4">Type</th>
@@ -203,7 +203,7 @@ export default function AdminTransactionsPage() {
                     <th className="p-4">Details</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-[#1e2126]">
                   {transactions.map((item: TransactionItem) => {
                     const parsed = parseTransactionDescription(
                       item.description,
@@ -211,19 +211,19 @@ export default function AdminTransactionsPage() {
                     return (
                       <tr
                         key={item.id}
-                        className="hover:bg-gray-50 transition-colors"
+                        className="hover:bg-[#202030] transition-colors"
                       >
                         {/* ID */}
                         <td className="p-4">
-                          <span className="text-xs text-gray-500 font-mono">
+                          <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                             {item.id.slice(0, 8)}…
                           </span>
                         </td>
 
                         {/* Date */}
-                        <td className="p-4 text-sm text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
+                        <td className="p-4">
+                          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                            <Calendar className="w-3.5 h-3.5" />
                             {new Date(item.createdAt).toLocaleDateString(
                               "en-US",
                               {
@@ -244,15 +244,15 @@ export default function AdminTransactionsPage() {
                         <td className="p-4">
                           <div className="flex items-center gap-1.5">
                             {item.amount >= 0 ? (
-                              <ArrowDownLeft className="w-4 h-4 text-green-600" />
+                              <ArrowDownLeft className="w-4 h-4 text-green-400" />
                             ) : (
-                              <ArrowUpRight className="w-4 h-4 text-red-600" />
+                              <ArrowUpRight className="w-4 h-4 text-red-500" />
                             )}
                             <span
-                              className={`font-bold font-oswald text-base ${
+                              className={`font-black text-[13px] tracking-wider ${
                                 item.amount >= 0
-                                  ? "text-green-600"
-                                  : "text-red-600"
+                                  ? "text-green-400"
+                                  : "text-red-500"
                               }`}
                             >
                               {formatCurrency(item.amount)}
@@ -262,7 +262,7 @@ export default function AdminTransactionsPage() {
 
                         {/* Fee */}
                         <td className="p-4">
-                          <span className="text-sm text-gray-500 font-oswald">
+                          <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                             {item.feeAmount > 0
                               ? `${item.feeAmount.toLocaleString("en-US")}₫`
                               : "—"}
@@ -281,8 +281,8 @@ export default function AdminTransactionsPage() {
                             {parsed.proofUrl && (
                               <button
                                 onClick={() => setPreviewImage(parsed.proofUrl)}
-                                className="p-1.5 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 text-gray-500 hover:text-blue-600 transition flex-shrink-0"
-                                title="Xem ảnh"
+                                className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] text-gray-500 hover:text-[#f5d800] hover:border-[#f5d800]/50 transition flex-shrink-0"
+                                title="View evidence"
                               >
                                 <Eye className="w-3.5 h-3.5" />
                               </button>
@@ -297,7 +297,7 @@ export default function AdminTransactionsPage() {
                     <tr>
                       <td
                         colSpan={7}
-                        className="p-12 text-center text-gray-400"
+                        className="p-12 text-center text-[10px] font-bold uppercase tracking-widest text-gray-600 italic"
                       >
                         No transactions found.
                       </td>
@@ -310,10 +310,10 @@ export default function AdminTransactionsPage() {
 
           {/* Pagination */}
           {transactionsPagination && transactionsPagination.totalPages > 1 && (
-            <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50">
-              <p className="text-sm text-gray-500">
+            <div className="flex items-center justify-between p-4 border-t border-[#1e2126] bg-black">
+              <p className="text-[10px] uppercase font-bold tracking-widest text-gray-500">
                 Page{" "}
-                <strong>
+                <strong className="text-white">
                   {transactionsPagination.currentPage} /{" "}
                   {transactionsPagination.totalPages}
                 </strong>{" "}
@@ -325,7 +325,7 @@ export default function AdminTransactionsPage() {
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={!transactionsPagination.hasPreviousPage}
-                  className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="p-2 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] disabled:opacity-40 disabled:cursor-not-allowed transition text-gray-400 hover:text-white"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -336,7 +336,7 @@ export default function AdminTransactionsPage() {
                     )
                   }
                   disabled={!transactionsPagination.hasNextPage}
-                  className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="p-2 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] disabled:opacity-40 disabled:cursor-not-allowed transition text-gray-400 hover:text-white"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -350,7 +350,7 @@ export default function AdminTransactionsPage() {
       {previewImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setPreviewImage(null)}
           />
           <div className="relative max-w-2xl w-full mx-4">
@@ -359,13 +359,13 @@ export default function AdminTransactionsPage() {
               alt="Evidence"
               width={800}
               height={600}
-              className="w-full h-auto rounded-2xl shadow-2xl object-contain"
+              className="w-full h-auto rounded-sm shadow-2xl object-contain border border-[#1e2126]"
             />
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute top-3 right-3 bg-white/90 rounded-full p-2 hover:bg-white transition shadow"
+              className="absolute top-3 right-3 bg-black/80 border border-[#1e2126] hover:border-[#f5d800]/50 rounded-sm p-2 hover:bg-[#202030] transition shadow"
             >
-              <X className="w-5 h-5 text-gray-700" />
+              <X className="w-5 h-5 text-gray-400 hover:text-[#f5d800]" />
             </button>
           </div>
         </div>

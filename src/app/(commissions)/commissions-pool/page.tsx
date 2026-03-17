@@ -46,13 +46,13 @@ const formatDate = (dateStr: string): string => {
 
 // ─── Skeleton Card ─────────────────────────────────────────
 const SkeletonCard = () => (
-  <div className="animate-pulse">
-    <div className="bg-[#f4f5f6] rounded-lg aspect-[4/5]" />
-    <div className="pt-4 space-y-2.5">
-      <div className="h-4 bg-gray-200 rounded w-3/4" />
-      <div className="h-4 bg-gray-200 rounded w-1/2" />
-      <div className="h-3.5 bg-gray-100 rounded w-2/3 mt-3" />
-      <div className="h-3 bg-gray-100 rounded w-1/3" />
+  <div className="animate-pulse flex flex-col h-full w-full overflow-hidden rounded-none border border-transparent">
+    <div className="bg-[#151515] aspect-square w-full" />
+    <div className="px-4 py-4 space-y-2.5 flex-grow">
+      <div className="h-4 bg-[#202030] rounded w-3/4" />
+      <div className="h-4 bg-[#202030] rounded w-1/2" />
+      <div className="h-3.5 bg-[#151515] rounded w-2/3 mt-3" />
+      <div className="h-3 bg-[#151515] rounded w-1/3" />
     </div>
   </div>
 );
@@ -64,49 +64,83 @@ interface CommissionCardProps {
 }
 
 const CommissionCard = ({ request, onClick }: CommissionCardProps) => (
-  <div onClick={onClick} className="group block cursor-pointer">
-    {/* Image Area */}
-    <div className="relative bg-[#f4f5f6] rounded-t-lg overflow-hidden aspect-[4/5]">
+  <div
+    onClick={onClick}
+    className="group/card relative flex flex-col h-full w-full overflow-hidden rounded-none transition-all duration-300 border border-transparent cursor-pointer"
+  >
+    {/* IMAGE AREA */}
+    <div
+      className="relative block w-full aspect-square overflow-hidden shrink-0"
+      style={{
+        background:
+          "radial-gradient(ellipse at center, #242424 0%, #0f0f0f 100%)",
+      }}
+    >
+      {/* Diagonal stripe texture overlay */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, #222324ff 38%, #141415ff 70%)",
+        }}
+      />
+
+      {/* Badge / Quantity */}
+      <span className="absolute top-0 left-0 z-20 text-[11px] font-black uppercase tracking-wider px-3 py-1.5 rounded-none bg-black text-white">
+        QTY: {request.quantity}
+      </span>
+
+      {/* Image */}
       {request.referenceImages ? (
         <Image
           src={request.referenceImages}
           alt={request.title}
           fill
+          className="object-contain relative z-10 transition-transform duration-500 ease-out group-hover/card:scale-[1.1]"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-contain scale-105 mix-blend-multiply transition-transform duration-500 group-hover:scale-110"
         />
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Package className="w-16 h-16 text-gray-300" />
+        <div className="absolute inset-0 z-10 flex items-center justify-center">
+          <Package className="w-16 h-16 text-gray-500" />
         </div>
       )}
 
-      {/* Quantity badge */}
-      <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-700 text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm">
-        Qty: {request.quantity}
-      </span>
+      {/* Slide-up CTA */}
+      <div className="absolute inset-x-0 bottom-0 z-20 translate-y-full opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100 transition-all duration-300 ease-out">
+        <div className="w-full flex items-center justify-center gap-2 py-3 bg-[#f5d800] text-black text-[11px] font-black uppercase tracking-[0.12em]">
+          <Info className="w-4 h-4 shrink-0" />
+          <span>View Request</span>
+        </div>
+      </div>
     </div>
 
-    {/* Content Area */}
-    <div className="pt-4 pb-2">
-      <h3 className="text-[15px] font-bold text-gray-900 leading-snug line-clamp-2 mb-1.5">
+    {/* Thin separator */}
+    <div className="w-full h-px shrink-0" />
+
+    {/* INFO AREA */}
+    <div className="px-4 py-4 flex flex-col flex-grow">
+      {/* Title */}
+      <h3 className="text-[13px] font-bold text-white leading-snug uppercase tracking-wide line-clamp-2 min-h-[40px] mb-3 group-hover/card:text-[#f5d800] transition-colors">
         {request.title}
       </h3>
 
-      <p className="text-[15px] text-gray-900 font-medium">
-        {formatVND(request.minBudget)}
-        <span className="text-gray-400 font-normal mx-1">–</span>
-        {formatVND(request.maxBudget)}
-      </p>
+      {/* Budget */}
+      <div className="mb-3">
+        <p className="text-[18px] font-black text-[#f5d800] leading-none">
+          {formatVND(request.minBudget)}
+          <span className="text-gray-500 font-normal mx-1 text-sm">–</span>
+          {formatVND(request.maxBudget)}
+        </p>
+      </div>
 
-      {/* Meta */}
-      <div className="flex items-center gap-3 mt-3 text-[13px] text-gray-500">
-        <span className="flex items-center gap-1">
+      {/* Meta Footer */}
+      <div className="mt-auto flex items-center gap-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">
+        <span className="flex items-center gap-1.5 hover:text-white transition-colors">
           <User className="w-3.5 h-3.5" />
-          {request.userName}
+          <span className="truncate max-w-[100px]">{request.userName}</span>
         </span>
-        <span className="text-gray-300">·</span>
-        <span className="flex items-center gap-1">
+        <span className="text-[#1e2126]">/</span>
+        <span className="flex items-center gap-1.5 hover:text-white transition-colors">
           <Calendar className="w-3.5 h-3.5" />
           {formatDate(request.createdAt)}
         </span>
@@ -188,36 +222,36 @@ const CommissionModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-6xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden relative flex flex-col lg:flex-row"
+        className="w-full max-w-6xl max-h-[90vh] bg-[#151515] border border-[#1e2126] rounded-sm shadow-2xl overflow-hidden relative flex flex-col lg:flex-row"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-50 w-9 h-9 rounded-full bg-white/90 hover:bg-gray-100 backdrop-blur-sm flex items-center justify-center transition-colors shadow-sm"
+          className="absolute top-4 right-4 z-50 w-9 h-9 rounded-full bg-black/60 hover:bg-[#202030] border border-white/10 backdrop-blur-sm flex items-center justify-center transition-colors shadow-sm"
         >
-          <X className="w-5 h-5 text-gray-600" />
+          <X className="w-5 h-5 text-gray-300" />
         </button>
 
         {/* ─── Left Column: Request Details ─── */}
         <div className="lg:w-1/2 overflow-y-auto">
           {/* Reference Image */}
-          <div className="bg-[#f4f5f6] aspect-video relative">
+          <div className="bg-[#0f0f0f] aspect-video relative flex items-center justify-center border-b border-[#1e2126] lg:border-b-0">
             {request.referenceImages ? (
               <Image
                 src={request.referenceImages}
                 alt={request.title}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-contain mix-blend-multiply"
+                className="object-contain"
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
-                <Package className="w-16 h-16 text-gray-300" />
+                <Package className="w-16 h-16 text-gray-600" />
               </div>
             )}
           </div>
@@ -225,42 +259,42 @@ const CommissionModal = ({
           {/* Details Content */}
           <div className="p-8">
             {/* Meta Row */}
-            <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
-              <span className="flex items-center gap-1.5">
-                <User className="w-4 h-4" />
+            <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
+              <span className="flex items-center gap-1.5 font-medium">
+                <User className="w-4 h-4 text-gray-500" />
                 {request.userName}
               </span>
-              <span className="text-gray-300">·</span>
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4" />
+              <span className="text-gray-600">·</span>
+              <span className="flex items-center gap-1.5 font-medium">
+                <Calendar className="w-4 h-4 text-gray-500" />
                 {formatDate(request.createdAt)}
               </span>
-              <span className="text-gray-300">·</span>
-              <span className="flex items-center gap-1.5">
+              <span className="text-gray-600">·</span>
+              <span className="flex items-center gap-1.5 font-medium text-[#f5d800]">
                 <Hash className="w-4 h-4" />
                 Qty: {request.quantity}
               </span>
             </div>
 
             {/* Title */}
-            <h2 className="text-2xl font-bold text-gray-900 mt-3 leading-tight">
+            <h2 className="text-2xl font-bold text-white mt-3 leading-tight">
               {request.title}
             </h2>
 
             {/* Budget */}
-            <p className="text-xl font-bold text-blue-600 mt-3">
+            <p className="text-xl font-bold text-[#f5d800] mt-3">
               {formatVND(request.minBudget)}
-              <span className="text-blue-300 font-normal mx-1.5">–</span>
+              <span className="text-gray-500 font-normal mx-1.5">–</span>
               {formatVND(request.maxBudget)}
             </p>
 
             {/* Description */}
             <div className="mt-6">
-              <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-1.5">
+              <h3 className="text-sm font-semibold text-white mb-2 flex items-center gap-1.5 uppercase tracking-wider">
                 <FileText className="w-4 h-4 text-gray-400" />
                 Mô tả yêu cầu
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
+              <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap bg-[#0f0f0f] p-4 rounded-sm border border-[#1e2126]">
                 {request.description}
               </p>
             </div>
@@ -268,19 +302,19 @@ const CommissionModal = ({
         </div>
 
         {/* ─── Right Column: Quote Form ─── */}
-        <div className="lg:w-1/2 border-t lg:border-t-0 lg:border-l border-gray-100 bg-gray-50 p-8 overflow-y-auto flex flex-col">
+        <div className="lg:w-1/2 border-t lg:border-t-0 lg:border-l border-[#1e2126] bg-[#0f0f0f] p-8 overflow-y-auto flex flex-col">
           {isOwner ? (
             <div className="flex flex-col items-center justify-center flex-1 text-center">
-              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                <Info className="w-8 h-8 text-gray-400" />
+              <div className="w-16 h-16 rounded-full bg-[#151515] border border-[#1e2126] flex items-center justify-center mb-4">
+                <Info className="w-8 h-8 text-gray-500" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
+              <h3 className="text-lg font-bold text-white mb-2 uppercase tracking-wide">
                 This is your own request
               </h3>
-              <p className="text-sm text-gray-500 max-w-xs">
+              <p className="text-sm text-gray-400 max-w-xs">
                 You cannot send a quotation for your own request.
               </p>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-500 rounded-md text-sm font-medium mt-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#151515] border border-white/10 text-gray-400 rounded-sm text-sm font-bold mt-4 uppercase">
                 <Info className="w-4 h-4" />
                 View only
               </div>
@@ -289,10 +323,10 @@ const CommissionModal = ({
             <>
               {/* Form Header */}
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-black text-white uppercase tracking-wider">
                   Send quotation to customer
                 </h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-400 mt-1">
                   Offer a competitive price and describe in detail the materials
                   you will use.
                 </p>
@@ -304,11 +338,11 @@ const CommissionModal = ({
               >
                 {/* Proposed Price */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Proposed price (VND) <span className="text-red-500">*</span>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
+                    Proposed price (VND) <span className="text-[#ce2a32]">*</span>
                   </label>
                   <div className="relative">
-                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500">
                       <DollarSign className="w-4 h-4" />
                     </div>
                     <input
@@ -317,9 +351,9 @@ const CommissionModal = ({
                       onChange={(e) => setPrice(e.target.value)}
                       min={1}
                       placeholder="1,500,000"
-                      className="w-full border border-gray-300 rounded-xl pl-10 pr-14 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white"
+                      className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm pl-10 pr-14 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors"
                     />
-                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-semibold">
+                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-bold uppercase tracking-widest">
                       VND
                     </span>
                   </div>
@@ -335,14 +369,14 @@ const CommissionModal = ({
 
                 {/* Estimated Time */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
                     Estimated completion time{" "}
-                    <span className="text-red-500">*</span>
+                    <span className="text-[#ce2a32]">*</span>
                   </label>
                   <select
                     value={estimatedDays}
                     onChange={(e) => setEstimatedDays(e.target.value)}
-                    className="w-full border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white appearance-none cursor-pointer"
+                    className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors appearance-none cursor-pointer"
                   >
                     <option value="3">3 days</option>
                     <option value="5">5 days</option>
@@ -356,16 +390,16 @@ const CommissionModal = ({
 
                 {/* Note / Details */}
                 <div className="flex-1 flex flex-col">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
                     Message / Material details{" "}
-                    <span className="text-red-500">*</span>
+                    <span className="text-[#ce2a32]">*</span>
                   </label>
                   <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     rows={5}
                     placeholder="Describe in detail the switch, keycap, mod you will use...\nE.g.: Gateron Oil King lubed, GMK Olivia clone, foam mod, tape mod..."
-                    className="w-full flex-1 min-h-[120px] border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white resize-none"
+                    className="w-full flex-1 min-h-[120px] border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors resize-none placeholder-gray-600"
                   />
                   {errors.note ? (
                     <p className="text-xs text-red-500 mt-1.5">
@@ -386,7 +420,7 @@ const CommissionModal = ({
                 <button
                   type="submit"
                   disabled={isSubmittingQuote}
-                  className="w-full py-4 bg-black hover:bg-gray-800 disabled:bg-gray-400 text-white font-bold text-lg rounded-xl shadow-md transition-all flex items-center justify-center gap-2.5 mt-auto"
+                  className="w-full py-4 bg-[#f5d800] hover:bg-[#e6ca00] disabled:bg-[#f5d800]/50 text-black font-black uppercase tracking-widest text-[13px] rounded-sm shadow-md transition-all flex items-center justify-center gap-2.5 mt-auto"
                 >
                   {isSubmittingQuote ? (
                     <>
@@ -428,33 +462,38 @@ export default function CommissionPoolPage() {
   };
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-black min-h-screen text-white">
       <div className="max-w-[1280px] mx-auto px-4 py-10 lg:py-14">
         {/* Hero Banner */}
-        <div className="w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl p-8 mb-8 shadow-md flex flex-col items-center text-center">
-          <h2 className="text-3xl font-bold text-white">
+        <div className="w-full bg-[#151515] border border-[#1e2126] rounded-sm p-8 mb-8 shadow-md flex flex-col items-center text-center relative overflow-hidden group">
+          {/* Subtle gradient accent */}
+          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#ce2a32] via-[#f5d800] to-[#ce2a32]" />
+          
+          <h2 className="text-3xl font-black text-white uppercase tracking-tight z-10">
             Do you have a unique mechanical keyboard idea?
           </h2>
-          <p className="text-white opacity-90 mt-2">
+          <p className="text-gray-400 mt-2 z-10 max-w-2xl mx-auto">
             Post your request now to receive quotations from dozens of reputable
             Shops on the system.
           </p>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="mt-6 bg-white text-purple-600 font-bold rounded-full px-8 py-3 hover:bg-gray-100 transition shadow-lg cursor-pointer"
+            className="mt-6 bg-[#f5d800] text-black font-black uppercase tracking-widest text-[13px] rounded-sm px-8 py-3.5 hover:bg-[#e6ca00] transition-colors shadow-lg cursor-pointer z-10"
           >
             Post Request to Market
           </button>
         </div>
 
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight">
-            Custom Request Market
-          </h1>
-          <p className="text-sm text-gray-500 mt-1.5">
-            Explore custom keyboard requests from the community
-          </p>
+        <div className="mb-10 flex items-end justify-between border-b mx-4 md:mx-0 pb-4 border-[#1e2126]">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-black text-white tracking-widest uppercase">
+              Custom Request Market
+            </h1>
+            <p className="text-sm text-gray-500 mt-1.5 uppercase font-medium tracking-wide">
+              Explore custom keyboard requests from the community
+            </p>
+          </div>
         </div>
 
         {/* Loading State */}
@@ -469,16 +508,16 @@ export default function CommissionPoolPage() {
         {/* Error State */}
         {!loadingPool && error && (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-5">
-              <Loader2 className="w-8 h-8 text-red-400" />
+            <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-5 border border-red-500/20">
+              <Loader2 className="w-8 h-8 text-red-500" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900 mb-2">
+            <h2 className="text-lg font-bold text-white uppercase tracking-wide mb-2">
               Unable to load data
             </h2>
             <p className="text-sm text-gray-500 mb-6 max-w-sm">{error}</p>
             <button
               onClick={handleRetry}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-full transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#202030] border border-white/10 hover:bg-[#2a2a3a] text-white text-sm font-bold uppercase tracking-widest rounded-sm transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               Retry
@@ -488,14 +527,14 @@ export default function CommissionPoolPage() {
 
         {/* Empty State */}
         {!loadingPool && !error && poolRequests.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-5">
-              <Inbox className="w-8 h-8 text-gray-400" />
+          <div className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-[#1e2126] bg-[#151515] rounded-sm mx-4 lg:mx-0">
+            <div className="w-16 h-16 rounded-full bg-[#202030] flex items-center justify-center mb-5">
+              <Inbox className="w-8 h-8 text-gray-500" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900 mb-2">
+            <h2 className="text-lg font-black text-white uppercase tracking-widest mb-2">
               No requests yet
             </h2>
-            <p className="text-sm text-gray-500 max-w-sm">
+            <p className="text-sm text-gray-400 max-w-sm">
               There are currently no custom keyboard requests in the public
               market. Please check back later!
             </p>

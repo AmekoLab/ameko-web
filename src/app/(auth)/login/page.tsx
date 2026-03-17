@@ -96,7 +96,7 @@ export default function LoginPage() {
           )}
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className=" text-black space-y-5">
             <InputField
               label="Email Address"
               placeholder="name@example.com"

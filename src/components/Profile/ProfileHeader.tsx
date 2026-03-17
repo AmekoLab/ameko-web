@@ -100,7 +100,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-b-md shadow-sm border-b border-gray-200 mb-6 relative">
+    <div className="bg-[#151515] rounded-b-md shadow-sm border-b border-[#1e2126] mb-6 relative">
       <ImageModal
         imgSrc={selectedImage}
         onClose={() => setSelectedImage(null)}
@@ -122,7 +122,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
       {/* 1. Banner Image */}
       <div
         onClick={() => setSelectedImage(profile.bannerUrl)}
-        className="relative h-48 md:h-64 lg:h-80 w-full bg-gray-200 group cursor-zoom-in overflow-hidden"
+        className="relative h-48 md:h-64 lg:h-80 w-full bg-[#202030] group cursor-zoom-in overflow-hidden"
       >
         {profile.bannerUrl && (
           <Image
@@ -140,10 +140,10 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
         <div className="relative flex flex-col items-center md:items-start md:flex-row md:gap-6">
           {/* Avatar / Logo */}
           <div className="relative -mt-16 md:-mt-20 mb-3 md:mb-0">
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full p-1 bg-white shadow-md">
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full p-1 bg-[#151515] shadow-md">
               <div
                 onClick={() => setSelectedImage(profile.logoUrl)}
-                className="relative w-full h-full rounded-full overflow-hidden bg-gray-100 cursor-zoom-in"
+                className="relative w-full h-full rounded-full overflow-hidden bg-[#202030] cursor-zoom-in"
               >
                 {profile.logoUrl && (
                   <Image
@@ -156,7 +156,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
               </div>
             </div>
             <div
-              className="absolute bottom-4 right-4 w-4 h-4 bg-green-500 border-2 border-white rounded-full"
+              className="absolute bottom-4 right-4 w-4 h-4 bg-green-500 border-2 border-[#151515] rounded-full"
               title="Online"
             ></div>
           </div>
@@ -164,25 +164,25 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
           {/* Text Info */}
           <div className="flex-1 text-center md:text-left mt-2">
             <div className="flex flex-col md:flex-row md:items-center gap-2 mb-1">
-              <h1 className="text-2xl font-black text-gray-900">
+              <h1 className="text-2xl font-black text-white">
                 {profile.shopName}
               </h1>
-              <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border border-blue-100">
+              <span className="inline-flex items-center gap-1 bg-[#f5d800]/10 text-[#f5d800] px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border border-[#f5d800]/20">
                 <CheckCircle className="w-3 h-3" /> Verified Shop
               </span>
             </div>
 
-            <p className="text-sm text-gray-500 font-medium mb-3">
+            <p className="text-sm text-gray-400 font-medium mb-3">
               @{profile.id.slice(0, 8)}
             </p>
 
             {/* Stats Row */}
             <div className="flex justify-center md:justify-start gap-6 text-[15px] mb-4">
               <div className="flex items-center gap-1">
-                <span className="font-semibold text-gray-900">
+                <span className="font-semibold text-white">
                   {profile.rating}
                 </span>
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                <Star className="w-4 h-4 text-[#f5d800] fill-[#f5d800]" />
               </div>
 
               {/* Followers: Click to open Followers Modal */}
@@ -190,10 +190,10 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                 className="cursor-pointer hover:opacity-70 transition-opacity"
                 onClick={() => openFollowsModal("Followers")}
               >
-                <span className="font-semibold text-gray-900">
+                <span className="font-semibold text-white">
                   {localFollowersCount}
                 </span>{" "}
-                <span className="text-gray-800">followers</span>
+                <span className="text-white">followers</span>
               </div>
 
               {/* Following: Click to open Following Modal */}
@@ -201,10 +201,10 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                 className="cursor-pointer hover:opacity-70 transition-opacity"
                 onClick={() => openFollowsModal("Following")}
               >
-                <span className="font-semibold text-gray-900">
+                <span className="font-semibold text-white">
                   {profile.followingCount || 0}
                 </span>{" "}
-                <span className="text-gray-800">following</span>
+                <span className="text-white">following</span>
               </div>
             </div>
           </div>
@@ -214,7 +214,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
             {isMe ? (
               <Link
                 href="/shop/profile"
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black font-bold text-sm rounded-sm transition-colors border border-gray-200"
+                className="flex items-center gap-2 px-4 py-2 bg-[#202030] hover:bg-[#2a2a3a] text-white font-bold text-sm rounded-sm transition-colors border border-white/10"
               >
                 <Settings className="w-4 h-4" /> Edit Shop Profile
               </Link>
@@ -226,8 +226,8 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                   disabled={isLoading}
                   className={`flex items-center gap-1.5 px-6 py-2 font-semibold text-sm rounded-lg transition-colors shadow-sm disabled:opacity-70 ${
                     isFollowing
-                      ? "bg-[#efefef] text-black hover:bg-gray-200"
-                      : "bg-[#0095f6] text-white hover:bg-[#1877f2]"
+                      ? "bg-[#202030] text-white hover:bg-[#2a2a3a] border border-white/10"
+                      : "bg-[#f5d800] text-black hover:bg-[#e5c800]"
                   }`}
                 >
                   {isFollowing ? (
@@ -249,10 +249,10 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                   </button>
 
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50">
+                    <div className="absolute right-0 mt-2 w-56 bg-[#151515] rounded-lg shadow-xl border border-[#1e2126] py-1 z-50">
                       <Link
                         href={`/builder?shopId=${profile.id}&categoryId=${kitCategoryId}`}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:bg-[#202030] transition-colors"
                         onClick={() => setIsDropdownOpen(false)}
                       >
                         <Wrench className="w-4 h-4" /> Customize Configuration
@@ -262,14 +262,14 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                           setIsCommissionModalOpen(true);
                           setIsDropdownOpen(false);
                         }}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors w-full text-left"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:bg-[#202030] transition-colors w-full text-left"
                       >
                         <FileText className="w-4 h-4" /> Send Quotation Request
                       </button>
                     </div>
                   )}
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-black font-bold text-sm rounded-sm transition-colors">
+                <button className="flex items-center gap-2 px-4 py-2 bg-[#202030] border border-white/10 hover:bg-[#2a2a3a] text-white font-bold text-sm rounded-sm transition-colors">
                   <MessageCircle className="w-4 h-4" /> Chat
                 </button>
               </>
