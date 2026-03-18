@@ -14,6 +14,7 @@ import {
   Keyboard,
   Loader2,
 } from "lucide-react";
+import OrderDetailModal from "./OrderDetailModal";
 import { orderService } from "@/src/services/order.service";
 import { CartData, OrderItem } from "@/src/types/order.types";
 import { toast } from "react-toastify";
@@ -21,19 +22,19 @@ import { format, parseISO } from "date-fns";
 
 // ─── Constants ─────────────────────────────────────────────
 const ORDER_STATUS_STYLES: Record<string, string> = {
-  Pending: "bg-yellow-100 text-yellow-800",
-  Processing: "bg-blue-100 text-blue-800",
-  Completed: "bg-green-100 text-green-800",
-  Cancelled: "bg-red-100 text-red-800",
-  Shipped: "bg-indigo-100 text-indigo-800",
+  Pending: "bg-[#f5d800]/10 text-[#f5d800] border border-[#f5d800]/20",
+  Processing: "bg-blue-500/10 text-blue-400 border border-blue-500/20",
+  Completed: "bg-green-500/10 text-green-400 border border-green-500/20",
+  Cancelled: "bg-red-500/10 text-red-500 border border-red-500/20",
+  Shipped: "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20",
 };
 
 const PAYMENT_STATUS_STYLES: Record<string, string> = {
-  Pending: "bg-yellow-100 text-yellow-800",
-  Paid: "bg-green-100 text-green-800",
-  Released: "bg-emerald-100 text-emerald-800",
-  Failed: "bg-red-100 text-red-800",
-  Refunded: "bg-gray-100 text-gray-800",
+  Pending: "bg-[#f5d800]/10 text-[#f5d800] border border-[#f5d800]/20",
+  Paid: "bg-green-500/10 text-green-400 border border-green-500/20",
+  Released: "bg-teal-500/10 text-teal-400 border border-teal-500/20",
+  Failed: "bg-red-500/10 text-red-500 border border-red-500/20",
+  Refunded: "bg-gray-500/10 text-gray-400 border border-gray-500/20",
 };
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -54,34 +55,34 @@ const formatDate = (dateStr: string): string => {
 const getStatusBadge = (
   status: string,
   styles: Record<string, string>,
-): string => styles[status] || "bg-gray-100 text-gray-800";
+): string => styles[status] || "bg-gray-500/10 text-gray-400 border border-gray-500/20";
 
 // ─── Loading Skeleton ──────────────────────────────────────
 const OrdersSkeleton: FC = () => (
   <div className="max-w-[1000px] mx-auto px-4 md:px-8 py-12 lg:py-20 animate-pulse">
-    <div className="h-10 w-56 bg-gray-200 rounded mb-8" />
-    <div className="space-y-4">
+    <div className="h-10 w-56 bg-[#1e2126] rounded-sm mb-8" />
+    <div className="space-y-6">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-white rounded-xl border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div key={i} className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
+          <div className="flex items-center justify-between p-5 border-b border-[#1e2126] bg-[#1a1c20]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-200 rounded-full" />
-              <div className="h-5 w-32 bg-gray-200 rounded" />
+              <div className="w-10 h-10 bg-[#1e2126] rounded-full" />
+              <div className="h-5 w-32 bg-[#1e2126] rounded-sm" />
             </div>
-            <div className="h-6 w-20 bg-gray-200 rounded-full" />
+            <div className="h-6 w-20 bg-[#1e2126] rounded-sm" />
           </div>
-          <div className="space-y-3">
+          <div className="p-5">
             <div className="flex gap-3">
-              <div className="w-16 h-16 bg-gray-200 rounded" />
+              <div className="w-16 h-16 bg-[#1e2126] rounded-sm" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 w-40 bg-gray-200 rounded" />
-                <div className="h-3 w-24 bg-gray-200 rounded" />
+                <div className="h-4 w-40 bg-[#1e2126] rounded-sm" />
+                <div className="h-3 w-24 bg-[#1e2126] rounded-sm" />
               </div>
             </div>
           </div>
-          <div className="flex justify-between mt-4 pt-4 border-t border-gray-100">
-            <div className="h-4 w-28 bg-gray-200 rounded" />
-            <div className="h-5 w-32 bg-gray-200 rounded" />
+          <div className="flex justify-between p-5 border-t border-[#1e2126] bg-[#1a1c20]">
+            <div className="h-4 w-28 bg-[#1e2126] rounded-sm" />
+            <div className="h-5 w-32 bg-[#1e2126] rounded-sm" />
           </div>
         </div>
       ))}
@@ -92,17 +93,17 @@ const OrdersSkeleton: FC = () => (
 // ─── Empty State ───────────────────────────────────────────
 const EmptyOrders: FC = () => (
   <div className="flex flex-col items-center justify-center py-24 text-center">
-    <Package className="w-20 h-20 text-gray-300 mb-6" strokeWidth={1} />
-    <h2 className="text-2xl font-bold text-gray-900 mb-2 font-oswald">
+    <Package className="w-20 h-20 text-[#1e2126] mb-6" strokeWidth={1} />
+    <h2 className="text-2xl font-black text-white mb-2 font-oswald uppercase tracking-widest">
       No Orders Yet
     </h2>
-    <p className="text-gray-500 mb-8 max-w-sm">
+    <p className="text-gray-500 text-[11px] font-bold uppercase tracking-widest leading-relaxed mb-8 max-w-sm">
       You haven&apos;t placed any orders yet. Start exploring our collection of
       mechanical keyboards and parts!
     </p>
     <Link
       href="/shop/all-products"
-      className="inline-flex items-center gap-2 bg-[#ce2a32] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#b52429] transition-colors"
+      className="inline-flex items-center gap-2 bg-[#f5d800] text-black px-6 py-3 rounded-sm font-black uppercase tracking-widest hover:bg-[#ffe500] transition-colors shadow-[0_0_15px_rgba(245,216,0,0.3)]"
     >
       <ShoppingBag className="w-5 h-5" />
       Browse Products
@@ -116,8 +117,8 @@ interface OrderItemRowProps {
 }
 
 const OrderItemRow: FC<OrderItemRowProps> = ({ item }) => (
-  <div className="flex items-center gap-3 py-2">
-    <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 flex-shrink-0">
+  <div className="flex items-center gap-3 py-3 border-b border-[#1e2126] last:border-b-0">
+    <div className="relative w-14 h-14 rounded-sm overflow-hidden bg-black border border-[#1e2126] flex-shrink-0">
       {item.productImage ? (
         <Image
           src={item.productImage}
@@ -126,20 +127,20 @@ const OrderItemRow: FC<OrderItemRowProps> = ({ item }) => (
           className="object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gray-50">
-          <Keyboard className="w-6 h-6 text-gray-300" />
+        <div className="w-full h-full flex items-center justify-center bg-[#151515]">
+          <Keyboard className="w-6 h-6 text-gray-500" />
         </div>
       )}
     </div>
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-medium text-gray-900 truncate">
+      <p className="text-[12px] font-black uppercase tracking-wider text-white truncate">
         {item.productName}
       </p>
-      <p className="text-xs text-gray-500">
-        {item.quantity} × {formatCurrency(item.unitPrice)}
+      <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mt-1">
+        {item.quantity} × <span className="text-[#f5d800]">{formatCurrency(item.unitPrice)}</span>
       </p>
     </div>
-    <p className="text-sm font-semibold text-gray-900 whitespace-nowrap">
+    <p className="text-[13px] font-oswald font-black tracking-wider text-white whitespace-nowrap">
       {formatCurrency(item.totalPrice)}
     </p>
   </div>
@@ -148,9 +149,10 @@ const OrderItemRow: FC<OrderItemRowProps> = ({ item }) => (
 // ─── Order Card ────────────────────────────────────────────
 interface OrderCardProps {
   order: CartData;
+  onViewDetails: (orderId: string) => void;
 }
 
-const OrderCard: FC<OrderCardProps> = ({ order }) => {
+const OrderCard: FC<OrderCardProps> = ({ order, onViewDetails }) => {
   const [expanded, setExpanded] = useState(false);
   const [paying, setPaying] = useState(false);
   const visibleItems = expanded
@@ -179,12 +181,12 @@ const OrderCard: FC<OrderCardProps> = ({ order }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-[#151515] rounded-sm border border-[#1e2126] transition-all hover:border-[#f5d800]/50 hover:shadow-[0_0_15px_rgba(245,216,0,0.1)]">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-4 border-b border-[#1e2126] bg-[#1a1c20] rounded-t-sm">
         <div className="flex items-center gap-3">
           {order.shopAvatar ? (
-            <div className="relative w-9 h-9 rounded-full overflow-hidden border border-gray-200">
+            <div className="relative w-9 h-9 rounded-full overflow-hidden border border-[#1e2126]">
               <Image
                 src={order.shopAvatar}
                 alt={order.shopName}
@@ -193,14 +195,14 @@ const OrderCard: FC<OrderCardProps> = ({ order }) => {
               />
             </div>
           ) : (
-            <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
-              <Store className="w-4 h-4 text-gray-400" />
+            <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center border border-[#1e2126]">
+              <Store className="w-4 h-4 text-gray-500" />
             </div>
           )}
           <div>
-            <p className="text-sm font-bold text-gray-900">{order.shopName}</p>
-            <div className="flex items-center gap-1 text-xs text-gray-500">
-              <Calendar className="w-3 h-3" />
+            <p className="text-[12px] font-black uppercase tracking-wider text-white">{order.shopName}</p>
+            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500 mt-0.5">
+              <Calendar className="w-3.5 h-3.5" />
               {formatDate(order.createdAt)}
             </div>
           </div>
@@ -208,12 +210,12 @@ const OrderCard: FC<OrderCardProps> = ({ order }) => {
 
         <div className="flex items-center gap-2">
           <span
-            className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide ${getStatusBadge(order.orderStatus, ORDER_STATUS_STYLES)}`}
+            className={`inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-black uppercase tracking-widest ${getStatusBadge(order.orderStatus, ORDER_STATUS_STYLES)}`}
           >
             {order.orderStatus}
           </span>
           <span
-            className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide ${getStatusBadge(order.paymentStatus, PAYMENT_STATUS_STYLES)}`}
+            className={`inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-black uppercase tracking-widest ${getStatusBadge(order.paymentStatus, PAYMENT_STATUS_STYLES)}`}
           >
             {order.paymentStatus}
           </span>
@@ -221,7 +223,7 @@ const OrderCard: FC<OrderCardProps> = ({ order }) => {
       </div>
 
       {/* Order Items */}
-      <div className="px-5 py-3 divide-y divide-gray-50">
+      <div className="px-5 py-2">
         {visibleItems.map((item) => (
           <OrderItemRow key={item.orderItemId} item={item} />
         ))}
@@ -229,7 +231,7 @@ const OrderCard: FC<OrderCardProps> = ({ order }) => {
         {hasMore && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1 text-xs text-[#ce2a32] font-medium pt-2 hover:underline"
+            className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-[#f5d800] hover:text-[#ffe500] transition-colors py-3 hover:underline w-full justify-center"
           >
             {expanded ? (
               <>
@@ -248,8 +250,8 @@ const OrderCard: FC<OrderCardProps> = ({ order }) => {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between px-5 py-3 bg-gray-50/60 rounded-b-xl border-t border-gray-100">
-        <div className="text-xs text-gray-500">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-4 bg-[#1a1c20] rounded-b-sm border-t border-[#1e2126]">
+        <div className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
           {order.orderItems.length} item
           {order.orderItems.length !== 1 ? "s" : ""}
           {order.shippingFee > 0 && (
@@ -258,8 +260,8 @@ const OrderCard: FC<OrderCardProps> = ({ order }) => {
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <p className="text-base font-bold text-gray-900">
+        <div className="flex items-center gap-3">
+          <p className="text-lg font-oswald font-black text-white tracking-wider">
             {formatCurrency(order.totalAmount)}
           </p>
           {/* Pay Now button: only for Pending orders with Pending payment */}
@@ -268,12 +270,13 @@ const OrderCard: FC<OrderCardProps> = ({ order }) => {
               <button
                 onClick={handleRepay}
                 disabled={paying}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-bold bg-orange-500 text-white hover:bg-orange-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ml-2"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-sm font-black uppercase tracking-widest text-[11px] bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ml-2 shadow-[0_0_10px_rgba(220,38,38,0.3)]"
               >
-                {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                {paying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                 Pay Now
               </button>
             )}
+          <button onClick={() => onViewDetails(order.orderId)} className="inline-flex items-center gap-2 px-4 py-2 rounded-sm font-black uppercase tracking-widest text-[11px] border border-[#1e2126] text-white hover:text-white hover:border-[#f5d800] hover:bg-[#202030] transition-colors ml-2">View Details</button>
         </div>
       </div>
     </div>
@@ -294,6 +297,7 @@ export default function MyOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -336,21 +340,21 @@ export default function MyOrdersPage() {
   if (loading) return <OrdersSkeleton />;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-black">
       <div className="max-w-[1000px] mx-auto px-4 md:px-8 py-12 lg:py-20">
         {/* Back + Title */}
         <div className="flex items-center gap-4 mb-8">
           <Link
             href="/"
-            className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+            className="p-2.5 rounded-sm bg-[#151515] border border-[#1e2126] text-gray-400 hover:text-white hover:bg-[#202030] hover:border-[#f5d800]/50 transition-all flex-shrink-0"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 font-oswald tracking-tight">
+            <h1 className="text-3xl font-black text-white font-oswald tracking-widest uppercase">
               My Orders
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mt-1">
               {orders.length} order{orders.length !== 1 ? "s" : ""} placed
             </p>
           </div>
@@ -358,7 +362,7 @@ export default function MyOrdersPage() {
 
         {/* Filter Tabs */}
         {orders.length > 0 && (
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+          <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
             {STATUS_FILTERS.map((f) => {
               const count =
                 f.value === "all"
@@ -369,19 +373,19 @@ export default function MyOrdersPage() {
                 <button
                   key={f.value}
                   onClick={() => setActiveFilter(f.value)}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-sm text-[11px] font-black uppercase tracking-widest whitespace-nowrap transition-all border ${
                     activeFilter === f.value
-                      ? "bg-[#ce2a32] text-white"
-                      : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+                      ? "bg-[#f5d800] text-black border-[#f5d800] shadow-[0_0_10px_rgba(245,216,0,0.2)]"
+                      : "bg-[#151515] text-gray-400 border-[#1e2126] hover:border-[#f5d800]/50 hover:text-white"
                   }`}
                 >
                   {f.label}
                   {count > 0 && (
                     <span
-                      className={`text-xs px-1.5 py-0.5 rounded-full ${
+                      className={`text-[9px] px-1.5 py-0.5 rounded-full font-black ${
                         activeFilter === f.value
-                          ? "bg-white/20 text-white"
-                          : "bg-gray-100 text-gray-500"
+                          ? "bg-black/20 text-black"
+                          : "bg-black text-gray-500 border border-[#1e2126]"
                       }`}
                     >
                       {count}
@@ -395,11 +399,11 @@ export default function MyOrdersPage() {
 
         {/* Error State */}
         {error && !loading && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-red-700 text-sm">{error}</p>
+          <div className="bg-red-500/10 border border-red-500/20 rounded-sm p-4 mb-6">
+            <p className="text-red-500 text-[11px] font-bold uppercase tracking-widest">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="text-red-600 text-sm font-semibold mt-2 hover:underline"
+              className="text-red-400 text-[11px] font-black uppercase tracking-widest mt-2 hover:underline inline-flex items-center gap-1"
             >
               Try again
             </button>
@@ -409,19 +413,19 @@ export default function MyOrdersPage() {
         {/* Order List */}
         {filteredOrders.length === 0 && !error ? (
           activeFilter !== "all" ? (
-            <div className="text-center py-16">
+            <div className="text-center py-16 border border-[#1e2126] bg-[#151515] rounded-sm">
               <Package
-                className="w-16 h-16 text-gray-300 mx-auto mb-4"
+                className="w-16 h-16 text-[#1e2126] mx-auto mb-4"
                 strokeWidth={1}
               />
-              <p className="text-gray-500">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
                 No{" "}
-                <span className="font-semibold lowercase">{activeFilter}</span>{" "}
+                <span className="font-black text-white">{activeFilter}</span>{" "}
                 orders found
               </p>
               <button
                 onClick={() => setActiveFilter("all")}
-                className="text-[#ce2a32] text-sm font-semibold mt-2 hover:underline"
+                className="text-[#f5d800] text-[10px] font-black uppercase tracking-widest mt-4 hover:underline"
               >
                 View all orders
               </button>
@@ -430,13 +434,14 @@ export default function MyOrdersPage() {
             <EmptyOrders />
           )
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {filteredOrders.map((order) => (
-              <OrderCard key={order.orderId} order={order} />
+              <OrderCard key={order.orderId} order={order} onViewDetails={(id) => setSelectedOrderId(id)} />
             ))}
           </div>
         )}
       </div>
+      <OrderDetailModal isOpen={!!selectedOrderId} orderId={selectedOrderId} onClose={() => setSelectedOrderId(null)} />
     </div>
   );
 }
