@@ -91,4 +91,12 @@ export const orderService = {
   ): Promise<ApiResponse<CartPreviewData>> => {
     return api.post("/orders/calculate-preview", payload);
   },
+
+  /**
+   * Fetch details for a specific order.
+   * GET /orders/{orderId}
+   */
+  getOrderDetail: async (orderId: string): Promise<ApiResponse<CartData>> => {
+    return api.get(`/orders/${orderId}`);
+  },
 };

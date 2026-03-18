@@ -14,6 +14,7 @@ import {
   ChevronRight,
   UserPlus,
   Pencil,
+  Users,
 } from "lucide-react";
 import CreateUserModal from "@/src/components/Admin/CreateUserModal";
 import EditUserModal from "@/src/components/Admin/EditUserModal";
@@ -35,30 +36,29 @@ export default function AdminUsersPage() {
     dispatch(fetchAdminUserList({ currentPage, pageSize }));
   }, [dispatch, currentPage]);
 
-  // Helper: render role badge
   const renderRoleBadge = (role: string) => {
     switch (role) {
       case "Admin":
         return (
-          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-bold uppercase">
+          <span className="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-sm font-black uppercase tracking-widest whitespace-nowrap">
             Admin
           </span>
         );
       case "Shop":
         return (
-          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold uppercase">
+          <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-sm font-black uppercase tracking-widest whitespace-nowrap">
             Shop
           </span>
         );
       case "Customer":
         return (
-          <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded font-bold uppercase">
+          <span className="text-[10px] bg-gray-500/10 text-gray-400 border border-gray-500/20 px-2 py-0.5 rounded-sm font-black uppercase tracking-widest whitespace-nowrap">
             Customer
           </span>
         );
       default:
         return (
-          <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-bold uppercase">
+          <span className="text-[10px] bg-gray-500/10 text-gray-500 border border-gray-500/20 px-2 py-0.5 rounded-sm font-black uppercase tracking-widest whitespace-nowrap">
             {role}
           </span>
         );
@@ -68,11 +68,11 @@ export default function AdminUsersPage() {
   // Helper: render email verified badge
   const renderEmailBadge = (confirmed: boolean) => {
     return confirmed ? (
-      <span className="flex items-center gap-1 text-xs text-green-600">
+      <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-green-400">
         <ShieldCheck className="w-3 h-3" /> Verified
       </span>
     ) : (
-      <span className="flex items-center gap-1 text-xs text-yellow-600">
+      <span className="flex items-center gap-1  text-[10px] font-black uppercase tracking-widest text-yellow-500">
         <Shield className="w-3 h-3" /> Unverified
       </span>
     );
@@ -83,45 +83,46 @@ export default function AdminUsersPage() {
     switch (status) {
       case 0:
         return (
-          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-bold uppercase">
+          <span className="text-[10px] bg-green-500/10 text-green-400 border border-green-500/20 px-2 py-0.5 rounded-sm font-black uppercase tracking-widest whitespace-nowrap">
             Active
           </span>
         );
       case 1:
         return (
-          <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold uppercase">
+          <span className="text-[10px] bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-0.5 rounded-sm font-black uppercase tracking-widest whitespace-nowrap">
             Banned
           </span>
         );
       default:
         return (
-          <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-bold uppercase">
+          <span className="text-[10px] bg-gray-500/10 text-gray-500 border border-gray-500/20 px-2 py-0.5 rounded-sm font-black uppercase tracking-widest whitespace-nowrap">
             Unknown
           </span>
         );
     }
   };
 
-  return (
-    <div className="p-8 bg-[#f0f2f5] min-h-screen">
-      <div className="max-w-7xl mx-auto">
+ return (
+    <div className="p-4 md:p-8 bg-black min-h-screen">
+      <div className="max-w-[1440px] w-full mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-end mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 border-b border-[#1e2126] pb-4">
           <div>
-            <h1 className="text-3xl font-black text-gray-800 mb-2 font-oswald uppercase">
+            <h1 className="text-3xl font-black text-white mb-2 font-oswald uppercase flex items-center gap-3 tracking-widest">
+              <Users className="w-8 h-8 text-[#f5d800]" />
               User Management
             </h1>
-            <p className="text-gray-500">
+            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
               Manage all registered users on the platform.
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-500">
-              Total: <strong>{pagination?.totalCount || 0}</strong> users
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
+              Total: <strong className="text-white mx-1">{pagination?.totalCount || 0}</strong> users
             </span>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition"
+              className="flex items-center gap-2 px-4 py-2 bg-[#f5d800] text-black text-[11px] font-black uppercase tracking-widest rounded-sm hover:bg-[#ffe500] transition shadow-[0_0_10px_rgba(245,216,0,0.2)]"
             >
               <UserPlus className="w-4 h-4" />
               Create User
@@ -130,126 +131,129 @@ export default function AdminUsersPage() {
         </div>
 
         {/* TABLE */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-[#151515] rounded-sm shadow-sm border border-[#1e2126] overflow-hidden">
           {loading && userList.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-gray-500 text-[11px] font-bold uppercase tracking-widest">
               Loading data...
             </div>
           ) : (
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-100 text-gray-600 text-xs uppercase font-bold tracking-wider border-b border-gray-200">
-                  <th className="p-4">User</th>
-                  <th className="p-4">Contact</th>
-                  <th className="p-4">Role</th>
-                  <th className="p-4">Email Status</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4">Created At</th>
-                  <th className="p-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {userList.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    {/* Col 1: User Info */}
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gray-200 relative overflow-hidden shrink-0 border border-gray-200 flex items-center justify-center">
-                          {user.image ? (
-                            <img
-                              src={user.image}
-                              alt="avatar"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <User className="w-5 h-5 text-gray-400" />
-                          )}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-[#1a1c20] text-gray-500 text-[10px] uppercase font-black tracking-widest border-b border-[#1e2126]">
+                    <th className="px-2 py-3">User</th>
+                    <th className="px-2 py-3">Contact</th>
+                    <th className="px-2 py-3">Role</th>
+                    <th className="px-2 py-3 whitespace-nowrap">Email Status</th>
+                    <th className="px-2 py-3">Status</th>
+                    <th className="px-2 py-3 whitespace-nowrap">Created At</th>
+                    <th className="px-2 py-3 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#1e2126]">
+                  {userList.map((user) => (
+                    <tr
+                      key={user.id}
+                      className="hover:bg-[#202030] transition-colors group"
+                    >
+                      {/* Col 1: User Info */}
+                      <td className="px-2 py-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-sm bg-black relative overflow-hidden shrink-0 border border-[#1e2126] flex items-center justify-center">
+                            {user.image ? (
+                              <img
+                                src={user.image}
+                                alt="avatar"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <User className="w-4 h-4 text-gray-500 group-hover:text-gray-400 transition-colors" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-wider text-white truncate max-w-[100px] lg:max-w-[140px]">
+                              {user.fullName}
+                            </p>
+                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">
+                              @{user.username}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-bold text-gray-900">
-                            {user.fullName}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            @{user.username}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* Col 2: Contact */}
-                    <td className="p-4 text-sm">
-                      <div className="flex items-center gap-1 text-gray-800">
-                        <Mail className="w-3 h-3 text-gray-400" />
-                        <span
-                          className="truncate max-w-[180px]"
-                          title={user.email}
+                      {/* Col 2: Contact */}
+                  
+                      <td className="px-2 py-2 text-sm">
+                        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-gray-300">
+                          <Mail className="w-3 h-3 text-gray-500" />
+                          <span
+                            className="truncate max-w-[120px] lg:max-w-[180px]"
+                            title={user.email}
+                          >
+                            {user.email}
+                          </span>
+                        </div>
+                        {user.phoneNumber && (
+                          <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[#f5d800] mt-1">
+                            <Phone className="w-3 h-3" />
+                            {user.phoneNumber}
+                          </div>
+                        )}
+                      </td>
+
+                      {/* Col 3: Role */}
+                      <td className="px-2 py-2">{renderRoleBadge(user.roleName)}</td>
+
+                      {/* Col 4: Email Verified */}
+                      <td className="px-2 py-2 whitespace-nowrap">
+                        {renderEmailBadge(user.emailConfirmed)}
+                      </td>
+
+                      {/* Col 5: Status */}
+                      <td className="px-2 py-2">{renderStatusBadge(user.status)}</td>
+
+                      {/* Col 6: Created At */}
+                      <td className="px-2 py-2">
+                        <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-400 whitespace-nowrap">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(user.createdAt).toLocaleDateString("vi-VN")}
+                        </div>
+                      </td>
+
+                      {/* Col 7: Actions */}
+                      <td className="px-2 py-2 text-center">
+                        <button
+                          onClick={() => {
+                            setEditingUser(user);
+                            setShowEditModal(true);
+                          }}
+                          className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] text-gray-400 hover:text-white hover:bg-[#202030] hover:border-[#f5d800]/50 transition-colors"
+                          title="Edit user"
                         >
-                          {user.email}
-                        </span>
-                      </div>
-                      {user.phoneNumber && (
-                        <div className="flex items-center gap-1 text-gray-500 mt-1">
-                          <Phone className="w-3 h-3" />
-                          {user.phoneNumber}
-                        </div>
-                      )}
-                    </td>
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
 
-                    {/* Col 3: Role */}
-                    <td className="p-4">{renderRoleBadge(user.roleName)}</td>
-
-                    {/* Col 4: Email Verified */}
-                    <td className="p-4">
-                      {renderEmailBadge(user.emailConfirmed)}
-                    </td>
-
-                    {/* Col 5: Status */}
-                    <td className="p-4">{renderStatusBadge(user.status)}</td>
-
-                    {/* Col 6: Created At */}
-                    <td className="p-4 text-sm text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {new Date(user.createdAt).toLocaleDateString("vi-VN")}
-                      </div>
-                    </td>
-
-                    {/* Col 7: Actions */}
-                    <td className="p-4">
-                      <button
-                        onClick={() => {
-                          setEditingUser(user);
-                          setShowEditModal(true);
-                        }}
-                        className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50 hover:border-blue-300 text-gray-500 hover:text-blue-600 transition"
-                        title="Edit user"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-
-                {userList.length === 0 && !loading && (
-                  <tr>
-                    <td colSpan={7} className="p-12 text-center text-gray-400">
-                      No users found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  {userList.length === 0 && !loading && (
+                    <tr>
+                      <td colSpan={7} className="px-5 py-12 text-center text-gray-500 text-[11px] font-bold uppercase tracking-widest">
+                        No users found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           )}
 
           {/* Pagination */}
           {pagination && pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50">
-              <p className="text-sm text-gray-500">
+            <div className="flex items-center justify-between px-5 py-4 border-t border-[#1e2126] bg-[#1a1c20]">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
                 Page{" "}
-                <strong>
+                <strong className="text-white px-0.5">
                   {pagination.currentPage} / {pagination.totalPages}
                 </strong>{" "}
                 — {pagination.totalCount} users total
@@ -260,7 +264,7 @@ export default function AdminUsersPage() {
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={!pagination.hasPreviousPage}
-                  className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] text-gray-400 hover:text-white hover:bg-[#202030] hover:border-[#f5d800]/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -271,7 +275,7 @@ export default function AdminUsersPage() {
                     )
                   }
                   disabled={!pagination.hasNextPage}
-                  className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] text-gray-400 hover:text-white hover:bg-[#202030] hover:border-[#f5d800]/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
