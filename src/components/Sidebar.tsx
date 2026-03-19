@@ -123,6 +123,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
       icon: Settings,
       items: [
         { name: "Shop Settings", path: "/shop/profile" },
+        { name: "Assembly Templates", path: "/shop/assembly-templates" },
         { name: "Warranty Requests", path: "/shop/warranty-requests" },
       ],
     },

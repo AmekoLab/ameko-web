@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { X, Loader2, Package, Calendar, CreditCard, Keyboard } from "lucide-react";
 import { orderService } from "@/src/services/order.service";
@@ -6,6 +6,7 @@ import { shopOrderService } from "@/src/services/shopOrder.service";
 import { CartData } from "@/src/types/order.types";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
+import AssemblyTimeline from "@/src/components/Shop/Assembly/AssemblyTimeline";
 
 interface OrderDetailModalProps {
   orderId: string | null;
@@ -32,31 +33,33 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose,
   const [order, setOrder] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const fetchOrderDetail = useCallback(async () => {
+    if (!orderId) return;
+    setLoading(true);
+    try {
+      const res = role === "shop" 
+        ? await shopOrderService.getShopOrderDetail(orderId)
+        : await orderService.getOrderDetail(orderId);
+      if (res.success && res.data) {
+        setOrder(res.data);
+      } else {
+        toast.error(res.message || "Failed to fetch order details");
+      }
+    } catch (err: unknown) {
+      const message = (err as { message?: string }).message || "Failed to fetch order details";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [orderId, role]);
+
   useEffect(() => {
     if (isOpen && orderId) {
-      const fetchOrderDetail = async () => {
-        setLoading(true);
-        try {
-          const res = role === "shop" 
-            ? await shopOrderService.getShopOrderDetail(orderId)
-            : await orderService.getOrderDetail(orderId);
-          if (res.success && res.data) {
-            setOrder(res.data);
-          } else {
-            toast.error(res.message || "Failed to fetch order details");
-          }
-        } catch (err: unknown) {
-          const message = (err as { message?: string }).message || "Failed to fetch order details";
-          toast.error(message);
-        } finally {
-          setLoading(false);
-        }
-      };
       fetchOrderDetail();
     } else {
       setOrder(null);
     }
-  }, [isOpen, orderId, role]);
+  }, [isOpen, orderId, fetchOrderDetail]);
 
   if (!isOpen) return null;
 
@@ -188,6 +191,13 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose,
                               </div>
                             ))}
                           </div>
+                        </div>
+                      )}
+
+                      {/* Assembly Timeline */}
+                      {item.isCustom && (
+                        <div className="mt-4">
+                          <AssemblyTimeline orderItemId={item.orderItemId} role={role} />
                         </div>
                       )}
                     </div>
