@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Loader2, Rocket, Pencil } from "lucide-react";
+import { Loader2, Rocket, Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { assemblyService } from "@/src/services/assembly.service";
 import { AssemblyLog } from "@/src/types/assembly.types";
 import UpdateLogModal from "./UpdateLogModal";
 import AddAdhocStepModal from "./AddAdhocStepModal";
+import DeleteLogModal from "./DeleteLogModal";
 
 interface Props {
   orderItemId: string;
@@ -23,6 +24,8 @@ export default function AssemblyTimeline({ orderItemId, role }: Props) {
   const [selectedLog, setSelectedLog] = useState<AssemblyLog | null>(null);
 
   const [isAdhocModalOpen, setIsAdhocModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [logToDelete, setLogToDelete] = useState<AssemblyLog | null>(null);
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -129,13 +132,25 @@ export default function AssemblyTimeline({ orderItemId, role }: Props) {
                       {log.stepName}
                     </p>
                     {role === "shop" && (
-                      <button
-                        onClick={() => handleEditClick(log)}
-                        className="p-1 text-gray-500 hover:text-white transition-colors"
-                        title="Update Status"
-                      >
-                        <Pencil className="w-3 h-3" />
-                      </button>
+                      <>
+                        <button
+                          onClick={() => handleEditClick(log)}
+                          className="p-1 text-gray-500 hover:text-white transition-colors"
+                          title="Update Status"
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLogToDelete(log);
+                            setIsDeleteModalOpen(true);
+                          }}
+                          className="text-gray-500 hover:text-red-500 transition-colors ml-2"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </>
                     )}
                   </div>
 
@@ -198,6 +213,13 @@ export default function AssemblyTimeline({ orderItemId, role }: Props) {
         onSuccess={fetchLogs}
         orderItemId={orderItemId}
         nextOrder={logs.length > 0 ? Math.max(...logs.map((l) => l.stepOrder)) + 1 : 1}
+      />
+
+      <DeleteLogModal
+        isOpen={isDeleteModalOpen}
+        log={logToDelete}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onSuccess={fetchLogs}
       />
     </div>
   );

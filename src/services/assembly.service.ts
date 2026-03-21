@@ -42,4 +42,8 @@ export const assemblyService = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+
+  deleteTrackingLog: async (progressLogId: string): Promise<ApiResponse<null>> => {
+    return api.delete(`/assembly-tracking/logs/${progressLogId}`);
+  }
 };
