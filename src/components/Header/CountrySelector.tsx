@@ -56,7 +56,7 @@ export const CountrySelector: FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredCountries = COUNTRIES.filter((c) =>
-    c.name.toLowerCase().includes(searchTerm.toLowerCase())
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   useEffect(() => {
@@ -160,7 +160,7 @@ export const CountrySelector: FC = () => {
                         <p
                           className={`text-sm font-medium ${
                             country.code === c.code
-                              ? "text-primary-700"
+                              ? "text-gray-900"
                               : "text-gray-900"
                           }`}
                         >

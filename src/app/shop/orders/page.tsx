@@ -295,7 +295,6 @@ export default function ShopOrdersPage() {
         isOpen={!!selectedOrderId}
         orderId={selectedOrderId}
         onClose={() => setSelectedOrderId(null)}
-        role="shop"
       />
     </div>
   );

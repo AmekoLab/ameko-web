@@ -27,7 +27,9 @@ type MenuGroup = { groupName: string; icon: LucideIcon; items: MenuItem[] };
 
 export default function Sidebar({ role = "staff" }: { role?: string }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
+    {},
+  );
   const pathname = usePathname();
 
   // 1. Define menus
@@ -75,13 +77,13 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
     },
   ];
 
-  const staffMenu: MenuGroup[] = [
+  const userMenu: MenuGroup[] = [
     {
       groupName: "Management",
       icon: CheckSquare,
       items: [
-        { name: "Tasks", path: "/staff/tasks" },
-        { name: "Reports", path: "/staff/reports" },
+        { name: "Tasks", path: "/user/tasks" },
+        { name: "Reports", path: "/user/reports" },
       ],
     },
   ];
@@ -125,13 +127,14 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
         { name: "Shop Settings", path: "/shop/profile" },
         { name: "Assembly Templates", path: "/shop/assembly-templates" },
         { name: "Warranty Requests", path: "/shop/warranty-requests" },
+        { name: "Cancel Requests", path: "/shop/cancel-requests" },
       ],
     },
   ];
 
   let menu: MenuGroup[] = [...commonMenu];
   if (role === "admin") menu = [...menu, ...adminMenu];
-  if (role === "staff") menu = [...menu, ...staffMenu];
+  if (role === "user") menu = [...menu, ...userMenu];
   if (role === "shop") menu = [...menu, ...shopMenu];
 
   // 2. Smart active state handling
@@ -144,7 +147,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
         return true;
       }
       return group.items.some(
-        (item) => item.path !== "/" && pathname.startsWith(item.path)
+        (item) => item.path !== "/" && pathname.startsWith(item.path),
       );
     });
 
@@ -180,7 +183,9 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
         {menu.map((group) => {
           const Icon = group.icon;
           const isExpanded = expandedGroups[group.groupName] || false;
-          const isGroupActive = group.items.some((item) => isItemActive(item.path));
+          const isGroupActive = group.items.some((item) =>
+            isItemActive(item.path),
+          );
 
           return (
             <div key={group.groupName} className="flex flex-col mb-1">
@@ -195,7 +200,10 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
                   }`}
                   onClick={() => {
                     setIsCollapsed(false);
-                    setExpandedGroups((prev) => ({ ...prev, [group.groupName]: true }));
+                    setExpandedGroups((prev) => ({
+                      ...prev,
+                      [group.groupName]: true,
+                    }));
                   }}
                   title={group.groupName}
                 >
@@ -227,7 +235,9 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
               {!isCollapsed && (
                 <div
                   className={`flex flex-col gap-1 overflow-hidden transition-all duration-300 ease-in-out ${
-                    isExpanded ? "max-h-[500px] mt-1 opacity-100" : "max-h-0 opacity-0"
+                    isExpanded
+                      ? "max-h-[500px] mt-1 opacity-100"
+                      : "max-h-0 opacity-0"
                   }`}
                 >
                   {group.items.map((item) => {

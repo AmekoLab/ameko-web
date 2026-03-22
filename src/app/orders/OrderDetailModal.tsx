@@ -1,5 +1,6 @@
 import { FC, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
+import { usePathname } from "next/navigation"; // Thêm hook này
 import { X, Loader2, Package, Calendar, CreditCard, Keyboard } from "lucide-react";
 import { orderService } from "@/src/services/order.service";
 import { shopOrderService } from "@/src/services/shopOrder.service";
@@ -7,12 +8,13 @@ import { CartData } from "@/src/types/order.types";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 import AssemblyTimeline from "@/src/components/Shop/Assembly/AssemblyTimeline";
+import CancelOrderModal from "@/src/components/User/Orders/CancelOrderModal";
 
 interface OrderDetailModalProps {
   orderId: string | null;
   isOpen: boolean;
   onClose: () => void;
-  role?: "user" | "shop";
+  // Bỏ cái role ở đây đi vì nó làm rối luồng, ta dùng pathname để check
 }
 
 const formatCurrency = (amount: number): string =>
@@ -29,17 +31,26 @@ const formatDate = (dateStr: string): string => {
   }
 };
 
-const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose, role = "user" }) => {
+const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose }) => {
+  const pathname = usePathname();
+  // KIỂM TRA NGỮ CẢNH: Đang ở URL bắt đầu bằng "/orders" -> Là Người Mua (Buyer)
+  // Đang ở "/shop/..." -> Là Người Bán (Seller)
+  const isBuyerContext = pathname?.startsWith("/orders");
+
   const [order, setOrder] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [cancelingOrderId, setCancelingOrderId] = useState<string | null>(null);
 
   const fetchOrderDetail = useCallback(async () => {
     if (!orderId) return;
     setLoading(true);
     try {
-      const res = role === "shop" 
+      // Dùng isBuyerContext để gọi đúng API
+      const res = !isBuyerContext
         ? await shopOrderService.getShopOrderDetail(orderId)
         : await orderService.getOrderDetail(orderId);
+        
       if (res.success && res.data) {
         setOrder(res.data);
       } else {
@@ -51,7 +62,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose,
     } finally {
       setLoading(false);
     }
-  }, [orderId, role]);
+  }, [orderId, isBuyerContext]);
 
   useEffect(() => {
     if (isOpen && orderId) {
@@ -133,6 +144,20 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose,
                         <p className="text-[11px] text-gray-400 italic">"{order.note}"</p>
                       </div>
                     )}
+                    
+                 
+                    {isBuyerContext && order.orderStatus === 'Processing' && order.paymentStatus === 'Paid' && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCancelingOrderId(order.orderId);
+                          setIsCancelModalOpen(true);
+                        }}
+                        className="mt-4 text-[10px] text-red-500 border border-red-500 border-dashed rounded-sm px-4 py-2 hover:bg-red-500 hover:text-white transition-colors uppercase font-bold tracking-widest w-full text-center"
+                      >
+                        Request Cancel
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -197,7 +222,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose,
                       {/* Assembly Timeline */}
                       {item.isCustom && (
                         <div className="mt-4">
-                          <AssemblyTimeline orderItemId={item.orderItemId} role={role} />
+                          <AssemblyTimeline orderItemId={item.orderItemId} role={!isBuyerContext ? "shop" : "user"} />
                         </div>
                       )}
                     </div>
@@ -232,6 +257,13 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose,
           </div>
         )}
       </div>
+
+      <CancelOrderModal
+        isOpen={isCancelModalOpen}
+        orderId={cancelingOrderId}
+        onClose={() => setIsCancelModalOpen(false)}
+        onSuccess={fetchOrderDetail}
+      />
     </div>
   );
 };
