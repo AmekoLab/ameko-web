@@ -378,14 +378,16 @@ export const Header: FC = () => {
                         label: "Shop Dashboard",
                         show:
                           currentShop?.status === ShopStatus.Active &&
-                          user.role !== "Admin",
+                          user.role !== "Admin" &&
+                          user.role !== "User",
                       },
                       {
                         href: `/profile/shop/${currentShop?.id}`,
                         label: "View My Store",
                         show:
                           currentShop?.status === ShopStatus.Active &&
-                          user.role !== "Admin",
+                          user.role !== "Admin" &&
+                          user.role !== "User",
                       },
                       {
                         href: "/shop/wallet",
@@ -407,6 +409,11 @@ export const Header: FC = () => {
                       {
                         href: "/my-warranty-requests",
                         label: "Warranty Requests",
+                        show: user.role !== "Admin",
+                      },
+                      {
+                        href: "/cancel-requests",
+                        label: "Cancel Requests",
                         show: user.role !== "Admin",
                       },
                     ]
