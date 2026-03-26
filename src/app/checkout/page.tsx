@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, FormEvent, Suspense } from "react";
+import { useAppSelector, useAppDispatch } from "@/src/store/hook";
+import { fetchWalletDetails } from "@/src/store/slices/walletSlice";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -151,6 +153,20 @@ function CheckoutContent() {
   const searchParams = useSearchParams();
   const selectedOrderItemIds = searchParams.getAll("items");
 
+  const dispatch = useAppDispatch();
+
+  // ── Voucher state from Redux (same source used by the preview hook) ──
+  const applicableVouchers = useAppSelector((state) => state.voucher.applicableVouchers);
+  const selectedSystemIds = useAppSelector((state) => state.voucher.selectedSystemVoucherIds);
+  const selectedShopVoucherIdsMap = useAppSelector((state) => state.voucher.selectedShopVoucherIds);
+
+  // ── Wallet state ──────────────────────────────────────────────────────
+  const { details: walletDetails } = useAppSelector((state) => state.wallet);
+
+  useEffect(() => {
+    dispatch(fetchWalletDetails());
+  }, [dispatch]);
+
   const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -163,6 +179,7 @@ function CheckoutContent() {
     note: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [paymentMethod, setPaymentMethod] = useState<number>(0);
 
   // Fetch cart data and pre-fill form if available
   useEffect(() => {
@@ -197,6 +214,36 @@ function CheckoutContent() {
     fetchCart();
   }, []);
 
+  // ── Map selected voucher IDs → codes (mirrors useCartPreviewLogic) ─────────
+  const payloadCodes = useMemo(() => {
+    // Resolve system voucher code — undefined (not null) when none selected
+    const systemCode =
+      selectedSystemIds?.length && applicableVouchers?.systemVouchers
+        ? (applicableVouchers.systemVouchers.find(
+            (v) => v.id === selectedSystemIds[0],
+          )?.code ?? undefined)
+        : undefined;
+
+    // Resolve shop voucher codes — always an object, never null (prevents backend crash)
+    const shopCodes: Record<string, string> = {};
+    if (selectedShopVoucherIdsMap && applicableVouchers?.shopVoucherGroups) {
+      Object.entries(selectedShopVoucherIdsMap).forEach(([shopId, vIds]) => {
+        if (vIds && vIds.length > 0) {
+          const group = applicableVouchers.shopVoucherGroups.find(
+            (g) => g.shopId === shopId,
+          );
+          const code = group?.vouchers.find((v) => v.id === vIds[0])?.code;
+          if (code) shopCodes[shopId] = code;
+        }
+      });
+    }
+    return {
+      systemCode,
+      // CRITICAL: send {} not null/undefined so the backend never crashes on a missing key
+      shopCodes,
+    };
+  }, [applicableVouchers, selectedSystemIds, selectedShopVoucherIdsMap]);
+
   const handleInputChange = useCallback(
     (field: keyof CheckoutForm) =>
       (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -224,7 +271,8 @@ function CheckoutContent() {
       try {
         const origin =
           typeof window !== "undefined" ? window.location.origin : "";
-        const res = await orderService.checkout({
+
+        const payload = {
           receiverName: form.receiverName.trim(),
           receiverPhone: form.receiverPhone.trim(),
           shippingAddress: form.shippingAddress.trim(),
@@ -232,7 +280,15 @@ function CheckoutContent() {
           successUrl: `${origin}/payment-success`,
           cancelUrl: `${origin}/payment-fail`,
           selectedOrderItemIds,
-        });
+          // Voucher codes — undefined omits field from JSON; {} is explicit "no shop vouchers"
+          appliedSystemVoucherCode: payloadCodes.systemCode,
+          appliedShopVoucherCodes: payloadCodes.shopCodes,
+          paymentMethod,
+        };
+
+        console.log("🚀 FINAL CHECKOUT PAYLOAD:", payload);
+
+        const res = await orderService.checkout(payload);
 
         if (res.success && res.data?.paymentUrl) {
           // Redirect to Stripe Checkout
@@ -247,7 +303,7 @@ function CheckoutContent() {
         setSubmitting(false);
       }
     },
-    [form, selectedOrderItemIds],
+    [form, selectedOrderItemIds, payloadCodes, paymentMethod],
   );
 
   // ─── Derived data (must be above early returns — Rules of Hooks) ───────────
@@ -280,8 +336,10 @@ function CheckoutContent() {
     selectedItemIdsSet,
   );
 
-  // Mobile total: prefer live preview, fall back to local sum
-  const displayTotal = cartPreview?.finalTotalAmount ?? selectedTotal;
+  // Mobile total: Subtotal - Discount (shipping is Pay-on-Delivery, excluded from Stripe total)
+  const displayTotal = cartPreview
+    ? (cartPreview.totalCartSubTotal ?? selectedTotal) - (cartPreview.totalDiscountAmount ?? 0)
+    : selectedTotal;
 
 
   // ─── Loading ─────────────────────────────────────────────
@@ -436,6 +494,56 @@ function CheckoutContent() {
                 maxLength={500}
               />
             </div>
+
+            {/* ─── Payment Method ──────────────────────────── */}
+            <h2 className="text-lg font-medium mb-4 mt-8 pt-8 border-t border-gray-200">Payment Method</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Stripe */}
+              <label
+                className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
+                  paymentMethod === 0
+                    ? "border-[#ce2a32] bg-red-50"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value={0}
+                  checked={paymentMethod === 0}
+                  onChange={() => setPaymentMethod(0)}
+                  className="accent-[#ce2a32]"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-800">Stripe (Credit Card)</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Pay securely via Stripe</p>
+                </div>
+              </label>
+
+              {/* Ameko Wallet */}
+              <label
+                className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
+                  paymentMethod === 1
+                    ? "border-[#ce2a32] bg-red-50"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value={1}
+                  checked={paymentMethod === 1}
+                  onChange={() => setPaymentMethod(1)}
+                  className="accent-[#ce2a32]"
+                />
+                <div className="ml-3 flex flex-col">
+                  <span className="font-medium text-sm">Ameko Wallet</span>
+                  <span className="text-xs text-gray-500 italic mt-0.5">
+                    Balance: {walletDetails?.balance?.toLocaleString("vi-VN") ?? 0}₫
+                  </span>
+                </div>
+              </label>
+            </div>
           </div>
 
           {/* ─── Footer Actions ───────────────────────────── */}
@@ -456,6 +564,8 @@ function CheckoutContent() {
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Processing...
                 </>
+              ) : paymentMethod === 1 ? (
+                "Pay with Wallet"
               ) : (
                 "Pay with Stripe"
               )}
@@ -520,12 +630,8 @@ function CheckoutContent() {
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span className="font-medium text-black">
-                  {isCalculatingPreview ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-                  ) : (
-                    `${(cartPreview?.totalShippingFee ?? 0).toLocaleString()}₫`
-                  )}
+                <span className="italic text-gray-400 text-xs">
+                  Pay on delivery
                 </span>
               </div>
               {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (
@@ -551,7 +657,7 @@ function CheckoutContent() {
                 {isCalculatingPreview ? (
                   <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
                 ) : (
-                  `${(cartPreview?.finalTotalAmount ?? displayTotal).toLocaleString()}₫`
+                  `${displayTotal.toLocaleString()}₫`
                 )}
               </span>
             </div>

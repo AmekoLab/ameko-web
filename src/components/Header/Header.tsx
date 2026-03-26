@@ -390,10 +390,9 @@ export const Header: FC = () => {
                           user.role !== "User",
                       },
                       {
-                        href: "/shop/wallet",
+                        href: "/wallet",
                         label: "My Wallet",
                         show:
-                          currentShop?.status === ShopStatus.Active &&
                           user.role !== "Admin",
                       },
                       {

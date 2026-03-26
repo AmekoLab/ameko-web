@@ -17,6 +17,7 @@ const updateVoucherSchema = z.object({
   endDate: z.string().min(1, "Select end date"),
   usageLimit: z.string().min(1, "Cannot be empty"),
   status: z.string().min(1, "Select status"),
+  maxUsesPerUser: z.string().optional(),
 });
 
 type UpdateVoucherFormValues = z.infer<typeof updateVoucherSchema>;
@@ -64,6 +65,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
       endDate: toDatetimeLocal(voucher.endDate),
       usageLimit: String(voucher.usageLimit),
       status: String(statusStringToEnum(voucher.status)),
+      maxUsesPerUser: voucher.maxUsesPerUser ? String(voucher.maxUsesPerUser) : "",
     },
   });
 
@@ -78,6 +80,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
             endDate: new Date(data.endDate).toISOString(),
             usageLimit: Number(data.usageLimit),
             status: Number(data.status) as VoucherStatus,
+            maxUsesPerUser: (data.maxUsesPerUser && Number(data.maxUsesPerUser) > 0) ? Number(data.maxUsesPerUser) : null,
           },
         }),
       ).unwrap();
@@ -157,8 +160,8 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
             )}
           </div>
 
-          {/* Usage Limit + Status row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Usage Limit + Status + Max Uses Per User row */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className={labelCls}>Usage Limit</label>
               <input
@@ -169,6 +172,11 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
               {errors.usageLimit && (
                 <p className={errCls}>{errors.usageLimit.message}</p>
               )}
+            </div>
+            <div>
+              <label className={labelCls}>Max Uses / User</label>
+              <input type="number" {...register("maxUsesPerUser")} placeholder="Unlimited" className={inputCls} />
+              {errors.maxUsesPerUser && <p className={errCls}>{errors.maxUsesPerUser.message}</p>}
             </div>
             <div>
               <label className={labelCls}>Status</label>

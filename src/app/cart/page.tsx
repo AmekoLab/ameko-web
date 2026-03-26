@@ -585,16 +585,10 @@ const OrderSummary: FC<OrderSummaryProps> = ({
           </span>
         </div>
 
-        {/* Shipping */}
+        {/* Shipping — Pay on Delivery (excluded from Stripe total) */}
         <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
           <span>Shipping</span>
-          <span className="text-white">
-            {isCalculatingPreview ? (
-              <Loader2 className="w-4 h-4 animate-spin inline" />
-            ) : (
-              formatCurrency(cartPreview?.totalShippingFee || 0)
-            )}
-          </span>
+          <span className="italic text-gray-400 normal-case text-xs">Pay on delivery</span>
         </div>
 
         {/* Discount */}
@@ -607,7 +601,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
           </div>
         )}
 
-        {/* Total */}
+        {/* Total = Subtotal - Discount (shipping is COD, excluded from Stripe) */}
         <div className="flex justify-between items-end mb-2 mt-4 pt-3 border-t border-[#1e2126]">
           <span className="text-[13px] font-black text-white uppercase tracking-widest">
             Estimated Total
@@ -616,7 +610,9 @@ const OrderSummary: FC<OrderSummaryProps> = ({
             {isCalculatingPreview ? (
               <Loader2 className="w-5 h-5 animate-spin inline" />
             ) : (
-              formatCurrency(cartPreview?.finalTotalAmount || 0)
+              formatCurrency(
+                (cartPreview?.totalCartSubTotal || 0) - (cartPreview?.totalDiscountAmount || 0)
+              )
             )}
           </span>
         </div>

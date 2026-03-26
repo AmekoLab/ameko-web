@@ -67,6 +67,7 @@ interface VoucherCardProps {
   onToggle: (id: string) => void;
   brandLabel: string;
   selectionMode: "radio" | "checkbox";
+  isFullyClaimed: boolean;
 }
 
 const VoucherCard: FC<VoucherCardProps> = ({
@@ -78,6 +79,7 @@ const VoucherCard: FC<VoucherCardProps> = ({
   onToggle,
   brandLabel,
   selectionMode,
+  isFullyClaimed,
 }) => {
   const progress = usageProgress(voucher);
   const isAlmostGone = progress >= 0.8;
@@ -189,12 +191,19 @@ const VoucherCard: FC<VoucherCardProps> = ({
 
         {/* Ineligible message */}
         {!eligible && (
-          <div className="flex items-center gap-1 mt-1.5 text-[11px] text-orange-500">
-            <AlertCircle className="w-3 h-3 shrink-0" />
-            <span>
-              Spend {fmtVND(remainingAmount)} more to use this voucher
-            </span>
-          </div>
+          isFullyClaimed ? (
+            <div className="flex items-center gap-1 mt-1.5 text-[11px] text-red-500">
+              <AlertCircle className="w-3 h-3 shrink-0" />
+              <span>Voucher fully claimed</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 mt-1.5 text-[11px] text-orange-500">
+              <AlertCircle className="w-3 h-3 shrink-0" />
+              <span>
+                Spend {fmtVND(remainingAmount)} more to use this voucher
+              </span>
+            </div>
+          )
         )}
       </div>
     </div>
@@ -259,8 +268,12 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
   // Sort: eligible first, then by value descending
   const sortedVouchers = useMemo(() => {
     return [...vouchers].sort((a, b) => {
-      const aEligible = currentSubtotal >= a.minOrderValue;
-      const bEligible = currentSubtotal >= b.minOrderValue;
+      const aEligible =
+        currentSubtotal >= a.minOrderValue &&
+        (a.usageLimit <= 0 || a.usedCount < a.usageLimit);
+      const bEligible =
+        currentSubtotal >= b.minOrderValue &&
+        (b.usageLimit <= 0 || b.usedCount < b.usageLimit);
       if (aEligible !== bEligible) return aEligible ? -1 : 1;
       return b.value - a.value;
     });
@@ -384,8 +397,11 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
             </div>
           ) : (
             sortedVouchers.map((v) => {
-              const eligible = currentSubtotal >= v.minOrderValue;
-              const remainingAmount = eligible
+              const meetsMinOrder = currentSubtotal >= v.minOrderValue;
+              const isFullyClaimed = v.usageLimit > 0 && v.usedCount >= v.usageLimit;
+              const eligible = meetsMinOrder && !isFullyClaimed;
+
+              const remainingAmount = meetsMinOrder
                 ? 0
                 : v.minOrderValue - currentSubtotal;
 
@@ -402,6 +418,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                   onToggle={handleToggle}
                   brandLabel={brandLabel}
                   selectionMode={selectionMode}
+                  isFullyClaimed={isFullyClaimed}
                 />
               );
             })

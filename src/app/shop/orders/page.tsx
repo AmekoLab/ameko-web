@@ -14,7 +14,7 @@ const formatCurrency = (amount: number): string =>
     currency: "VND",
   }).format(amount);
 
-const STATUS_FILTERS = ["All", "Pending", "Processing", "Completed", "Cancelled"];
+const STATUS_FILTERS = ["All", "Pending", "Processing", "Completed", "Cancelled" , "Shipped"];
 
 export default function ShopOrdersPage() {
   const [orders, setOrders] = useState<CartData[]>([]);
@@ -71,6 +71,8 @@ export default function ShopOrdersPage() {
       case "paid":
       case "completed":
         return "bg-green-500/10 text-green-400 border border-green-500/20";
+      case "shipped": 
+        return "bg-blue-500/10 text-blue-400 border border-blue-500/20";
       case "cancelled":
       case "refunded":
       case "failed":

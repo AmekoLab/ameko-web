@@ -57,8 +57,15 @@ export default function LoginPage() {
             break;
         }
       }
-    } catch (error: any) {
-      console.error("Login Error:", error);
+   } catch (error: any) {
+      // 1. Dùng console.log thay vì console.error để Next.js không "cảnh sát" màn hình đỏ
+      // console.log("Login Error detail:", error); 
+
+      // 2. Bắt câu chửi của Backend (nếu có), không thì dùng câu mặc định
+      const errorMessage = error?.response?.data?.message || error?.message || "Tài khoản hoặc mật khẩu không chính xác!";
+      
+      // 3. Quăng Toast đỏ xịn xò cho khách hàng xem
+      toast.error(errorMessage);
     }
   };
 

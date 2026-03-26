@@ -53,6 +53,7 @@ export interface Voucher {
   targetUserId: string | null;
   isStackable: boolean;
   stackingPolicy: string; // "All" | "WithCompensationOnly" | "None"
+  maxUsesPerUser: number | null;
 }
 
 export interface CreatePromotionVoucherPayload {
@@ -69,6 +70,7 @@ export interface CreatePromotionVoucherPayload {
   usageLimit: number;
   isStackable: boolean;
   stackingPolicy: number;
+  maxUsesPerUser?: number;
 }
 
 export interface UpdateVoucherPayload {
@@ -77,6 +79,7 @@ export interface UpdateVoucherPayload {
   endDate: string; // ISO String
   usageLimit: number;
   status: VoucherStatus;
+  maxUsesPerUser?: number | null;
 }
 
 export interface PaginatedResponse<T> {

@@ -11,6 +11,7 @@ import {
   DiscountType,
   VoucherType,
   StackingPolicy,
+  CreatePromotionVoucherPayload,
 } from "@/src/services/voucher.service";
 
 // ─── Zod Schema ──────────────────────────────────────────
@@ -28,6 +29,7 @@ const createVoucherSchema = z
     maxDiscountAmount: z.string().optional(),
     minOrderValue: z.string().min(1, "Cannot be empty"),
     usageLimit: z.string().min(1, "Cannot be empty"),
+    maxUsesPerUser: z.string().optional(),
     startDate: z.string().min(1, "Select start date"),
     endDate: z.string().min(1, "Select end date"),
     allowStacking: z.boolean(),
@@ -83,6 +85,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
       maxDiscountAmount: "",
       minOrderValue: "0",
       usageLimit: "100",
+      maxUsesPerUser: "",
       startDate: "",
       endDate: "",
       allowStacking: true,
@@ -94,7 +97,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
   const onSubmit = async (data: CreateVoucherFormValues) => {
     try {
       const dt = Number(data.discountType);
-      const payload = {
+      const payload: CreatePromotionVoucherPayload = {
         code: data.code.toUpperCase(),
         name: data.name,
         description: data.description,
@@ -114,6 +117,10 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           ? StackingPolicy.AllowStacking
           : StackingPolicy.None,
       };
+
+      if (data.maxUsesPerUser && Number(data.maxUsesPerUser) > 0) {
+        payload.maxUsesPerUser = Number(data.maxUsesPerUser);
+      }
 
       const result = await dispatch(
         createPromotionVoucherThunk(payload),
@@ -234,8 +241,8 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
             </div>
           )}
 
-          {/* ── Row 3: Min Order + Usage Limit ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* ── Row 3: Min Order + Usage Limit + Max Uses Per User ── */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className={labelCls}>Minimum Order (VND)</label>
               <input
@@ -258,6 +265,18 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               />
               {errors.usageLimit && (
                 <p className={errCls}>{errors.usageLimit.message}</p>
+              )}
+            </div>
+            <div>
+              <label className={labelCls}>Max Uses / User</label>
+              <input
+                type="number"
+                {...register("maxUsesPerUser")}
+                placeholder="Empty = Unlimited"
+                className={inputCls}
+              />
+              {errors.maxUsesPerUser && (
+                <p className={errCls}>{errors.maxUsesPerUser.message}</p>
               )}
             </div>
           </div>

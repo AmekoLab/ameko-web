@@ -1,12 +1,13 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Loader2 } from "lucide-react";
 import { Product } from "@/src/types/product";
 import { useAppDispatch } from "@/src/store/hook";
-import { addToCart } from "@/src/store/slices/cartSlice";
+import { fetchServerCart, setCartOpen } from "@/src/store/slices/cartSlice";
+import { orderService } from "@/src/services/order.service";
 import { toast } from "react-toastify";
 
 interface ProductCardProps {
@@ -17,33 +18,39 @@ interface ProductCardProps {
 
 export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
   const dispatch = useAppDispatch();
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const thumbnail =
     product.images && product.images.length > 0
       ? product.images[0]
       : "/images/placeholder.png";
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    dispatch(
-      addToCart({
-        id: product.id,
+    if (isAddingToCart) return;
+    setIsAddingToCart(true);
+    try {
+      await orderService.addToCart({
         productId: product.id,
-        name: product.name,
-        price: product.basePrice,
-        image: thumbnail,
-        slug: product.slug,
         quantity: 1,
-        variant: "Default",
-      }),
-    );
-
-    toast.success(`${product.name} added to cart!`, {
-      position: "top-right",
-      theme: "dark",
-    });
+        isCustom: false,
+      });
+      toast.success(`${product.name} added to cart!`, {
+        position: "top-right",
+        theme: "dark",
+      });
+      dispatch(fetchServerCart());
+      dispatch(setCartOpen(true));
+    } catch (err: unknown) {
+      const e2 = err as { response?: { data?: { message?: string } } };
+      toast.error(
+        e2.response?.data?.message || "Failed to add item to cart. Please try again.",
+        { position: "top-right", theme: "dark" },
+      );
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   // Badge colour logic
@@ -137,10 +144,15 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
         {/* Always-visible Add to Cart text link */}
         <button
           onClick={handleAddToCart}
-          className="mt-auto flex items-center gap-2 text-[#f5d800] hover:text-[#ffe500] hover:underline text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer w-fit"
+          disabled={isAddingToCart}
+          className="mt-auto flex items-center gap-2 text-[#f5d800] hover:text-[#ffe500] hover:underline text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer w-fit disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <ShoppingCart className="w-5 h-5 shrink-0" />
-          <span className="text-sm">Add to Cart</span>
+          {isAddingToCart ? (
+            <Loader2 className="w-5 h-5 shrink-0 animate-spin" />
+          ) : (
+            <ShoppingCart className="w-5 h-5 shrink-0" />
+          )}
+          <span className="text-sm">{isAddingToCart ? "Adding..." : "Add to Cart"}</span>
         </button>
       </div>
     </div>

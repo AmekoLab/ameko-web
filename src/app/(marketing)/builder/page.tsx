@@ -405,6 +405,7 @@ function BuilderContent() {
     setAddingToCart(true);
     try {
       const res = await orderService.addToCart({
+        productId: session.kitId,
         quantity: 1,
         isCustom: true,
         builderSessionId: session.id,

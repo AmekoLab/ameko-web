@@ -9,10 +9,15 @@ import {
   Truck,
   Package,
   RotateCcw,
+  Loader2,
 } from "lucide-react";
 import { Product } from "@/src/types/product";
 import { useAppDispatch } from "@/src/store/hook";
-import { addToCart } from "@/src/store/slices/cartSlice";
+import {
+  fetchServerCart,
+  setCartOpen,
+} from "@/src/store/slices/cartSlice";
+import { orderService } from "@/src/services/order.service";
 import { toast } from "react-toastify";
 
 interface ProductInfoProps {
@@ -26,6 +31,7 @@ export const ProductInfo = ({
 }: ProductInfoProps) => {
   const dispatch = useAppDispatch();
   const [quantity, setQuantity] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Sticky bar state
   const [isStickyVisible, setIsStickyVisible] = useState(false);
@@ -69,23 +75,30 @@ export const ProductInfo = ({
     }
   };
 
-  const handleAddToCart = () => {
-    dispatch(
-      addToCart({
-        id: product.id,
+  const handleAddToCart = async () => {
+    if (isAddingToCart) return;
+    setIsAddingToCart(true);
+    try {
+      await orderService.addToCart({
         productId: product.id,
-        name: product.name,
-        price: product.basePrice,
-        image: product.images?.[0] || "/placeholder.png",
-        slug: product.slug,
         quantity: quantity,
-        variant: "Default",
-      }),
-    );
-    toast.success(`${product.name} added to cart!`, {
-      position: "top-right",
-      theme: "dark",
-    });
+        isCustom: false,
+      });
+      toast.success(`${product.name} added to cart!`, {
+        position: "top-right",
+        theme: "dark",
+      });
+      dispatch(fetchServerCart());
+      dispatch(setCartOpen(true));
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } } };
+      toast.error(
+        e.response?.data?.message || "Failed to add item to cart. Please try again.",
+        { position: "top-right", theme: "dark" },
+      );
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   return (
@@ -239,17 +252,23 @@ export const ProductInfo = ({
           {/* Add to Cart Button — solid yellow block */}
           <button
             onClick={handleAddToCart}
-            disabled={isOutOfStock}
+            disabled={isOutOfStock || isAddingToCart}
             type="button"
-            className={`flex-1 h-full flex items-center justify-center text-[14px] font-black uppercase tracking-[0.2em] transition-colors active:scale-[0.98]
+            className={`flex-1 h-full flex items-center justify-center gap-2 text-[14px] font-black uppercase tracking-[0.2em] transition-colors active:scale-[0.98]
               ${
-                isOutOfStock
+                isOutOfStock || isAddingToCart
                   ? "bg-[#2a2a2a] text-gray-600 cursor-not-allowed"
                   : "bg-[#f5d800] hover:bg-[#ffe500] text-black"
               }
             `}
           >
-            {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+            {isAddingToCart ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Adding...</>
+            ) : isOutOfStock ? (
+              "Out of Stock"
+            ) : (
+              "Add to Cart"
+            )}
           </button>
         </div>
 
@@ -372,11 +391,15 @@ export const ProductInfo = ({
             </span>
             <button
               onClick={handleAddToCart}
-              disabled={isOutOfStock}
+              disabled={isOutOfStock || isAddingToCart}
               type="button"
-              className="h-10 px-6 bg-[#f5d800] hover:bg-[#ffe014] text-black text-[11px] font-black uppercase tracking-[0.18em] transition-all disabled:bg-[#2a2a2a] disabled:text-gray-600 disabled:cursor-not-allowed"
+              className="h-10 px-6 bg-[#f5d800] hover:bg-[#ffe014] text-black text-[11px] font-black uppercase tracking-[0.18em] transition-all disabled:bg-[#2a2a2a] disabled:text-gray-600 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              Add to Cart
+              {isAddingToCart ? (
+                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Adding...</>
+              ) : (
+                "Add to Cart"
+              )}
             </button>
           </div>
         </div>

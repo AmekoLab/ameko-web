@@ -43,21 +43,20 @@ export const Footer: FC = () => {
       <div className="max-w-[1920px] mx-auto px-4 lg:px-8">
         {/* --- MAIN FOOTER CONTENT --- */}
         {/* Chuyển sang grid-cols-4 nhưng chia tỷ lệ nội dung lại */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-16">
           
           {/* COL 1: BRAND, IMAGE & SOCIAL */}
           <div className="space-y-6">
-            <div className="brightness-0 invert">
+            {/* <div className="brightness-0 invert">
               <Logo />
-            </div>
-            <p className="text-gray-400 text-sm leading-relaxed">
+            </div> */}
+            <p className="text-white text-sm leading-relaxed">
               AMEKO - German engineering meets Swedish design. Professional
               gaming gear for esports athletes.
             </p>
             
-            {/* Website Preview Image */}
+          
             <div className="relative w-full aspect-[21/9] rounded-sm overflow-hidden border border-[#1e2126] group cursor-pointer">
-              {/* Sếp thay "/images/website-preview.jpg" bằng ảnh chụp web thật của sếp nhé */}
               <Image 
                 src="https://res.cloudinary.com/doezwafgz/image/upload/v1773515613/home2_xpdnpr.png" 
                 alt="Ameko Website Preview" 
@@ -135,7 +134,7 @@ export const Footer: FC = () => {
           </div>
 
           {/* COL 4: PARTNER / ADMIN CTA */}
-          <div>
+          {/* <div>
             {user?.role !== "Admin" ? (
               <div>
                 <h4 className="text-sm font-bold uppercase tracking-widest mb-6 text-[#ce2a32]">
@@ -173,7 +172,7 @@ export const Footer: FC = () => {
                 </p>
               </div>
             )}
-          </div>
+          </div> */}
         </div>
 
         {/* --- BOTTOM BAR --- */}

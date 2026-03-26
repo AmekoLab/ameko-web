@@ -18,4 +18,10 @@ export const shopOrderService = {
   getShopOrderDetail: async (orderId: string): Promise<ApiResponse<CartData>> => {
     return api.get(`/orders/shop/${orderId}`);
   },
+
+  updateOrderStatus: async (orderId: string, status: number): Promise<ApiResponse<null>> => {
+    return api.put(`/orders/shop/${orderId}/status`, status, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 };
