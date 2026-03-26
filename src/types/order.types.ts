@@ -40,6 +40,7 @@ export interface CartData {
   orderStatus: string;
   paymentStatus: string;
   subTotal: number;
+  hasCancelRequest?: boolean;
   shippingFee: number;
   discountAmount: number;
   totalAmount: number;
@@ -53,9 +54,10 @@ export interface CartData {
 
 /** Payload for POST /orders/cart (Add to Cart) */
 export interface AddToCartPayload {
+  productId: string;
   quantity: number;
   isCustom: boolean;
-  builderSessionId: string;
+  builderSessionId?: string; // Only required for custom builder flow
 }
 
 /** Payload for POST /orders/checkout */
@@ -67,6 +69,7 @@ export interface CheckoutPayload {
   successUrl: string;
   cancelUrl: string;
   selectedOrderItemIds: string[];
+  paymentMethod: number;
 }
 
 /** Response data from POST /orders/checkout */

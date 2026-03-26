@@ -904,7 +904,7 @@ export const CartSidebar: FC = memo(() => {
                     <Loader2 className="w-4 h-4 animate-spin" /> Processing...
                   </>
                 ) : hasSelection ? (
-                  `Checkout • ${formatCurrency(cartPreview?.finalTotalAmount || 0)}`
+                  `Checkout • ${formatCurrency((cartPreview?.totalCartSubTotal || 0) - (cartPreview?.totalDiscountAmount || 0))}`
                 ) : (
                   "Select Items"
                 )}

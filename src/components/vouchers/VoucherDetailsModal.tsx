@@ -360,6 +360,9 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                       <DetailRow label="End Date">
                         {fmtDate(voucher.endDate)}
                       </DetailRow>
+                      <DetailRow label="Max Uses / User">
+                        {voucher.maxUsesPerUser ? voucher.maxUsesPerUser : <span className="text-gray-400 italic">Unlimited</span>}
+                      </DetailRow>
                       <DetailRow label="Status">
                         <span
                           className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusColor(voucher.status)}`}

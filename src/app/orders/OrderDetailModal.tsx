@@ -41,6 +41,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
   const [loading, setLoading] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelingOrderId, setCancelingOrderId] = useState<string | null>(null);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState<number | null>(null);
 
   const fetchOrderDetail = useCallback(async () => {
     if (!orderId) return;
@@ -71,6 +72,25 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
       setOrder(null);
     }
   }, [isOpen, orderId, fetchOrderDetail]);
+
+  const handleUpdateStatus = async (newStatus: number) => {
+    if (!orderId) return;
+    setIsUpdatingStatus(newStatus);
+    try {
+      const res = await shopOrderService.updateOrderStatus(orderId, newStatus);
+      if (res.success) {
+        toast.success("Order status updated successfully.");
+        fetchOrderDetail(); // Refresh the modal data
+      } else {
+        toast.error(res.message || "Failed to update status.");
+      }
+    } catch (err: unknown) {
+      const message = (err as { message?: string }).message || "An error occurred while updating status.";
+      toast.error(message);
+    } finally {
+      setIsUpdatingStatus(null);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -146,7 +166,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                     )}
                     
                  
-                    {isBuyerContext && order.orderStatus === 'Processing' && order.paymentStatus === 'Paid' && (
+                    {isBuyerContext && order.orderStatus === 'Processing' && order.paymentStatus === 'Paid' &&  !order.hasCancelRequest && (
                       <button
                         type="button"
                         onClick={() => {
@@ -157,6 +177,43 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                       >
                         Request Cancel
                       </button>
+                        )}
+                        {isBuyerContext && order.hasCancelRequest && (
+  <div className="mt-4 text-[10px] text-yellow-500 border border-yellow-500/50 bg-yellow-500/10 rounded-sm px-4 py-2 text-center uppercase font-bold tracking-widest w-full">
+    Cancel Request Pending Approval
+  </div>
+)}
+
+                    {/* SHOP ACTIONS: Update Status */}
+                    {!isBuyerContext && (order.orderStatus === 'Processing' || order.orderStatus === 'Shipped') && (
+                      <div className="pt-3 mt-3 border-t border-[#1e2126] flex flex-col gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 block mb-1">Shop Actions:</span>
+                        <div className="flex gap-2">
+                          
+                          {order.orderStatus === 'Processing' && (
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateStatus(3)}
+                              disabled={isUpdatingStatus !== null}
+                              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold uppercase tracking-widest py-2 rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                              {isUpdatingStatus === 3 && <Loader2 className="w-3 h-3 animate-spin" />}
+                              Mark Shipped
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateStatus(4)}
+                            disabled={isUpdatingStatus !== null}
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-white text-[10px] font-bold uppercase tracking-widest py-2 rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                          >
+                            {isUpdatingStatus === 4 && <Loader2 className="w-3 h-3 animate-spin" />}
+                            Mark Completed
+                          </button>
+
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>

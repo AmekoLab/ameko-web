@@ -108,7 +108,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
       icon: ShoppingCart,
       items: [
         { name: "Orders", path: "/shop/orders" },
-        { name: "Wallet", path: "/shop/wallet" },
+        // { name: "Wallet", path: "/shop/wallet" },
         { name: "Vouchers", path: "/shop/vouchers" },
       ],
     },
