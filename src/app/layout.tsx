@@ -3,6 +3,8 @@ import { Inter, Oswald } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "../store/StoreProvider";
 import { CartSidebar } from "../components/Cart/CartSideBar";
+import GlobalChatInitializer from "../components/chat/GlobalChatInitializer";
+import FloatingChatWidget from "../components/chat/FloatingChatWidget";
 
 // Font chính (Inter)
 const inter = Inter({
@@ -34,8 +36,10 @@ export default function RootLayout({
         className={`${inter.variable} ${oswald.variable} antialiased font-sans`}
       >
         <StoreProvider>
+          <GlobalChatInitializer />
           {children}
           <CartSidebar />
+          <FloatingChatWidget />
         </StoreProvider>
       </body>
     </html>
