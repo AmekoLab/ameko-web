@@ -22,6 +22,7 @@ import { ImageModal } from "../Community/ImageModal";
 
 import { FollowsModal } from "./FollowModal";
 import { CreateCommissionModal } from "./CreateCommissionModal";
+import { startConversationThunk } from "@/src/store/slices/chatSlice";
 
 interface ProfileHeaderProps {
   profile: ShopPublicProfile;
@@ -269,7 +270,10 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                     </div>
                   )}
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-[#202030] border border-white/10 hover:bg-[#2a2a3a] text-white font-bold text-sm rounded-sm transition-colors">
+                <button 
+                  onClick={() => dispatch(startConversationThunk(profile.userId))}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#202030] border border-white/10 hover:bg-[#2a2a3a] text-white font-bold text-sm rounded-sm transition-colors"
+                >
                   <MessageCircle className="w-4 h-4" /> Chat
                 </button>
               </>

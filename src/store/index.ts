@@ -16,6 +16,7 @@ import orderReducer from "./slices/orderSlice";
 import warrantyReducer from "./slices/warrantySlice";
 import shopWarrantyReducer from "./slices/shopWarrantySlice";
 import adminWarrantyReducer from "./slices/adminWarrantySlice";
+import chatReducer from "./slices/chatSlice";
 
 export const store = configureStore({
   reducer: {
@@ -36,6 +37,7 @@ export const store = configureStore({
     warranty: warrantyReducer,
     shopWarranty: shopWarrantyReducer,
     adminWarranty: adminWarrantyReducer,
+    chat: chatReducer,
   },
 });
 export type RootState = ReturnType<typeof store.getState>;
