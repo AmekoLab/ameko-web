@@ -14,6 +14,33 @@ export interface Conversation {
   unreadCount: number;
 }
 
+export enum ReactionType {
+  Like = 0,
+  Love = 1,
+  Haha = 2,
+  Wow = 3,
+  Sad = 4,
+  Angry = 5,
+}
+
+export const REACTION_EMOJIS: Record<number, string> = {
+  [ReactionType.Like]: "👍",
+  [ReactionType.Love]: "❤️",
+  [ReactionType.Haha]: "😂",
+  [ReactionType.Wow]: "😮",
+  [ReactionType.Sad]: "😢",
+  [ReactionType.Angry]: "😡",
+};
+
+export const REACTION_LABELS: Record<number, string> = {
+  [ReactionType.Like]: "Like",
+  [ReactionType.Love]: "Love",
+  [ReactionType.Haha]: "Haha",
+  [ReactionType.Wow]: "Wow",
+  [ReactionType.Sad]: "Sad",
+  [ReactionType.Angry]: "Angry",
+};
+
 export interface Message {
   id: number;
   conversationId: number;
@@ -24,7 +51,7 @@ export interface Message {
   createdAt: string;
   tempId?: string;
   status?: "sending" | "sent" | "error";
-  reactions?: Record<string, number> | { userId: string; reaction: number }[]; 
+  reaction?: number | null;
   isRead?: boolean;
 }
 

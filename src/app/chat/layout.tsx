@@ -1,45 +1,14 @@
-import { Header } from "@/src/components/Header/Header";
-import "../globals.css";
-import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
+import type { Metadata } from "next";
+import AuthProvider from "@/src/providers/AuthProvider";
 
-import { Inter, Oswald } from "next/font/google";
-import { Footer } from "@/src/components/Footer/Footer";
-
-const oswald = Oswald({
-  subsets: ["latin", "vietnamese"],
-  weight: ["300", "400", "500", "700"],
-  display: "swap",
-  variable: "--font-oswald",
-});
-
-const inter = Inter({
-  subsets: ["latin", "vietnamese"],
-  display: "swap",
-  variable: "--font-inter",
-});
-
-export const metadata = {
-  title: "AMEKO - Community",
-  description: "Cộng đồng bàn phím cơ Việt Nam",
+export const metadata: Metadata = {
+  title: "AMEKO - Messages",
+  description: "Chat with shops and community members",
 };
 
-export default function ChatLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className={`flex flex-col min-h-screen bg-black ${inter.className} ${oswald.variable}`}
-    >
-      <LayoutWrapper>
-        <div className={`${oswald.className} sticky top-0 z-40`}>
-          <Header />
-        </div>
-
-        <main className="flex-grow">{children}</main>
-        <Footer />
-      </LayoutWrapper>
-    </div>
-  );
+// Chat page uses its own full-screen layout — no header/footer/padding wrapper.
+// AuthProvider is required here so checkTokenAndFetchProfile runs on hard reload
+// and isAuthInitialized reaches true (preventing the infinite spinner in ChatPage).
+export default function ChatLayout({ children }: { children: React.ReactNode }) {
+  return <AuthProvider>{children}</AuthProvider>;
 }
