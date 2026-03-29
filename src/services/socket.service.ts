@@ -16,12 +16,13 @@ import { Message } from "@/src/types/chat.types";
 interface ReactionChangedPayload {
   conversationId: number;
   messageId: number;
-  reactions: Message["reactions"];
+  reaction: Message["reaction"];
 }
 
 interface ReadReceiptPayload {
   conversationId: number;
-  messageIds: number[];
+  userId: string;
+  upToMessageId: number;
 }
 
 function buildHubUrl(): string {
@@ -82,18 +83,18 @@ class SocketService {
   }
 
   async joinConversation(conversationId: string): Promise<void> {
-    this.assertConnected();
+    if (!this.connection || this.connection.state !== HubConnectionState.Connected) return;
     try {
-      await this.connection!.invoke("JoinConversation", conversationId);
+      await this.connection.invoke("JoinConversation", Number(conversationId));
     } catch (err) {
       console.error(`[SocketService] Failed to join conversation.`, err);
     }
   }
 
   async leaveConversation(conversationId: string): Promise<void> {
-    this.assertConnected();
+    if (!this.connection || this.connection.state !== HubConnectionState.Connected) return;
     try {
-      await this.connection!.invoke("LeaveConversation", conversationId);
+      await this.connection.invoke("LeaveConversation", Number(conversationId));
     } catch (err) {
       console.error(`[SocketService] Failed to leave conversation.`, err);
     }
@@ -126,8 +127,14 @@ class SocketService {
       this.dispatch?.(updateMessageReaction(data));
     });
 
+    // Backend sends: { conversationId, userId, upToMessageId }
+    // Reducer expects: { conversationId, messageIds: number[] }
+    // We signal the receipt for all currently loaded messages up to upToMessageId
     this.connection.on("readReceipt", (data: ReadReceiptPayload) => {
-      this.dispatch?.(markMessagesAsRead(data));
+      this.dispatch?.(markMessagesAsRead({
+        conversationId: data.conversationId,
+        messageIds: data.upToMessageId != null ? [data.upToMessageId] : [],
+      }));
     });
   }
 

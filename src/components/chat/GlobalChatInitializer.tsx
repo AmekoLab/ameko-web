@@ -12,9 +12,11 @@ export default function GlobalChatInitializer() {
 
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const isInitialized = useAppSelector((state) => state.auth.isInitialized);
-  
+  const conversationsInitialized = useAppSelector((state) => state.chat.conversationsInitialized);
+  const isLoadingConversations = useAppSelector((state) => state.chat.isLoadingConversations);
+
   const activeConversationId = useAppSelector((state) => state.chat.activeConversationId);
-  
+
   // Use a ref so the socket event listener always sees the latest activeConversationId
   // without needing to re-bind the listener on every render or state change.
   const activeIdRef = useRef(activeConversationId);
@@ -26,37 +28,51 @@ export default function GlobalChatInitializer() {
 
   // ── Listener Registration ────────────────────────────────
   useEffect(() => {
-    // This stable callback won't be re-created thanks to the refs
     const handleNewMessage = (message: Message) => {
       dispatch(receiveMessage(message));
-      
-      // If it's for a different conversation, trigger a toast
       if (activeIdRef.current !== message.conversationId) {
-         toast.success("New message received!");
+        toast.success("New message received!");
       }
     };
-
     socketService.onMessageReceived(handleNewMessage);
-    
-    // Cleanup the specific handler on unmount
     return () => socketService.offMessageReceived(handleNewMessage);
   }, [dispatch]);
 
-  // ── Connection Lifecycle ─────────────────────────────────
+  // ── Step 1: Fetch conversations immediately on auth-ready ────────────────
+  // This is decoupled from the socket so the UI hydrates fast on every page
+  // load / reload, even before the WebSocket is established.
+  useEffect(() => {
+    if (!isInitialized || !isAuthenticated) return;
+    if (conversationsInitialized || isLoadingConversations) return;
+    dispatch(fetchInitialConversations());
+  }, [isInitialized, isAuthenticated, conversationsInitialized, isLoadingConversations, dispatch]);
+
+  // ── Step 2: Connect socket & join SignalR groups ─────────────────────────
+  // Runs independently after auth is confirmed. Once connected, joins all
+  // existing conversation groups so real-time messages are delivered.
   useEffect(() => {
     if (!isInitialized) return;
 
     if (isAuthenticated) {
       const token = typeof window !== "undefined" ? (localStorage.getItem("token") ?? "") : "";
       if (!token) return;
-
       if (isConnectedRef.current) return;
       isConnectedRef.current = true;
 
       (async () => {
         try {
           await socketService.connect(token, dispatch);
-          dispatch(fetchInitialConversations());
+          // After connecting, join all conversation groups. We read the slice
+          // state via a one-time selector result — the fetch may have already
+          // finished by the time the socket connects.
+          const result = await dispatch(fetchInitialConversations());
+          const conversations =
+            (result.payload as { conversationId: number }[] | undefined) ?? [];
+          await Promise.all(
+            conversations.map((c) =>
+              socketService.joinConversation(c.conversationId.toString()),
+            ),
+          );
         } catch {
           isConnectedRef.current = false;
         }
@@ -71,6 +87,16 @@ export default function GlobalChatInitializer() {
       isConnectedRef.current = false;
     };
   }, [isAuthenticated, isInitialized, dispatch]);
+
+  // ── Join group whenever a conversation is newly opened ───────────────────
+  useEffect(() => {
+    if (activeConversationId == null) return;
+    socketService
+      .joinConversation(activeConversationId.toString())
+      .catch((err) =>
+        console.warn("[GlobalChatInitializer] joinConversation failed:", err),
+      );
+  }, [activeConversationId]);
 
   return null;
 }

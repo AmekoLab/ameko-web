@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${oswald.variable} antialiased font-sans`}
+        className={`custom-scrollbar ${inter.variable} ${oswald.variable} antialiased font-sans`}
       >
         <StoreProvider>
           <GlobalChatInitializer />

@@ -108,6 +108,10 @@ interface ChatState {
   messages: Record<number, Message[]>;
   connectionStatus: ConnectionStatus;
   isWidgetOpen: boolean;
+  /** true while fetchInitialConversations is in-flight */
+  isLoadingConversations: boolean;
+  /** true once at least one successful fetch has completed */
+  conversationsInitialized: boolean;
 }
 
 const initialState: ChatState = {
@@ -116,6 +120,8 @@ const initialState: ChatState = {
   messages: {},
   connectionStatus: "disconnected",
   isWidgetOpen: false,
+  isLoadingConversations: false,
+  conversationsInitialized: false,
 };
 
 // ─── Helpers ─────────────────────────────────────────────
@@ -193,12 +199,12 @@ export const chatSlice = createSlice({
       const { conversationId, messages } = action.payload;
       state.messages[conversationId] = messages;
     },
-    updateMessageReaction(state, action: PayloadAction<{ conversationId: number; messageId: number; reactions: any }>) {
-      const { conversationId, messageId, reactions } = action.payload;
+    updateMessageReaction(state, action: PayloadAction<{ conversationId: number; messageId: number; reaction: any }>) {
+      const { conversationId, messageId, reaction } = action.payload;
       const bucket = state.messages[conversationId];
       if (!bucket) return;
       const message = bucket.find((m) => m.id === messageId);
-      if (message) message.reactions = reactions;
+      if (message) message.reaction = reaction;
     },
     optimisticMarkAsRead(state, action: PayloadAction<{ conversationId: number }>) {
       const conversation = state.conversations.find((c) => c.conversationId === action.payload.conversationId);
@@ -219,11 +225,20 @@ export const chatSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchInitialConversations.pending, (state) => {
+        state.isLoadingConversations = true;
+      })
       .addCase(fetchInitialConversations.fulfilled, (state, action) => {
+        state.isLoadingConversations = false;
+        state.conversationsInitialized = true;
         state.conversations = action.payload;
         action.payload.forEach((c: Conversation) => {
           if (!state.messages[c.conversationId]) state.messages[c.conversationId] = [];
         });
+      })
+      .addCase(fetchInitialConversations.rejected, (state) => {
+        state.isLoadingConversations = false;
+        state.conversationsInitialized = true; // mark done even on error so we don't loop
       })
       .addCase(fetchMessagesThunk.fulfilled, (state, action) => {
         const { conversationId, items } = action.payload;
@@ -235,24 +250,8 @@ export const chatSlice = createSlice({
         if (!bucket) return;
         const message = bucket.find((m) => m.id === messageId);
         if (!message) return;
-        
-        const responseData = action.payload as any;
-        const userId = responseData?.userId;
-        if (!userId) return;
-
-        let currentReactions = message.reactions || [];
-        if (!Array.isArray(currentReactions)) {
-          currentReactions = Object.entries(currentReactions).map(([uId, r]) => ({ userId: uId, reaction: r as number }));
-        }
-
-        const existingIdx = currentReactions.findIndex((r) => r.userId === userId);
-        if (reaction === null) {
-          if (existingIdx !== -1) currentReactions.splice(existingIdx, 1);
-        } else {
-          if (existingIdx !== -1) currentReactions[existingIdx].reaction = reaction;
-          else currentReactions.push({ userId, reaction });
-        }
-        message.reactions = currentReactions;
+        // API returns a single number reaction value (or null to remove)
+        message.reaction = reaction;
       })
       .addCase(sendMessageThunk.pending, (state, action) => {
         const { conversationId, content, messageType, tempId, senderId } = action.meta.arg;
