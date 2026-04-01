@@ -352,12 +352,12 @@ export const Header: FC = () => {
                 </button>
 
                 {userDropdownOpen && (
-                  <div className="absolute right-0 mt-1 w-52 bg-[#111] border border-white/15 shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
-                    <div className="px-4 py-2.5 border-b border-white/10">
-                      <p className="text-white font-bold truncate text-xs">
+                  <div className="absolute right-0 mt-2 w-52 bg-[#111] border border-white/15 shadow-2xl py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right rounded-md">
+                    <div className="px-4 py-2.5 border-b border-white/10 mb-1">
+                      <p className="text-white font-semibold truncate text-[13px] leading-tight">
                         {user.email}
                       </p>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-0.5">
+                      <p className="text-[10px] text-gray-400 mt-0.5 font-medium">
                         {user.role}
                       </p>
                     </div>
@@ -421,16 +421,16 @@ export const Header: FC = () => {
                         <Link
                           key={item.href}
                           href={item.href}
-                          className="block px-4 py-2 text-[11px] text-gray-300 hover:bg-white/5 hover:text-white uppercase tracking-wider transition-colors"
+                          className="block px-4 py-2 text-[12px] text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                           onClick={() => setUserDropdownOpen(false)}
                         >
                           {item.label}
                         </Link>
                       ))}
-                    <div className="border-t border-white/10 mt-1">
+                    <div className="border-t border-white/10 mt-1 pt-1">
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-[11px] text-[#ce2a32] hover:bg-white/5 uppercase tracking-wider transition-colors"
+                        className="w-full text-left px-4 py-2 text-[12px] font-semibold text-[#ce2a32] hover:bg-white/10 transition-colors"
                       >
                         Sign Out
                       </button>

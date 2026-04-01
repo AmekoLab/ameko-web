@@ -12,6 +12,8 @@ import {
   ChevronRight,
   Loader2,
   ChevronUp,
+  X,
+  Store,
 } from "lucide-react";
 import { orderService } from "@/src/services/order.service";
 import { CartData, OrderItem } from "@/src/types/order.types";
@@ -92,6 +94,11 @@ const CheckoutItemRow = ({ item }: { item: OrderItem }) => {
           <h3 className="font-medium text-sm text-gray-800 truncate capitalize">
             {item.productName}
           </h3>
+          {/* {item.shopName && (
+            <p className="text-xs text-gray-500 mt-0.5 truncate">
+              Shop: <span className="font-medium text-gray-700">{item.shopName}</span>
+            </p>
+          )} */}
           {isCustom && (
             <button
               onClick={() => setShowComponents(!showComponents)}
@@ -109,7 +116,7 @@ const CheckoutItemRow = ({ item }: { item: OrderItem }) => {
 
         {/* Price */}
         <p className="font-medium text-sm text-gray-800 tabular-nums shrink-0">
-          {item.totalPrice.toLocaleString()}₫
+          {item.totalPrice.toLocaleString("vi-VN")}₫
         </p>
       </div>
 
@@ -171,6 +178,7 @@ function CheckoutContent() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [activePolicy, setActivePolicy] = useState<"terms" | "privacy" | "returns" | null>(null);
 
   const [form, setForm] = useState<CheckoutForm>({
     receiverName: "",
@@ -341,6 +349,16 @@ function CheckoutContent() {
     ? (cartPreview.totalCartSubTotal ?? selectedTotal) - (cartPreview.totalDiscountAmount ?? 0)
     : selectedTotal;
 
+  // Group selected items by shop for Shopee-style rendering
+  const groupedItems = useMemo(() => {
+    return selectedItems.reduce<Record<string, typeof selectedItems>>((acc, item) => {
+      const key = item.shopName || "AMK Collective Official";
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(item);
+      return acc;
+    }, {});
+  }, [selectedItems]);
+
 
   // ─── Loading ─────────────────────────────────────────────
   if (loading) {
@@ -392,6 +410,7 @@ function CheckoutContent() {
       ═══════════════════════════════════════════════════════ */}
       <div className="flex-1 lg:flex-[0_0_58%] lg:order-1 order-2 bg-white px-4 md:px-8 lg:px-14 py-8 lg:py-12 border-r border-gray-200">
         <form
+          id="checkout-form"
           onSubmit={handleSubmit}
           className="max-w-[600px] ml-auto mr-auto lg:mr-0"
         >
@@ -401,7 +420,13 @@ function CheckoutContent() {
               AMEKO STORE
             </h1>
           </Link>
-
+{/* 
+          <Link
+            href="/cart"
+            className="text-[#ce2a32] hover:text-[#a01e25] transition-colors text-sm inline-flex items-center gap-1 mb-8"
+          >
+            <ChevronRight className="w-4 h-4 rotate-180" /> Return to cart
+          </Link> */}
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-xs text-gray-500 mb-6">
             <Link href="/cart" className="text-[#ce2a32] hover:underline">
@@ -412,6 +437,7 @@ function CheckoutContent() {
             <ChevronRight className="w-3 h-3" />
             <span>Payment</span>
           </nav>
+
 
           {/* ─── Shipping Information ─────────────────────── */}
           <div className="mb-8">
@@ -547,29 +573,35 @@ function CheckoutContent() {
           </div>
 
           {/* ─── Footer Actions ───────────────────────────── */}
-          <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-4 mt-10">
-            <Link
-              href="/cart"
-              className="text-[#ce2a32] hover:text-[#a01e25] transition-colors text-sm flex items-center gap-1"
-            >
-              <ChevronRight className="w-4 h-4 rotate-180" /> Return to cart
-            </Link>
-            <button
-              type="submit"
-              disabled={submitting || isCalculatingPreview || cartPreview === null}
-              className="w-full md:w-auto bg-[#1a1a1a] hover:bg-black text-white px-8 py-4 rounded-md font-medium transition-colors text-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Processing...
-                </>
-              ) : paymentMethod === 1 ? (
-                "Pay with Wallet"
-              ) : (
-                "Pay with Stripe"
-              )}
-            </button>
+       <div className="mt-10 border-t border-gray-200 pt-6">
+  <p className="text-[11px] md:text-xs text-gray-500 leading-relaxed mb-6 text-justify">
+    By placing your order, you confirm that you have read, understood, and agree to be bound by AMK Collective&apos;s{" "}
+    <button
+      type="button"
+      onClick={() => setActivePolicy("terms")}
+      className="font-bold text-gray-800 hover:text-[#ce2a32] hover:underline transition-colors"
+    >
+      Terms of Use and Sale
+    </button>
+    . You also acknowledge that your personal information will be securely collected and processed in accordance with our{" "}
+    <button
+      type="button"
+      onClick={() => setActivePolicy("privacy")}
+      className="font-bold text-gray-800 hover:text-[#ce2a32] hover:underline transition-colors"
+    >
+      Privacy Policy
+    </button>{" "}
+    to fulfill your order and enhance your shopping experience. All financial transactions are fully encrypted and processed through secure third-party payment gateways; we do not store your full credit card details on our servers. For details regarding cancellations or refunds, please refer to our{" "}
+    <button
+      type="button"
+      onClick={() => setActivePolicy("returns")}
+      className="font-bold text-gray-800 hover:text-[#ce2a32] hover:underline transition-colors"
+    >
+      Return & Refund Policy
+    </button>
+    .
+  </p>
+
           </div>
         </form>
       </div>
@@ -598,7 +630,7 @@ function CheckoutContent() {
             {isCalculatingPreview ? (
               <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
             ) : (
-              `${displayTotal.toLocaleString()}₫`
+              `${displayTotal.toLocaleString("vi-VN")}₫`
             )}
           </span>
         </button>
@@ -609,12 +641,24 @@ function CheckoutContent() {
             isSummaryOpen ? "block" : "hidden"
           } max-w-[400px]`}
         >
-          {/* Product List */}
-          <div className="space-y-4 mb-6">
-            {selectedItems.map((item) => (
-              <CheckoutItemRow key={item.orderItemId} item={item} />
-            ))}
-          </div>
+          {/* Product List — grouped by shop */}
+          {Object.entries(groupedItems).map(([shopName, items]) => (
+            <div key={shopName} className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm mb-4">
+              {/* Shop Header */}
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100 bg-gray-50/80">
+                <Store className="w-4 h-4 text-gray-500 shrink-0" />
+                <span className="font-semibold text-sm text-gray-800 tracking-tight truncate">
+                  {shopName}
+                </span>
+              </div>
+              {/* Items */}
+              <div className="p-4 space-y-4">
+                {items.map((item) => (
+                  <CheckoutItemRow key={item.orderItemId} item={item} />
+                ))}
+              </div>
+            </div>
+          ))}
 
           {/* Cost Breakdown */}
           <div className="space-y-3 border-t border-gray-200 pt-6 pb-6 mb-6 text-sm text-gray-600">
@@ -624,7 +668,7 @@ function CheckoutContent() {
                   {isCalculatingPreview ? (
                     <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
                   ) : (
-                    `${(cartPreview?.totalCartSubTotal ?? selectedTotal).toLocaleString()}₫`
+                    `${(cartPreview?.totalCartSubTotal ?? selectedTotal).toLocaleString("vi-VN")}₫`
                   )}
                 </span>
               </div>
@@ -641,7 +685,7 @@ function CheckoutContent() {
                   {isCalculatingPreview ? (
                     <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
                   ) : (
-                    `-${cartPreview!.totalDiscountAmount.toLocaleString()}₫`
+                    `-${cartPreview!.totalDiscountAmount.toLocaleString("vi-VN")}₫`
                   )}
                 </span>
               </div>
@@ -649,7 +693,7 @@ function CheckoutContent() {
           </div>
 
           {/* Total */}
-          <div className="flex justify-between items-center border-t border-gray-200 pt-6">
+          <div className="flex justify-between items-center border-t border-gray-200 pt-6 mb-6">
             <span className="text-base font-medium text-gray-800">Total</span>
             <div className="flex items-baseline gap-2">
               <span className="text-xs text-gray-500 font-medium">VND</span>
@@ -657,13 +701,87 @@ function CheckoutContent() {
                 {isCalculatingPreview ? (
                   <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
                 ) : (
-                  `${displayTotal.toLocaleString()}₫`
+                  `${displayTotal.toLocaleString("vi-VN")}₫`
                 )}
               </span>
             </div>
           </div>
+
+          {/* Pay Button */}
+          <button
+            type="submit"
+            form="checkout-form"
+            disabled={submitting || isCalculatingPreview || cartPreview === null}
+            className="w-full bg-[#1a1a1a] hover:bg-black text-white px-10 py-4 rounded-md font-medium transition-colors text-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Processing...
+              </>
+            ) : paymentMethod === 1 ? (
+              "Pay with Wallet"
+            ) : (
+              "Pay with Stripe"
+            )}
+          </button>
         </div>
       </div>
+
+      {activePolicy && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden max-h-[85vh] animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900">
+                {activePolicy === "terms" && "Terms of Use and Sale"}
+                {activePolicy === "privacy" && "Privacy Policy"}
+                {activePolicy === "returns" && "Return & Refund Policy"}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setActivePolicy(null)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors focus:outline-none"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="px-6 py-5 overflow-y-auto flex-1 text-sm text-gray-600 space-y-4">
+              {activePolicy === "terms" && (
+                <>
+                  <p>Welcome to AMK Collective. By accessing our platform, you agree to these terms.</p>
+                  <p>All products sold are subject to availability. Prices may change without notice.</p>
+                  <p>We are not liable for external delays in shipping once the product is handed over to the carrier.</p>
+                </>
+              )}
+              {activePolicy === "privacy" && (
+                <>
+                  <p>Your privacy is critically important to us.</p>
+                  <p>We only collect personal information that is necessary to process your order and deliver your items.</p>
+                  <p>We will never sell your personal contact information or credit card details to third parties.</p>
+                </>
+              )}
+              {activePolicy === "returns" && (
+                <>
+                  <p>We accept returns within 14 days of receipt for most items in new condition.</p>
+                  <p>Custom-built products may be subject to a restocking fee.</p>
+                  <p>Refunds will be processed to the original method of payment within 5-7 business days of receiving the returned item.</p>
+                </>
+              )}
+            </div>
+
+            <div className="p-4 sm:p-6 border-t border-gray-100 bg-gray-50 mt-auto">
+              <button
+                type="button"
+                onClick={() => setActivePolicy(null)}
+                className="w-full bg-gray-900 hover:bg-black text-white py-2.5 rounded-xl font-medium transition-colors focus:outline-none"
+              >
+                I Understand & Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
