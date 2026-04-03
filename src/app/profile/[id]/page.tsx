@@ -63,7 +63,7 @@ export default async function ProfilePage({ params }: PageProps) {
     <div className="bg-[#FAFAFA] min-h-screen">
       <div className="max-w-[1280px] mx-auto px-2 lg:px-2">
         <ProfileHeader profile={profile} />
-        <ProfileView profile={profile} initialPosts={posts.data} />
+        {/* <ProfileView profile={profile} initialPosts={posts.data} /> */}
       </div>
     </div>
   );

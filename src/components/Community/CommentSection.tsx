@@ -3,8 +3,9 @@
 import { FC, useState, useEffect } from "react";
 import Image from "next/image";
 import { Send, Loader2 } from "lucide-react";
-import { PostComment } from "@/src/types/community";
-import { CommunityService } from "@/src/services/community.service";
+import { SocialComment } from "@/src/types/social.types";
+import { socialService } from "@/src/services/social.service";
+import toast from "react-hot-toast";
 import { CommentItem } from "./CommentItem";
 
 interface CommentSectionProps {
@@ -17,10 +18,14 @@ export const CommentSection: FC<CommentSectionProps> = ({
   postId,
   onCommentAdded,
 }) => {
-  const [comments, setComments] = useState<PostComment[]>([]);
+  const [comments, setComments] = useState<SocialComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [inputValue, setInputValue] = useState("");
   const [isPosting, setIsPosting] = useState(false);
+
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // TODO: [PAGINATION] Thêm state để quản lý phân trang comment
   // const [page, setPage] = useState(1);
@@ -32,25 +37,36 @@ export const CommentSection: FC<CommentSectionProps> = ({
     "https://res.cloudinary.com/doezwafgz/image/upload/v1765602783/a0a1d1831b40575009c07fad4634ef52_y23lze.jpg";
 
   // 1. Fetch Comments khi mở ra
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        // TODO: [API] Truyền thêm tham số page/limit nếu Backend hỗ trợ phân trang
-        const data = await CommunityService.getComments(postId);
-        setComments(data);
-      } catch (error) {
-        console.error("Failed to load comments", error);
-        // TODO: [UX] Hiển thị Toast lỗi nhẹ nhàng
-      } finally {
-        setLoading(false);
+  const fetchComments = async (cursor?: string | null) => {
+    try {
+      const res = await socialService.getComments(postId, 5, cursor);
+      if (res.success && res.data) {
+        if (cursor) {
+          setComments((prev) => [...res.data.items, ...prev]);
+        } else {
+          setComments(res.data.items);
+        }
+        setNextCursor(res.data.nextCursor);
+        setHasMore(res.data.hasMore);
       }
-    };
+    } catch (error) {
+      console.error("Failed to load comments", error);
+      toast.error("Không thể tải bình luận lúc này");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // TODO: [REALTIME] Lắng nghe sự kiện socket 'new_comment' để cập nhật list ngay khi người khác comment
-    // socket.on(`post_${postId}_comment`, (newComment) => { ... });
-
+  useEffect(() => {
     fetchComments();
   }, [postId]);
+
+  const handleLoadMore = async () => {
+    if (!hasMore || isLoadingMore) return;
+    setIsLoadingMore(true);
+    await fetchComments(nextCursor);
+    setIsLoadingMore(false);
+  };
 
   // 2. Handle Submit Comment
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,34 +82,40 @@ export const CommentSection: FC<CommentSectionProps> = ({
     setIsPosting(true);
 
     try {
-      // Gọi API
-      const newComment = await CommunityService.addComment(postId, content);
+      const res = await socialService.addComment(postId, { content });
 
-      // Thêm vào list hiển thị
-      setComments((prev) => [...prev, newComment]);
-
-      // Callback cập nhật số lượng ở PostCard
-      if (onCommentAdded) onCommentAdded();
+      if (res.success && res.data) {
+        setComments((prev) => [...prev, res.data]);
+        if (onCommentAdded) onCommentAdded();
+      }
     } catch (error) {
       console.error("Failed to post comment");
-      setInputValue(content); // Trả lại text nếu lỗi
-      // TODO: [UX] Toast error: "Gửi bình luận thất bại"
+      setInputValue(content);
+      toast.error("Gửi bình luận thất bại");
     } finally {
       setIsPosting(false);
     }
   };
 
   return (
-    <div className="border-t border-gray-100 pt-3 mt-3 px-4 pb-4">
+    <div className="border-t border-[#2a2d31] pt-3 mt-3 px-4 pb-4">
       {/* Loading State */}
       {loading ? (
         <div className="flex justify-center py-4">
           <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
         </div>
       ) : (
-        <div className="space-y-4 mb-4">
-          {/* TODO: [PAGINATION] Nút "Xem các bình luận trước đó" nếu có nhiều comment */}
-          {/* {hasMoreComments && <button onClick={loadMore} className="text-xs text-gray-500 font-bold hover:underline">View previous comments</button>} */}
+        <div className="space-y-4 mb-4 flex flex-col">
+          {hasMore && (
+            <button
+              onClick={handleLoadMore}
+              disabled={isLoadingMore}
+              className="text-xs text-gray-500 font-bold hover:underline mb-2 flex items-center justify-center gap-1 self-center"
+            >
+              {isLoadingMore && <Loader2 className="w-3 h-3 animate-spin" />}
+              {isLoadingMore ? "Loading..." : "View previous comments"}
+            </button>
+          )}
 
           {comments.map((comment) => (
             <CommentItem key={comment.id} comment={comment} />
@@ -109,7 +131,7 @@ export const CommentSection: FC<CommentSectionProps> = ({
 
       {/* Input Area */}
       <div className="flex gap-3 items-start">
-        <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 bg-gray-200">
+        <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 bg-[#2a2d31]">
           <Image
             src={currentUserAvatar} // Đã thay bằng biến const ở trên
             alt="Me"
@@ -124,7 +146,7 @@ export const CommentSection: FC<CommentSectionProps> = ({
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Write a comment..."
             // TODO: [UX] Thêm sự kiện onKeyDown để xử lý Enter -> Submit (Shift+Enter -> Xuống dòng)
-            className="w-full bg-gray-100 rounded-2xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-gray-300 pr-10"
+            className="w-full bg-[#111] text-white rounded-2xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#555] placeholder-gray-400 pr-10"
           />
           <button
             type="submit"

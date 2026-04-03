@@ -17,7 +17,7 @@ export const LeftSidebar: FC = () => (
       text="Trending Builds"
     />
 
-    <div className="border-t border-gray-200 my-4"></div>
+    <div className="border-t border-[#2a2d31] my-4"></div>
 
     <h3 className="text-md font-black uppercase text-gray-400 mb-3 px-3 tracking-widest">
       My Groups
@@ -32,8 +32,8 @@ export const LeftSidebar: FC = () => (
 export const RightSidebar: FC = () => (
   <div className="sticky top-32 space-y-6">
     {/* Trending Tags */}
-    <div className="bg-white p-4 rounded-sm shadow-sm border border-gray-100">
-      <h3 className="text-sm font-black uppercase mb-4 text-black">
+    <div className="bg-[#1a1a1a] p-4 rounded-sm shadow-sm border border-[#2a2d31]">
+      <h3 className="text-sm font-black uppercase mb-4 text-white">
         Trending Tags
       </h3>
       <div className="flex flex-wrap gap-2">
@@ -41,7 +41,7 @@ export const RightSidebar: FC = () => (
           (tag) => (
             <span
               key={tag}
-              className="text-md bg-gray-100 hover:bg-[#ce2a32] hover:text-white transition-colors px-2 py-1 rounded-md cursor-pointer font-medium text-gray-600"
+              className="text-md bg-[#111] hover:bg-[#ce2a32] hover:text-white transition-colors px-2 py-1 rounded-md cursor-pointer font-medium text-gray-300"
             >
               {tag}
             </span>
@@ -51,8 +51,8 @@ export const RightSidebar: FC = () => (
     </div>
 
     {/* Top Builders */}
-    <div className="bg-white p-4 rounded-md shadow-sm border border-gray-100">
-      <h3 className="text-sm font-black uppercase mb-4 text-black">
+    <div className="bg-[#1a1a1a] p-4 rounded-md shadow-sm border border-[#2a2d31]">
+      <h3 className="text-sm font-black uppercase mb-4 text-white">
         Top Builders
       </h3>
       <ul className="space-y-4">
@@ -77,8 +77,8 @@ const SidebarLink = ({
   <div
     className={`flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer transition-colors ${
       active
-        ? "bg-white shadow-sm font-bold text-black border-l-4 border-[#ce2a32]"
-        : "hover:bg-white hover:shadow-sm text-gray-600"
+        ? "bg-[#111] shadow-sm font-bold text-white border-l-4 border-[#ce2a32]"
+        : "hover:bg-[#111] hover:shadow-sm text-gray-300"
     }`}
   >
     {icon}
@@ -87,9 +87,9 @@ const SidebarLink = ({
 );
 
 const SidebarGroup = ({ text }: { text: string }) => (
-  <div className="flex items-center gap-3 px-3 py-2 rounded-sm cursor-pointer hover:bg-white hover:shadow-sm transition-colors group">
-    <div className="w-8 h-8 rounded-lg bg-gray-200 group-hover:bg-gray-300 transition-colors"></div>
-    <span className="text-sm font-medium text-gray-700 group-hover:text-black">
+  <div className="flex items-center gap-3 px-3 py-2 rounded-sm cursor-pointer hover:bg-[#111] hover:shadow-sm transition-colors group">
+    <div className="w-8 h-8 rounded-lg bg-[#2a2d31] group-hover:bg-[#3a3d42] transition-colors"></div>
+    <span className="text-sm font-medium text-gray-400 group-hover:text-white">
       {text}
     </span>
   </div>
@@ -97,9 +97,9 @@ const SidebarGroup = ({ text }: { text: string }) => (
 
 const BuilderRow = ({ name, role }: { name: string; role: string }) => (
   <li className="flex items-center gap-3">
-    <div className="w-8 h-8 rounded-full bg-gray-200"></div>
+    <div className="w-8 h-8 rounded-full bg-[#2a2d31]"></div>
     <div>
-      <p className="text-md font-bold text-black hover:text-[#ce2a32] cursor-pointer">
+      <p className="text-md font-bold text-white hover:text-[#ce2a32] cursor-pointer">
         {name}
       </p>
       <p className="text-[10px] uppercase text-gray-400 font-bold">{role}</p>
