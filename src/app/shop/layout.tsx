@@ -43,7 +43,7 @@ export default function ShopLayout({ children }: { children: ReactNode }) {
             </main>
           </div>
 
-          <Footer />
+          {/* <Footer /> */}
         </div>
       </AuthWrapper>
     </LayoutWrapper>
