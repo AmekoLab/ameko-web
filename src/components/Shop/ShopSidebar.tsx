@@ -128,14 +128,17 @@ interface ShopSidebarProps {
   filters: {
     categories: string[];
     availability: string[];
+    layout: string[];
   };
-  onFilterChange: (type: "categories" | "availability", value: string) => void;
+  onFilterChange: (type: "categories" | "availability" | "layout", value: string) => void;
   onClearAll?: () => void;
   productCounts?: {
     [key: string]: number;
   };
   /** Dynamic category list derived from actual products */
   categoryList?: string[];
+  /** Dynamic layout list derived from actual products */
+  layoutList?: string[];
 }
 
 export const ShopSidebar: FC<ShopSidebarProps> = ({
@@ -144,6 +147,7 @@ export const ShopSidebar: FC<ShopSidebarProps> = ({
   onClearAll,
   productCounts = {},
   categoryList = [],
+  layoutList = [],
 }) => {
   const handleCategoryChange = useCallback(
     (value: string) => onFilterChange("categories", value),
@@ -152,6 +156,11 @@ export const ShopSidebar: FC<ShopSidebarProps> = ({
 
   const handleAvailabilityChange = useCallback(
     (value: string) => onFilterChange("availability", value),
+    [onFilterChange],
+  );
+
+  const handleLayoutChange = useCallback(
+    (value: string) => onFilterChange("layout", value),
     [onFilterChange],
   );
 
@@ -181,8 +190,18 @@ export const ShopSidebar: FC<ShopSidebarProps> = ({
     [categoryList, productCounts],
   );
 
+  const layoutOptions = useMemo<FilterOption[]>(
+    () =>
+      layoutList.map((layout) => ({
+        label: layout,
+        value: layout,
+        count: productCounts[`layout:${layout}`],
+      })),
+    [layoutList, productCounts],
+  );
+
   const hasActiveFilters =
-    filters.categories.length > 0 || filters.availability.length > 0;
+    filters.categories.length > 0 || filters.availability.length > 0 || filters.layout.length > 0;
 
   return (
     <aside
@@ -235,6 +254,16 @@ export const ShopSidebar: FC<ShopSidebarProps> = ({
         onChange={handleCategoryChange}
         options={categoryOptions}
       />
+
+      {/* Layout Filter */}
+      {layoutOptions.length > 0 && (
+        <FilterGroup
+          title="Layout"
+          selectedValues={filters.layout}
+          onChange={handleLayoutChange}
+          options={layoutOptions}
+        />
+      )}
     </aside>
   );
 };

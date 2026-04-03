@@ -36,6 +36,8 @@ const parseSearchParams = (searchParams: URLSearchParams) => {
       searchParams.get("categories")?.split(",").filter(Boolean) || [],
     availability:
       searchParams.get("availability")?.split(",").filter(Boolean) || [],
+    layout:
+      searchParams.get("layout")?.split(",").filter(Boolean) || [],
     sort: (searchParams.get("sort") as SortOption) || "featured",
     page: parseInt(searchParams.get("page") || "1", 10),
   };
@@ -44,6 +46,7 @@ const parseSearchParams = (searchParams: URLSearchParams) => {
 const buildSearchParams = (
   categories: string[],
   availability: string[],
+  layout: string[],
   sort: SortOption,
   page: number,
 ) => {
@@ -51,6 +54,7 @@ const buildSearchParams = (
   if (categories.length > 0) params.set("categories", categories.join(","));
   if (availability.length > 0)
     params.set("availability", availability.join(","));
+  if (layout.length > 0) params.set("layout", layout.join(","));
   if (sort !== "featured") params.set("sort", sort);
   if (page > 1) params.set("page", page.toString());
   return params.toString();
@@ -156,11 +160,29 @@ export default function ShopView() {
     [allProducts],
   );
 
+  // Compute dynamic layout list from actual product specs
+  const layoutList = useMemo(
+    () =>
+      [
+        ...new Set(
+          allProducts
+            .map((p) => p.specs?.layout)
+            .filter((l): l is string => Boolean(l) && l !== "N/A"),
+        ),
+      ],
+    [allProducts],
+  );
+
   const productCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     allProducts.forEach((p) => {
       counts[p.category] = (counts[p.category] || 0) + 1;
       counts[p.status] = (counts[p.status] || 0) + 1;
+      // Layout counts (prefixed to avoid collision)
+      const layout = p.specs?.layout;
+      if (layout && layout !== "N/A") {
+        counts[`layout:${layout}`] = (counts[`layout:${layout}`] || 0) + 1;
+      }
     });
     return counts;
   }, [allProducts]);
@@ -177,6 +199,9 @@ export default function ShopView() {
   const [selectedAvailability, setSelectedAvailability] = useState<string[]>(
     initialState.availability,
   );
+  const [selectedLayout, setSelectedLayout] = useState<string[]>(
+    initialState.layout,
+  );
   const [sortBy, setSortBy] = useState<SortOption>(initialState.sort);
   const [currentPage] = useState(initialState.page);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
@@ -188,6 +213,7 @@ export default function ShopView() {
     const params = buildSearchParams(
       selectedCategories,
       selectedAvailability,
+      selectedLayout,
       sortBy,
       currentPage,
     );
@@ -196,7 +222,7 @@ export default function ShopView() {
     startTransition(() => {
       router.replace(newUrl, { scroll: false });
     });
-  }, [selectedCategories, selectedAvailability, sortBy, currentPage, router]);
+  }, [selectedCategories, selectedAvailability, selectedLayout, sortBy, currentPage, router]);
 
   /*
     Filter & Sort Products
@@ -209,6 +235,11 @@ export default function ShopView() {
     }
     if (selectedAvailability.length > 0) {
       result = result.filter((p) => selectedAvailability.includes(p.status));
+    }
+    if (selectedLayout.length > 0) {
+      result = result.filter(
+        (p) => p.specs?.layout && selectedLayout.includes(p.specs.layout),
+      );
     }
 
     switch (sortBy) {
@@ -228,7 +259,7 @@ export default function ShopView() {
     }
 
     return result;
-  }, [allProducts, selectedCategories, selectedAvailability, sortBy]);
+  }, [allProducts, selectedCategories, selectedAvailability, selectedLayout, sortBy]);
 
   // Products currently shown (load-more pattern)
   const displayedProducts = useMemo(
@@ -242,7 +273,7 @@ export default function ShopView() {
     Handlers
    */
   const handleFilterChange = useCallback(
-    (type: "categories" | "availability", value: string) => {
+    (type: "categories" | "availability" | "layout", value: string) => {
       setVisibleCount(ITEMS_PER_PAGE); // reset on filter change
 
       if (type === "categories") {
@@ -251,10 +282,16 @@ export default function ShopView() {
             ? prev.filter((c) => c !== value)
             : [...prev, value],
         );
-      } else {
+      } else if (type === "availability") {
         setSelectedAvailability((prev) =>
           prev.includes(value)
             ? prev.filter((a) => a !== value)
+            : [...prev, value],
+        );
+      } else {
+        setSelectedLayout((prev) =>
+          prev.includes(value)
+            ? prev.filter((l) => l !== value)
             : [...prev, value],
         );
       }
@@ -270,6 +307,7 @@ export default function ShopView() {
   const handleClearFilters = useCallback(() => {
     setSelectedCategories([]);
     setSelectedAvailability([]);
+    setSelectedLayout([]);
     setSortBy("featured");
     setVisibleCount(ITEMS_PER_PAGE);
   }, []);
@@ -284,7 +322,7 @@ export default function ShopView() {
   }, []);
 
   const hasActiveFilters =
-    selectedCategories.length > 0 || selectedAvailability.length > 0;
+    selectedCategories.length > 0 || selectedAvailability.length > 0 || selectedLayout.length > 0;
 
   return (
     <div className="w-full bg-black text-white min-h-screen">
@@ -471,11 +509,13 @@ export default function ShopView() {
               filters={{
                 categories: selectedCategories,
                 availability: selectedAvailability,
+                layout: selectedLayout,
               }}
               onFilterChange={handleFilterChange}
               onClearAll={handleClearFilters}
               productCounts={productCounts}
               categoryList={categoryList}
+              layoutList={layoutList}
             />
           </aside>
 
