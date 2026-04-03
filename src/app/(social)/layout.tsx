@@ -1,5 +1,4 @@
 import { Header } from "@/src/components/Header/Header";
-import "../globals.css";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 
 import { Inter, Oswald } from "next/font/google";
@@ -29,7 +28,7 @@ export default function SocialLayout({
 }) {
   return (
     <div
-      className={`flex flex-col min-h-screen bg-[#f0f2f5] ${inter.className} ${oswald.variable}`}
+      className={`flex flex-col min-h-screen bg-black ${inter.className} ${oswald.variable}`}
     >
       <LayoutWrapper>
         <div className={`${oswald.className} sticky top-0 z-40`}>

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ProfileHeader } from "@/src/components/Profile/ProfileHeader";
 import { ProfileView } from "@/src/components/Profile/ProfileView";
 import { shopService } from "@/src/services/shopService";
-import { CommunityService } from "@/src/services/community.service";
+import { socialService } from "@/src/services/social.service";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -29,6 +29,7 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
+    console.error(error);
     return { title: "Shop Not Found" };
   }
 }
@@ -40,7 +41,7 @@ export default async function ProfilePage({ params }: PageProps) {
     // 1. Fetch dữ liệu Shop Profile và Posts đồng thời trên Server
     const [shopResponse, postsData] = await Promise.all([
       shopService.getShopById(id),
-      CommunityService.getPosts(1),
+      socialService.getUserPosts(id).catch(() => ({ data: { items: [] } })),
     ]);
 
     const shop = shopResponse.data;
@@ -55,7 +56,10 @@ export default async function ProfilePage({ params }: PageProps) {
         <div className="max-w-[1280px] mx-auto px-2 lg:px-2">
           {/* Truyền trực tiếp dữ liệu ShopPublicProfile vào component */}
           <ProfileHeader profile={shop} />
-          <ProfileView profile={shop} initialPosts={postsData?.data || []} />
+          <ProfileView
+            profile={shop}
+            initialPosts={postsData?.data?.items || []}
+          />
         </div>
       </div>
     );

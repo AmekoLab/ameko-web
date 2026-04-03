@@ -4,7 +4,7 @@ import { FC, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Product } from "@/src/types/profile";
 import { ShopPublicProfile } from "@/src/types/shop.types";
-import { Post } from "@/src/types/community";
+import { Post } from "@/src/types/social.types";
 import { ProfileSidebar } from "./ProfileSidebar";
 import FeedClient from "../Community/FeedClient";
 import { ProfileService } from "@/src/services/profile.service";
@@ -186,7 +186,9 @@ export const ProfileView: FC<{
 
         {/* TAB CONTENT */}
         <div className="min-h-[500px]">
-          {currentTab === "posts" && <FeedClient initialPosts={initialPosts} />}
+          {currentTab === "posts" && (
+            <FeedClient initialPosts={initialPosts} userId={profile.userId} />
+          )}
 
           {currentTab === "shop" && (
             <div>

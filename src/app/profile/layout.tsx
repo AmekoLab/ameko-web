@@ -1,5 +1,4 @@
 import { Inter, Oswald } from "next/font/google";
-import "../globals.css";
 import { Header } from "@/src/components/Header/Header";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 

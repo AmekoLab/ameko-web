@@ -45,7 +45,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
     {
       groupName: "Dashboard",
       icon: LayoutDashboard,
-      items: [{ name: "Dashboard", path: "/admin/dashboard" }],
+      items: [{ name: "Admin Dashboard", path: "/admin/dashboard" }],
     },
     {
       groupName: "User Management",
@@ -92,7 +92,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
     {
       groupName: "Dashboard",
       icon: LayoutDashboard,
-      items: [{ name: "Dashboard", path: "/shop/dashboard" }],
+      items: [{ name: "Shop Dashboard", path: "/shop/dashboard" }],
     },
     {
       groupName: "Catalog",
@@ -179,7 +179,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
       }`}
     >
       {/* Menu Area */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[#1e2126] scrollbar-track-transparent p-4 flex flex-col gap-2">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar p-4 flex flex-col gap-2">
         {menu.map((group) => {
           const Icon = group.icon;
           const isExpanded = expandedGroups[group.groupName] || false;
