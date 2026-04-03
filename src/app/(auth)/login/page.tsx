@@ -9,6 +9,7 @@ import { useAppDispatch } from "@/src/store/hook";
 import { loginAndFetchProfile } from "@/src/store/action/authActions";
 import { useLoginForm } from "@/src/features/auth/hooks/useLoginForm";
 import { LoginSchemaType } from "@/src/features/auth/schemas/login.schema";
+import { authService } from "@/src/services/authServices";
 
 import { InputField } from "@/src/components/ui/InputField";
 
@@ -23,8 +24,33 @@ export default function LoginPage() {
   // --- HANDLER: SUBMIT FORM ---
   const onSubmit = async (data: LoginSchemaType) => {
     try {
-      // 1. Gọi Action đăng nhập
-      // Lưu ý: Không dùng .unwrap() vì đây là Manual Thunk
+      // BƯỚC 1: Gọi login API trực tiếp để kiểm tra emailConfirmed
+      const loginRes = await authService.login({
+        email: data.username,
+        password: data.password,
+      });
+
+      if (!loginRes.success || !loginRes.data) {
+        throw new Error(loginRes.message || "Login failed");
+      }
+
+      // BƯỚC 2: Nếu email chưa xác thực → gửi OTP & redirect sang verify-email
+      if (loginRes.data.emailConfirmed === false) {
+        toast.info("Please confirm your email.");
+
+        // Gửi OTP tự động (fire-and-forget, không block redirect)
+        authService.sendOtp(loginRes.data.email).catch(() => {
+          // Silent fail – user can resend on the verify page
+        });
+
+        router.push(
+          "/auth/verify-email?email=" +
+            encodeURIComponent(loginRes.data.email),
+        );
+        return; // Dừng lại, KHÔNG lưu token
+      }
+
+      // BƯỚC 3: Email đã xác thực → chạy thunk đầy đủ (lưu token + fetch profile)
       const profile: any = await dispatch(
         loginAndFetchProfile({
           email: data.username,
@@ -32,9 +58,8 @@ export default function LoginPage() {
         }),
       );
 
-      // 2. Kiểm tra kết quả trả về
+      // 4. Kiểm tra kết quả trả về
       if (profile && profile.role) {
-        // Hiển thị thông báo chào mừng
         toast.success(
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-500" />
@@ -44,7 +69,7 @@ export default function LoginPage() {
           </div>,
         );
 
-        // 3. Điều hướng dựa trên Role
+        // Điều hướng dựa trên Role
         switch (profile.role) {
           case "Admin":
             router.push("/admin/dashboard");
@@ -57,14 +82,12 @@ export default function LoginPage() {
             break;
         }
       }
-   } catch (error: any) {
-      // 1. Dùng console.log thay vì console.error để Next.js không "cảnh sát" màn hình đỏ
-      // console.log("Login Error detail:", error); 
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Account or password is not correct!";
 
-      // 2. Bắt câu chửi của Backend (nếu có), không thì dùng câu mặc định
-      const errorMessage = error?.response?.data?.message || error?.message || "Tài khoản hoặc mật khẩu không chính xác!";
-      
-      // 3. Quăng Toast đỏ xịn xò cho khách hàng xem
       toast.error(errorMessage);
     }
   };
