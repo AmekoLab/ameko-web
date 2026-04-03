@@ -104,3 +104,63 @@ export interface UpdateUserResponse {
   emailConfirmed: boolean;
   phoneNumberConfirmed: boolean;
 }
+
+// --- Admin Dashboard Overview ---
+export interface AdminDashboardOverview {
+  fromUtc: string;
+  toUtc: string;
+  totalOrders: number;
+  completedOrders: number;
+  cancelledOrders: number;
+  refundedOrders: number;
+  grossMerchandiseValue: number;
+  netRevenue: number;
+  activeBuyers: number;
+  activeShops: number;
+  newUsers: number;
+  orderCompletionRate: number;
+}
+
+// --- Payment Health ---
+export interface PaymentMethodMetric {
+  method: number;
+  total: number;
+  successful: number;
+  failed: number;
+}
+
+export interface PaymentTypeMetric {
+  type: number;
+  total: number;
+  amount: number;
+}
+
+export interface PaymentHealthData {
+  fromUtc: string;
+  toUtc: string;
+  totalPayments: number;
+  successfulPayments: number;
+  failedPayments: number;
+  refundedPayments: number;
+  successfulPaymentVolume: number;
+  paymentSuccessRate: number;
+  methodMetrics: PaymentMethodMetric[];
+  typeMetrics: PaymentTypeMetric[];
+}
+
+// --- Risk Overview ---
+export interface RiskOverviewData {
+  fromUtc: string;
+  toUtc: string;
+  totalOrders: number;
+  totalIssues: number;
+  openIssues: number;
+  cancelRequests: number;
+  refundRequests: number;
+  disputeRequests: number;
+  cancelledOrders: number;
+  refundedOrders: number;
+  cancelRate: number;
+  refundRate: number;
+  issueRate: number;
+}
