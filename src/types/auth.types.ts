@@ -50,6 +50,7 @@ export interface UserData {
   status?: number;
   emailConfirmed?: boolean;
   banner?: string;
+  accountStatus: string;
 }
 
 export interface LoginPayload {

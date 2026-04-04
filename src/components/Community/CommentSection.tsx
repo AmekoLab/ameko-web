@@ -12,11 +12,13 @@ interface CommentSectionProps {
   postId: number;
   initialCount: number;
   onCommentAdded?: () => void;
+  onCommentDeleted?: () => void;
 }
 
 export const CommentSection: FC<CommentSectionProps> = ({
   postId,
   onCommentAdded,
+  onCommentDeleted,
 }) => {
   const [comments, setComments] = useState<SocialComment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,7 +120,21 @@ export const CommentSection: FC<CommentSectionProps> = ({
           )}
 
           {comments.map((comment) => (
-            <CommentItem key={comment.id} comment={comment} />
+            <CommentItem 
+              key={comment.id} 
+              comment={comment} 
+              onCommentUpdated={(updatedComment) => {
+                setComments((prev) => 
+                  prev.map((c) => (c.id === updatedComment.id ? updatedComment : c))
+                );
+              }}
+              onCommentDeleted={(commentId) => {
+                setComments((prev) => prev.filter((c) => c.id !== commentId));
+                if (onCommentDeleted) {
+                  onCommentDeleted();
+                }
+              }}
+            />
           ))}
 
           {comments.length === 0 && (
@@ -139,19 +155,32 @@ export const CommentSection: FC<CommentSectionProps> = ({
             className="object-cover"
           />
         </div>
-        <form onSubmit={handleSubmit} className="flex-grow relative">
-          <input
-            type="text"
+        <form onSubmit={handleSubmit} className="flex-grow relative flex items-end">
+          <textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                if (inputValue.trim() && !isPosting) {
+                  handleSubmit(e as unknown as React.FormEvent);
+                }
+              }
+            }}
+            onInput={(e) => {
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = "auto";
+              target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
+            }}
             placeholder="Write a comment..."
-            // TODO: [UX] Thêm sự kiện onKeyDown để xử lý Enter -> Submit (Shift+Enter -> Xuống dòng)
-            className="w-full bg-[#111] text-white rounded-2xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#555] placeholder-gray-400 pr-10"
+            rows={1}
+            className="w-full bg-gray-800 text-white rounded-2xl px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#555] placeholder-gray-400 pr-10 resize-none overflow-y-auto"
+            style={{ minHeight: "40px", maxHeight: "120px" }}
           />
           <button
             type="submit"
             disabled={!inputValue.trim() || isPosting}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-[#ce2a32] disabled:text-gray-400 p-1"
+            className="absolute right-2 bottom-1.5 text-[#ce2a32] disabled:text-gray-400 p-1"
           >
             {isPosting ? (
               <Loader2 className="w-4 h-4 animate-spin" />

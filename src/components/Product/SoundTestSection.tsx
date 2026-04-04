@@ -7,7 +7,7 @@ interface SoundTestProps {
 
 export const SoundTestSection = ({ videoUrl, description }: SoundTestProps) => {
   return (
-    <div className="relative w-screen left-[50%] right-[50%] -ml-[50vw] -mr-[50vw] bg-[#0a0a0a] text-white py-8 group overflow-hidden">
+    <div className="relative w-[100vw] left-1/2 -translate-x-1/2 bg-[#0a0a0a] text-white py-8 group overflow-hidden">
       {/* Yellow glow orb */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[#f5d800]/5 blur-[150px] pointer-events-none" />
 
