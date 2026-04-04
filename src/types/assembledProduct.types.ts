@@ -65,6 +65,7 @@ export interface AssembledProductItem {
   status?: AssembledProductStatus;
   shopId?: string;
   shopName?: string;
+  logoUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -25,7 +25,7 @@ export interface Post {
   avatarUrl?: string;
   shopId?: string | null;
   role?: string;
-  currentReaction?: PostReactionType | null; // Added to fix the reload issue
+  currentUserReaction?: PostReactionType | null; // Matches backend JSON field name
 }
 
 export interface FeedResponseData {
@@ -74,6 +74,11 @@ export interface ReactToPostData {
   success: boolean;
 }
 
+export interface CommentEditHistory {
+  content: string;
+  editedAt: string;
+}
+
 export interface SocialComment {
   id: number;
   userId: string;
@@ -82,6 +87,8 @@ export interface SocialComment {
   avatarUrl: string;
   content: string;
   createdAt: string;
+  isEdited?: boolean;
+  editHistory?: CommentEditHistory[];
 }
 
 export interface CommentsResponseData {
@@ -91,5 +98,9 @@ export interface CommentsResponseData {
 }
 
 export interface AddCommentPayload {
+  content: string;
+}
+
+export interface UpdateCommentPayload {
   content: string;
 }

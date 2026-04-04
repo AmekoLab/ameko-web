@@ -3,6 +3,7 @@
 import { FC, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { ShoppingCart, Loader2 } from "lucide-react";
 import { Product } from "@/src/types/product";
 import { useAppDispatch } from "@/src/store/hook";
@@ -18,6 +19,8 @@ interface ProductCardProps {
 
 export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const thumbnail =
@@ -28,6 +31,20 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Auth guard: redirect unauthenticated users to login
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.info("Please login to add product to cart", {
+        position: "top-right",
+        theme: "dark",
+      });
+    setTimeout(() => {
+    router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
+  }, 2000);
+      return;
+    }
+
     if (isAddingToCart) return;
     setIsAddingToCart(true);
     try {
@@ -39,6 +56,7 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
       toast.success(`${product.name} added to cart!`, {
         position: "top-right",
         theme: "dark",
+      
       });
       dispatch(fetchServerCart());
       dispatch(setCartOpen(true));

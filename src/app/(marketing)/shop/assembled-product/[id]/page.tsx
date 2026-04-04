@@ -264,7 +264,12 @@ export default function AssembledProductDetailPage() {
 
         {/* Product Info — 40% right, black panel */}
         <div className="w-full lg:w-[45%] bg-black p-6 lg:p-10 xl:p-14 ">
-          <ProductInfo product={product} />
+          <ProductInfo
+            product={product}
+            shopId={assembledProduct.shopId}
+            shopName={assembledProduct.shopName}
+            logoUrl={assembledProduct.logoUrl}
+          />
         </div>
       </div>
 

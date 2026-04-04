@@ -12,6 +12,7 @@ import {
   SocialComment,
   CommentsResponseData,
   AddCommentPayload,
+  UpdateCommentPayload,
 } from "@/src/types/social.types";
 
 export const socialService = {
@@ -142,4 +143,42 @@ export const socialService = {
       throw error;
     }
   },
+
+  updateComment: async (
+    commentId: number,
+    payload: UpdateCommentPayload,
+  ): Promise<ApiResponse<SocialComment>> => {
+    try {
+      return await api.put(
+        `/SocialCommerce/comments/${commentId}`,
+        payload,
+      );
+    } catch (error) {
+      console.error("Failed to update comment:", error);
+      throw error;
+    }
+  },
+
+  deleteComment: async (
+    commentId: number,
+  ): Promise<ApiResponse<null>> => {
+    try {
+      return await api.delete(`/SocialCommerce/comments/${commentId}/soft-delete`);
+    } catch (error) {
+      console.error("Failed to delete comment:", error);
+      throw error;
+    }
+  },
+
+  hardDeleteComment: async (
+    commentId: number,
+  ): Promise<ApiResponse<null>> => {
+    try {
+      return await api.delete(`/SocialCommerce/comments/${commentId}`);
+    } catch (error) {
+      console.error("Failed to permanently delete comment:", error);
+      throw error;
+    }
+  },
 };
+

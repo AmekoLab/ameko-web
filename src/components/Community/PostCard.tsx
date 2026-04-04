@@ -15,6 +15,7 @@ import {
   Save,
   Trash2,
   Store,
+  AlertTriangle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -44,7 +45,7 @@ import { ImageModal } from "./ImageModal";
 export const PostCard: FC<{ post: Post }> = ({ post }) => {
   const [currentPost, setCurrentPost] = useState<Post>(post);
   const [userReaction, setUserReaction] = useState<PostReactionType | null>(
-    post.currentReaction || null, // This needs to be provided from backend to persist across reloads
+    post.currentUserReaction || null,
   );
   const [reactionCount, setReactionCount] = useState(post.reactionCount);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -65,6 +66,14 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
 
   const [isDeleted, setIsDeleted] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const currentUserStr = typeof window !== 'undefined' ? localStorage.getItem("user") : null;
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+  const isOwner = currentUser?.id === post.userId;
+  const isAdmin = currentUser?.role === "Admin";
+  const canManage = isOwner || isAdmin;
+
 
   const handleOpenReactions = async () => {
     setIsReactionsModalOpen(true);
@@ -145,17 +154,17 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
     }
   };
 
-  const handleDeletePost = async () => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) return;
+  const executeDelete = async () => {
+    setShowDeleteConfirm(false);
     setIsDeleting(true);
     try {
       const res = await socialService.deletePost(currentPost.id);
       if (res.success) {
         setIsDeleted(true);
-        toast.success("Đã xóa bài viết!");
+        toast.success(res.message || "Post deleted permanently");
       }
     } catch {
-      toast.error("Không thể xóa bài viết lúc này");
+      toast.error("Failed to delete post");
       setIsDeleting(false);
     }
   };
@@ -248,6 +257,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
           </div>
 
           {/* Menu Option */}
+          {canManage && (
           <div className="relative">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -264,21 +274,23 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                   transition={{ duration: 0.1 }}
                   className="absolute right-0 mt-2 w-48 bg-[#1a1a1a] border border-[#2a2d31] rounded-md shadow-xl z-[99]"
                 >
+                  {isOwner && (
+                    <button
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsEditing(true);
+                        setEditTitle(currentPost.title);
+                      }}
+                      className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-gray-200 hover:text-white hover:bg-[#111] first:rounded-t-md transition-colors"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      Edit the post
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       setIsMenuOpen(false);
-                      setIsEditing(true);
-                      setEditTitle(currentPost.title);
-                    }}
-                    className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-gray-200 hover:text-white hover:bg-[#111] first:rounded-t-md transition-colors"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                    Edit the post
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      handleDeletePost();
+                      setShowDeleteConfirm(true);
                     }}
                     disabled={isDeleting}
                     className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-red-500 hover:text-red-400 hover:bg-[#111] last:rounded-b-md transition-colors disabled:opacity-50"
@@ -294,6 +306,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
               )}
             </AnimatePresence>
           </div>
+          )}
         </div>
 
         {/* CONTENT */}
@@ -395,7 +408,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                 onClick={handleOpenReactions}
                 className="cursor-pointer hover:underline text-gray-400"
               >
-                {reactionCount} {userReaction || "likes"}
+                {reactionCount} {reactionCount <= 1 ? "reaction" : "reactions"}
               </span>
             </div>
             <div className="flex gap-3">
@@ -491,6 +504,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
             postId={post.id}
             initialCount={post.commentCount}
             onCommentAdded={() => setCommentCount((prev) => prev + 1)}
+            onCommentDeleted={() => setCommentCount(prev => Math.max(0, prev - 1))}
           />
         )}
       </motion.div>
@@ -543,6 +557,49 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
           </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              className="bg-[#1a1a1a] border border-[#2a2d31] rounded-xl p-6 w-full max-w-sm shadow-2xl"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-5 h-5 text-red-500" />
+                </div>
+                <h3 className="text-lg font-black uppercase tracking-wide text-white">
+                  Delete Item?
+                </h3>
+              </div>
+              <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+                Are you sure you want to permanently delete this? This action cannot be undone.
+              </p>
+              <div className="flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                  className="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={executeDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2 text-sm font-bold uppercase tracking-wider bg-[#ce2a32] hover:bg-red-600 text-white rounded-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

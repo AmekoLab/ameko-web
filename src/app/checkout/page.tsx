@@ -298,13 +298,20 @@ function CheckoutContent() {
 
         const res = await orderService.checkout(payload);
 
-        if (res.success && res.data?.paymentUrl) {
-          // Redirect to Stripe Checkout
-          window.location.href = res.data.paymentUrl;
-        } else {
-          toast.error(res.message || "Checkout failed. Please try again.");
-          setSubmitting(false);
-        }
+       if (res.success) {
+  if (res.data?.paymentUrl) {
+    // Trường hợp 1: VNPay hoặc Stripe (Có URL chuyển hướng)
+    window.location.href = res.data.paymentUrl;
+  } else {
+    // Trường hợp 2: Ví Ameko Wallet (Thanh toán xong ngay lập tức, không có URL)
+    // Bạn chuyển hướng khách về thẳng trang Thành công của dự án
+    window.location.href = `/payment-success?orderId=${res.data?.orderGroupId || ''}`;
+  }
+} else {
+  // Thất bại thực sự (lỗi Backend, hết hàng, lỗi hệ thống...)
+  toast.error(res.message || "Checkout failed. Please try again.");
+  setSubmitting(false);
+}
       } catch (error: unknown) {
         const err = error as { message?: string };
         toast.error(err.message || "Checkout failed. Please try again.");
@@ -569,6 +576,28 @@ function CheckoutContent() {
                   </span>
                 </div>
               </label>
+
+              { /* VN PAY*/}
+              <label
+                className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
+                  paymentMethod === 2
+                    ? "border-[#ce2a32] bg-red-50"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value={2}
+                  checked={paymentMethod === 2}
+                  onChange={() => setPaymentMethod(2)}
+                  className="accent-[#ce2a32]"
+                />
+                <div className="ml-3 flex flex-col">
+                  <span className="font-medium text-sm">VN PAY</span>
+                  <span className="text-xs text-gray-500 italic mt-0.5">Pay via VN PAY</span>
+                </div>
+              </label>
             </div>
           </div>
 
@@ -721,9 +750,12 @@ function CheckoutContent() {
               </>
             ) : paymentMethod === 1 ? (
               "Pay with Wallet"
+            ) : paymentMethod === 2 ? (
+              "Pay with VN PAY"
             ) : (
               "Pay with Stripe"
-            )}
+            )
+            }
           </button>
         </div>
       </div>

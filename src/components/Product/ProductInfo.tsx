@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Check,
   XCircle,
@@ -10,6 +11,7 @@ import {
   Package,
   RotateCcw,
   Loader2,
+  Store,
 } from "lucide-react";
 import { Product } from "@/src/types/product";
 import { useAppDispatch } from "@/src/store/hook";
@@ -23,13 +25,21 @@ import { toast } from "react-toastify";
 interface ProductInfoProps {
   product: Product;
   relatedProducts?: Product[];
+  shopId?: string;
+  shopName?: string;
+  logoUrl?: string;
 }
 
 export const ProductInfo = ({
   product,
   relatedProducts = [],
+  shopId,
+  shopName,
+  logoUrl,
 }: ProductInfoProps) => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
@@ -76,6 +86,17 @@ export const ProductInfo = ({
   };
 
   const handleAddToCart = async () => {
+    // Auth guard: redirect unauthenticated users to login
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.info("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng", {
+        position: "top-right",
+        theme: "dark",
+      });
+      router.push("/login?callbackUrl=" + encodeURIComponent(pathname));
+      return;
+    }
+
     if (isAddingToCart) return;
     setIsAddingToCart(true);
     try {
@@ -125,6 +146,50 @@ export const ProductInfo = ({
             NEW
           </span>
         </div>
+
+        {/* --- SHOP BADGE --- */}
+        {shopId && shopName && (
+          <Link
+            href={`/profile/shop/${shopId}`}
+            className="group/shop flex items-center gap-3 bg-[#161616] border border-white/10 hover:border-[#f5d800]/40 rounded-sm px-3 py-2.5 transition-all duration-200 w-fit"
+          >
+            {/* Shop Logo */}
+            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-[#222] border border-white/10 group-hover/shop:border-[#f5d800]/50 transition-colors shrink-0">
+              {logoUrl ? (
+                <Image
+                  src={logoUrl}
+                  alt={shopName}
+                  fill
+                  className="object-cover"
+                  sizes="32px"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Store className="w-4 h-4 text-gray-500" />
+                </div>
+              )}
+            </div>
+            {/* Shop Info */}
+            <div className="flex flex-col min-w-0">
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-500 leading-none mb-0.5">
+                Sold by
+              </span>
+              <span className="text-[20px] font-bold text-white group-hover/shop:text-[#f5d800] transition-colors truncate leading-tight">
+                {shopName}
+              </span>
+            </div>
+            {/* Arrow indicator */}
+            {/* <svg
+              className="w-3.5 h-3.5 text-gray-600 group-hover/shop:text-[#f5d800] transition-colors ml-1 shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg> */}
+          </Link>
+        )}
 
         {/* --- PRODUCT NAME --- */}
         <h1 className="text-3xl lg:text-[32px] font-black uppercase tracking-tight leading-[1.1] mb-2">
@@ -292,8 +357,8 @@ export const ProductInfo = ({
             <Package className="w-4 h-4 text-[#f5d800] shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
               <p className="text-[12px] text-gray-400">
-                Order today for estimated delivery by{" "}
-                <span className="text-white font-bold">03/18–03/19/2026</span>
+             Order today to{" "}
+              <span className="text-white font-bold">receive incentives</span>
               </p>
             </div>
             <span className="flex items-center gap-1 border border-[#f5d800] text-[#f5d800] text-[10px] font-black uppercase tracking-[0.1em] px-2 py-0.5 shrink-0">

@@ -112,7 +112,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
               <Loader2 className="w-10 h-10 text-[#f5d800] animate-spin mb-4" />

@@ -53,6 +53,29 @@ api.interceptors.response.use(
       if (typeof window !== "undefined") {
         originalRequest._retry = true;
 
+        // Helper: Clear auth storage & conditionally redirect
+        const handleAuthFailure = (reason: unknown) => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("user");
+
+          const publicPaths = ["/", "/shop", "/assembled-product", "/about"];
+          const currentPath = window.location.pathname;
+
+          const isPublicPage = publicPaths.some((p) =>
+            p === "/"
+              ? currentPath === "/"
+              : currentPath === p || currentPath.startsWith(p + "/"),
+          );
+
+          // Only redirect if NOT on a public page and NOT already on /login
+          if (!isPublicPage && !currentPath.startsWith("/login")) {
+            window.location.href = `/login?callbackUrl=${encodeURIComponent(currentPath)}`;
+          }
+
+          return Promise.reject(reason);
+        };
+
         try {
           const refreshToken = localStorage.getItem("refreshToken");
           const userStr = localStorage.getItem("user");
@@ -60,7 +83,7 @@ api.interceptors.response.use(
           const userId = userObj?.id;
 
           if (!refreshToken || !userId) {
-            throw new Error("Missing credentials");
+            return handleAuthFailure(new Error("Missing credentials"));
           }
 
           // Gọi Refresh Token (Dùng axios gốc để tránh interceptor này)
@@ -91,15 +114,7 @@ api.interceptors.response.use(
             return api(originalRequest);
           }
         } catch (refreshError) {
-          // Refresh thất bại -> Xóa storage & Redirect Login
-          localStorage.removeItem("token");
-          localStorage.removeItem("refreshToken");
-          localStorage.removeItem("user");
-
-          if (!window.location.pathname.includes("/login")) {
-            window.location.href = "/login";
-          }
-          return Promise.reject(refreshError);
+          return handleAuthFailure(refreshError);
         }
       }
     }
