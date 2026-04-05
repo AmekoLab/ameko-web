@@ -187,6 +187,7 @@ export default function AssembledProductDetailPage() {
     useState<AssembledProductItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   const fetchProduct = useCallback(async () => {
     if (!productId) return;
@@ -243,7 +244,7 @@ export default function AssembledProductDetailPage() {
   const soundTestUrl = assembledProduct.details?.[0]?.soundUrl?.trim() || null;
 
   return (
-    <div className="bg-[#0d0d0d] min-h-screen pb-16 w-full font-sans">
+    <div className="bg-[#0d0d0d] min-h-screen pb-16 w-full font-sans overflow-x-clip">
 
       {/* ================================================================
           HERO — Full-bleed 60 / 40 split, no max-width cap
@@ -297,30 +298,55 @@ export default function AssembledProductDetailPage() {
             <h3 className="text-2xl lg:text-[28px] font-black uppercase text-white mb-6 leading-tight">
               Product Description
             </h3>
-            <div className="text-[13px] text-gray-100 leading-relaxed space-y-4">
-              {product.description ? (
-                <p>{product.description}</p>
-              ) : (
-                <>
-                  <p>{product.shortDesc}</p>
-                  <p>
-                    Designed for enthusiasts, gamers, and professionals alike,
-                    the{" "}
-                    <strong className="text-white font-black">
-                      {product.name}
-                    </strong>{" "}
-                    offers unparalleled customization and performance. With its
-                    gasket-mounted structure and tri-mode connectivity, it
-                    adapts seamlessly to any setup.
-                  </p>
-                  <p>
-                    The premium build quality ensures durability, while the
-                    hot-swappable PCB allows you to customize your typing
-                    experience without soldering.
-                  </p>
-                </>
+            <div className="relative">
+              <div
+                className={`text-[13px] text-gray-100 leading-relaxed space-y-4 overflow-hidden transition-all duration-300 [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-md [&_img]:mx-auto [&_img]:my-6 [&_p]:mb-4 ${
+                  isDescriptionExpanded ? "" : "max-h-[300px]"
+                }`}
+              >
+                {product.description ? (
+                  <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                ) : (
+                  <>
+                    <p>{product.shortDesc}</p>
+                    <p>
+                      Designed for enthusiasts, gamers, and professionals alike,
+                      the{" "}
+                      <strong className="text-white font-black">
+                        {product.name}
+                      </strong>{" "}
+                      offers unparalleled customization and performance. With its
+                      gasket-mounted structure and tri-mode connectivity, it
+                      adapts seamlessly to any setup.
+                    </p>
+                    <p>
+                      The premium build quality ensures durability, while the
+                      hot-swappable PCB allows you to customize your typing
+                      experience without soldering.
+                    </p>
+                  </>
+                )}
+              </div>
+              
+              {/* Fade out gradient when collapsed */}
+              {!isDescriptionExpanded && (
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0d0d0d] to-transparent pointer-events-none" />
               )}
             </div>
+            
+            {/* Toggle Button */}
+            <button
+              onClick={() => setIsDescriptionExpanded((prev) => !prev)}
+              className="mt-6 text-[#f5d800] hover:text-[#ffe500] hover:underline text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center gap-1"
+            >
+              {isDescriptionExpanded ? "Show Less" : "Read More"}
+              <svg
+                className={`w-4 h-4 transition-transform duration-300 ${isDescriptionExpanded ? "rotate-180" : ""}`}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
 
           <div className="lg:col-span-5">

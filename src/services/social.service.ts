@@ -97,6 +97,17 @@ export const socialService = {
     }
   },
 
+  deletePostReaction: async (
+    postId: number,
+  ): Promise<ApiResponse<ReactToPostData>> => {
+    try {
+      return await api.delete(`/SocialCommerce/posts/${postId}/reactions`);
+    } catch (error) {
+      console.error("Failed to delete post reaction:", error);
+      throw error;
+    }
+  },
+
   getPostReactions: async (
     postId: number,
   ): Promise<ApiResponse<PostReaction[]>> => {

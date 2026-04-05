@@ -1,11 +1,10 @@
 import { AuthWrapper } from "@/src/wrapper/AuthWrapper";
-
-import "../../globals.css";
+import { Header } from "../../components/Header/Header";
+import "../globals.css";
 import { ReactNode } from "react";
 import { Footer } from "@/src/components/Footer/Footer";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 import { Inter, Oswald } from "next/font/google";
-import { Header } from "@/src/components/Header/Header";
 import Sidebar from "@/src/components/Sidebar";
 
 const oswald = Oswald({
@@ -22,14 +21,14 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "AMEKO - Admin Dashboard",
+  title: "AMEKO - Shop Dashboard",
   description: "Cộng đồng bàn phím cơ Việt Nam",
 };
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default function TransactionsLayout({ children }: { children: ReactNode }) {
   return (
     <LayoutWrapper>
-      <AuthWrapper allowedRoles={["Admin"]}>
+      <AuthWrapper allowedRoles={["Customer", "Shop"]}>
         <div
           className={`flex flex-col min-h-screen bg-black ${inter.className} ${oswald.variable}`}
         >
@@ -38,14 +37,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex flex-1 min-h-0">
-            {/* Main Content */}
-            <Sidebar role="admin" />
+           
             <main className="flex-1 p-6 bg-black overflow-auto">
               {children}
             </main>
           </div>
 
-          <Footer />
+          {/* <Footer /> */}
         </div>
       </AuthWrapper>
     </LayoutWrapper>
