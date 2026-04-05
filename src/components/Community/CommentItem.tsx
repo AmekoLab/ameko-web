@@ -87,7 +87,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
         <div className="flex flex-col flex-grow">
           <div className="bg-[#111] rounded-2xl px-3 py-2 relative">
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-xs font-bold text-white">
+              <span className="text-md font-bold text-white">
                 {comment.username || comment.fullName}
               </span>
             </div>

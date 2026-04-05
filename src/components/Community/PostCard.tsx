@@ -74,6 +74,22 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
   const isAdmin = currentUser?.role === "Admin";
   const canManage = isOwner || isAdmin;
 
+  const formattedDate = () => {
+    try {
+      const d = new Date(post.createdAt);
+      if (isNaN(d.getTime())) return post.createdAt;
+      return d.toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return post.createdAt;
+    }
+  };
+
 
   const handleOpenReactions = async () => {
     setIsReactionsModalOpen(true);
@@ -117,7 +133,11 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
     setShowReactionsMenu(false); // Hide the popup
 
     try {
-      await socialService.reactToPost(post.id, type);
+      if (nextReaction === null) {
+        await socialService.deletePostReaction(post.id);
+      } else {
+        await socialService.reactToPost(post.id, nextReaction);
+      }
     } catch {
       // Rollback on fail
       setUserReaction(prevReaction);
@@ -208,7 +228,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-white group-hover:underline">
+                    <span className="font-bold text-lg text-white group-hover:underline">
                       {post.username || post.fullName || post.userId}
                     </span>
                     <div title="Verified Shop">
@@ -220,8 +240,8 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                       </span>
                     )}
                   </div>
-                  <p className="text-md text-gray-400 font-medium">
-                    {post.createdAt}
+                  <p className="text-sm text-gray-400 font-medium">
+                    {formattedDate()}
                   </p>
                 </div>
               </Link>
@@ -248,8 +268,8 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                       </span>
                     )}
                   </div>
-                  <p className="text-md text-gray-400 font-medium">
-                    {post.createdAt}
+                  <p className="text-sm text-gray-400 font-medium">
+                    {formattedDate()}
                   </p>
                 </div>
               </div>
@@ -544,11 +564,11 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                     )}
                     <div className="flex flex-col">
                       <span className="text-white text-sm font-medium">
-                        {reaction.fullName}
-                      </span>
-                      <span className="text-gray-500 text-xs">
                         {reaction.username}
                       </span>
+                      {/* <span className="text-gray-500 text-xs">
+                        {reaction.username}
+                      </span> */}
                     </div>
                   </div>
                 ))

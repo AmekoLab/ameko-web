@@ -160,7 +160,7 @@ export default function ApproveWithdrawalModal({
             <textarea
               rows={3}
               placeholder="Enter reason..."
-              className={`w-full border-2 rounded-lg p-3 outline-none transition-all resize-none ${
+              className={` text-black w-full border-2 rounded-lg p-3 outline-none transition-all resize-none ${
                 errors.reason
                   ? "border-red-400 focus:border-red-500"
                   : "border-gray-300 focus:border-black"

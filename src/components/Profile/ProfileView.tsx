@@ -210,7 +210,7 @@ export const ProfileView: FC<{
                     <PackageOpen className="w-8 h-8 text-gray-400" />
                   </div>
                   <p className="text-gray-400 font-medium">
-                    Chưa có sản phẩm nào đang bán.
+                    No products found.
                   </p>
                 </div>
               )}
@@ -221,7 +221,7 @@ export const ProfileView: FC<{
             <div className="bg-[#151515] p-16 text-center rounded-sm border border-dashed border-white/10">
               <ImageIcon className="w-10 h-10 text-gray-400 mx-auto mb-3" />
               <p className="text-gray-400 font-medium">
-                Bộ sưu tập đang được cập nhật...
+                Showcase is being updated...
               </p>
             </div>
           )}
@@ -246,7 +246,7 @@ export const ProfileView: FC<{
                     <div className="bg-[#151515] p-16 text-center rounded-sm border border-dashed border-white/10">
                       <Star className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                       <p className="text-gray-400 font-medium">
-                        Chưa có đánh giá nào.
+                        No reviews yet.
                       </p>
                     </div>
                   )}

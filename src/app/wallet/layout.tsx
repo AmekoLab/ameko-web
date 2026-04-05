@@ -43,7 +43,7 @@ export default function WalletLayout({ children }: { children: ReactNode }) {
             </main>
           </div>
 
-          <Footer />
+          {/* <Footer /> */}
         </div>
       </AuthWrapper>
     </LayoutWrapper>

@@ -5,6 +5,8 @@ import {
   ApproveShopPayload,
   ShopPublicProfile,
   ShopResponse,
+  ShopListParams,
+  ShopListResponse,
 } from "@/src/types/shop.types";
 import { deactivateShop } from "../store/slices/shopSlice";
 
@@ -76,5 +78,13 @@ export const shopService = {
 
   reactivate: async () => {
     return api.put<any, ApiResponse<null>>("/shops/reactivate");
+  },
+
+  /**
+   * Public: Fetch paginated shop list with optional search.
+   * GET /shops
+   */
+  getShops: async (params: ShopListParams): Promise<ShopListResponse> => {
+    return api.get<unknown, ShopListResponse>("/shops", { params });
   },
 };

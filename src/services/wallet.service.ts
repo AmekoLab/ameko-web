@@ -1,5 +1,9 @@
 import api from "@/src/utils/api";
 import { ApiResponse } from "@/src/types/auth.types";
+import {
+  TransactionQueryParams,
+  TransactionResponse,
+} from "@/src/types/wallet.types";
 
 export interface PinStatusResponse {
   hasPin: boolean;
@@ -232,5 +236,28 @@ export const walletService = {
       "/wallet/admin/withdrawals/pending",
       { params: { page, size } },
     );
+  },
+
+  /**
+   * Fetch paginated wallet transactions with filtering & sorting.
+   * GET /Wallet/transactions
+   */
+  getTransactions: async (
+    params: TransactionQueryParams,
+  ): Promise<TransactionResponse> => {
+    // Map camelCase → PascalCase to match API contract
+    const query: Record<string, unknown> = {};
+    if (params.type !== undefined) query.Type = params.type;
+    if (params.status !== undefined) query.Status = params.status;
+    if (params.fromDate) query.FromDate = params.fromDate;
+    if (params.toDate) query.ToDate = params.toDate;
+    if (params.pageNumber !== undefined) query.PageNumber = params.pageNumber;
+    if (params.pageSize !== undefined) query.PageSize = params.pageSize;
+    if (params.sortBy) query.SortBy = params.sortBy;
+    if (params.isAscending !== undefined) query.IsAscending = params.isAscending;
+
+    return api.get<unknown, TransactionResponse>("/Wallet/transactions", {
+      params: query,
+    });
   },
 };

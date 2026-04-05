@@ -415,6 +415,11 @@ export const Header: FC = () => {
                         label: "Cancel Requests",
                         show: user.role !== "Admin",
                       },
+                      {
+                        href: "/transactions",
+                        label: "Transactions",
+                        show: user.role !== "Admin",
+                      },
                     ]
                       .filter((item) => item.show)
                       .map((item) => (
