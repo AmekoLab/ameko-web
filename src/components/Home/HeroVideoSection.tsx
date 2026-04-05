@@ -22,7 +22,7 @@ const defaults = {
   title: "AMEKO",
   subtitle: "DESIGN YOUR DREAM KEYBOARD",
   ctaText: "START CUSTOMIZING",
-  ctaHref: "/shop",
+  ctaHref: "/custom-build",
 } as const;
 
 // ─── COMPONENT ────────────────────────────────────────────────────────────────

@@ -91,3 +91,41 @@ export interface UpdateShopFormValues {
 }
 
 export type ShopState = ShopResponse;
+
+// ─── Public Shop Listing (GET /shops) ─────────────────────
+export interface ShopItem {
+  id: string;
+  shopName: string;
+  userId: string;
+  bio: string | null;
+  logoUrl: string | null;
+  bannerUrl: string | null;
+  rating: number;
+  totalSales: number;
+  createdAt: string;
+  isActive: boolean;
+  followersCount: number;
+  followingCount: number;
+}
+
+export interface ShopListPagination {
+  page: number;
+  size: number;
+  totalCount: number;
+}
+
+export interface ShopListResponse {
+  success: boolean;
+  message: string;
+  data: {
+    items: ShopItem[];
+    pagination: ShopListPagination;
+  };
+  errors: unknown | null;
+}
+
+export interface ShopListParams {
+  searchTerm?: string;
+  page?: number;
+  size?: number;
+}

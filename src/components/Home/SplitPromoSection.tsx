@@ -25,7 +25,7 @@ const defaultCards: [SplitPromoCard, SplitPromoCard] = [
     title: "CUSTOM BUILDS",
     subtitle: "Build your dream PC from scratch",
     ctaText: "START BUILDING",
-    ctaHref: "/builder",
+    ctaHref: "/custom-build",
     imageSrc:
       "https://res.cloudinary.com/doezwafgz/image/upload/v1773520076/home6_lcqhgc.jpg",
   },
@@ -34,7 +34,7 @@ const defaultCards: [SplitPromoCard, SplitPromoCard] = [
     title: "PC CASES",
     subtitle: "Premium towers for every setup",
     ctaText: "SHOP CASES",
-    ctaHref: "/shop?category=cases",
+    ctaHref: "/shop/all-products",
     imageSrc:
       "https://res.cloudinary.com/doezwafgz/image/upload/v1773519760/home4_scaovf.jpg",
   },
