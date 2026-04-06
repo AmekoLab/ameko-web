@@ -7,6 +7,7 @@ import {
   Voucher,
   PaginatedResponse,
   CreatePromotionVoucherPayload,
+  CreateNegotiationVoucherPayload,
   UpdateVoucherPayload,
   VoucherUsageItem,
   VoucherUsageResponse,
@@ -248,6 +249,23 @@ export const removeVoucherThunk = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || error.message || "Lỗi xoá voucher",
+      );
+    }
+  },
+);
+
+export const createNegotiationVoucherThunk = createAsyncThunk(
+  "voucher/createNegotiationVoucher",
+  async (
+    payload: CreateNegotiationVoucherPayload,
+    { rejectWithValue },
+  ) => {
+    try {
+      const response = await voucherService.createNegotiationVoucher(payload);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Lỗi tạo voucher thương lượng",
       );
     }
   },

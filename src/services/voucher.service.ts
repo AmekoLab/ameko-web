@@ -82,6 +82,12 @@ export interface UpdateVoucherPayload {
   maxUsesPerUser?: number | null;
 }
 
+export interface CreateNegotiationVoucherPayload {
+  targetUserId: string;
+  discountAmount: number;
+  minOrderValue: number;
+}
+
 export interface PaginatedResponse<T> {
   items: T[];
   totalCount: number;
@@ -211,5 +217,14 @@ export const voucherService = {
     return api.get<any, ApiResponse<VoucherUsageResponse>>(
       `/Voucher/${id}/usage?pageNumber=${pageNumber}&pageSize=${pageSize}`,
     );
+  },
+
+  /**
+   * Tạo voucher thương lượng (Negotiation) cho một user cụ thể
+   */
+  createNegotiationVoucher: async (
+    payload: CreateNegotiationVoucherPayload,
+  ): Promise<ApiResponse<Voucher>> => {
+    return api.post<any, ApiResponse<Voucher>>(`/Voucher/negotiation`, payload);
   },
 };
