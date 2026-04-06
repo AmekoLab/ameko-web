@@ -30,9 +30,9 @@ import {
   fetchApplicableVouchersThunk,
   selectShopVoucherGroups,
   selectSystemVouchers,
-  setSelectedSystemVouchers,
+  setSelectedSystemVoucher,
   setSelectedShopVouchers,
-  selectSelectedSystemVoucherIds,
+  selectSelectedSystemVoucherCode,
 } from "@/src/store/slices/voucherSlice";
 import {
   toggleItemSelection,
@@ -382,9 +382,9 @@ const OrderSummary: FC<OrderSummaryProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const systemVouchers = useAppSelector(selectSystemVouchers);
-  const selectedSystemIds = useAppSelector(selectSelectedSystemVoucherIds);
-  const selectedShopVoucherIdsMap = useAppSelector(
-    (state) => state.voucher.selectedShopVoucherIds,
+  const selectedSystemCode = useAppSelector(selectSelectedSystemVoucherCode);
+  const selectedShopVoucherCodesMap = useAppSelector(
+    (state) => state.voucher.selectedShopVoucherCodes,
   );
   const applicableVouchers = useAppSelector(
     (state) => state.voucher.applicableVouchers,
@@ -398,16 +398,16 @@ const OrderSummary: FC<OrderSummaryProps> = ({
     isUpdating,
   );
 
-  // Derive the selected system voucher code (for display)
-  const selectedSystemVoucherCode = useMemo(() => {
-    if (!selectedSystemIds?.length || !applicableVouchers?.systemVouchers)
+  // Derive the selected system voucher object (for display)
+  const selectedSystemVoucher = useMemo(() => {
+    if (!selectedSystemCode || !applicableVouchers?.systemVouchers)
       return null;
     return (
       applicableVouchers.systemVouchers.find(
-        (v) => v.id === selectedSystemIds[0],
+        (v) => v.code === selectedSystemCode,
       ) ?? null
     );
-  }, [selectedSystemIds, applicableVouchers]);
+  }, [selectedSystemCode, applicableVouchers]);
 
   // Derive selected shop vouchers (for display)
   const selectedShopVouchers = useMemo(() => {
@@ -415,32 +415,26 @@ const OrderSummary: FC<OrderSummaryProps> = ({
     const result: {
       shopId: string;
       shopName: string;
-      code: string;
+      codes: string[];
       discountAmount: number;
     }[] = [];
-    Object.entries(selectedShopVoucherIdsMap).forEach(([shopId, vIds]) => {
-      if (!vIds || vIds.length === 0) return;
-      const group = applicableVouchers.shopVoucherGroups.find(
-        (g) => g.shopId === shopId,
+    Object.entries(selectedShopVoucherCodesMap).forEach(([shopId, codes]) => {
+      if (!codes || codes.length === 0) return;
+      const shopPreview = cartPreview?.shopPreviews.find(
+        (s) => s.shopId === shopId,
       );
-      const voucher = group?.vouchers.find((v) => v.id === vIds[0]);
-      if (voucher) {
-        const shopPreview = cartPreview?.shopPreviews.find(
-          (s) => s.shopId === shopId,
-        );
-        result.push({
-          shopId,
-          shopName: shopPreview?.shopName ?? shopId,
-          code: voucher.code,
-          discountAmount: shopPreview?.shopDiscountAmount ?? 0,
-        });
-      }
+      result.push({
+        shopId,
+        shopName: shopPreview?.shopName ?? shopId,
+        codes,
+        discountAmount: shopPreview?.shopDiscountAmount ?? 0,
+      });
     });
     return result;
-  }, [selectedShopVoucherIdsMap, applicableVouchers, cartPreview]);
+  }, [selectedShopVoucherCodesMap, applicableVouchers, cartPreview]);
 
   const hasAppliedVouchers =
-    !!selectedSystemVoucherCode || selectedShopVouchers.length > 0;
+    !!selectedSystemVoucher || selectedShopVouchers.length > 0;
 
   // Derive system-only discount = total minus all shop discounts
   const totalShopDiscount =
@@ -470,9 +464,9 @@ const OrderSummary: FC<OrderSummaryProps> = ({
               <span className="font-bold text-[13px] text-white uppercase tracking-wider">Ameko Voucher</span>
             </div>
             <div className="flex items-center gap-1">
-              {selectedSystemIds.length > 0 ? (
+              {selectedSystemCode ? (
                 <span className="text-[11px] font-bold text-[#f5d800] uppercase tracking-widest">
-                  Selected {selectedSystemIds.length}
+                  Selected 1
                 </span>
               ) : availableSystemVouchersCount > 0 ? (
                 <span className="text-[11px] font-bold text-[#f5d800] uppercase tracking-widest">
@@ -500,12 +494,12 @@ const OrderSummary: FC<OrderSummaryProps> = ({
             </p>
 
             {/* System voucher row */}
-            {selectedSystemVoucherCode && (
+            {selectedSystemVoucher && (
               <div className="flex items-center justify-between text-[11px] font-bold">
                 <div className="flex items-center gap-1.5 pt-1">
                   <Ticket className="w-3 h-3 text-[#f5d800]" />
                   <span className="text-white uppercase tracking-wider">
-                    {selectedSystemVoucherCode.code}
+                    {selectedSystemVoucher.code}
                   </span>
                   <span className="text-gray-500 uppercase tracking-wider">(System)</span>
                 </div>
@@ -517,7 +511,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
                   )}
                   <button
                     type="button"
-                    onClick={() => dispatch(setSelectedSystemVouchers([]))}
+                    onClick={() => dispatch(setSelectedSystemVoucher(null))}
                     className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                     aria-label="Remove system voucher"
                   >
@@ -535,7 +529,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
               >
                 <div className="flex items-center gap-1.5 pt-1">
                   <Ticket className="w-3 h-3 text-[#f5d800]" />
-                  <span className="text-white uppercase tracking-wider">{sv.code}</span>
+                  <span className="text-white uppercase tracking-wider">{sv.codes.join(", ")}</span>
                   <span className="text-gray-500 uppercase tracking-wider">({sv.shopName})</span>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -550,12 +544,12 @@ const OrderSummary: FC<OrderSummaryProps> = ({
                       dispatch(
                         setSelectedShopVouchers({
                           shopId: sv.shopId,
-                          voucherIds: [],
+                          voucherCodes: [],
                         }),
                       )
                     }
                     className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                    aria-label={`Remove voucher ${sv.code}`}
+                    aria-label={`Remove vouchers for ${sv.shopName}`}
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -656,7 +650,7 @@ export default function CartPage() {
   const dispatch = useAppDispatch();
   const shopVoucherGroups = useAppSelector(selectShopVoucherGroups);
   const systemVouchersMain = useAppSelector(selectSystemVouchers);
-  const selectedSystemIds = useAppSelector(selectSelectedSystemVoucherIds);
+  const selectedSystemCode = useAppSelector(selectSelectedSystemVoucherCode);
   const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -675,13 +669,16 @@ export default function CartPage() {
   );
 
   // ── Voucher modal state ──
+  const selectedShopVoucherCodesMap = useAppSelector(
+    (state) => state.voucher.selectedShopVoucherCodes,
+  );
   const [voucherModal, setVoucherModal] = useState<{
     isOpen: boolean;
     title: string;
     vouchers: Voucher[];
     subtotal: number;
     brandLabel: string;
-    selectedIds: string[];
+    selectedCodes: string[];
     scope: { type: "system" } | { type: "shop"; shopId: string };
   }>({
     isOpen: false,
@@ -689,7 +686,7 @@ export default function CartPage() {
     vouchers: [],
     subtotal: 0,
     brandLabel: "Ameko",
-    selectedIds: [],
+    selectedCodes: [],
     scope: { type: "system" },
   });
 
@@ -804,10 +801,10 @@ export default function CartPage() {
       vouchers: systemVouchersMain,
       subtotal: selectedTotal,
       brandLabel: "Ameko",
-      selectedIds: selectedSystemIds,
+      selectedCodes: selectedSystemCode ? [selectedSystemCode] : [],
       scope: { type: "system" },
     });
-  }, [cart, selectedItemIds, systemVouchersMain, selectedSystemIds]);
+  }, [cart, selectedItemIds, systemVouchersMain, selectedSystemCode]);
 
   // ── Open voucher modal for a specific shop ──
   const handleOpenShopVoucherModal = useCallback(
@@ -826,24 +823,24 @@ export default function CartPage() {
         vouchers: group?.vouchers ?? [],
         subtotal: shopSubtotal,
         brandLabel: shopName,
-        selectedIds: [],
+        selectedCodes: selectedShopVoucherCodesMap[shopId] ?? [],
         scope: { type: "shop", shopId },
       });
     },
-    [cart, selectedItemIds, shopVoucherGroups],
+    [cart, selectedItemIds, shopVoucherGroups, selectedShopVoucherCodesMap],
   );
 
   // ── Handle voucher confirm ──
   const handleVoucherConfirm = useCallback(
     (selectedVouchers: Voucher[]) => {
-      const ids = selectedVouchers.map((v) => v.id);
+      const codes = selectedVouchers.map((v) => v.code);
       if (voucherModal.scope.type === "system") {
-        dispatch(setSelectedSystemVouchers(ids));
+        dispatch(setSelectedSystemVoucher(codes.length > 0 ? codes[0] : null));
       } else {
         dispatch(
           setSelectedShopVouchers({
             shopId: voucherModal.scope.shopId,
-            voucherIds: ids,
+            voucherCodes: codes,
           }),
         );
       }
@@ -1126,8 +1123,9 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
         vouchers={voucherModal.vouchers}
         currentSubtotal={voucherModal.subtotal}
         brandLabel={voucherModal.brandLabel}
-        selectedIds={voucherModal.selectedIds}
+        selectedCodes={voucherModal.selectedCodes}
         onConfirm={handleVoucherConfirm}
+        scope={voucherModal.scope}
         orderId={cart?.orderId}
       />
     </div>

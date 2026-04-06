@@ -66,10 +66,12 @@ export interface CheckoutPayload {
   receiverPhone: string;
   shippingAddress: string;
   note: string;
-  successUrl: string;
-  cancelUrl: string;
+  successUrl?: string;
+  cancelUrl?: string;
   selectedOrderItemIds: string[];
   paymentMethod: number;
+  appliedSystemVoucherCode?: string;
+  appliedShopVoucherCodeGroups?: Record<string, string[]>;
 }
 
 /** Response data from POST /orders/checkout */
@@ -129,7 +131,7 @@ export interface OrderGroup {
 export interface CalculatePreviewPayload {
   selectedOrderItemIds: string[];
   appliedSystemVoucherCode?: string;
-  appliedShopVoucherCodes?: Record<string, string>;
+  appliedShopVoucherCodeGroups?: Record<string, string[]>;
 }
 
 /** Per-shop result from the calculate-preview response */

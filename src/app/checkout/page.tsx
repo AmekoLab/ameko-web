@@ -164,8 +164,8 @@ function CheckoutContent() {
 
   // ── Voucher state from Redux (same source used by the preview hook) ──
   const applicableVouchers = useAppSelector((state) => state.voucher.applicableVouchers);
-  const selectedSystemIds = useAppSelector((state) => state.voucher.selectedSystemVoucherIds);
-  const selectedShopVoucherIdsMap = useAppSelector((state) => state.voucher.selectedShopVoucherIds);
+  const selectedSystemCode = useAppSelector((state) => state.voucher.selectedSystemVoucherCode);
+  const selectedShopVoucherCodesMap = useAppSelector((state) => state.voucher.selectedShopVoucherCodes);
 
   // ── Wallet state ──────────────────────────────────────────────────────
   const { details: walletDetails } = useAppSelector((state) => state.wallet);
@@ -222,35 +222,21 @@ function CheckoutContent() {
     fetchCart();
   }, []);
 
-  // ── Map selected voucher IDs → codes (mirrors useCartPreviewLogic) ─────────
+  // ── Build voucher codes payload (codes stored directly in state) ─────────
   const payloadCodes = useMemo(() => {
-    // Resolve system voucher code — undefined (not null) when none selected
-    const systemCode =
-      selectedSystemIds?.length && applicableVouchers?.systemVouchers
-        ? (applicableVouchers.systemVouchers.find(
-            (v) => v.id === selectedSystemIds[0],
-          )?.code ?? undefined)
-        : undefined;
-
-    // Resolve shop voucher codes — always an object, never null (prevents backend crash)
-    const shopCodes: Record<string, string> = {};
-    if (selectedShopVoucherIdsMap && applicableVouchers?.shopVoucherGroups) {
-      Object.entries(selectedShopVoucherIdsMap).forEach(([shopId, vIds]) => {
-        if (vIds && vIds.length > 0) {
-          const group = applicableVouchers.shopVoucherGroups.find(
-            (g) => g.shopId === shopId,
-          );
-          const code = group?.vouchers.find((v) => v.id === vIds[0])?.code;
-          if (code) shopCodes[shopId] = code;
+    const shopCodeGroups: Record<string, string[]> = {};
+    if (selectedShopVoucherCodesMap) {
+      Object.entries(selectedShopVoucherCodesMap).forEach(([shopId, codes]) => {
+        if (codes && codes.length > 0) {
+          shopCodeGroups[shopId] = codes;
         }
       });
     }
     return {
-      systemCode,
-      // CRITICAL: send {} not null/undefined so the backend never crashes on a missing key
-      shopCodes,
+      systemCode: selectedSystemCode ?? undefined,
+      shopCodeGroups,
     };
-  }, [applicableVouchers, selectedSystemIds, selectedShopVoucherIdsMap]);
+  }, [selectedSystemCode, selectedShopVoucherCodesMap]);
 
   const handleInputChange = useCallback(
     (field: keyof CheckoutForm) =>
@@ -290,7 +276,10 @@ function CheckoutContent() {
           selectedOrderItemIds,
           // Voucher codes — undefined omits field from JSON; {} is explicit "no shop vouchers"
           appliedSystemVoucherCode: payloadCodes.systemCode,
-          appliedShopVoucherCodes: payloadCodes.shopCodes,
+          appliedShopVoucherCodeGroups:
+            Object.keys(payloadCodes.shopCodeGroups).length > 0
+              ? payloadCodes.shopCodeGroups
+              : undefined,
           paymentMethod,
         };
 

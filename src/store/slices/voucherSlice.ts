@@ -272,8 +272,8 @@ interface VoucherState {
   applicableVouchers: ApplicableVouchersData | null;
   isFetchingApplicable: boolean;
   // Selected vouchers for checkout
-  selectedSystemVoucherIds: string[];
-  selectedShopVoucherIds: Record<string, string[]>; // shopId -> voucherIds
+  selectedSystemVoucherCode: string | null;
+  selectedShopVoucherCodes: Record<string, string[]>; // shopId -> voucherCodes
   // Apply voucher result (checkout summary)
   checkoutSummary: ApplyVoucherResponseData | null;
   isApplyingVoucher: boolean;
@@ -309,8 +309,8 @@ const initialState: VoucherState = {
   isUpdatingVoucher: false,
   applicableVouchers: null,
   isFetchingApplicable: false,
-  selectedSystemVoucherIds: [],
-  selectedShopVoucherIds: {},
+  selectedSystemVoucherCode: null,
+  selectedShopVoucherCodes: {},
   checkoutSummary: null,
   isApplyingVoucher: false,
   isRemovingVoucher: false,
@@ -327,19 +327,19 @@ const voucherSlice = createSlice({
   name: "voucher",
   initialState,
   reducers: {
-    setSelectedSystemVouchers(state, action: { payload: string[] }) {
-      state.selectedSystemVoucherIds = action.payload;
+    setSelectedSystemVoucher(state, action: { payload: string | null }) {
+      state.selectedSystemVoucherCode = action.payload;
     },
     setSelectedShopVouchers(
       state,
-      action: { payload: { shopId: string; voucherIds: string[] } },
+      action: { payload: { shopId: string; voucherCodes: string[] } },
     ) {
-      state.selectedShopVoucherIds[action.payload.shopId] =
-        action.payload.voucherIds;
+      state.selectedShopVoucherCodes[action.payload.shopId] =
+        action.payload.voucherCodes;
     },
     clearAllSelectedVouchers(state) {
-      state.selectedSystemVoucherIds = [];
-      state.selectedShopVoucherIds = {};
+      state.selectedSystemVoucherCode = null;
+      state.selectedShopVoucherCodes = {};
     },
     clearCheckoutSummary(state) {
       state.checkoutSummary = null;
@@ -478,8 +478,8 @@ const voucherSlice = createSlice({
         state.isRemovingVoucher = false;
         state.isApplyingVoucher = false;
         state.checkoutSummary = null;
-        state.selectedSystemVoucherIds = [];
-        state.selectedShopVoucherIds = {};
+        state.selectedSystemVoucherCode = null;
+        state.selectedShopVoucherCodes = {};
         toast.success("All vouchers removed successfully");
       })
       .addCase(removeAllVouchersThunk.rejected, (state, action) => {
@@ -503,7 +503,7 @@ const voucherSlice = createSlice({
 });
 
 export const {
-  setSelectedSystemVouchers,
+  setSelectedSystemVoucher,
   setSelectedShopVouchers,
   clearAllSelectedVouchers,
   clearCheckoutSummary,
@@ -543,15 +543,15 @@ export const selectShopVouchersByShopId = createSelector(
 export const selectIsFetchingApplicable = (state: RootState) =>
   state.voucher.isFetchingApplicable;
 
-/** Currently selected system voucher IDs */
-export const selectSelectedSystemVoucherIds = (state: RootState) =>
-  state.voucher.selectedSystemVoucherIds;
+/** Currently selected system voucher code */
+export const selectSelectedSystemVoucherCode = (state: RootState) =>
+  state.voucher.selectedSystemVoucherCode;
 
-/** Currently selected shop voucher IDs for a given shop */
-export const selectSelectedShopVoucherIds = (
+/** Currently selected shop voucher codes for a given shop */
+export const selectSelectedShopVoucherCodes = (
   state: RootState,
   shopId: string,
-) => state.voucher.selectedShopVoucherIds[shopId] ?? [];
+) => state.voucher.selectedShopVoucherCodes[shopId] ?? [];
 
 /** Checkout summary from apply-voucher response */
 export const selectCheckoutSummary = (state: RootState) =>

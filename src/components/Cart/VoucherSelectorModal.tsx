@@ -50,8 +50,9 @@ export interface VoucherSelectorModalProps {
   vouchers: Voucher[];
   currentSubtotal: number;
   brandLabel?: string;
-  selectedIds?: string[];
+  selectedCodes?: string[];
   onConfirm: (selectedVouchers: Voucher[]) => void;
+  scope: { type: "system" } | { type: "shop"; shopId: string };
   /** Kept for API compat but no longer used to call API */
   orderId?: string;
 }
@@ -64,7 +65,7 @@ interface VoucherCardProps {
   remainingAmount: number;
   selected: boolean;
   isApplied: boolean;
-  onToggle: (id: string) => void;
+  onToggle: (code: string) => void;
   brandLabel: string;
   selectionMode: "radio" | "checkbox";
   isFullyClaimed: boolean;
@@ -95,7 +96,7 @@ const VoucherCard: FC<VoucherCardProps> = ({
               ? "border-[#f5d800] ring-1 ring-[#f5d800]/30 shadow-sm"
               : "border-[#1e2126] hover:border-[#f5d800]/40 cursor-pointer"
       }`}
-      onClick={() => eligible && onToggle(voucher.id)}
+      onClick={() => eligible && onToggle(voucher.code)}
       role="button"
       tabIndex={eligible ? 0 : -1}
       aria-disabled={!eligible}
@@ -190,8 +191,8 @@ const VoucherCard: FC<VoucherCardProps> = ({
         </div>
 
         {/* Ineligible message */}
-        {!eligible && (
-          isFullyClaimed ? (
+        {!eligible &&
+          (isFullyClaimed ? (
             <div className="flex items-center gap-1 mt-1.5 text-[11px] text-red-500">
               <AlertCircle className="w-3 h-3 shrink-0" />
               <span>Voucher fully claimed</span>
@@ -203,8 +204,7 @@ const VoucherCard: FC<VoucherCardProps> = ({
                 Spend {fmtVND(remainingAmount)} more to use this voucher
               </span>
             </div>
-          )
-        )}
+          ))}
       </div>
     </div>
   );
@@ -219,13 +219,14 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
   vouchers,
   currentSubtotal,
   brandLabel = "Ameko",
-  selectedIds = [],
+  selectedCodes = [],
   onConfirm,
+  scope,
 }) => {
   // Track the modal open transition to reset local state
   const [prevOpen, setPrevOpen] = useState(false);
-  const [localSelectedIds, setLocalSelectedIds] = useState<Set<string>>(
-    () => new Set(selectedIds),
+  const [localSelectedCodes, setLocalSelectedCodes] = useState<Set<string>>(
+    () => new Set(selectedCodes),
   );
   const [codeInput, setCodeInput] = useState("");
   const [codeError, setCodeError] = useState<string | null>(null);
@@ -234,7 +235,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
   // Reset local selection when modal opens
   if (isOpen && !prevOpen) {
     setPrevOpen(true);
-    setLocalSelectedIds(new Set(selectedIds));
+    setLocalSelectedCodes(new Set(selectedCodes));
     setCodeInput("");
     setCodeError(null);
   } else if (!isOpen && prevOpen) {
@@ -262,9 +263,6 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
     return () => document.removeEventListener("keydown", handleEsc);
   }, [isOpen, onClose]);
 
-  // BUSINESS RULE: Only ONE voucher per group (shop or system) -> always radio
-  const selectionMode = "radio" as const;
-
   // Sort: eligible first, then by value descending
   const sortedVouchers = useMemo(() => {
     return [...vouchers].sort((a, b) => {
@@ -279,19 +277,55 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
     });
   }, [vouchers, currentSubtotal]);
 
-  const handleToggle = useCallback((id: string) => {
-    setLocalSelectedIds((prev) => {
-      // Radio: one at a time; clicking selected one deselects
-      if (prev.has(id)) return new Set();
-      return new Set([id]);
-    });
-  }, []);
+  // Hybrid toggle logic: system = radio, shop = stacking with targetUserId rules
+  const handleToggle = useCallback(
+    (code: string) => {
+      const clickedVoucher = vouchers.find((v) => v.code === code);
+      if (!clickedVoucher) return;
+
+      setLocalSelectedCodes((prev) => {
+        const newSet = new Set(prev);
+
+        // If clicking an already selected voucher, deselect it
+        if (newSet.has(code)) {
+          newSet.delete(code);
+          return newSet;
+        }
+
+        if (scope.type === "system") {
+          // SYSTEM SCOPE: Strictly Radio (Only 1 code ever)
+          return new Set([code]);
+        } else {
+          // SHOP SCOPE: Hybrid Stacking
+          if (clickedVoucher.targetUserId) {
+            // Targeted/Refund Voucher: Can stack with anything. Just add it.
+            newSet.add(code);
+          } else {
+            // General Voucher: Can only have ONE general voucher.
+            // Remove any existing general voucher from the selection first.
+            const generalCodesToRemove = vouchers
+              .filter((v) => !v.targetUserId && newSet.has(v.code))
+              .map((v) => v.code);
+
+            generalCodesToRemove.forEach((c) => newSet.delete(c));
+
+            // Now add the new general voucher
+            newSet.add(code);
+          }
+          return newSet;
+        }
+      });
+    },
+    [vouchers, scope.type],
+  );
 
   const handleConfirm = useCallback(() => {
-    const selectedVouchers = vouchers.filter((v) => localSelectedIds.has(v.id));
+    const selectedVouchers = vouchers.filter((v) =>
+      localSelectedCodes.has(v.code),
+    );
     onConfirm(selectedVouchers);
     onClose();
-  }, [vouchers, localSelectedIds, onConfirm, onClose]);
+  }, [vouchers, localSelectedCodes, onConfirm, onClose]);
 
   // Handle manual code input apply — find by code locally, call onConfirm
   const handleApplyCode = useCallback(() => {
@@ -405,7 +439,13 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                 ? 0
                 : v.minOrderValue - currentSubtotal;
 
-              const isApplied = localSelectedIds.has(v.id);
+              const isApplied = localSelectedCodes.has(v.code);
+
+              // Determine selectionMode dynamically
+              let selectionMode: "radio" | "checkbox" = "radio";
+              if (scope.type === "shop" && v.targetUserId) {
+                selectionMode = "checkbox";
+              }
 
               return (
                 <VoucherCard
@@ -413,7 +453,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                   voucher={v}
                   eligible={eligible}
                   remainingAmount={remainingAmount}
-                  selected={localSelectedIds.has(v.id) || isApplied}
+                  selected={localSelectedCodes.has(v.code) || isApplied}
                   isApplied={isApplied}
                   onToggle={handleToggle}
                   brandLabel={brandLabel}
@@ -429,14 +469,14 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
         <div className="px-5 py-4 border-t border-[#1e2126] bg-[#151515]">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-              {localSelectedIds.size > 0
-                ? `Selected ${localSelectedIds.size} voucher(s)`
+              {localSelectedCodes.size > 0
+                ? `Selected ${localSelectedCodes.size} voucher(s)`
                 : "No voucher selected"}
             </span>
-            {localSelectedIds.size > 0 && (
+            {localSelectedCodes.size > 0 && (
               <button
                 type="button"
-                onClick={() => setLocalSelectedIds(new Set())}
+                onClick={() => setLocalSelectedCodes(new Set())}
                 className="text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-red-500 transition-colors"
               >
                 Deselect all

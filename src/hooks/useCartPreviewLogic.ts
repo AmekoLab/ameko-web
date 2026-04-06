@@ -7,7 +7,7 @@ import {
 import {
   clearAllSelectedVouchers,
   setSelectedShopVouchers,
-  setSelectedSystemVouchers,
+  setSelectedSystemVoucher,
 } from "@/src/store/slices/voucherSlice";
 import { OrderItem } from "@/src/types/order.types";
 
@@ -28,51 +28,43 @@ export const useCartPreviewLogic = (
   const applicableVouchers = useAppSelector(
     (state) => state.voucher.applicableVouchers,
   );
-  const selectedSystemIds = useAppSelector(
-    (state) => state.voucher.selectedSystemVoucherIds,
+  const selectedSystemCode = useAppSelector(
+    (state) => state.voucher.selectedSystemVoucherCode,
   );
-  const selectedShopVoucherIdsMap = useAppSelector(
-    (state) => state.voucher.selectedShopVoucherIds,
+  const selectedShopVoucherCodesMap = useAppSelector(
+    (state) => state.voucher.selectedShopVoucherCodes,
   );
 
-  // 1. Map selected voucher IDs → voucher codes
+  // 1. Build payload codes directly from state (already stores codes)
   const payloadCodes = useMemo(() => {
-    const systemCode =
-      selectedSystemIds?.length && applicableVouchers?.systemVouchers
-        ? applicableVouchers.systemVouchers.find(
-            (v) => v.id === selectedSystemIds[0],
-          )?.code
-        : undefined;
-
-    const shopCodes: Record<string, string> = {};
-    if (selectedShopVoucherIdsMap && applicableVouchers?.shopVoucherGroups) {
-      Object.entries(selectedShopVoucherIdsMap).forEach(([shopId, vIds]) => {
-        if (vIds && vIds.length > 0) {
-          const group = applicableVouchers.shopVoucherGroups.find(
-            (g) => g.shopId === shopId,
-          );
-          const code = group?.vouchers.find((v) => v.id === vIds[0])?.code;
-          if (code) shopCodes[shopId] = code;
+    const shopCodeGroups: Record<string, string[]> = {};
+    if (selectedShopVoucherCodesMap) {
+      Object.entries(selectedShopVoucherCodesMap).forEach(([shopId, codes]) => {
+        if (codes && codes.length > 0) {
+          shopCodeGroups[shopId] = codes;
         }
       });
     }
-    return { systemCode, shopCodes };
-  }, [applicableVouchers, selectedSystemIds, selectedShopVoucherIdsMap]);
+    return {
+      systemCode: selectedSystemCode ?? undefined,
+      shopCodeGroups,
+    };
+  }, [selectedSystemCode, selectedShopVoucherCodesMap]);
 
   // 1a. Hydrate Redux from localStorage on mount (runs once)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        const savedSystem = localStorage.getItem('ameko_system_vouchers');
-        const savedShop = localStorage.getItem('ameko_shop_vouchers');
+        const savedSystem = localStorage.getItem('ameko_system_voucher_code');
+        const savedShop = localStorage.getItem('ameko_shop_voucher_codes');
 
         if (savedSystem) {
-          dispatch(setSelectedSystemVouchers(JSON.parse(savedSystem)));
+          dispatch(setSelectedSystemVoucher(JSON.parse(savedSystem)));
         }
         if (savedShop) {
           const parsedShop = JSON.parse(savedShop);
-          Object.entries(parsedShop).forEach(([shopId, voucherIds]) => {
-            dispatch(setSelectedShopVouchers({ shopId, voucherIds: voucherIds as string[] }));
+          Object.entries(parsedShop).forEach(([shopId, voucherCodes]) => {
+            dispatch(setSelectedShopVouchers({ shopId, voucherCodes: voucherCodes as string[] }));
           });
         }
       } catch (error) {
@@ -85,9 +77,9 @@ export const useCartPreviewLogic = (
   // 1b. Sync Redux state → localStorage (only after hydration)
   useEffect(() => {
     if (!isHydrated || typeof window === 'undefined') return;
-    localStorage.setItem('ameko_system_vouchers', JSON.stringify(selectedSystemIds || []));
-    localStorage.setItem('ameko_shop_vouchers', JSON.stringify(selectedShopVoucherIdsMap || {}));
-  }, [isHydrated, selectedSystemIds, selectedShopVoucherIdsMap]);
+    localStorage.setItem('ameko_system_voucher_code', JSON.stringify(selectedSystemCode ?? null));
+    localStorage.setItem('ameko_shop_voucher_codes', JSON.stringify(selectedShopVoucherCodesMap || {}));
+  }, [isHydrated, selectedSystemCode, selectedShopVoucherCodesMap]);
 
   // 2. Safe auto-cleanup guard (prevent infinite loops)
   useEffect(() => {
@@ -95,10 +87,9 @@ export const useCartPreviewLogic = (
 
     if (selectedItemIds.size === 0) {
       const hasVouchers =
-        Object.values(selectedShopVoucherIdsMap).some(
+        Object.values(selectedShopVoucherCodesMap).some(
           (v) => v && v.length > 0,
-        ) ||
-        (selectedSystemIds && selectedSystemIds.length > 0);
+        ) || !!selectedSystemCode;
       if (hasVouchers) dispatch(clearAllSelectedVouchers());
       if (cartPreview) dispatch(clearCartPreview());
       return;
@@ -110,9 +101,9 @@ export const useCartPreviewLogic = (
         .filter((item) => selectedItemIds.has(item.orderItemId))
         .map((item) => item.shopId),
     );
-    Object.entries(selectedShopVoucherIdsMap).forEach(([sId, vIds]) => {
-      if (!activeShopIds.has(sId) && vIds && vIds.length > 0) {
-        dispatch(setSelectedShopVouchers({ shopId: sId, voucherIds: [] }));
+    Object.entries(selectedShopVoucherCodesMap).forEach(([sId, codes]) => {
+      if (!activeShopIds.has(sId) && codes && codes.length > 0) {
+        dispatch(setSelectedShopVouchers({ shopId: sId, voucherCodes: [] }));
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -120,8 +111,8 @@ export const useCartPreviewLogic = (
     dispatch,
     selectedItemIds.size,
     cartItems.length,
-    selectedShopVoucherIdsMap,
-    selectedSystemIds,
+    selectedShopVoucherCodesMap,
+    selectedSystemCode,
   ]); // Intentional: .size and .length used to avoid Set/array reference loops
 
   // Create a signature that tracks the exact quantities of selected items
@@ -137,9 +128,9 @@ export const useCartPreviewLogic = (
   const payloadToFetch = {
     selectedOrderItemIds: Array.from(selectedItemIds),
     appliedSystemVoucherCode: payloadCodes.systemCode,
-    appliedShopVoucherCodes:
-      Object.keys(payloadCodes.shopCodes).length > 0
-        ? payloadCodes.shopCodes
+    appliedShopVoucherCodeGroups:
+      Object.keys(payloadCodes.shopCodeGroups).length > 0
+        ? payloadCodes.shopCodeGroups
         : undefined,
   };
   // Stringify guarantees a stable primitive dependency — object reference
