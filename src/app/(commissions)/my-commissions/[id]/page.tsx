@@ -13,6 +13,7 @@ import {
   publishCommissionToPool,
 } from "@/src/store/slices/commissionSlice";
 import { CommissionQuote } from "@/src/types/commission.types";
+import { EditCommissionModal } from "@/src/components/Profile/EditCommissionModal";
 import { toast } from "react-toastify";
 import {
   ArrowLeft,
@@ -33,6 +34,7 @@ const STATUS_STYLES: Record<
   string,
   { bg: string; text: string; label: string }
 > = {
+  Draft: { bg: "bg-gray-200", text: "text-gray-700", label: "Draft" },
   PendingTarget: {
     bg: "bg-orange-100",
     text: "text-orange-700",
@@ -275,6 +277,7 @@ export default function CommissionDetailPage() {
   const [confirmQuoteId, setConfirmQuoteId] = useState<string | null>(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [showPublishConfirm, setShowPublishConfirm] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -331,14 +334,17 @@ export default function CommissionDetailPage() {
   }
 
   const statusStyle = STATUS_STYLES[currentRequest.status] || DEFAULT_STATUS;
+  const isDraft = currentRequest.status === "Draft";
   const isCanceled = currentRequest.status === "Canceled";
   const canCancel =
+    !isDraft &&
     !isCanceled &&
     (currentRequest.status === "PendingTarget" ||
       currentRequest.status === "OpenPool");
   const canPublish =
-    currentRequest.status === "PendingTarget" ||
-    currentRequest.status === "TargetRejected";
+    !isDraft &&
+    (currentRequest.status === "PendingTarget" ||
+      currentRequest.status === "TargetRejected");
 
   return (
     <div className="bg-[#FAFAFA] min-h-screen">
@@ -545,6 +551,30 @@ export default function CommissionDetailPage() {
               </p>
             </div>
 
+            {/* Draft Action Buttons */}
+            {isDraft && (
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowPublishConfirm(true)}
+                  disabled={isPublishingToPool}
+                  className="flex-1 py-3 bg-[#f5d800] hover:bg-[#e6ca00] text-black font-black uppercase text-xs tracking-widest rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isPublishingToPool ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Globe className="w-4 h-4" />
+                  )}
+                  Publish Request
+                </button>
+                <button
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold uppercase text-xs tracking-widest rounded-lg transition-colors border border-gray-200"
+                >
+                  Edit Request
+                </button>
+              </div>
+            )}
+
             {/* Cancel Button */}
             {canCancel && (
               <button
@@ -619,6 +649,15 @@ export default function CommissionDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Draft Modal */}
+      {currentRequest && (
+        <EditCommissionModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          request={currentRequest}
+        />
+      )}
     </div>
   );
 }

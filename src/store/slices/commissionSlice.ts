@@ -5,6 +5,7 @@ import {
   CommissionRequest,
   CommissionQuote,
   SubmitQuotePayload,
+  UpdateCommissionPayload,
 } from "@/src/types/commission.types";
 import { toast } from "react-toastify";
 
@@ -18,10 +19,11 @@ interface CommissionState {
   targetedRequests: CommissionRequest[];
   loadingTargetedRequests: boolean;
   isSubmittingQuote: boolean;
-  isUpdatingQuote: boolean;
+  isRevokingQuote: boolean;
   isAcceptingQuote: boolean;
   isCanceling: boolean;
   isPublishingToPool: boolean;
+  isUpdatingRequest: boolean;
   poolRequests: CommissionRequest[];
   loadingPool: boolean;
   shopQuotes: CommissionQuote[];
@@ -38,10 +40,11 @@ const initialState: CommissionState = {
   targetedRequests: [],
   loadingTargetedRequests: false,
   isSubmittingQuote: false,
-  isUpdatingQuote: false,
+  isRevokingQuote: false,
   isAcceptingQuote: false,
   isCanceling: false,
   isPublishingToPool: false,
+  isUpdatingRequest: false,
   poolRequests: [],
   loadingPool: false,
   shopQuotes: [],
@@ -180,22 +183,20 @@ export const submitCommissionQuote = createAsyncThunk(
   },
 );
 
-export const updateCommissionQuote = createAsyncThunk(
-  "commission/updateQuote",
-  async (
-    { quoteId, payload }: { quoteId: string; payload: SubmitQuotePayload },
-    { rejectWithValue },
-  ) => {
+export const revokeCommissionQuote = createAsyncThunk(
+  "commission/revokeQuote",
+  async (quoteId: string, { rejectWithValue, dispatch }) => {
     try {
-      const response = await commissionService.updateQuote(quoteId, payload);
+      const response = await commissionService.revokeQuote(quoteId);
       if (response.success) {
-        toast.success("Cập nhật báo giá thành công!");
+        toast.success("Đã thu hồi báo giá thành công.");
+        dispatch(fetchShopQuotes());
         return;
       }
-      return rejectWithValue(response.message || "Cập nhật báo giá thất bại");
+      return rejectWithValue(response.message || "Thu hồi báo giá thất bại");
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Lỗi khi cập nhật báo giá";
+        error instanceof Error ? error.message : "Lỗi khi thu hồi báo giá";
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -281,6 +282,29 @@ export const rejectCommissionRequest = createAsyncThunk(
   },
 );
 
+export const updateCommissionRequestThunk = createAsyncThunk(
+  "commission/update",
+  async (
+    { id, payload }: { id: string; payload: UpdateCommissionPayload },
+    { rejectWithValue, dispatch },
+  ) => {
+    try {
+      const response = await commissionService.updateCommission(id, payload);
+      if (response.success) {
+        toast.success("Cập nhật yêu cầu thành công!");
+        dispatch(fetchCommissionDetail(id));
+        return;
+      }
+      return rejectWithValue(response.message || "Cập nhật thất bại");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Lỗi khi cập nhật yêu cầu";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  },
+);
+
 const commissionSlice = createSlice({
   name: "commission",
   initialState,
@@ -354,15 +378,15 @@ const commissionSlice = createSlice({
       .addCase(submitCommissionQuote.rejected, (state) => {
         state.isSubmittingQuote = false;
       })
-      // --- Update Quote ---
-      .addCase(updateCommissionQuote.pending, (state) => {
-        state.isUpdatingQuote = true;
+      // --- Revoke Quote ---
+      .addCase(revokeCommissionQuote.pending, (state) => {
+        state.isRevokingQuote = true;
       })
-      .addCase(updateCommissionQuote.fulfilled, (state) => {
-        state.isUpdatingQuote = false;
+      .addCase(revokeCommissionQuote.fulfilled, (state) => {
+        state.isRevokingQuote = false;
       })
-      .addCase(updateCommissionQuote.rejected, (state) => {
-        state.isUpdatingQuote = false;
+      .addCase(revokeCommissionQuote.rejected, (state) => {
+        state.isRevokingQuote = false;
       })
       // --- Accept Quote ---
       .addCase(acceptCommissionQuote.pending, (state) => {
@@ -425,6 +449,16 @@ const commissionSlice = createSlice({
       .addCase(fetchShopQuotes.rejected, (state, action) => {
         state.loadingShopQuotes = false;
         state.error = action.payload as string;
+      })
+      // --- Update Commission Request ---
+      .addCase(updateCommissionRequestThunk.pending, (state) => {
+        state.isUpdatingRequest = true;
+      })
+      .addCase(updateCommissionRequestThunk.fulfilled, (state) => {
+        state.isUpdatingRequest = false;
+      })
+      .addCase(updateCommissionRequestThunk.rejected, (state) => {
+        state.isUpdatingRequest = false;
       });
   },
 });

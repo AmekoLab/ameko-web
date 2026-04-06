@@ -5,7 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/src/store/index";
-import { fetchMyRequests } from "@/src/store/slices/commissionSlice";
+import {
+  fetchMyRequests,
+  publishCommissionToPool,
+} from "@/src/store/slices/commissionSlice";
 import { CreateCommissionModal } from "@/src/components/Profile/CreateCommissionModal";
 import {
   FileText,
@@ -23,6 +26,7 @@ const STATUS_STYLES: Record<
   string,
   { bg: string; text: string; label: string }
 > = {
+  Draft: { bg: "bg-gray-200", text: "text-gray-700", label: "Draft" },
   PendingTarget: {
     bg: "bg-orange-100",
     text: "text-orange-700",
@@ -88,7 +92,7 @@ const CardSkeleton = () => (
 // ─── Page ──────────────────────────────────────────────────
 export default function MyCommissionsPage() {
   const dispatch = useDispatch<AppDispatch>();
-  const { myRequests, loadingMyRequests } = useSelector(
+  const { myRequests, loadingMyRequests, isPublishingToPool } = useSelector(
     (state: RootState) => state.commission,
   );
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -153,6 +157,7 @@ export default function MyCommissionsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {myRequests.map((req) => {
               const statusStyle = STATUS_STYLES[req.status] || DEFAULT_STATUS;
+              const isDraft = req.status === "Draft";
 
               return (
                 <div
@@ -228,12 +233,41 @@ export default function MyCommissionsPage() {
                     </div>
 
                     {/* Footer */}
-                    <Link
-                      href={`/my-commissions/${req.commissionRequestId}`}
-                      className="mt-4 w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-sm rounded-lg transition-colors text-center block"
-                    >
-                      View Details
-                    </Link>
+                    {isDraft ? (
+                      <div className="grid grid-cols-2 gap-2 mt-4">
+                        <button
+                          onClick={async () => {
+                            try {
+                              await dispatch(
+                                publishCommissionToPool(
+                                  req.commissionRequestId,
+                                ),
+                              ).unwrap();
+                              dispatch(fetchMyRequests());
+                            } catch {
+                              // Errors are already handled by the thunk's toast notifications
+                            }
+                          }}
+                          disabled={isPublishingToPool}
+                          className="w-full py-2 bg-[#f5d800] hover:bg-[#e6ca00] text-black font-semibold text-sm rounded-lg transition-colors flex items-center justify-center"
+                        >
+                          Publish
+                        </button>
+                        <Link
+                          href={`/my-commissions/${req.commissionRequestId}`}
+                          className="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-sm rounded-lg transition-colors flex items-center justify-center text-center"
+                        >
+                          Edit / View
+                        </Link>
+                      </div>
+                    ) : (
+                      <Link
+                        href={`/my-commissions/${req.commissionRequestId}`}
+                        className="block w-full py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold text-sm rounded-lg transition-colors text-center border border-gray-200 mt-4"
+                      >
+                        View Details
+                      </Link>
+                    )}
                   </div>
                 </div>
               );

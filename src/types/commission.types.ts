@@ -6,6 +6,9 @@ export interface CreateCommissionPayload {
   minBudget: number;
   maxBudget: number;
   quantity: number;
+  isDraft: boolean;
+  shopResponseWindowHours: number;
+  customerResponseWindowHours: number;
 }
 
 export interface CreateCommissionResponse {
@@ -42,6 +45,9 @@ export interface CommissionRequest {
   status: string;
   createdAt: string;
   quantity: number;
+  isDraft: boolean;
+  shopResponseWindowHours: number;
+  customerResponseWindowHours: number;
   quotes: CommissionQuote[];
 }
 
@@ -55,4 +61,16 @@ export interface SubmitQuotePayload {
   quotedPrice: number;
   estimatedDays: number;
   shopNotes: string;
+}
+
+export interface UpdateCommissionPayload {
+  title?: string;
+  description?: string;
+  referenceImages?: string;
+  minBudget?: number;
+  maxBudget?: number;
+  quantity?: number;
+  isDraft?: boolean;
+  shopResponseWindowHours?: number;
+  customerResponseWindowHours?: number;
 }

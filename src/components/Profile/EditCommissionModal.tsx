@@ -1,17 +1,18 @@
 "use client";
-import { FC, useRef, useState } from "react";
+import { FC, useRef, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X, Upload, Loader2 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/src/store/index";
-import { createCommissionRequest } from "@/src/store/slices/commissionSlice";
+import { updateCommissionRequestThunk } from "@/src/store/slices/commissionSlice";
+import { CommissionRequest } from "@/src/types/commission.types";
 import { uploadImage } from "@/src/utils/uploadImage";
 import { toast } from "react-toastify";
 import Image from "next/image";
 
-const commissionSchema = z
+const editSchema = z
   .object({
     title: z.string().min(1, "Title cannot be empty"),
     description: z.string().min(1, "Description cannot be empty"),
@@ -27,26 +28,25 @@ const commissionSchema = z
     path: ["maxBudget"],
   });
 
-type CommissionFormData = z.infer<typeof commissionSchema>;
+type EditFormData = z.infer<typeof editSchema>;
 
-interface CreateCommissionModalProps {
+interface EditCommissionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  targetedShopId?: string;
-  onSuccess?: () => void;
+  request: CommissionRequest;
 }
 
-export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
+export const EditCommissionModal: FC<EditCommissionModalProps> = ({
   isOpen,
   onClose,
-  targetedShopId,
-  onSuccess,
+  request,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [submitType, setSubmitType] = useState<"draft" | "send">("send");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    request.referenceImages || null,
+  );
 
   const {
     register,
@@ -54,19 +54,34 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
     setValue,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<CommissionFormData>({
-    resolver: zodResolver(commissionSchema),
+  } = useForm<EditFormData>({
+    resolver: zodResolver(editSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      quantity: 1,
-      minBudget: 0,
-      maxBudget: 0,
-      referenceImages: "",
-      shopResponseWindowHours: 72,
-      customerResponseWindowHours: 72,
+      title: request.title,
+      description: request.description,
+      quantity: request.quantity,
+      minBudget: request.minBudget,
+      maxBudget: request.maxBudget,
+      referenceImages: request.referenceImages,
+      shopResponseWindowHours: request.shopResponseWindowHours ?? 72,
+      customerResponseWindowHours: request.customerResponseWindowHours ?? 72,
     },
   });
+
+  // Re-sync form when `request` prop changes (e.g. after a refetch)
+  useEffect(() => {
+    reset({
+      title: request.title,
+      description: request.description,
+      quantity: request.quantity,
+      minBudget: request.minBudget,
+      maxBudget: request.maxBudget,
+      referenceImages: request.referenceImages,
+      shopResponseWindowHours: request.shopResponseWindowHours ?? 72,
+      customerResponseWindowHours: request.customerResponseWindowHours ?? 72,
+    });
+    setPreviewUrl(request.referenceImages || null);
+  }, [request, reset]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -78,43 +93,38 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
       setValue("referenceImages", url, { shouldValidate: true });
       setPreviewUrl(url);
     } catch {
-      toast.error("Upload image failed, please try again");
+      toast.error("Upload failed, please try again");
     } finally {
       setIsUploading(false);
     }
   };
 
-  const onSubmit = async (data: CommissionFormData) => {
-    const isDraft = submitType === "draft";
+  const onSubmit = async (data: EditFormData) => {
     try {
       await dispatch(
-        createCommissionRequest({
-          ...(targetedShopId ? { targetedShopId } : {}),
-          title: data.title,
-          description: data.description,
-          referenceImages: data.referenceImages,
-          minBudget: data.minBudget,
-          maxBudget: data.maxBudget,
-          quantity: data.quantity,
-          isDraft,
-          shopResponseWindowHours: data.shopResponseWindowHours,
-          customerResponseWindowHours: data.customerResponseWindowHours,
+        updateCommissionRequestThunk({
+          id: request.commissionRequestId,
+          payload: {
+            title: data.title,
+            description: data.description,
+            referenceImages: data.referenceImages,
+            minBudget: data.minBudget,
+            maxBudget: data.maxBudget,
+            quantity: data.quantity,
+            shopResponseWindowHours: data.shopResponseWindowHours,
+            customerResponseWindowHours: data.customerResponseWindowHours,
+          },
         }),
       ).unwrap();
 
-      toast.success(isDraft ? "Saved as draft!" : "Request sent successfully!");
-      reset();
-      setPreviewUrl(null);
+      // toast.success("Cập nhật thành công!");
       onClose();
-      onSuccess?.();
     } catch (err) {
-      toast.error(typeof err === "string" ? err : "Failed to send request");
+      toast.error(typeof err === "string" ? err : "Update failed");
     }
   };
 
   const handleClose = () => {
-    reset();
-    setPreviewUrl(null);
     onClose();
   };
 
@@ -128,15 +138,13 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
       onClick={handleClose}
     >
       <div
-        className=" bg-[#151515] border border-[#1e2126] rounded-sm w-full max-w-[520px] shadow-2xl flex flex-col overflow-hidden custom-scrollbar"
+        className="bg-[#151515] border border-[#1e2126] rounded-sm w-full max-w-[520px] shadow-2xl flex flex-col overflow-hidden custom-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#1e2126]">
           <h3 className="text-[15px] font-black uppercase text-white tracking-widest">
-            {targetedShopId
-              ? "Send quotation request"
-              : "Post request to Public Market"}
+            Edit Draft Request
           </h3>
           <button
             onClick={handleClose}
@@ -250,7 +258,9 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
               </label>
               <input
                 type="number"
-                {...register("shopResponseWindowHours", { valueAsNumber: true })}
+                {...register("shopResponseWindowHours", {
+                  valueAsNumber: true,
+                })}
                 min={24}
                 placeholder="72"
                 className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors"
@@ -267,7 +277,9 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
               </label>
               <input
                 type="number"
-                {...register("customerResponseWindowHours", { valueAsNumber: true })}
+                {...register("customerResponseWindowHours", {
+                  valueAsNumber: true,
+                })}
                 min={24}
                 placeholder="72"
                 className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors"
@@ -337,39 +349,20 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
             )}
           </div>
 
-          {/* Submit Buttons */}
-          <div className="grid grid-cols-2 gap-3 mt-4">
-            <button
-              type="submit"
-              disabled={isBusy}
-              onClick={() => setSubmitType("draft")}
-              className="w-full py-4 bg-[#202030] hover:bg-[#2a2a3d] disabled:bg-[#202030]/50 text-white font-black uppercase tracking-widest text-[13px] rounded-sm shadow-md transition-all flex items-center justify-center gap-2 border border-[#1e2126]"
-            >
-              {isSubmitting && submitType === "draft" ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Saving...
-                </>
-              ) : (
-                "Save Draft"
-              )}
-            </button>
-            <button
-              type="submit"
-              disabled={isBusy}
-              onClick={() => setSubmitType("send")}
-              className="w-full py-4 bg-[#f5d800] hover:bg-[#e6ca00] disabled:bg-[#f5d800]/50 text-black font-black uppercase tracking-widest text-[13px] rounded-sm shadow-md transition-all flex items-center justify-center gap-2"
-            >
-              {isSubmitting && submitType === "send" ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Sending...
-                </>
-              ) : targetedShopId ? (
-                "Send Request"
-              ) : (
-                "Post to Pool"
-              )}
-            </button>
-          </div>
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isBusy}
+            className="w-full py-4 bg-[#f5d800] hover:bg-[#e6ca00] disabled:bg-[#f5d800]/50 text-black font-black uppercase tracking-widest text-[13px] rounded-sm shadow-md transition-all flex items-center justify-center gap-2 mt-4"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
+          </button>
         </form>
       </div>
     </div>
