@@ -23,5 +23,16 @@ export const shopOrderService = {
     return api.put(`/orders/shop/${orderId}/status`, status, {
       headers: { 'Content-Type': 'application/json' }
     });
-  }
+  },
+
+  /**
+   * Shop cancels a customer order.
+   * POST /orders/shop/{orderId}/cancel
+   */
+  shopCancelOrder: async (
+    orderId: string,
+    reason: string,
+  ): Promise<ApiResponse<null>> => {
+    return api.post(`/orders/shop/${orderId}/cancel`, { reason });
+  },
 };

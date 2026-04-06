@@ -1,7 +1,7 @@
 import { FC, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation"; // Thêm hook này
-import { X, Loader2, Package, Calendar, CreditCard, Keyboard } from "lucide-react";
+import { X, Loader2, Package, Calendar, CreditCard, Keyboard, Pencil } from "lucide-react";
 import { orderService } from "@/src/services/order.service";
 import { shopOrderService } from "@/src/services/shopOrder.service";
 import { CartData } from "@/src/types/order.types";
@@ -42,6 +42,18 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelingOrderId, setCancelingOrderId] = useState<string | null>(null);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<number | null>(null);
+
+  // ── Shop cancel order state ──
+  const [isShopCancelOpen, setIsShopCancelOpen] = useState(false);
+  const [shopCancelReason, setShopCancelReason] = useState("");
+  const [isCancellingOrder, setIsCancellingOrder] = useState(false);
+
+  // ── Shipping address editing state ──
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editAddress, setEditAddress] = useState("");
 
   const fetchOrderDetail = useCallback(async () => {
     if (!orderId) return;
@@ -92,6 +104,73 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
     }
   };
 
+  // ── Shop cancel order ──
+  const handleShopCancelOrder = useCallback(async () => {
+    if (!orderId) return;
+    const reason = shopCancelReason.trim();
+    if (!reason) {
+      toast.error("Please provide a cancellation reason");
+      return;
+    }
+    setIsCancellingOrder(true);
+    try {
+      const res = await shopOrderService.shopCancelOrder(orderId, reason);
+      if (res.success) {
+        toast.success("Order cancelled successfully");
+        setIsShopCancelOpen(false);
+        setShopCancelReason("");
+        fetchOrderDetail();
+      } else {
+        toast.error(res.message || "Failed to cancel order");
+      }
+    } catch (err: unknown) {
+      const message = (err as { message?: string }).message || "Failed to cancel order";
+      toast.error(message);
+    } finally {
+      setIsCancellingOrder(false);
+    }
+  }, [orderId, shopCancelReason, fetchOrderDetail]);
+
+  // ── Save shipping address ──
+  const handleSaveAddress = useCallback(async () => {
+    if (!orderId || !order) return;
+    const name = editName.trim();
+    const phone = editPhone.trim();
+    const address = editAddress.trim();
+    if (!name || !phone || !address) {
+      toast.error("Please fill in all shipping fields");
+      return;
+    }
+    setIsSavingAddress(true);
+    try {
+      const res = await orderService.updateShippingAddress(orderId, {
+        receiverName: name,
+        receiverPhone: phone,
+        shippingAddress: address,
+      });
+      if (res.success) {
+        toast.success("Shipping address updated successfully");
+        setIsEditingAddress(false);
+        fetchOrderDetail(); // Refresh data
+      } else {
+        toast.error(res.message || "Failed to update address");
+      }
+    } catch (err: unknown) {
+      const message = (err as { message?: string }).message || "Failed to update address";
+      toast.error(message);
+    } finally {
+      setIsSavingAddress(false);
+    }
+  }, [orderId, order, editName, editPhone, editAddress, fetchOrderDetail]);
+
+  const startEditingAddress = useCallback(() => {
+    if (!order) return;
+    setEditName(order.receiverName || "");
+    setEditPhone(order.receiverPhone || "");
+    setEditAddress(order.shippingAddress || "");
+    setIsEditingAddress(true);
+  }, [order]);
+
   if (!isOpen) return null;
 
   return (
@@ -132,12 +211,77 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                 <div>
                   <h3 className="text-[11px] font-black uppercase tracking-widest text-[#f5d800] mb-3 flex items-center gap-2">
                     Shipping Address
+                    {isBuyerContext && order.orderStatus === 'Processing' && !isEditingAddress && (
+                      <button
+                        type="button"
+                        onClick={startEditingAddress}
+                        className="ml-auto p-1 text-gray-500 hover:text-[#f5d800] transition-colors rounded-sm hover:bg-white/5"
+                        title="Edit shipping address"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </h3>
-                  <div className="bg-[#1a1c20] p-4 rounded-sm border border-[#1e2126]">
-                    <p className="text-[12px] font-bold text-white mb-1 uppercase tracking-wider">{order.receiverName}</p>
-                    <p className="text-[11px] font-bold text-gray-400 mb-2">{order.receiverPhone}</p>
-                    <p className="text-[11px] text-gray-500 leading-relaxed">{order.shippingAddress}</p>
-                  </div>
+
+                  {isEditingAddress ? (
+                    <div className="bg-[#1a1c20] p-4 rounded-sm border border-[#f5d800]/30 space-y-3">
+                      <div>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Name</label>
+                        <input
+                          type="text"
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          className="w-full bg-[#111111] border border-[#2a2d35] rounded-sm px-3 py-2 text-[12px] font-bold text-white focus:outline-none focus:border-[#f5d800]/50 placeholder-gray-600"
+                          placeholder="Receiver name"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Phone</label>
+                        <input
+                          type="text"
+                          value={editPhone}
+                          onChange={(e) => setEditPhone(e.target.value)}
+                          className="w-full bg-[#111111] border border-[#2a2d35] rounded-sm px-3 py-2 text-[12px] font-bold text-white focus:outline-none focus:border-[#f5d800]/50 placeholder-gray-600"
+                          placeholder="Phone number"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Address</label>
+                        <input
+                          type="text"
+                          value={editAddress}
+                          onChange={(e) => setEditAddress(e.target.value)}
+                          className="w-full bg-[#111111] border border-[#2a2d35] rounded-sm px-3 py-2 text-[12px] font-bold text-white focus:outline-none focus:border-[#f5d800]/50 placeholder-gray-600"
+                          placeholder="Shipping address"
+                        />
+                      </div>
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingAddress(false)}
+                          disabled={isSavingAddress}
+                          className="flex-1 py-2 rounded-sm text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-[#111111] hover:bg-[#252830] transition-colors border border-[#2a2d35]"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveAddress}
+                          disabled={isSavingAddress}
+                          className="flex-1 py-2 rounded-sm text-[10px] font-black uppercase tracking-widest text-black bg-[#f5d800] hover:bg-[#e6cc00] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          {isSavingAddress && <Loader2 className="w-3 h-3 animate-spin" />}
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-[#1a1c20] p-4 rounded-sm border border-[#1e2126]">
+                      <p className="text-[12px] font-bold text-white mb-1 uppercase tracking-wider">{order.receiverName}</p>
+                      <p className="text-[11px] font-bold text-gray-400 mb-2">{order.receiverPhone}</p>
+                      <p className="text-[11px] text-gray-500 leading-relaxed">{order.shippingAddress}</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Status Summary */}
@@ -213,6 +357,52 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                           </button>
 
                         </div>
+
+                        {/* Shop Cancel Order */}
+                        {order.orderStatus === 'Processing' && (
+                          <div className="pt-2 mt-1">
+                            {!isShopCancelOpen ? (
+                              <button
+                                type="button"
+                                onClick={() => setIsShopCancelOpen(true)}
+                                disabled={isUpdatingStatus !== null || isCancellingOrder}
+                                className="w-full text-[10px] text-red-500 border border-red-500/40 border-dashed rounded-sm px-4 py-2 hover:bg-red-500 hover:text-white transition-colors uppercase font-bold tracking-widest text-center disabled:opacity-50"
+                              >
+                                Cancel Order
+                              </button>
+                            ) : (
+                              <div className="border border-red-500/30 rounded-sm p-3 bg-red-500/5 space-y-2">
+                                <label className="block text-[10px] font-bold uppercase tracking-widest text-red-400 mb-1">Cancellation Reason</label>
+                                <textarea
+                                  value={shopCancelReason}
+                                  onChange={(e) => setShopCancelReason(e.target.value)}
+                                  rows={2}
+                                  className="w-full bg-[#111111] border border-[#2a2d35] rounded-sm px-3 py-2 text-[11px] text-white focus:outline-none focus:border-red-500/50 placeholder-gray-600 resize-none"
+                                  placeholder="Why are you cancelling this order?"
+                                />
+                                <div className="flex gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => { setIsShopCancelOpen(false); setShopCancelReason(""); }}
+                                    disabled={isCancellingOrder}
+                                    className="flex-1 py-1.5 rounded-sm text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-[#111111] hover:bg-[#252830] transition-colors border border-[#2a2d35]"
+                                  >
+                                    Back
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={handleShopCancelOrder}
+                                    disabled={isCancellingOrder || !shopCancelReason.trim()}
+                                    className="flex-1 py-1.5 rounded-sm text-[10px] font-black uppercase tracking-widest text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                                  >
+                                    {isCancellingOrder && <Loader2 className="w-3 h-3 animate-spin" />}
+                                    Confirm Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

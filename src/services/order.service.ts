@@ -8,6 +8,7 @@ import {
   OrderGroup,
   CalculatePreviewPayload,
   CartPreviewData,
+  UpdateShippingAddressPayload,
 } from "@/src/types/order.types";
 
 export const orderService = {
@@ -98,5 +99,16 @@ export const orderService = {
    */
   getOrderDetail: async (orderId: string): Promise<ApiResponse<CartData>> => {
     return api.get(`/orders/${orderId}`);
+  },
+
+  /**
+   * Update shipping address for a Processing order.
+   * PUT /orders/{orderId}/shipping-address
+   */
+  updateShippingAddress: async (
+    orderId: string,
+    payload: UpdateShippingAddressPayload,
+  ): Promise<ApiResponse<null>> => {
+    return api.put(`/orders/${orderId}/shipping-address`, payload);
   },
 };

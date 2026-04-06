@@ -52,13 +52,13 @@ export default function ProfilePage() {
   if (!isInitialized || !user) {
     return (
       <div className="max-w-4xl mx-auto mt-8 p-6 animate-pulse">
-        <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-        <div className="bg-white shadow-card rounded-xl p-6 flex items-center gap-6">
-          <div className="w-32 h-32 bg-gray-200 rounded-full"></div>
+        <div className="h-8 bg-[#1e2126] rounded-sm w-1/4 mb-6"></div>
+        <div className="bg-[#151515] border border-[#1e2126] rounded-sm p-6 flex items-center gap-6">
+          <div className="w-32 h-32 bg-[#1e2126] rounded-full"></div>
           <div className="flex-1 space-y-3">
-            <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-6 bg-[#1e2126] rounded-sm w-1/3"></div>
+            <div className="h-4 bg-[#1e2126] rounded-sm w-1/2"></div>
+            <div className="h-4 bg-[#1e2126] rounded-sm w-1/4"></div>
           </div>
         </div>
       </div>
@@ -84,18 +84,18 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto mt-8 px-4 pb-12">
-      <h1 className="text-3xl font-black uppercase tracking-tight mb-8 font-oswald text-black">
+      <h1 className="text-3xl font-black uppercase tracking-tight mb-8 font-oswald text-white">
         My Profile
       </h1>
 
-      <div className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-100 relative">
+      <div className="bg-[#151515] shadow-2xl rounded-sm overflow-hidden border border-[#1e2126] relative">
         {/* Header Background */}
-        <div className="h-32 bg-gradient-to-r from-gray-900 to-gray-700"></div>
+        <div className="h-32 bg-[#1a1c20] border-b border-[#1e2126]"></div>
 
         <div className="px-8 pb-8">
           <div className="relative flex justify-between items-end -mt-12 mb-6">
             {/* Avatar */}
-            <div className="relative w-32 h-32 rounded-full border-4 border-white shadow-md bg-white overflow-hidden">
+            <div className="relative w-32 h-32 rounded-full border-4 border-[#151515] shadow-md bg-[#1e2126] overflow-hidden">
               <img
                 src={avatarSrc}
                 alt="avatar"
@@ -111,7 +111,7 @@ export default function ProfilePage() {
             {/* Edit Button */}
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-black hover:text-white transition shadow-sm font-medium text-sm flex items-center gap-2"
+              className="bg-[#1a1c20] border border-[#2a2d35] text-gray-300 px-4 py-2 hover:border-[#f5d800]/50 hover:text-[#f5d800] rounded-sm transition shadow-sm font-medium text-[11px] uppercase tracking-widest flex items-center gap-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -133,13 +133,13 @@ export default function ProfilePage() {
 
           {/* User Info */}
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{fullName}</h2>
+            <h2 className="text-2xl font-bold text-white">{fullName}</h2>
             <div className="flex items-center gap-2 mt-1">
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-bold uppercase rounded">
+              <span className="px-2 py-0.5 bg-[#1e2126] text-gray-400 text-[10px] font-black uppercase tracking-widest rounded-sm border border-[#2a2d35]">
                 {user.role}
               </span>
               <span
-                className={`px-2 py-0.5 text-xs font-bold uppercase rounded ${user.emailConfirmed ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}
+                className={`px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-sm border ${user.emailConfirmed ? "bg-green-500/10 text-green-400 border-green-500/30" : "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"}`}
               >
                 {user.emailConfirmed ? "Verified" : "Unverified"}
               </span>
@@ -151,22 +151,22 @@ export default function ProfilePage() {
               {/* TRƯỜNG HỢP 1: PENDING */}
               {currentShop &&
                 currentShop.status === ShopStatus.PendingApproval && (
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-4 animate-in fade-in">
-                    <div className="w-12 h-12 bg-gray-100 text-yellow-600 rounded-full flex items-center justify-center shrink-0">
+                  <div className="bg-[#1a1c20] border border-[#2a2d35] rounded-sm p-6 flex flex-col sm:flex-row items-center gap-4 animate-in fade-in">
+                    <div className="w-12 h-12 bg-yellow-500/10 text-yellow-500 rounded-full flex items-center justify-center shrink-0">
                       <Clock className="w-6 h-6 animate-pulse" />
                     </div>
                     <div className="text-center sm:text-left">
-                      <h3 className="font-bold text-lg text-gray-900">
+                      <h3 className="font-bold text-[14px] uppercase tracking-wider text-white">
                         The application is being reviewed
                       </h3>
-                      <p className="text-sm text-gray-700">
+                      <p className="text-[12px] text-gray-400">
                         Please wait for the review process to complete. This
                         usually takes 24 hours.
                       </p>
                     </div>
                     <button
                       onClick={() => setIsApplicationModalOpen(true)}
-                      className="px-4 py-2 text-gray-600 font-bold hover:text-black hover:bg-gray-100 text-sm rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap"
+                      className="px-4 py-2 text-gray-400 font-bold hover:text-[#f5d800] hover:bg-[#111111] text-[11px] uppercase tracking-widest rounded-sm transition-colors flex items-center gap-2 whitespace-nowrap border border-transparent hover:border-[#2a2d35]"
                     >
                       <Eye className="w-4 h-4" /> View Application
                     </button>
@@ -175,16 +175,16 @@ export default function ProfilePage() {
 
               {/* TRƯỜNG HỢP 2: CHƯA CÓ SHOP */}
               {!currentShop && (
-                <div className="bg-gradient-to-r from-gray-50 to-white border border-gray-200 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 group hover:border-black/30 transition-all shadow-sm">
+                <div className="bg-[#1a1c20] border border-[#2a2d35] rounded-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-4 group hover:border-[#f5d800]/50 transition-all shadow-sm">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-700 group-hover:bg-[#ce2a32] group-hover:text-white group-hover:border-[#ce2a32] transition-colors shadow-sm shrink-0">
+                    <div className="w-12 h-12 bg-[#111111] border border-[#2a2d35] rounded-full flex items-center justify-center text-gray-400 group-hover:bg-[#f5d800]/10 group-hover:text-[#f5d800] group-hover:border-[#f5d800]/50 transition-colors shadow-sm shrink-0">
                       <Store className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg text-gray-900 group-hover:text-[#ce2a32] transition-colors">
+                      <h3 className="font-bold text-[14px] uppercase tracking-wider text-white group-hover:text-[#f5d800] transition-colors">
                         Bạn muốn bán hàng trên Ameko?
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-[12px] text-gray-400">
                         Nâng cấp tài khoản để mở Shop và bắt đầu kinh doanh ngay
                         hôm nay.
                       </p>
@@ -193,7 +193,7 @@ export default function ProfilePage() {
 
                   <Link
                     href="/shop/register"
-                    className="px-5 py-2.5 bg-black text-white text-sm font-bold uppercase tracking-wider rounded-lg hover:bg-[#ce2a32] transition-colors flex items-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
+                    className="px-5 py-2.5 bg-[#f5d800] text-black text-[11px] font-black uppercase tracking-widest rounded-sm hover:bg-[#e6cc00] transition-colors flex items-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
                   >
                     Đăng ký Shop <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -202,16 +202,16 @@ export default function ProfilePage() {
 
               {/* TRƯỜNG HỢP 2B: REJECTED → CẬP NHẬT LẠI HỒ SƠ */}
               {currentShop && currentShop.status === ShopStatus.Rejected && (
-                <div className="bg-gradient-to-r from-red-50 to-white border border-red-200 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 group hover:border-red-300 transition-all shadow-sm">
+                <div className="bg-[#1a1c20] border border-red-500/30 rounded-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-4 group hover:border-red-500/50 transition-all shadow-sm">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center shrink-0">
                       <AlertCircle className="w-6 h-6 text-red-500" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg text-gray-900">
+                      <h3 className="font-bold text-[14px] uppercase tracking-wider text-white">
                         Your application was rejected
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-[12px] text-gray-400">
                         {currentShop.adminNote
                           ? `Reason: ${currentShop.adminNote}`
                           : "Please review your information and resubmit."}
@@ -222,13 +222,13 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setIsApplicationModalOpen(true)}
-                      className="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap"
+                      className="px-4 py-2.5 bg-[#111111] border border-[#2a2d35] text-gray-300 text-[11px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#252830] hover:text-white transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap"
                     >
                       <Eye className="w-4 h-4" /> View Application
                     </button>
                     <button
                       onClick={() => setIsUpdateShopModalOpen(true)}
-                      className="px-5 py-2.5 bg-black text-white text-sm font-bold uppercase tracking-wider rounded-lg hover:bg-[#ce2a32] transition-colors flex items-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
+                      className="px-5 py-2.5 bg-[#f5d800] text-black text-[11px] font-black uppercase tracking-widest rounded-sm hover:bg-[#e6cc00] transition-colors flex items-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
                     >
                       Update & Resubmit <ArrowRight className="w-4 h-4" />
                     </button>
@@ -238,16 +238,16 @@ export default function ProfilePage() {
 
               {/* TRƯỜNG HỢP 3: ACTIVE */}
               {currentShop && currentShop.status === ShopStatus.Active && (
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                <div className="bg-[#1a1c20] border border-blue-500/30 rounded-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center shrink-0">
                       <ShoppingBag className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg text-blue-900">
+                      <h3 className="font-bold text-[14px] uppercase tracking-wider text-white">
                         Manage Your Shop Dashboard
                       </h3>
-                      <p className="text-sm text-blue-600">
+                      <p className="text-[12px] text-gray-400">
                         Access your shop's dashboard to manage products, orders,
                         and view analytics.
                       </p>
@@ -255,7 +255,7 @@ export default function ProfilePage() {
                   </div>
                   <Link
                     href="/shop/dashboard"
-                    className="px-5 py-2.5 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
+                    className="px-5 py-2.5 bg-blue-600 text-white text-[11px] font-black uppercase tracking-widest rounded-sm hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
                   >
                     Vào Dashboard <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -264,22 +264,22 @@ export default function ProfilePage() {
 
               {/* TRƯỜNG HỢP 4: BANNED */}
               {currentShop && currentShop.status === ShopStatus.Banned && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-4 shadow-sm">
-                  <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center shrink-0">
+                <div className="bg-[#1a1c20] border border-red-500/30 rounded-sm p-6 flex flex-col sm:flex-row items-center gap-4 shadow-sm">
+                  <div className="w-12 h-12 bg-red-500/10 text-red-400 rounded-full flex items-center justify-center shrink-0">
                     <Ban className="w-6 h-6" />
                   </div>
                   <div className="text-center sm:text-left">
-                    <h3 className="font-bold text-lg text-red-800">
+                    <h3 className="font-bold text-[14px] uppercase tracking-wider text-white">
                       Your shop has been banned
                     </h3>
-                    <p className="text-sm text-red-600">
+                    <p className="text-[12px] text-red-400">
                       Your shop has been suspended due to a policy violation.
                       Please contact support for more information.
                     </p>
                   </div>
                   <button
                     onClick={() => setIsApplicationModalOpen(true)}
-                    className="px-4 py-2 text-red-600 font-bold hover:text-red-800 hover:bg-red-100 text-sm rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap"
+                    className="px-4 py-2 text-red-400 font-bold hover:text-red-300 hover:bg-red-500/10 border border-transparent hover:border-red-500/30 text-[11px] uppercase tracking-widest rounded-sm transition-colors flex items-center gap-2 whitespace-nowrap"
                   >
                     <Eye className="w-4 h-4" /> View Details
                   </button>
@@ -291,26 +291,26 @@ export default function ProfilePage() {
 
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Contact Info */}
-            <div className="p-5 bg-gray-50 rounded-xl border border-gray-100">
-              <h3 className="font-bold text-gray-900 mb-4 uppercase text-sm tracking-wide flex items-center gap-2">
+            <div className="p-6 bg-[#1a1c20] rounded-sm border border-[#1e2126]">
+              <h3 className="font-black text-[#f5d800] mb-5 uppercase text-[11px] tracking-widest flex items-center gap-2">
                 Contact Information
               </h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between border-b border-gray-200 pb-2">
-                  <span className="text-gray-500">Email</span>
-                  <span className="font-medium text-gray-900 break-all">
+              <div className="space-y-4 text-sm">
+                <div className="flex justify-between border-b border-[#1e2126] pb-3">
+                  <span className="text-gray-500 text-[11px] uppercase tracking-widest font-bold">Email</span>
+                  <span className="font-bold text-white break-all text-[12px]">
                     {user.email}
                   </span>
                 </div>
-                <div className="flex justify-between border-b border-gray-200 pb-2">
-                  <span className="text-gray-500">Phone</span>
-                  <span className="font-medium text-gray-900">
+                <div className="flex justify-between border-b border-[#1e2126] pb-3">
+                  <span className="text-gray-500 text-[11px] uppercase tracking-widest font-bold">Phone</span>
+                  <span className="font-bold text-white text-[12px]">
                     {user.phoneNumber || "Not updated"}
                   </span>
                 </div>
                 <div className="flex justify-between pt-1">
-                  <span className="text-gray-500">Username</span>
-                  <span className="font-medium text-gray-900">
+                  <span className="text-gray-500 text-[11px] uppercase tracking-widest font-bold">Username</span>
+                  <span className="font-bold text-white text-[12px]">
                     @{user.username}
                   </span>
                 </div>
@@ -320,20 +320,20 @@ export default function ProfilePage() {
             {/* Store Details (CHỈ HIỆN NẾU KHÔNG PHẢI ADMIN) */}
             {/* Vì Admin không có shop nên phần này sẽ trống rỗng, ẩn luôn cho đẹp */}
             {user.role !== "Admin" && (
-              <div className="p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <h3 className="font-bold text-gray-900 mb-4 uppercase text-sm tracking-wide">
+              <div className="p-6 bg-[#1a1c20] rounded-sm border border-[#1e2126]">
+                <h3 className="font-black text-[#f5d800] mb-5 uppercase text-[11px] tracking-widest">
                   Store Details
                 </h3>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between border-b border-gray-200 pb-2">
-                    <span className="text-gray-500">Address</span>
-                    <span className="font-medium text-gray-900 text-right max-w-[60%] truncate">
+                <div className="space-y-4 text-sm">
+                  <div className="flex justify-between border-b border-[#1e2126] pb-3">
+                    <span className="text-gray-500 text-[11px] uppercase tracking-widest font-bold">Address</span>
+                    <span className="font-bold text-white text-[12px] text-right max-w-[60%] truncate">
                       {user.storeAddress || "No address provided"}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-1 pt-1">
-                    <span className="text-gray-500">Description</span>
-                    <p className="font-medium text-gray-900 italic text-xs leading-relaxed">
+                  <div className="flex flex-col gap-2 pt-1">
+                    <span className="text-gray-500 text-[11px] uppercase tracking-widest font-bold">Description</span>
+                    <p className="font-medium text-gray-300 italic text-[12px] leading-relaxed">
                       "{user.storeDescription || "No description available."}"
                     </p>
                   </div>
@@ -343,14 +343,14 @@ export default function ProfilePage() {
           </div>
 
           {/* Logout & Change Password */}
-          <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap justify-end gap-3">
+          <div className="mt-8 pt-6 border-t border-[#1e2126] flex flex-wrap justify-end gap-3">
             <button
               onClick={() => setIsPasswordModalOpen(true)}
-              className="text-gray-600 font-bold hover:text-black hover:bg-gray-100 px-4 py-2 rounded transition flex items-center gap-2 text-sm"
+              className="text-gray-400 font-bold hover:text-white hover:bg-[#1a1c20] border border-transparent hover:border-[#2a2d35] px-4 py-2 rounded-sm transition flex items-center gap-2 text-[11px] uppercase tracking-widest"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className="h-4 w-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -366,11 +366,11 @@ export default function ProfilePage() {
             </button>
             <button
               onClick={handleLogout}
-              className="text-red-600 font-bold hover:bg-gray-100 px-4 py-2 rounded transition flex items-center gap-2 text-sm border border-red-100"
+              className="text-red-500 font-bold hover:bg-red-500/10 px-4 py-2 rounded-sm transition flex items-center gap-2 text-[11px] uppercase tracking-widest border border-red-500/30 hover:border-red-500/50"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className="h-4 w-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

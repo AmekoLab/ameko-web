@@ -81,6 +81,13 @@ export interface CheckoutResponseData {
   paymentUrl: string;
 }
 
+/** Payload for PUT /orders/{orderId}/shipping-address */
+export interface UpdateShippingAddressPayload {
+  receiverName: string;
+  receiverPhone: string;
+  shippingAddress: string;
+}
+
 // ============================================================
 // Payment History Types
 // ============================================================
