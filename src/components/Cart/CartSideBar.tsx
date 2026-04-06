@@ -35,9 +35,9 @@ import {
   selectSystemVouchers,
   selectShopVoucherGroups,
   fetchApplicableVouchersThunk,
-  setSelectedSystemVouchers,
+  setSelectedSystemVoucher,
   setSelectedShopVouchers,
-  selectSelectedSystemVoucherIds,
+  selectSelectedSystemVoucherCode,
 } from "@/src/store/slices/voucherSlice";
 import { OrderItem, OrderItemComponent } from "@/src/types/order.types";
 import { useRouter } from "next/navigation";
@@ -243,11 +243,11 @@ export const CartSidebar: FC = memo(() => {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
   const systemVouchers = useAppSelector(selectSystemVouchers);
   const shopVoucherGroups = useAppSelector(selectShopVoucherGroups);
-  const selectedSystemVoucherIds = useAppSelector(
-    selectSelectedSystemVoucherIds,
+  const selectedSystemVoucherCode = useAppSelector(
+    selectSelectedSystemVoucherCode,
   );
-  const selectedShopVoucherIdsMap = useAppSelector(
-    (state) => state.voucher.selectedShopVoucherIds,
+  const selectedShopVoucherCodesMap = useAppSelector(
+    (state) => state.voucher.selectedShopVoucherCodes,
   );
   const applicableVouchers = useAppSelector(
     (state) => state.voucher.applicableVouchers,
@@ -318,7 +318,7 @@ export const CartSidebar: FC = memo(() => {
     vouchers: Voucher[];
     subtotal: number;
     brandLabel: string;
-    selectedIds: string[];
+    selectedCodes: string[];
     scope: { type: "system" } | { type: "shop"; shopId: string };
   }>({
     isOpen: false,
@@ -326,7 +326,7 @@ export const CartSidebar: FC = memo(() => {
     vouchers: [],
     subtotal: 0,
     brandLabel: "Ameko",
-    selectedIds: [],
+    selectedCodes: [],
     scope: { type: "system" },
   });
 
@@ -337,10 +337,10 @@ export const CartSidebar: FC = memo(() => {
       vouchers: systemVouchers,
       subtotal: cartPreview?.totalCartSubTotal ?? 0,
       brandLabel: "Ameko",
-      selectedIds: selectedSystemVoucherIds,
+      selectedCodes: selectedSystemVoucherCode ? [selectedSystemVoucherCode] : [],
       scope: { type: "system" },
     });
-  }, [systemVouchers, cartPreview, selectedSystemVoucherIds]);
+  }, [systemVouchers, cartPreview, selectedSystemVoucherCode]);
 
   const handleOpenShopVoucherModal = useCallback(
     (shopId: string, shopName: string) => {
@@ -356,23 +356,23 @@ export const CartSidebar: FC = memo(() => {
         vouchers: group?.vouchers ?? [],
         subtotal: shopSubtotal,
         brandLabel: shopName,
-        selectedIds: [],
+        selectedCodes: selectedShopVoucherCodesMap[shopId] ?? [],
         scope: { type: "shop", shopId },
       });
     },
-    [items, selectedItemIds, shopVoucherGroups],
+    [items, selectedItemIds, shopVoucherGroups, selectedShopVoucherCodesMap],
   );
 
   const handleVoucherConfirm = useCallback(
     (selectedVouchers: Voucher[]) => {
-      const ids = selectedVouchers.map((v) => v.id);
+      const codes = selectedVouchers.map((v) => v.code);
       if (voucherModal.scope.type === "system") {
-        dispatch(setSelectedSystemVouchers(ids));
+        dispatch(setSelectedSystemVoucher(codes.length > 0 ? codes[0] : null));
       } else {
         dispatch(
           setSelectedShopVouchers({
             shopId: voucherModal.scope.shopId,
-            voucherIds: ids,
+            voucherCodes: codes,
           }),
         );
       }
@@ -716,17 +716,17 @@ export const CartSidebar: FC = memo(() => {
                   <div className="flex items-center gap-2">
                     <Ticket className="w-4 h-4 shrink-0" />
                     <span className="font-bold text-[11px] uppercase tracking-wider">
-                      {selectedSystemVoucherIds.length > 0
-                        ? `Selected ${selectedSystemVoucherIds.length} system voucher(s)`
+                      {selectedSystemVoucherCode
+                        ? `Selected 1 system voucher`
                         : `Platform Voucher (${systemVouchers.length} available)`}
                     </span>
                   </div>
-                  {selectedSystemVoucherIds.length > 0 && (
+                  {!!selectedSystemVoucherCode && (
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        dispatch(setSelectedSystemVouchers([]));
+                        dispatch(setSelectedSystemVoucher(null));
                       }}
                       className="p-1 text-gray-500 hover:text-red-500 transition-colors"
                       aria-label="Remove system voucher"
@@ -770,8 +770,8 @@ export const CartSidebar: FC = memo(() => {
             </p>
 
             {/* Applied Vouchers Summary */}
-            {(selectedSystemVoucherIds.length > 0 ||
-              Object.values(selectedShopVoucherIdsMap).some(
+            {(!!selectedSystemVoucherCode ||
+              Object.values(selectedShopVoucherCodesMap).some(
                 (v) => v && v.length > 0,
               )) && (
               <div className="space-y-1.5 py-2 border-t border-[#1e2126]">
@@ -780,10 +780,10 @@ export const CartSidebar: FC = memo(() => {
                 </span>
 
                 {/* System voucher */}
-                {selectedSystemVoucherIds.length > 0 &&
+                {selectedSystemVoucherCode &&
                   applicableVouchers?.systemVouchers && (() => {
                     const sv = applicableVouchers.systemVouchers.find(
-                      (v) => v.id === selectedSystemVoucherIds[0],
+                      (v) => v.code === selectedSystemVoucherCode,
                     );
                     if (!sv) return null;
                     const totalShopDiscount =
@@ -808,7 +808,7 @@ export const CartSidebar: FC = memo(() => {
                           )}
                           <button
                             type="button"
-                            onClick={() => dispatch(setSelectedSystemVouchers([]))}
+                            onClick={() => dispatch(setSelectedSystemVoucher(null))}
                             className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                             aria-label="Remove system voucher"
                           >
@@ -819,59 +819,58 @@ export const CartSidebar: FC = memo(() => {
                     );
                   })()}
 
-                {/* Shop vouchers */}
+                {/* Shop vouchers — iterate through ALL applied codes per shop */}
                 {applicableVouchers?.shopVoucherGroups &&
-                  Object.entries(selectedShopVoucherIdsMap).map(
-                    ([shopId, vIds]) => {
-                      if (!vIds || vIds.length === 0) return null;
+                  Object.entries(selectedShopVoucherCodesMap).map(
+                    ([shopId, vCodes]) => {
+                      if (!vCodes || vCodes.length === 0) return null;
                       const group = applicableVouchers.shopVoucherGroups.find(
                         (g) => g.shopId === shopId,
                       );
-                      const voucher = group?.vouchers.find(
-                        (v) => v.id === vIds[0],
-                      );
-                      if (!voucher) return null;
+                      if (!group) return null;
                       const shopPreview = cartPreview?.shopPreviews.find(
                         (s) => s.shopId === shopId,
                       );
-                      return (
-                        <div
-                          key={shopId}
-                          className="flex items-center justify-between text-[11px] font-bold"
-                        >
-                          <div className="flex items-center gap-1.5 pt-1">
-                            <Ticket className="w-3 h-3 text-[#f5d800]" />
-                            <span className="text-white uppercase tracking-wider">
-                              {voucher.code}
-                            </span>
-                            <span className="text-gray-500 uppercase tracking-wider">
-                              ({shopPreview?.shopName ?? shopId})
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            {(shopPreview?.shopDiscountAmount ?? 0) > 0 && (
-                              <span className="text-green-500">
-                                -{formatCurrency(shopPreview!.shopDiscountAmount)}
+
+                      return vCodes.map((code) => {
+                        const voucher = group.vouchers.find((v) => v.code === code);
+                        if (!voucher) return null;
+
+                        return (
+                          <div
+                            key={`${shopId}-${code}`}
+                            className="flex items-center justify-between text-[11px] font-bold mt-1"
+                          >
+                            <div className="flex items-center gap-1.5 pt-1">
+                              <Ticket className="w-3 h-3 text-[#f5d800]" />
+                              <span className="text-white uppercase tracking-wider">
+                                {voucher.code}
                               </span>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() =>
-                                dispatch(
-                                  setSelectedShopVouchers({
-                                    shopId,
-                                    voucherIds: [],
-                                  }),
-                                )
-                              }
-                              className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                              aria-label={`Remove voucher ${voucher.code}`}
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
+                              <span className="text-gray-500 uppercase tracking-wider">
+                                ({shopPreview?.shopName ?? shopId})
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newCodes = vCodes.filter((c) => c !== code);
+                                  dispatch(
+                                    setSelectedShopVouchers({
+                                      shopId,
+                                      voucherCodes: newCodes,
+                                    }),
+                                  );
+                                }}
+                                className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                aria-label={`Remove voucher ${voucher.code}`}
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      );
+                        );
+                      });
                     },
                   )}
 
@@ -922,8 +921,9 @@ export const CartSidebar: FC = memo(() => {
         vouchers={voucherModal.vouchers}
         currentSubtotal={voucherModal.subtotal}
         brandLabel={voucherModal.brandLabel}
-        selectedIds={voucherModal.selectedIds}
+        selectedCodes={voucherModal.selectedCodes}
         onConfirm={handleVoucherConfirm}
+        scope={voucherModal.scope}
         orderId={serverCart?.orderId}
       />
     </>

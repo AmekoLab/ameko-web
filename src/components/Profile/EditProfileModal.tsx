@@ -130,7 +130,7 @@ export const EditProfileModal = ({
   // Helper để hiển thị style lỗi cho input
   // Nếu có lỗi thì viền đỏ (border-red-500), không thì viền xám (border-gray-300)
   const getInputClass = (fieldName: keyof FormErrors) => {
-    return `w-full border rounded-lg px-4 py-2 focus:ring-2 outline-none transition ${
+    return `text-black w-full border rounded-lg px-4 py-2 focus:ring-2 outline-none transition ${
       errors[fieldName]
         ? "border-red-500 focus:ring-red-200 focus:border-red-500"
         : "border-gray-300 focus:ring-gray-300 focus:border-transparent"
@@ -181,7 +181,7 @@ export const EditProfileModal = ({
               name="image"
               value={formData.image || ""}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-gray-300 outline-none transition"
+              className="text-black w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-gray-300 outline-none transition"
               placeholder="https://..."
             />
           </div>
@@ -272,7 +272,7 @@ export const EditProfileModal = ({
               Gender
             </label>
             <div className="flex gap-6 mt-2">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
+              <label className="text-black flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="radio"
                   name="gender"
@@ -283,7 +283,7 @@ export const EditProfileModal = ({
                 />
                 <span>Male</span>
               </label>
-              <label className="flex items-center gap-2 cursor-pointer select-none">
+              <label className="text-black flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="radio"
                   name="gender"
@@ -306,7 +306,7 @@ export const EditProfileModal = ({
               name="storeAddress"
               value={formData.storeAddress || ""}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-gray-300 outline-none transition"
+              className="text-black w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-gray-300 outline-none transition"
             />
           </div>
 
@@ -319,7 +319,7 @@ export const EditProfileModal = ({
               value={formData.storeDescription || ""}
               onChange={handleChange}
               rows={3}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-gray-300 outline-none transition resize-none"
+              className="text-black w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-gray-300 outline-none transition resize-none"
             />
           </div>
 

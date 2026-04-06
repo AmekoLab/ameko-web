@@ -9,7 +9,8 @@ import {
   KeyboardEvent,
   memo,
 } from "react";
-import { ArrowLeft, Send, Loader2, Heart } from "lucide-react";
+import { ArrowLeft, Send, Loader2, Heart, Ticket, Gift } from "lucide-react";
+import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppSelector, useAppDispatch } from "@/src/store/hook";
 import {
@@ -20,6 +21,7 @@ import {
   reactToMessageThunk,
   selectMessagesForConversation,
 } from "@/src/store/slices/chatSlice";
+import { createNegotiationVoucherThunk } from "@/src/store/slices/voucherSlice";
 import { Message, REACTION_EMOJIS, REACTION_LABELS, ReactionType } from "@/src/types/chat.types";
 
 // ─── Helpers ─────────────────────────────────────────────
@@ -210,6 +212,12 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
 
+  // ── Voucher gift state ──────────────────────────────
+  const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
+  const [isSendingVoucher, setIsSendingVoucher] = useState(false);
+  const [discountAmount, setDiscountAmount] = useState("");
+  const [minOrderValue, setMinOrderValue] = useState("");
+
   // ── Fetch history ────────────────────────────────────
   useEffect(() => {
     if (activeConversationId) dispatch(fetchMessagesThunk(activeConversationId));
@@ -280,6 +288,50 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
     if (!activeConversationId) return;
     dispatch(reactToMessageThunk({ conversationId: activeConversationId, messageId: m.id, reaction: newReaction }));
   }, [activeConversationId, dispatch]);
+
+  // ── Send Voucher Gift ────────────────────────────────
+  const handleSendVoucher = useCallback(async () => {
+    if (!activeConversation || !activeConversationId || !currentUserId) return;
+
+    const discount = Number(discountAmount);
+    const minOrder = Number(minOrderValue);
+
+    if (discount <= 0 || minOrder < 0) {
+      toast.error("Vui lòng nhập số tiền hợp lệ");
+      return;
+    }
+
+    setIsSendingVoucher(true);
+    try {
+      // 1. Create the Voucher using otherUserId as targetUserId
+      const voucherRes = await dispatch(createNegotiationVoucherThunk({
+        targetUserId: activeConversation.otherUserId,
+        discountAmount: discount,
+        minOrderValue: minOrder,
+      })).unwrap();
+
+      // 2. Send the Chat Message
+      const voucherCode = voucherRes.code || (voucherRes as any).data?.code || "N/A";
+      const messageContent = `🎉 Shop vừa tặng bạn Voucher giảm ${discount.toLocaleString()}₫ (Mã: ${voucherCode}) cho đơn từ ${minOrder.toLocaleString()}₫. Hãy vào giỏ hàng để sử dụng ngay nhé!`;
+
+      const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+      await dispatch(sendMessageThunk({
+        conversationId: activeConversationId,
+        content: messageContent,
+        messageType: 0,
+        tempId,
+        senderId: currentUserId,
+      })).unwrap();
+
+      setIsVoucherModalOpen(false);
+      setDiscountAmount("");
+      setMinOrderValue("");
+    } catch (error) {
+      toast.error(typeof error === 'string' ? error : "Lỗi khi tặng voucher");
+    } finally {
+      setIsSendingVoucher(false);
+    }
+  }, [activeConversation, activeConversationId, currentUserId, discountAmount, minOrderValue, dispatch]);
 
   // ── No active conversation ────────────────────────────
   if (!activeConversationId || !activeConversation) {
@@ -358,6 +410,19 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
       {/* ── Input area ───────────────────────────────────── */}
       <div className={`${compact ? "px-2.5 py-2" : "px-3 py-3"} border-t border-[#1e2126] bg-[#111111] shrink-0`}>
         <div className="flex items-end gap-2">
+          {/* Gift Voucher Button */}
+          <button
+            type="button"
+            onClick={() => setIsVoucherModalOpen(true)}
+            className={`
+              shrink-0 ${compact ? "w-8 h-8" : "w-10 h-10"} rounded-full bg-[#1e2030] text-[#f5d800]
+              flex items-center justify-center transition-all
+              hover:bg-[#252830] active:scale-95 self-end border border-[#2a2d35]
+            `}
+            title="Tặng deal riêng tư"
+          >
+            <Ticket className={compact ? "w-4 h-4" : "w-5 h-5"} />
+          </button>
           <textarea
             id="chat-input"
             rows={1}
@@ -408,6 +473,64 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
           </p>
         )}
       </div>
+      {/* Mini Voucher Modal */}
+      <AnimatePresence>
+        {isVoucherModalOpen && (
+          <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="w-full max-w-xs bg-[#111111] border border-[#f5d800]/20 rounded-xl p-4 shadow-2xl"
+            >
+              <div className="flex items-center gap-2 mb-4 text-[#f5d800]">
+                <Gift className="w-5 h-5" />
+                <h4 className="font-bold text-sm uppercase tracking-wider">Tặng Deal Riêng</h4>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Số tiền giảm (VNĐ)</label>
+                  <input
+                    type="number"
+                    value={discountAmount}
+                    onChange={(e) => setDiscountAmount(e.target.value)}
+                    className="w-full bg-[#1a1a1a] border border-[#2a2d35] rounded-lg px-3 py-2 text-sm font-bold text-white focus:outline-none focus:border-[#f5d800]/50"
+                    placeholder="VD: 50000"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Đơn tối thiểu (VNĐ)</label>
+                  <input
+                    type="number"
+                    value={minOrderValue}
+                    onChange={(e) => setMinOrderValue(e.target.value)}
+                    className="w-full bg-[#1a1a1a] border border-[#2a2d35] rounded-lg px-3 py-2 text-sm font-bold text-white focus:outline-none focus:border-[#f5d800]/50"
+                    placeholder="VD: 200000"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 mt-5">
+                <button
+                  onClick={() => setIsVoucherModalOpen(false)}
+                  className="flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-[#1a1a1a] hover:bg-[#252830] transition-colors"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={handleSendVoucher}
+                  disabled={isSendingVoucher || !discountAmount}
+                  className="flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-widest text-black bg-[#f5d800] hover:bg-[#e6cc00] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isSendingVoucher && <Loader2 className="w-3 h-3 animate-spin" />}
+                  Gửi Tặng
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

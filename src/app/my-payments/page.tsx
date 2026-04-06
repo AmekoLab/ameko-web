@@ -37,69 +37,73 @@ const formatDate = (dateStr: string): string => {
 };
 
 const ORDER_STATUS_STYLES: Record<string, string> = {
-  Pending: "bg-yellow-100 text-yellow-800",
-  Processing: "bg-blue-100 text-blue-800",
-  Completed: "bg-green-100 text-green-800",
-  Delivered: "bg-green-100 text-green-800",
-  Cancelled: "bg-red-100 text-red-800",
-  Shipped: "bg-indigo-100 text-indigo-800",
+  Pending: "bg-yellow-500/10 border-yellow-500/30 text-yellow-400",
+  Processing: "bg-blue-500/10 border-blue-500/30 text-blue-400",
+  Completed: "bg-green-500/10 border-green-500/30 text-green-400",
+  Delivered: "bg-green-500/10 border-green-500/30 text-green-400",
+  Cancelled: "bg-red-500/10 border-red-500/30 text-red-400",
+  Shipped: "bg-indigo-500/10 border-indigo-500/30 text-indigo-400",
 };
 
 const FINISHED_STATUSES = ["Delivered", "Completed"];
 
 const getStatusBadge = (status: string): string =>
-  ORDER_STATUS_STYLES[status] || "bg-gray-100 text-gray-800";
+  ORDER_STATUS_STYLES[status] || "bg-[#202030] border-[#2a2d35] text-gray-400";
 
 // ─── Loading Skeleton ──────────────────────────────────────
 const PaymentHistorySkeleton: FC = () => (
-  <div className="max-w-[1000px] mx-auto px-4 md:px-8 py-12 lg:py-20 animate-pulse">
-    <div className="h-10 w-64 bg-gray-200 rounded mb-8" />
-    <div className="space-y-6">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-white rounded-xl border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-200 rounded-full" />
-              <div className="h-5 w-32 bg-gray-200 rounded" />
-            </div>
-            <div className="h-6 w-24 bg-gray-200 rounded-full" />
-          </div>
-          <div className="space-y-3">
-            {[1, 2].map((j) => (
-              <div key={j} className="flex gap-3">
-                <div className="w-16 h-16 bg-gray-200 rounded" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 w-40 bg-gray-200 rounded" />
-                  <div className="h-3 w-24 bg-gray-200 rounded" />
-                </div>
+  <div className="bg-black min-h-screen">
+    <div className="max-w-[1000px] mx-auto px-4 md:px-8 py-12 lg:py-20 animate-pulse">
+      <div className="h-10 w-64 bg-[#1e2126] rounded-sm mb-8" />
+      <div className="space-y-6">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-[#151515] rounded-sm border border-[#1e2126] p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#202030] rounded-sm" />
+                <div className="h-5 w-32 bg-[#202030] rounded-sm" />
               </div>
-            ))}
+              <div className="h-6 w-24 bg-[#202030] rounded-sm" />
+            </div>
+            <div className="space-y-3">
+              {[1, 2].map((j) => (
+                <div key={j} className="flex gap-3">
+                  <div className="w-16 h-16 bg-[#202030] rounded-sm" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-40 bg-[#202030] rounded-sm" />
+                    <div className="h-3 w-24 bg-[#202030] rounded-sm" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-between mt-4 pt-4 border-t border-[#1e2126]">
+              <div className="h-4 w-28 bg-[#202030] rounded-sm" />
+              <div className="h-5 w-32 bg-[#202030] rounded-sm" />
+            </div>
           </div>
-          <div className="flex justify-between mt-4 pt-4 border-t border-gray-100">
-            <div className="h-4 w-28 bg-gray-200 rounded" />
-            <div className="h-5 w-32 bg-gray-200 rounded" />
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   </div>
 );
 
 // ─── Empty State ───────────────────────────────────────────
 const EmptyHistory: FC = () => (
-  <div className="flex flex-col items-center justify-center py-24 text-center">
-    <Package className="w-20 h-20 text-gray-300 mb-6" strokeWidth={1} />
-    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+  <div className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-[#1e2126] bg-[#151515] rounded-sm">
+    <div className="w-16 h-16 rounded-full bg-[#202030] border border-[#2a2d35] flex items-center justify-center mb-5">
+      <Package className="w-8 h-8 text-gray-500" />
+    </div>
+    <h2 className="text-[14px] font-black uppercase tracking-widest text-white mb-2">
       You have no orders yet
     </h2>
-    <p className="text-gray-500 mb-8 max-w-sm">
+    <p className="text-[12px] font-bold text-gray-400 mb-8 max-w-sm">
       Explore our collection of mechanical keyboards and accessories!
     </p>
     <Link
-      href="/shop/all-products"
-      className="inline-flex items-center gap-2 bg-[#ce2a32] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#b52429] transition-colors"
+      href="/shop"
+      className="inline-flex items-center gap-2 bg-[#f5d800] text-black px-6 py-3 rounded-sm font-black text-[11px] uppercase tracking-widest hover:bg-[#e6ca00] transition-colors shadow-sm"
     >
-      <ShoppingBag className="w-5 h-5" />
+      <ShoppingBag className="w-4 h-4" />
       Shop now
     </Link>
   </div>
@@ -119,8 +123,8 @@ const OrderItemRow: FC<OrderItemRowProps> = ({
   hasActiveWarranty,
   onWarrantyClick,
 }) => (
-  <div className="flex items-center gap-3 py-3">
-    <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 flex-shrink-0">
+  <div className="flex items-center gap-3 py-4">
+    <div className="relative w-16 h-16 rounded-sm overflow-hidden bg-[#0f0f0f] border border-[#1e2126] flex-shrink-0">
       {item.productImage ? (
         <Image
           src={item.productImage}
@@ -129,33 +133,33 @@ const OrderItemRow: FC<OrderItemRowProps> = ({
           className="object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gray-50">
-          <Keyboard className="w-7 h-7 text-gray-300" />
+        <div className="w-full h-full flex items-center justify-center bg-[#111111]">
+          <Keyboard className="w-6 h-6 text-gray-500" />
         </div>
       )}
     </div>
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-medium text-gray-900 truncate">
+      <p className="text-[12px] font-black uppercase tracking-wider text-white truncate mb-1">
         {item.productName}
       </p>
-      <p className="text-xs text-gray-500 mt-0.5">
-        {item.quantity} × {formatCurrency(item.unitPrice)}
+      <p className="text-[11px] font-bold text-gray-400">
+        <span className="text-white">{item.quantity}</span> × {formatCurrency(item.unitPrice)}
       </p>
     </div>
-    <div className="flex items-center gap-3 flex-shrink-0">
-      <p className="text-sm font-semibold text-gray-900 whitespace-nowrap">
+    <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 flex-shrink-0">
+      <p className="text-[12px] font-black tracking-widest text-[#f5d800] whitespace-nowrap">
         {formatCurrency(item.totalPrice)}
       </p>
       {showWarranty &&
         (hasActiveWarranty ? (
-          <span className="inline-flex items-center text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-md font-medium whitespace-nowrap">
-            <ShieldAlert className="w-4 h-4 mr-1" />
+          <span className="inline-flex items-center text-[10px] uppercase font-black tracking-widest text-gray-400 bg-[#202030] border border-[#2a2d35] px-3 py-1.5 rounded-sm whitespace-nowrap">
+            <ShieldAlert className="w-3.5 h-3.5 mr-1.5 text-gray-500" />
             Warranty Requested
           </span>
         ) : (
           <button
             onClick={onWarrantyClick}
-            className="text-sm text-blue-600 border border-blue-600 px-3 py-1 rounded hover:bg-blue-50 whitespace-nowrap"
+            className="text-[10px] uppercase font-black tracking-widest text-gray-300 border border-[#2a2d35] bg-[#111111] hover:bg-[#1a1c20] hover:text-white px-3 py-1.5 rounded-sm whitespace-nowrap transition-colors"
           >
             Request Warranty
           </button>
@@ -182,9 +186,9 @@ const OrderCard: FC<OrderCardProps> = ({
   const isFinished = FINISHED_STATUSES.includes(order.orderStatus);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[#1e2126] bg-[#111111]">
         <div className="flex items-center gap-3">
           {order.shopAvatar ? (
             <Image
@@ -192,26 +196,26 @@ const OrderCard: FC<OrderCardProps> = ({
               alt={order.shopName}
               width={36}
               height={36}
-              className="rounded-full object-cover"
+              className="rounded-sm object-cover border border-[#2a2d35]"
             />
           ) : (
-            <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center">
-              <Store className="w-4 h-4 text-gray-400" />
+            <div className="w-9 h-9 rounded-sm bg-[#202030] border border-[#2a2d35] flex items-center justify-center">
+              <Store className="w-4 h-4 text-gray-500" />
             </div>
           )}
-          <span className="font-semibold text-gray-900 text-sm">
+          <span className="font-black uppercase tracking-widest text-white text-[12px]">
             {order.shopName}
           </span>
         </div>
         <span
-          className={`text-xs font-medium px-3 py-1 rounded-full ${getStatusBadge(order.orderStatus)}`}
+          className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 box-border rounded-sm border ${getStatusBadge(order.orderStatus)}`}
         >
           {order.orderStatus}
         </span>
       </div>
 
       {/* Body — Order Items */}
-      <div className="px-5 divide-y divide-gray-100">
+      <div className="px-5 divide-y divide-[#1e2126]">
         {order.orderItems.length > 0 ? (
           order.orderItems.map((item) => (
             <OrderItemRow
@@ -225,19 +229,19 @@ const OrderCard: FC<OrderCardProps> = ({
             />
           ))
         ) : (
-          <p className="py-4 text-sm text-gray-400 italic">No products</p>
+          <p className="py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 italic">No products</p>
         )}
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100 bg-gray-50/50">
-        <span className="text-xs text-gray-500 flex items-center gap-1">
+      <div className="flex items-center justify-between px-5 py-4 border-t border-[#1e2126] bg-[#0f0f0f]">
+        <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500 flex items-center gap-1.5">
           <Calendar className="w-3.5 h-3.5" />
           {formatDate(order.createdAt)}
         </span>
         <div className="text-right">
-          <span className="text-xs text-gray-500">Total: </span>
-          <span className="text-base font-bold text-[#ce2a32]">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mr-2">Total:</span>
+          <span className="text-[14px] font-black tracking-widest text-[#f5d800]">
             {formatCurrency(order.totalAmount)}
           </span>
         </div>
@@ -287,41 +291,42 @@ const MyPaymentsPage: FC = () => {
   if (loadingHistory) return <PaymentHistorySkeleton />;
 
   return (
-    <div className="max-w-[1000px] mx-auto px-4 md:px-8 py-12 lg:py-20">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        My Payment History
-      </h1>
+    <div className="bg-black min-h-screen text-white">
+      <div className="max-w-[1000px] mx-auto px-4 md:px-8 py-12 lg:py-20">
+        <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-widest text-white mb-10 pb-4 border-b border-[#1e2126]">
+          My Payment History
+        </h1>
 
-      {orderGroups.length === 0 ? (
-        <EmptyHistory />
-      ) : (
-        <div className="space-y-8">
-          {orderGroups.map((group) => (
-            <div key={group.orderGroupId}>
-              {/* Order Group Header */}
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <span className="font-medium text-gray-700">
-                    Order #{group.orderGroupId.slice(0, 8).toUpperCase()}
-                  </span>
-                  <span>•</span>
-                  <span>{formatDate(group.createdAt)}</span>
+        {orderGroups.length === 0 ? (
+          <EmptyHistory />
+        ) : (
+          <div className="space-y-12">
+            {orderGroups.map((group) => (
+              <div key={group.orderGroupId}>
+                {/* Order Group Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-gray-500">
+                    <span className="font-black text-white px-2 py-1 bg-[#1a1c20] rounded-sm border border-[#2a2d35]">
+                      GRP #{group.orderGroupId.slice(0, 8).toUpperCase()}
+                    </span>
+                    <span>•</span>
+                    <span>{formatDate(group.createdAt)}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 box-border rounded-sm border ${
+                        group.paymentStatus === "Paid"
+                          ? "bg-green-500/10 border-green-500/30 text-green-400"
+                          : "bg-yellow-500/10 border-yellow-500/30 text-yellow-400"
+                      }`}
+                    >
+                      {group.paymentStatus}
+                    </span>
+                    <span className="text-[14px] font-black tracking-widest text-white">
+                      {formatCurrency(group.totalGroupAmount)}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
-                      group.paymentStatus === "Paid"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {group.paymentStatus}
-                  </span>
-                  <span className="text-sm font-bold text-gray-900">
-                    {formatCurrency(group.totalGroupAmount)}
-                  </span>
-                </div>
-              </div>
 
               {/* Orders within the group */}
               <div className="space-y-4">
@@ -335,16 +340,17 @@ const MyPaymentsPage: FC = () => {
                 ))}
               </div>
             </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
-      <CreateWarrantyModal
-        isOpen={warrantyModal.isOpen}
-        onClose={closeWarrantyModal}
-        orderGroupId={warrantyModal.orderGroupId}
-        availableItems={warrantyModal.items}
-      />
+        <CreateWarrantyModal
+          isOpen={warrantyModal.isOpen}
+          onClose={closeWarrantyModal}
+          orderGroupId={warrantyModal.orderGroupId}
+          availableItems={warrantyModal.items}
+        />
+      </div>
     </div>
   );
 };

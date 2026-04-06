@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/src/store/index";
 import {
   fetchShopQuotes,
-  updateCommissionQuote,
+  revokeCommissionQuote,
 } from "@/src/store/slices/commissionSlice";
-import { CommissionQuote } from "@/src/types/commission.types";
 import {
   Loader2,
   FileText,
@@ -16,10 +15,8 @@ import {
   RefreshCw,
   CheckCircle2,
   Timer,
-  Pencil,
-  X,
-  DollarSign,
-  Send,
+  XCircle,
+  AlertTriangle,
 } from "lucide-react";
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -57,6 +54,12 @@ const STATUS_MAP: Record<
     bg: "bg-green-500/10 border border-green-500/20",
     text: "text-green-400",
     icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+  },
+  Revoked: {
+    label: "Revoked",
+    bg: "bg-red-500/10 border border-red-500/20",
+    text: "text-red-500",
+    icon: <XCircle className="w-3.5 h-3.5" />,
   },
 };
 
@@ -98,198 +101,13 @@ const SkeletonRow = () => (
   </div>
 );
 
-// ─── Edit Quote Modal ──────────────────────────────────────
-interface EditQuoteModalProps {
-  quote: CommissionQuote;
-  onClose: () => void;
-  onSuccess: () => void;
-}
-
-const EditQuoteModal = ({ quote, onClose, onSuccess }: EditQuoteModalProps) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { isUpdatingQuote } = useSelector(
-    (state: RootState) => state.commission,
-  );
-
-  const [price, setPrice] = useState(String(quote.quotedPrice));
-  const [estimatedDays, setEstimatedDays] = useState(
-    String(quote.estimatedDays),
-  );
-  const [note, setNote] = useState(quote.shopNotes);
-  const [errors, setErrors] = useState<{ price?: string; note?: string }>({});
-
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = "";
-    };
-  }, [onClose]);
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    const newErrors: { price?: string; note?: string } = {};
-    const quotedPrice = Number(price);
-
-    if (!quotedPrice || quotedPrice <= 0) {
-      newErrors.price = "Please enter a valid price";
-    }
-    if (!note.trim() || note.trim().length < 10) {
-      newErrors.note = "Please enter at least 10 characters";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-    setErrors({});
-
-    try {
-      await dispatch(
-        updateCommissionQuote({
-          quoteId: quote.commissionQuoteId,
-          payload: {
-            quotedPrice,
-            estimatedDays: Number(estimatedDays),
-            shopNotes: note.trim(),
-          },
-        }),
-      ).unwrap();
-      onSuccess();
-    } catch {
-      // toast handled in thunk
-    }
-  };
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden relative"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <div>
-            <h3 className="text-lg font-bold text-gray-900">Update Quote</h3>
-            <p className="text-xs text-gray-500 mt-0.5 font-mono">
-              #{quote.commissionRequestId.slice(0, 8)}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
-          >
-            <X className="w-4.5 h-4.5 text-gray-500" />
-          </button>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* Price */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Proposed Price (VND) <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-                <DollarSign className="w-4 h-4" />
-              </div>
-              <input
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                min={1}
-                className="text-black w-full border border-gray-300 rounded-xl pl-10 pr-14 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors"
-              />
-              <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-semibold">
-                VND
-              </span>
-            </div>
-            {errors.price && (
-              <p className="text-xs text-red-500 mt-1">{errors.price}</p>
-            )}
-          </div>
-
-          {/* Estimated Days */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Estimated Completion Time <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={estimatedDays}
-              onChange={(e) => setEstimatedDays(e.target.value)}
-              className="text-black w-full border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors bg-white appearance-none cursor-pointer"
-            >
-              <option value="3">3 days</option>
-              <option value="5">5 days</option>
-              <option value="7">7 days</option>
-              <option value="10">10 days</option>
-              <option value="14">14 days</option>
-              <option value="21">21 days</option>
-              <option value="30">30 days</option>
-            </select>
-          </div>
-
-          {/* Note */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Message / Material Details <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={4}
-              className= "text-black w-full border border-gray-300 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition-colors resize-none"
-            />
-            {errors.note ? (
-              <p className="text-xs text-red-500 mt-1">{errors.note}</p>
-            ) : (
-              <p className="text-xs text-gray-400 mt-1">
-                Minimum 10 characters.
-              </p>
-            )}
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={isUpdatingQuote}
-            className="w-full py-3.5 bg-black hover:bg-gray-800 disabled:bg-gray-400 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
-          >
-            {isUpdatingQuote ? (
-              <>
-                <Loader2 className="w-4.5 h-4.5 animate-spin" />
-                Updating...
-              </>
-            ) : (
-              <>
-                <Send className="w-4.5 h-4.5" />
-                Update Quote
-              </>
-            )}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-};
-
 // ─── Page ──────────────────────────────────────────────────
 export default function ShopQuotesPage() {
   const dispatch = useDispatch<AppDispatch>();
   const { shopQuotes, loadingShopQuotes, error } = useSelector(
     (state: RootState) => state.commission,
   );
-  const [editingQuote, setEditingQuote] = useState<CommissionQuote | null>(
-    null,
-  );
+  const [quoteToRevoke, setQuoteToRevoke] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(fetchShopQuotes());
@@ -344,7 +162,7 @@ export default function ShopQuotesPage() {
               <Inbox className="w-7 h-7 text-[#f5d800]" />
             </div>
             <h2 className="text-[13px] font-black uppercase tracking-widest text-white mb-1.5">
-              You haven't sent any quotes
+              You haven&apos;t sent any quotes
             </h2>
             <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 max-w-sm">
               Visit the Custom Request Market to find and send quotes to
@@ -392,11 +210,11 @@ export default function ShopQuotesPage() {
                       <StatusBadge status={quote.status} />
                       {quote.status === "PendingUserDecision" && (
                         <button
-                          onClick={() => setEditingQuote(quote)}
-                          className="w-8 h-8 rounded-sm border border-[#1e2126] bg-black hover:bg-[#202030] hover:border-[#f5d800] hover:text-[#f5d800] flex items-center justify-center transition-colors shrink-0 text-gray-500"
-                          title="Edit quote"
+                          onClick={() => setQuoteToRevoke(quote.commissionQuoteId)}
+                          className="w-8 h-8 rounded-sm border border-[#1e2126] bg-black hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-500 flex items-center justify-center transition-colors shrink-0 text-gray-500"
+                          title="Revoke Quote"
                         >
-                          <Pencil className="w-3.5 h-3.5" />
+                          <XCircle className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
@@ -412,16 +230,48 @@ export default function ShopQuotesPage() {
         )}
       </div>
 
-      {/* Edit Quote Modal */}
-      {editingQuote && (
-        <EditQuoteModal
-          quote={editingQuote}
-          onClose={() => setEditingQuote(null)}
-          onSuccess={() => {
-            setEditingQuote(null);
-            dispatch(fetchShopQuotes());
-          }}
-        />
+      {/* Modern Confirm Revoke Modal */}
+      {quoteToRevoke && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          onClick={() => setQuoteToRevoke(null)}
+        >
+          <div
+            className="w-full max-w-md bg-[#151515] border border-[#1e2126] rounded-sm shadow-2xl p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
+                <AlertTriangle className="w-6 h-6 text-red-500" />
+              </div>
+              <h3 className="text-[15px] font-black uppercase text-white tracking-widest mb-2">
+                Revoke this quote?
+              </h3>
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6">
+                Are you sure you want to withdraw this quote? The customer will
+                no longer be able to accept it. This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setQuoteToRevoke(null)}
+                className="flex-1 py-3 bg-[#202030] hover:bg-[#2a2a3a] text-white font-bold uppercase tracking-widest text-[11px] rounded-sm transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  dispatch(revokeCommissionQuote(quoteToRevoke));
+                  setQuoteToRevoke(null);
+                }}
+                className="flex-1 py-3 bg-[#ce2a32] hover:bg-[#a12026] text-white font-black uppercase tracking-widest text-[11px] rounded-sm shadow-md transition-all flex items-center justify-center gap-2"
+              >
+                Yes, Revoke
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

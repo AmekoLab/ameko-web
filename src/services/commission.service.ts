@@ -6,6 +6,7 @@ import {
   CommissionQuote,
   ApiResponse,
   SubmitQuotePayload,
+  UpdateCommissionPayload,
 } from "@/src/types/commission.types";
 
 export const commissionService = {
@@ -42,13 +43,6 @@ export const commissionService = {
     return api.post(`../Commissions/${requestId}/quotes`, payload);
   },
 
-  updateQuote: (
-    quoteId: string,
-    payload: SubmitQuotePayload,
-  ): Promise<{ success: boolean; message: string }> => {
-    return api.put(`../Commissions/quotes/${quoteId}`, payload);
-  },
-
   acceptQuote: (
     quoteId: string,
   ): Promise<{ success: boolean; message: string; orderId: string }> => {
@@ -71,5 +65,18 @@ export const commissionService = {
     requestId: string,
   ): Promise<{ success: boolean; message: string }> => {
     return api.post(`../Commissions/${requestId}/publish`);
+  },
+
+  updateCommission: (
+    id: string,
+    payload: UpdateCommissionPayload,
+  ): Promise<{ success: boolean; message: string }> => {
+    return api.put(`../Commissions/${id}`, payload);
+  },
+
+  revokeQuote: (
+    quoteId: string,
+  ): Promise<{ success: boolean; message: string }> => {
+    return api.post(`../Commissions/quotes/${quoteId}/revoke`);
   },
 };
