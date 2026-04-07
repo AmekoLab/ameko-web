@@ -87,7 +87,7 @@ export const PromoSection: FC<{ data: PromoData }> = ({ data }) => {
             {/* Subtitle */}
             <p
               className={`text-sm md:text-base font-bold uppercase tracking-[0.2em] mb-3
-               ${data.theme === "dark" ? "text-gray-300" : "text-gray-800"}
+               ${data.theme === "dark" ? "text-gray-200" : "text-amazon-textMuted"}
             `}
             >
               {data.subtitle}
@@ -95,8 +95,8 @@ export const PromoSection: FC<{ data: PromoData }> = ({ data }) => {
 
             {/* Title */}
             <h2
-              className={`text-4xl md:text-6xl font-black uppercase tracking-tighter leading-[0.9] mb-8
-               ${data.theme === "dark" ? "text-white" : "text-black"}
+              className={`text-4xl md:text-6xl font-bold uppercase tracking-tighter leading-[0.9] mb-8
+               ${data.theme === "dark" ? "text-white" : "text-amazon-text"}
             `}
             >
               {data.title}
@@ -109,8 +109,8 @@ export const PromoSection: FC<{ data: PromoData }> = ({ data }) => {
                 group inline-flex items-center gap-3 px-8 py-3.5 text-sm font-bold uppercase tracking-widest transition-all duration-300 border-2
                 ${
                   data.theme === "dark"
-                    ? "bg-white text-black border-white hover:bg-transparent hover:text-white"
-                    : "bg-black text-white border-black hover:bg-transparent hover:text-black"
+                    ? "bg-amazon-btnPrimary text-amazon-text border-amazon-btnPrimary hover:brightness-95"
+                    : "bg-amazon-btnPrimary text-amazon-text border-amazon-btnPrimary hover:brightness-95"
                 }
               `}
             >

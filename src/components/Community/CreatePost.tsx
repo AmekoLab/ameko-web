@@ -221,10 +221,10 @@ export const CreatePost: FC = () => {
       {/* ================================================
           1. COMPACT INPUT BAR (Initial State)
       ================================================ */}
-      <div className="bg-[#1a1a1a] rounded-xl border border-[#2a2d35] p-3 mb-6">
+      <div className="bg-white rounded-xl border border-amazon-border p-3 mb-6 shadow-sm">
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 bg-gray-600">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 bg-neutral-200">
             <Image
               src={userAvatar}
               alt="My Avatar"
@@ -237,14 +237,14 @@ export const CreatePost: FC = () => {
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="flex-1 text-left bg-[#3a3b3c] hover:bg-[#4a4b4c] rounded-full px-4 py-2.5 text-sm text-gray-400 transition-colors cursor-pointer"
+            className="flex-1 text-left bg-neutral-100 hover:bg-neutral-200 rounded-full px-4 py-2.5 text-sm text-amazon-textMuted transition-colors cursor-pointer"
           >
             {userName} ơi, bạn đang nghĩ gì thế?
           </button>
         </div>
 
         {/* Divider */}
-        <div className="border-t border-[#2a2d35] mt-3 pt-3">
+        <div className="border-t border-amazon-border mt-3 pt-3">
           <div className="flex items-center justify-around">
             {/* <button
               type="button"
@@ -260,7 +260,7 @@ export const CreatePost: FC = () => {
                 setIsModalOpen(true);
                 setTimeout(() => fileInputRef.current?.click(), 200);
               }}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-lg hover:bg-[#3a3b3c] transition-colors text-sm text-gray-300 font-medium"
+              className="flex items-center gap-2 px-4 py-1.5 rounded-lg hover:bg-neutral-50 transition-colors text-sm text-amazon-textMuted font-medium"
             >
               <ImageIcon className="w-5 h-5 text-green-500" />
               <span className="hidden sm:inline">Photo/Video</span>
@@ -268,7 +268,7 @@ export const CreatePost: FC = () => {
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-lg hover:bg-[#3a3b3c] transition-colors text-sm text-gray-300 font-medium"
+              className="flex items-center gap-2 px-4 py-1.5 rounded-lg hover:bg-neutral-50 transition-colors text-sm text-amazon-textMuted font-medium"
             >
               <Smile className="w-5 h-5 text-yellow-500" />
               <span className="hidden sm:inline">Feeling/Activity</span>
@@ -306,24 +306,24 @@ export const CreatePost: FC = () => {
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-[#111111] border border-[#1e2126] rounded-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl"
+              className="bg-white border border-amazon-border rounded-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl"
             >
               {/* ---- Header ---- */}
-              <div className="flex items-center justify-between p-4 border-b border-[#1e2126]">
+              <div className="flex items-center justify-between p-4 border-b border-amazon-border">
                 <div className="w-9" /> {/* Spacer for centering */}
-                <h2 className="text-lg font-bold text-white">Tạo bài viết</h2>
+                <h2 className="text-lg font-bold text-amazon-text">Create Post</h2>
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="w-9 h-9 rounded-full bg-[#3a3b3c] hover:bg-[#4e4f50] flex items-center justify-center transition-colors"
+                  className="w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5 text-amazon-textMuted" />
                 </button>
               </div>
 
               {/* ---- User Info Row ---- */}
               <div className="p-4 flex items-center gap-3">
-                <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 bg-gray-600">
+                <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 bg-neutral-200">
                   <Image
                     src={userAvatar}
                     alt="My Avatar"
@@ -332,17 +332,16 @@ export const CreatePost: FC = () => {
                   />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-white">
+                  <span className="text-sm font-semibold text-amazon-text">
                     {userName}
                   </span>
-                  <button
-                    type="button"
-                    className="flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-md bg-[#3a3b3c] hover:bg-[#4e4f50] border border-[#2a2d35] transition-colors text-xs text-gray-300"
+                  <div
+                    className="flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-md bg-neutral-100 hover:bg-neutral-200 border border-amazon-border transition-colors text-xs text-amazon-textMuted"
                   >
                     <Lock className="w-3 h-3" />
-                    <span>Public</span>
-                    <ChevronDown className="w-3 h-3" />
-                  </button>
+                    <p>Public</p>
+                    {/* <ChevronDown className="w-3 h-3" /> */}
+                  </div>
                 </div>
               </div>
 
@@ -356,17 +355,17 @@ export const CreatePost: FC = () => {
                     setError(null);
                   }}
                   placeholder={`What are you thinking?`}
-                  className="w-full bg-transparent text-white placeholder-gray-500 text-lg focus:outline-none resize-none min-h-[120px]"
+                  className="w-full bg-transparent text-amazon-text placeholder-gray-400 text-lg focus:outline-none resize-none min-h-[120px]"
                   rows={4}
                 />
 
                 {/* Tagged product badge */}
                 {selectedProductName && (
-                  <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-[#1a1a1a] border border-[#2a2d35] rounded-lg">
-                    <ShoppingCart className="w-4 h-4 text-[#f5d800]" />
-                    <span className="text-xs text-gray-300">
+                  <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-amazon-bgSecondary border border-amazon-border rounded-lg">
+                    <ShoppingCart className="w-4 h-4 text-amazon-btnSecondary" />
+                    <span className="text-xs text-amazon-textMuted">
                       Sản phẩm:{" "}
-                      <span className="text-white font-medium">
+                      <span className="text-amazon-text font-medium">
                         {selectedProductName}
                       </span>
                     </span>
@@ -376,7 +375,7 @@ export const CreatePost: FC = () => {
                         setAssembledProductId("");
                         setSelectedProductName("");
                       }}
-                      className="ml-auto text-gray-500 hover:text-white transition-colors"
+                      className="ml-auto text-amazon-textMuted hover:text-amazon-text transition-colors"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -385,7 +384,7 @@ export const CreatePost: FC = () => {
 
                 {/* Image previews */}
                 {previewUrls.length > 0 && (
-                  <div className="mb-3 rounded-lg border border-[#2a2d35] overflow-hidden">
+                  <div className="mb-3 rounded-lg border border-amazon-border overflow-hidden">
                     <div
                       className={`grid gap-0.5 ${
                         previewUrls.length === 1
@@ -398,7 +397,7 @@ export const CreatePost: FC = () => {
                       {previewUrls.map((url, index) => (
                         <div
                           key={url}
-                          className="relative aspect-square bg-[#1a1a1a] group"
+                          className="relative aspect-square bg-neutral-100 group"
                         >
                           <Image
                             src={url}
@@ -421,15 +420,15 @@ export const CreatePost: FC = () => {
 
                 {/* Product Picker inside modal */}
                 {showProductPicker && (
-                  <div className="mb-3 border border-[#2a2d35] rounded-lg p-3 bg-[#1a1a1a]">
+                  <div className="mb-3 border border-amazon-border rounded-lg p-3 bg-amazon-bgSecondary">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-medium text-gray-300">
+                      <span className="text-xs font-medium text-amazon-textMuted">
                         Chọn sản phẩm để tag
                       </span>
                       <button
                         type="button"
                         onClick={() => setShowProductPicker(false)}
-                        className="text-gray-500 hover:text-white transition-colors"
+                        className="text-amazon-textMuted hover:text-amazon-text transition-colors"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -437,7 +436,7 @@ export const CreatePost: FC = () => {
 
                     {isLoadingProducts && (
                       <div className="flex items-center justify-center py-4">
-                        <Loader2 className="w-5 h-5 text-[#f5d800] animate-spin" />
+                        <Loader2 className="w-5 h-5 text-amazon-btnSecondary animate-spin" />
                       </div>
                     )}
 
@@ -462,12 +461,12 @@ export const CreatePost: FC = () => {
                               key={product.id}
                               type="button"
                               onClick={() => handleSelectProduct(product)}
-                              className="w-full text-left px-3 py-2 rounded-md hover:bg-[#222] border border-[#2a2d35] transition-colors"
+                              className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-50 border border-amazon-border transition-colors"
                             >
-                              <p className="text-sm font-medium text-white">
+                              <p className="text-sm font-medium text-amazon-text">
                                 {product.name}
                               </p>
-                              <p className="text-[11px] text-gray-500">
+                              <p className="text-[11px] text-amazon-textMuted">
                                 ID: {product.id}
                               </p>
                             </button>
@@ -482,54 +481,54 @@ export const CreatePost: FC = () => {
               </div>
 
               {/* ---- Addons Row ---- */}
-              <div className="p-4 mx-4 mb-3 border border-[#2a2d35] rounded-lg flex items-center justify-between gap-3 bg-[#1a1a1a]">
-                <span className="text-sm text-white font-medium whitespace-nowrap">
+              <div className="p-4 mx-4 mb-3 border border-amazon-border rounded-lg flex items-center justify-between gap-3 bg-white shadow-sm">
+                <span className="text-sm text-amazon-text font-medium whitespace-nowrap">
                   Add to your post
                 </span>
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
                     onClick={handleImageUpload}
-                    className="w-9 h-9 rounded-full hover:bg-[#3a3b3c] flex items-center justify-center transition-colors"
-                    title="Ảnh/video"
+                    className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
+                    title="Photo/video"
                   >
                     <ImageIcon className="w-5 h-5 text-green-500" />
                   </button>
                   <button
                     type="button"
                     onClick={handleTagProductsClick}
-                    className="w-9 h-9 rounded-full hover:bg-[#3a3b3c] flex items-center justify-center transition-colors"
-                    title="Tag sản phẩm"
+                    className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
+                    title="Tag products"
                   >
                     <UserPlus className="w-5 h-5 text-blue-500" />
                   </button>
                   <button
                     type="button"
-                    className="w-9 h-9 rounded-full hover:bg-[#3a3b3c] flex items-center justify-center transition-colors"
-                    title="Cảm xúc/hoạt động"
+                    className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
+                    title="Feeling/Activity"
                   >
                     <Smile className="w-5 h-5 text-yellow-500" />
                   </button>
                   <button
                     type="button"
-                    className="w-9 h-9 rounded-full hover:bg-[#3a3b3c] flex items-center justify-center transition-colors"
+                    className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
                     title="Check in"
                   >
                     <MapPin className="w-5 h-5 text-red-500" />
                   </button>
                   <button
                     type="button"
-                    className="w-9 h-9 rounded-full hover:bg-[#3a3b3c] flex items-center justify-center transition-colors"
+                    className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
                     title="GIF"
                   >
                     <Gift className="w-5 h-5 text-teal-400" />
                   </button>
                   <button
                     type="button"
-                    className="w-9 h-9 rounded-full hover:bg-[#3a3b3c] flex items-center justify-center transition-colors"
-                    title="Thêm"
+                    className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
+                    title="More"
                   >
-                    <MoreHorizontal className="w-5 h-5 text-gray-500" />
+                    <MoreHorizontal className="w-5 h-5 text-amazon-textMuted" />
                   </button>
                 </div>
               </div>
@@ -542,12 +541,12 @@ export const CreatePost: FC = () => {
                   disabled={!hasContent || isPosting}
                   className={`w-full font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 ${
                     hasContent && !isPosting
-                      ? "bg-[#0866ff] hover:bg-[#1877f2] text-white cursor-pointer"
-                      : "bg-[#3a3b3c] text-[#a8abaf] cursor-not-allowed"
+                      ? "bg-amazon-btnPrimary hover:brightness-95 text-amazon-text cursor-pointer"
+                      : "bg-neutral-200 text-neutral-400 cursor-not-allowed"
                   }`}
                 >
                   {isPosting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {isPosting ? "Đang đăng..." : "Đăng"}
+                  {isPosting ? "Posting..." : "Post"}
                 </button>
               </div>
             </motion.div>

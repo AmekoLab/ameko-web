@@ -46,13 +46,13 @@ const formatDate = (dateStr: string): string => {
 
 // ─── Skeleton Card ─────────────────────────────────────────
 const SkeletonCard = () => (
-  <div className="animate-pulse flex flex-col h-full w-full overflow-hidden rounded-none border border-transparent">
-    <div className="bg-[#151515] aspect-square w-full" />
+  <div className="animate-pulse flex flex-col h-full w-full overflow-hidden rounded-none border border-amazon-border bg-white shadow-sm">
+    <div className="bg-neutral-100 aspect-square w-full" />
     <div className="px-4 py-4 space-y-2.5 flex-grow">
-      <div className="h-4 bg-[#202030] rounded w-3/4" />
-      <div className="h-4 bg-[#202030] rounded w-1/2" />
-      <div className="h-3.5 bg-[#151515] rounded w-2/3 mt-3" />
-      <div className="h-3 bg-[#151515] rounded w-1/3" />
+      <div className="h-4 bg-neutral-200 rounded w-3/4" />
+      <div className="h-4 bg-neutral-200 rounded w-1/2" />
+      <div className="h-3.5 bg-neutral-200 rounded w-2/3 mt-3" />
+      <div className="h-3 bg-neutral-200 rounded w-1/3" />
     </div>
   </div>
 );
@@ -66,27 +66,14 @@ interface CommissionCardProps {
 const CommissionCard = ({ request, onClick }: CommissionCardProps) => (
   <div
     onClick={onClick}
-    className="group/card relative flex flex-col h-full w-full overflow-hidden rounded-none transition-all duration-300 border border-transparent cursor-pointer"
+    className="group/card relative flex flex-col h-full w-full overflow-hidden rounded-none transition-all duration-300 border border-amazon-border cursor-pointer bg-white shadow-sm hover:shadow-md"
   >
     {/* IMAGE AREA */}
     <div
-      className="relative block w-full aspect-square overflow-hidden shrink-0"
-      style={{
-        background:
-          "radial-gradient(ellipse at center, #242424 0%, #0f0f0f 100%)",
-      }}
+      className="relative block w-full aspect-square overflow-hidden shrink-0 bg-white"
     >
-      {/* Diagonal stripe texture overlay */}
-      <div
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, #222324ff 38%, #141415ff 70%)",
-        }}
-      />
-
       {/* Badge / Quantity */}
-      <span className="absolute top-0 left-0 z-20 text-[11px] font-black uppercase tracking-wider px-3 py-1.5 rounded-none bg-black text-white">
+      <span className="absolute top-0 left-0 z-20 text-[11px] font-black uppercase tracking-wider px-3 py-1.5 rounded-none bg-neutral-100 text-amazon-text border-b border-r border-amazon-border">
         QTY: {request.quantity}
       </span>
 
@@ -107,7 +94,7 @@ const CommissionCard = ({ request, onClick }: CommissionCardProps) => (
 
       {/* Slide-up CTA */}
       <div className="absolute inset-x-0 bottom-0 z-20 translate-y-full opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100 transition-all duration-300 ease-out">
-        <div className="w-full flex items-center justify-center gap-2 py-3 bg-[#f5d800] text-black text-[11px] font-black uppercase tracking-[0.12em]">
+        <div className="w-full flex items-center justify-center gap-2 py-3 bg-amazon-btnPrimary text-amazon-text text-[11px] font-black uppercase tracking-[0.12em]">
           <Info className="w-4 h-4 shrink-0" />
           <span>View Request</span>
         </div>
@@ -115,32 +102,32 @@ const CommissionCard = ({ request, onClick }: CommissionCardProps) => (
     </div>
 
     {/* Thin separator */}
-    <div className="w-full h-px shrink-0" />
+    <div className="w-full h-px shrink-0 bg-amazon-border" />
 
     {/* INFO AREA */}
     <div className="px-4 py-4 flex flex-col flex-grow">
       {/* Title */}
-      <h3 className="text-[13px] font-bold text-white leading-snug uppercase tracking-wide line-clamp-2 min-h-[40px] mb-3 group-hover/card:text-[#f5d800] transition-colors">
+      <h3 className="text-[13px] font-bold text-amazon-text leading-snug uppercase tracking-wide line-clamp-2 min-h-[40px] mb-3 group-hover/card:text-amazon-link transition-colors">
         {request.title}
       </h3>
 
       {/* Budget */}
       <div className="mb-3">
-        <p className="text-[18px] font-black text-[#f5d800] leading-none">
+        <p className="text-[18px] font-black text-amazon-price leading-none">
           {formatVND(request.minBudget)}
-          <span className="text-gray-500 font-normal mx-1 text-sm">–</span>
+          <span className="text-amazon-textMuted font-normal mx-1 text-sm">–</span>
           {formatVND(request.maxBudget)}
         </p>
       </div>
 
       {/* Meta Footer */}
-      <div className="mt-auto flex items-center gap-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">
-        <span className="flex items-center gap-1.5 hover:text-white transition-colors">
+      <div className="mt-auto flex items-center gap-3 text-[11px] font-bold uppercase tracking-wider text-amazon-textMuted">
+        <span className="flex items-center gap-1.5 hover:text-amazon-text transition-colors">
           <User className="w-3.5 h-3.5" />
           <span className="truncate max-w-[100px]">{request.userName}</span>
         </span>
-        <span className="text-[#1e2126]">/</span>
-        <span className="flex items-center gap-1.5 hover:text-white transition-colors">
+        <span className="text-amazon-border">/</span>
+        <span className="flex items-center gap-1.5 hover:text-amazon-text transition-colors">
           <Calendar className="w-3.5 h-3.5" />
           {formatDate(request.createdAt)}
         </span>
@@ -226,21 +213,21 @@ const CommissionModal = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-6xl max-h-[90vh] bg-[#151515] border border-[#1e2126] rounded-sm shadow-2xl overflow-hidden relative flex flex-col lg:flex-row"
+        className="w-full max-w-6xl max-h-[90vh] bg-white border border-amazon-border rounded-sm shadow-2xl overflow-hidden relative flex flex-col lg:flex-row"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-50 w-9 h-9 rounded-full bg-black/60 hover:bg-[#202030] border border-white/10 backdrop-blur-sm flex items-center justify-center transition-colors shadow-sm"
+          className="absolute top-4 right-4 z-50 w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 border border-amazon-border backdrop-blur-sm flex items-center justify-center transition-colors shadow-sm text-amazon-textMuted"
         >
-          <X className="w-5 h-5 text-gray-300" />
+          <X className="w-5 h-5" />
         </button>
 
         {/* ─── Left Column: Request Details ─── */}
         <div className="lg:w-1/2 overflow-y-auto">
           {/* Reference Image */}
-          <div className="bg-[#0f0f0f] aspect-video relative flex items-center justify-center border-b border-[#1e2126] lg:border-b-0">
+          <div className="bg-white aspect-video relative flex items-center justify-center border-b border-amazon-border lg:border-b-0">
             {request.referenceImages ? (
               <Image
                 src={request.referenceImages}
@@ -251,7 +238,7 @@ const CommissionModal = ({
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
-                <Package className="w-16 h-16 text-gray-600" />
+                <Package className="w-16 h-16 text-amazon-textMuted" />
               </div>
             )}
           </div>
@@ -259,42 +246,42 @@ const CommissionModal = ({
           {/* Details Content */}
           <div className="p-8">
             {/* Meta Row */}
-            <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-amazon-textMuted">
               <span className="flex items-center gap-1.5 font-medium">
-                <User className="w-4 h-4 text-gray-500" />
+                <User className="w-4 h-4 text-amazon-textMuted" />
                 {request.userName}
               </span>
-              <span className="text-gray-600">·</span>
+              <span className="text-amazon-textMuted">·</span>
               <span className="flex items-center gap-1.5 font-medium">
-                <Calendar className="w-4 h-4 text-gray-500" />
+                <Calendar className="w-4 h-4 text-amazon-textMuted" />
                 {formatDate(request.createdAt)}
               </span>
-              <span className="text-gray-600">·</span>
-              <span className="flex items-center gap-1.5 font-medium text-[#f5d800]">
+              <span className="text-amazon-textMuted">·</span>
+              <span className="flex items-center gap-1.5 font-medium text-amazon-btnSecondary">
                 <Hash className="w-4 h-4" />
                 Qty: {request.quantity}
               </span>
             </div>
 
             {/* Title */}
-            <h2 className="text-2xl font-bold text-white mt-3 leading-tight">
+            <h2 className="text-2xl font-bold text-amazon-text mt-3 leading-tight">
               {request.title}
             </h2>
 
             {/* Budget */}
-            <p className="text-xl font-bold text-[#f5d800] mt-3">
+            <p className="text-xl font-bold text-amazon-price mt-3">
               {formatVND(request.minBudget)}
-              <span className="text-gray-500 font-normal mx-1.5">–</span>
+              <span className="text-amazon-textMuted font-normal mx-1.5">–</span>
               {formatVND(request.maxBudget)}
             </p>
 
             {/* Description */}
             <div className="mt-6">
-              <h3 className="text-sm font-semibold text-white mb-2 flex items-center gap-1.5 uppercase tracking-wider">
-                <FileText className="w-4 h-4 text-gray-400" />
+              <h3 className="text-sm font-semibold text-amazon-text mb-2 flex items-center gap-1.5 uppercase tracking-wider">
+                <FileText className="w-4 h-4 text-amazon-textMuted" />
                 Mô tả yêu cầu
               </h3>
-              <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap bg-[#0f0f0f] p-4 rounded-sm border border-[#1e2126]">
+              <p className="text-sm text-amazon-text leading-relaxed whitespace-pre-wrap bg-amazon-bgSecondary p-4 rounded-sm border border-amazon-border">
                 {request.description}
               </p>
             </div>
@@ -302,19 +289,19 @@ const CommissionModal = ({
         </div>
 
         {/* ─── Right Column: Quote Form ─── */}
-        <div className="lg:w-1/2 border-t lg:border-t-0 lg:border-l border-[#1e2126] bg-[#0f0f0f] p-8 overflow-y-auto flex flex-col">
+        <div className="lg:w-1/2 border-t lg:border-t-0 lg:border-l border-amazon-border bg-neutral-50 p-8 overflow-y-auto flex flex-col">
           {isOwner ? (
             <div className="flex flex-col items-center justify-center flex-1 text-center">
-              <div className="w-16 h-16 rounded-full bg-[#151515] border border-[#1e2126] flex items-center justify-center mb-4">
-                <Info className="w-8 h-8 text-gray-500" />
+              <div className="w-16 h-16 rounded-full bg-white border border-amazon-border flex items-center justify-center mb-4">
+                <Info className="w-8 h-8 text-amazon-textMuted" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2 uppercase tracking-wide">
+              <h3 className="text-lg font-bold text-amazon-text mb-2 uppercase tracking-wide">
                 This is your own request
               </h3>
-              <p className="text-sm text-gray-400 max-w-xs">
+              <p className="text-sm text-amazon-textMuted max-w-xs">
                 You cannot send a quotation for your own request.
               </p>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#151515] border border-white/10 text-gray-400 rounded-sm text-sm font-bold mt-4 uppercase">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-amazon-border text-amazon-textMuted rounded-sm text-sm font-bold mt-4 uppercase">
                 <Info className="w-4 h-4" />
                 View only
               </div>
@@ -351,7 +338,7 @@ const CommissionModal = ({
                       onChange={(e) => setPrice(e.target.value)}
                       min={1}
                       placeholder="1,500,000"
-                      className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm pl-10 pr-14 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors"
+                      className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm pl-10 pr-14 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
                     />
                     <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-bold uppercase tracking-widest">
                       VND
@@ -369,14 +356,14 @@ const CommissionModal = ({
 
                 {/* Estimated Time */}
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
                     Estimated completion time{" "}
-                    <span className="text-[#ce2a32]">*</span>
+                    <span className="text-red-600">*</span>
                   </label>
                   <select
                     value={estimatedDays}
                     onChange={(e) => setEstimatedDays(e.target.value)}
-                    className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors appearance-none cursor-pointer"
+                    className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors appearance-none cursor-pointer"
                   >
                     <option value="3">3 days</option>
                     <option value="5">5 days</option>
@@ -390,16 +377,16 @@ const CommissionModal = ({
 
                 {/* Note / Details */}
                 <div className="flex-1 flex flex-col">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
                     Message / Material details{" "}
-                    <span className="text-[#ce2a32]">*</span>
+                    <span className="text-red-600">*</span>
                   </label>
                   <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     rows={5}
                     placeholder="Describe in detail the switch, keycap, mod you will use...\nE.g.: Gateron Oil King lubed, GMK Olivia clone, foam mod, tape mod..."
-                    className="w-full flex-1 min-h-[120px] border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors resize-none placeholder-gray-600"
+                    className="w-full flex-1 min-h-[120px] border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors resize-none placeholder-gray-400"
                   />
                   {errors.note ? (
                     <p className="text-xs text-red-500 mt-1.5">
@@ -409,7 +396,7 @@ const CommissionModal = ({
                       )}
                     </p>
                   ) : (
-                    <p className="text-xs text-gray-400 mt-1.5">
+                    <p className="text-xs text-amazon-textMuted mt-1.5">
                       Minimum 10 characters. Please describe clearly to build
                       customer trust.
                     </p>
@@ -420,7 +407,7 @@ const CommissionModal = ({
                 <button
                   type="submit"
                   disabled={isSubmittingQuote}
-                  className="w-full py-4 bg-[#f5d800] hover:bg-[#e6ca00] disabled:bg-[#f5d800]/50 text-black font-black uppercase tracking-widest text-[13px] rounded-sm shadow-md transition-all flex items-center justify-center gap-2.5 mt-auto"
+                  className="w-full py-4 bg-amazon-btnPrimary hover:brightness-95 disabled:bg-amazon-btnPrimary/50 text-amazon-text font-black uppercase tracking-widest text-[13px] rounded-sm shadow-md transition-all flex items-center justify-center gap-2.5 mt-auto"
                 >
                   {isSubmittingQuote ? (
                     <>
@@ -462,35 +449,35 @@ export default function CommissionPoolPage() {
   };
 
   return (
-    <div className="bg-black min-h-screen text-white">
-      <div className="max-w-[1280px] mx-auto px-4 py-10 lg:py-14">
+    <div className="bg-amazon-bgSecondary min-h-screen text-amazon-text">
+      <div className="max-w-[1280px] mx-auto px-2 py-6 lg:py-2">
         {/* Hero Banner */}
-        <div className="w-full bg-[#151515] border border-[#1e2126] rounded-sm p-8 mb-8 shadow-md flex flex-col items-center text-center relative overflow-hidden group">
+        <div className="w-full bg-amazon-bgSecondary p-2   flex flex-col items-center text-center relative overflow-hidden group">
           {/* Subtle gradient accent */}
-          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#ce2a32] via-[#f5d800] to-[#ce2a32]" />
+          {/* <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amazon-btnSecondary via-amazon-btnPrimary to-amazon-btnSecondary" /> */}
           
-          <h2 className="text-3xl font-black text-white uppercase tracking-tight z-10">
+          <h2 className="text-3xl font-black text-amazon-text uppercase tracking-tight z-10">
             Do you have a unique mechanical keyboard idea?
           </h2>
-          <p className="text-gray-400 mt-2 z-10 max-w-2xl mx-auto">
+          <p className="text-amazon-textMuted mt-2 z-10 max-w-2xl mx-auto">
             Post your request now to receive quotations from dozens of reputable
             Shops on the system.
           </p>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="mt-6 bg-[#f5d800] text-black font-black uppercase tracking-widest text-[13px] rounded-sm px-8 py-3.5 hover:bg-[#e6ca00] transition-colors shadow-lg cursor-pointer z-10"
+            className="mt-4 bg-amazon-btnPrimary text-amazon-text font-black uppercase tracking-widest text-[13px] rounded-sm px-6 py-3.5 hover:brightness-95 transition-colors shadow-lg cursor-pointer z-10"
           >
             Post Request to Market
           </button>
         </div>
 
         {/* Header */}
-        <div className="mb-10 flex items-end justify-between border-b mx-4 md:mx-0 pb-4 border-[#1e2126]">
+        <div className="mb-4 flex items-end justify-between border-b mx-4 md:mx-0 pb-2 border-amazon-border">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-black text-white tracking-widest uppercase">
+            <h1 className="text-2xl lg:text-3xl font-black text-amazon-text tracking-widest uppercase">
               Custom Request Market
             </h1>
-            <p className="text-sm text-gray-500 mt-1.5 uppercase font-medium tracking-wide">
+            <p className="text-sm text-amazon-textMuted mt-1.5 uppercase font-medium tracking-wide">
               Explore custom keyboard requests from the community
             </p>
           </div>
@@ -508,16 +495,16 @@ export default function CommissionPoolPage() {
         {/* Error State */}
         {!loadingPool && error && (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-5 border border-red-500/20">
+            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-5 border border-red-200">
               <Loader2 className="w-8 h-8 text-red-500" />
             </div>
-            <h2 className="text-lg font-bold text-white uppercase tracking-wide mb-2">
+            <h2 className="text-lg font-bold text-amazon-text uppercase tracking-wide mb-2">
               Unable to load data
             </h2>
-            <p className="text-sm text-gray-500 mb-6 max-w-sm">{error}</p>
+            <p className="text-sm text-amazon-textMuted mb-6 max-w-sm">{error}</p>
             <button
               onClick={handleRetry}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#202030] border border-white/10 hover:bg-[#2a2a3a] text-white text-sm font-bold uppercase tracking-widest rounded-sm transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-amazon-border hover:bg-neutral-50 text-amazon-text text-sm font-bold uppercase tracking-widest rounded-sm transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               Retry
@@ -527,14 +514,14 @@ export default function CommissionPoolPage() {
 
         {/* Empty State */}
         {!loadingPool && !error && poolRequests.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-[#1e2126] bg-[#151515] rounded-sm mx-4 lg:mx-0">
-            <div className="w-16 h-16 rounded-full bg-[#202030] flex items-center justify-center mb-5">
+          <div className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-amazon-border bg-white rounded-sm mx-4 lg:mx-0">
+            <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mb-5">
               <Inbox className="w-8 h-8 text-gray-500" />
             </div>
-            <h2 className="text-lg font-black text-white uppercase tracking-widest mb-2">
+            <h2 className="text-lg font-black text-amazon-text uppercase tracking-widest mb-2">
               No requests yet
             </h2>
-            <p className="text-sm text-gray-400 max-w-sm">
+            <p className="text-sm text-amazon-textMuted max-w-sm">
               There are currently no custom keyboard requests in the public
               market. Please check back later!
             </p>

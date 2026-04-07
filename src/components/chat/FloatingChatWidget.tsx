@@ -88,27 +88,27 @@ export default function FloatingChatWidget() {
             transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
             className="
               w-[320px] sm:w-[360px] flex flex-col
-              bg-[#111111] border border-[#1e2126]
-              rounded-2xl shadow-[0_8px_48px_rgba(0,0,0,0.7)]
+              bg-white border border-amazon-border
+              rounded-lg shadow-2xl
               overflow-hidden
             "
             style={{ height: "min(500px, calc(100vh - 100px))", transformOrigin: "bottom right" }}
           >
             {/* Popover header */}
-            <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[#1e2126] bg-[#151515] shrink-0">
+            <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-amazon-border bg-white shadow-sm shrink-0 z-10">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-[#f5d800]/10 flex items-center justify-center">
-                  <MessageSquare className="w-3.5 h-3.5 text-[#f5d800]" />
+                <div className="w-6 h-6 rounded-sm bg-amazon-btnSecondary flex items-center justify-center border border-amazon-border">
+                  <MessageSquare className="w-3.5 h-3.5 text-amazon-text" />
                 </div>
                 <Link
                   href="/chat"
-                  className="text-sm font-bold text-white tracking-tight hover:text-[#f5d800] transition-colors"
+                  className="text-sm font-black text-amazon-text  hover:text-amazon-link transition-colors"
                   onClick={() => dispatch(setWidgetOpen(false))}
                 >
                   Messages
                 </Link>
                 {totalUnread > 0 && (
-                  <span className="min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-[#f5d800] text-black text-[10px] font-bold px-1">
+                  <span className="min-w-[18px] h-[18px] flex items-center justify-center rounded-sm bg-amazon-btnPrimary text-amazon-text text-[10px] font-black px-1">
                     {totalUnread > 99 ? "99+" : totalUnread}
                   </span>
                 )}
@@ -116,7 +116,7 @@ export default function FloatingChatWidget() {
               <button
                 type="button"
                 onClick={() => dispatch(setWidgetOpen(false))}
-                className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
+                className="p-1.5 rounded-sm border border-transparent text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 transition-colors"
                 aria-label="Minimize chat"
               >
                 <X className="w-3.5 h-3.5" />
@@ -144,9 +144,9 @@ export default function FloatingChatWidget() {
         whileTap={{ scale: 0.93 }}
         className="
           relative w-12 h-12 rounded-full
-          bg-[#f5d800] text-black shadow-lg shadow-[#f5d800]/25
-          flex items-center justify-center
-          ring-4 ring-[#f5d800]/15
+          bg-amazon-btnPrimary text-amazon-text shadow-xl shadow-black/20
+          flex items-center justify-center border border-amazon-border
+          ring-2 ring-white
         "
       >
         <AnimatePresence mode="wait">
@@ -186,8 +186,8 @@ export default function FloatingChatWidget() {
               className="
                 absolute -top-1 -right-1
                 min-w-[18px] h-[18px] flex items-center justify-center
-                rounded-full bg-red-500 text-white text-[10px] font-bold px-1
-                ring-2 ring-[#0a0a0a]
+                rounded-sm bg-red-500 text-white text-[10px] font-bold px-1
+                ring-2 ring-white
               "
             >
               {totalUnread > 99 ? "99+" : totalUnread}

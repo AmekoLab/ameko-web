@@ -34,8 +34,8 @@ const Avatar: FC<{ name: string; avatarUrl?: string | null; compact?: boolean }>
     return <img src={avatarUrl} alt={name} className={`${cls} rounded-full object-cover shrink-0`} />;
   }
   return (
-    <div className={`${cls} rounded-full bg-[#f5d800]/20 border border-[#f5d800]/30 flex items-center justify-center shrink-0`}>
-      <span className="text-[#f5d800] text-[11px] font-bold leading-none">{getInitials(name)}</span>
+    <div className={`${cls} rounded-full bg-neutral-100 border border-amazon-border flex items-center justify-center shrink-0`}>
+      <span className="text-amazon-textMuted text-[11px] font-black leading-none">{getInitials(name)}</span>
     </div>
   );
 };
@@ -57,10 +57,10 @@ const ConversationItem: FC<{
       type="button"
       onClick={onClick}
       className={`
-        w-full flex items-center gap-2.5 px-2.5 ${py} rounded-xl text-left transition-all duration-150
+        group w-full flex items-center gap-2.5 px-2.5 ${py} rounded-sm text-left transition-all duration-150
         ${isActive
-          ? "bg-[#f5d800]/8 border border-[#f5d800]/20"
-          : "border border-transparent hover:bg-white/5"
+          ? "bg-neutral-50 border border-amazon-border shadow-sm"
+          : "border border-transparent hover:bg-neutral-50 hover:border-amazon-border"
         }
       `}
     >
@@ -72,22 +72,22 @@ const ConversationItem: FC<{
       {/* Text block */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-1 mb-0.5">
-          <span className={`text-[13px] font-semibold truncate ${isActive ? "text-[#f5d800]" : "text-white"}`}>
+          <span className={`text-[13px] truncate ${isActive ? "text-amazon-text font-black" : "text-amazon-text font-semibold"}`}>
             {otherUserName}
           </span>
           {lastMessageAt && (
-            <span className="text-[10px] text-gray-600 shrink-0">
+            <span className="text-[10px] text-amazon-textMuted font-bold shrink-0">
               {fmtTime(lastMessageAt)}
             </span>
           )}
         </div>
 
         <div className="flex items-center justify-between gap-1">
-          <p className={`text-[11px] truncate leading-snug ${hasUnread ? "text-gray-300 font-medium" : "text-gray-500"}`}>
-            {lastMessage ?? <span className="italic text-gray-600">No messages yet</span>}
+          <p className={`text-[11px] truncate leading-snug ${hasUnread ? "text-amazon-text font-bold" : "text-amazon-textMuted"}`}>
+            {lastMessage ?? <span className="italic text-amazon-textMuted">No messages yet</span>}
           </p>
           {hasUnread && (
-            <span className="shrink-0 min-w-[16px] h-4 rounded-full bg-[#f5d800] text-black text-[9px] font-bold flex items-center justify-center px-1">
+            <span className="shrink-0 min-w-[16px] h-4 rounded-sm bg-amazon-btnPrimary text-amazon-text text-[9px] font-black flex items-center justify-center px-1">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
@@ -101,14 +101,14 @@ const ConversationItem: FC<{
 
 const EmptyState: FC<{ isSearching?: boolean }> = ({ isSearching }) => (
   <div className="flex flex-col items-center justify-center flex-1 px-6 py-10 text-center">
-    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center mb-3">
-      <MessageSquare className="w-5 h-5 text-gray-600" />
+    <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center mb-3">
+      <MessageSquare className="w-5 h-5 text-amazon-textMuted" />
     </div>
-    <p className="text-xs font-semibold text-gray-400">
+    <p className="text-xs font-bold text-amazon-textMuted">
       {isSearching ? "No results found" : "No conversations yet"}
     </p>
     {!isSearching && (
-      <p className="text-[10px] text-gray-600 mt-1">
+      <p className="text-[10px] text-amazon-textMuted mt-1 font-bold">
         Start a chat from a product page
       </p>
     )}
@@ -146,21 +146,21 @@ const ConversationList: FC<ConversationListProps> = ({
   );
 
   return (
-    <div className="flex flex-col h-full bg-[#111111]">
+    <div className="flex flex-col h-full bg-white">
       {/* Search */}
       <div className={`${compact ? "px-2.5 py-2" : "px-3 py-2.5"} shrink-0`}>
         <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600 pointer-events-none" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-amazon-textMuted pointer-events-none" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search conversations…"
             className={`
-              w-full bg-[#1a1a1a] border border-[#1e2126] rounded-lg
+              w-full bg-neutral-50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border border-amazon-border rounded-sm
               pl-8 pr-3 ${compact ? "py-1.5 text-[11px]" : "py-2 text-xs"}
-              text-white placeholder-gray-600
-              focus:outline-none focus:border-[#f5d800]/40 focus:ring-1 focus:ring-[#f5d800]/15
+              text-amazon-text placeholder-amazon-textMuted font-bold
+              focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/20
               transition-colors
             `}
           />
@@ -168,7 +168,7 @@ const ConversationList: FC<ConversationListProps> = ({
       </div>
 
       {/* List */}
-      <div className={`flex-1 overflow-y-auto ${compact ? "px-1.5 pb-2" : "px-2 pb-3"} space-y-0.5 custom-scrollbar scrollbar-thumb-[#f5d800] scrollbar-track-transparent`}>
+      <div className={`flex-1 overflow-y-auto ${compact ? "px-1.5 pb-2" : "px-2 pb-3"} space-y-0.5 custom-scrollbar scrollbar-thumb-amazon-textMuted scrollbar-track-transparent`}>
         {filtered.length === 0 ? (
           <EmptyState isSearching={query.length > 0} />
         ) : (

@@ -89,12 +89,12 @@ const VoucherCard: FC<VoucherCardProps> = ({
     <div
       className={`flex rounded-sm overflow-hidden border transition-all ${
         !eligible
-          ? "opacity-50 grayscale border-[#1e2126] cursor-not-allowed"
+          ? "opacity-50 grayscale border-amazon-border cursor-not-allowed"
           : isApplied
-            ? "border-[#f5d800] ring-1 ring-[#f5d800]/30 bg-[#f5d800]/10 shadow-sm cursor-pointer"
+            ? "border-amazon-focus ring-1 ring-amazon-focus/30 bg-amazon-focus/10 shadow-sm cursor-pointer"
             : selected
-              ? "border-[#f5d800] ring-1 ring-[#f5d800]/30 shadow-sm"
-              : "border-[#1e2126] hover:border-[#f5d800]/40 cursor-pointer"
+              ? "border-amazon-focus ring-1 ring-amazon-focus/30 shadow-sm"
+              : "border-amazon-border hover:border-amazon-focus/40 cursor-pointer"
       }`}
       onClick={() => eligible && onToggle(voucher.code)}
       role="button"
@@ -102,12 +102,12 @@ const VoucherCard: FC<VoucherCardProps> = ({
       aria-disabled={!eligible}
     >
       {/* ── Left Ticket Part ── */}
-      <div className="relative w-[100px] shrink-0 bg-gradient-to-br from-[#f5d800] to-[#d4b900] flex flex-col items-center justify-center p-3 text-black">
+      <div className="relative w-[100px] shrink-0 bg-gradient-to-br from-amazon-btnPrimary to-[#f0c14b] flex flex-col items-center justify-center p-3 text-amazon-text">
         {/* Dashed "tear-off" edge */}
-        <div className="absolute top-0 right-0 h-full w-0 border-r-2 border-dashed border-black/20" />
+        <div className="absolute top-0 right-0 h-full w-0 border-r-2 border-dashed border-black/10" />
         {/* Scalloped circles */}
-        <div className="absolute -right-[6px] top-3 w-3 h-3 bg-black rounded-full border-l border-[#1e2126]" />
-        <div className="absolute -right-[6px] bottom-3 w-3 h-3 bg-black rounded-full border-l border-[#1e2126]" />
+        <div className="absolute -right-[6px] top-3 w-3 h-3 bg-white rounded-full border-l border-amazon-border" />
+        <div className="absolute -right-[6px] bottom-3 w-3 h-3 bg-white rounded-full border-l border-amazon-border" />
 
         <Ticket className="w-6 h-6 mb-1.5 opacity-80" />
         <span className="text-[10px] font-black uppercase tracking-widest text-center leading-tight">
@@ -124,25 +124,25 @@ const VoucherCard: FC<VoucherCardProps> = ({
 
       {/* ── Right Content Part ── */}
       <div
-        className={`flex-1 p-3 flex flex-col justify-between min-w-0 ${isApplied ? "bg-[#f5d800]/5" : "bg-[#151515]"}`}
+        className={`flex-1 p-3 flex flex-col justify-between min-w-0 ${isApplied ? "bg-amazon-btnPrimary/5" : "bg-white"}`}
       >
         <div>
           {/* Title + Applied badge */}
           <div className="flex items-center justify-between gap-1">
-            <p className="text-[13px] font-black text-white truncate uppercase tracking-widest">
+            <p className="text-[13px] font-black text-amazon-text truncate uppercase tracking-widest">
               {fmtDiscount(voucher)}
             </p>
             {isApplied && (
-              <CheckCircle2 className="w-4 h-4 text-[#f5d800] shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-amazon-focus shrink-0" />
             )}
           </div>
           {/* Description */}
-          <p className="text-[11px] font-bold text-gray-400 mt-0.5 line-clamp-1 uppercase tracking-wider">
-            {voucher.description || voucher.name}
+          <p className="text-[11px] font-bold text-amazon-textMuted mt-0.5 line-clamp-1 uppercase tracking-wider">
+           Code: {voucher.description || voucher.name}
           </p>
           {/* Min order */}
           {voucher.minOrderValue > 0 && (
-            <p className="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-wider">
+            <p className="text-[10px] font-bold text-amazon-textMuted mt-1 uppercase tracking-wider">
               Min order {fmtVND(voucher.minOrderValue)}
             </p>
           )}
@@ -151,15 +151,15 @@ const VoucherCard: FC<VoucherCardProps> = ({
         <div className="mt-2 flex items-end justify-between gap-2">
           {/* Expiry + progress */}
           <div className="min-w-0 mt-1">
-            <div className="flex items-center gap-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+            <div className="flex items-center gap-1 text-[10px] font-bold text-amazon-textMuted uppercase tracking-wider">
               <Clock className="w-3 h-3 shrink-0" />
               <span>Expiry: {fmtDate(voucher.endDate)}</span>
             </div>
             {/* Progress bar */}
             {voucher.usageLimit > 0 && voucher.usageLimit < 2147483647 && (
-              <div className="mt-1.5 w-full h-1 bg-black rounded-full overflow-hidden border border-[#1e2126]">
+              <div className="mt-1.5 w-full h-1 bg-neutral-200 rounded-full overflow-hidden border border-amazon-border">
                 <div
-                  className="h-full bg-[#f5d800] rounded-full transition-all"
+                  className="h-full bg-amazon-btnPrimary rounded-full transition-all"
                   style={{ width: `${progress * 100}%` }}
                 />
               </div>
@@ -170,7 +170,7 @@ const VoucherCard: FC<VoucherCardProps> = ({
           <div className="shrink-0">
             {eligible ? (
               isApplied ? (
-                <span className="inline-flex items-center gap-1 text-[10px] font-black text-[#f5d800] bg-[#f5d800]/10 px-1.5 py-0.5 rounded-sm uppercase tracking-widest whitespace-nowrap">
+                <span className="inline-flex items-center gap-1 text-[10px] font-black text-amazon-text bg-amazon-btnPrimary px-1.5 py-0.5 rounded-sm uppercase tracking-widest whitespace-nowrap shadow-sm">
                   <CheckCircle2 className="w-3 h-3" />
                   Applied
                 </span>
@@ -180,12 +180,12 @@ const VoucherCard: FC<VoucherCardProps> = ({
                   name="voucher-selection"
                   checked={selected}
                   readOnly
-                  className="w-4 h-4 accent-[#f5d800] cursor-pointer"
+                  className="w-4 h-4 accent-amazon-btnPrimary cursor-pointer"
                   aria-label={`Select ${voucher.name}`}
                 />
               )
             ) : (
-              <Tag className="w-4 h-4 text-gray-600" />
+              <Tag className="w-4 h-4 text-neutral-400" />
             )}
           </div>
         </div>
@@ -193,12 +193,12 @@ const VoucherCard: FC<VoucherCardProps> = ({
         {/* Ineligible message */}
         {!eligible &&
           (isFullyClaimed ? (
-            <div className="flex items-center gap-1 mt-1.5 text-[11px] text-red-500">
+            <div className="flex items-center gap-1 mt-1.5 text-[11px] text-red-600">
               <AlertCircle className="w-3 h-3 shrink-0" />
               <span>Voucher fully claimed</span>
             </div>
           ) : (
-            <div className="flex items-center gap-1 mt-1.5 text-[11px] text-orange-500">
+            <div className="flex items-center gap-1 mt-1.5 text-[11px] text-orange-600">
               <AlertCircle className="w-3 h-3 shrink-0" />
               <span>
                 Spend {fmtVND(remainingAmount)} more to use this voucher
@@ -368,28 +368,28 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
       onClick={handleOverlayClick}
       className="fixed inset-0 z-[80] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity"
     >
-      <div className="w-full md:max-w-[480px] max-h-[85vh] md:max-h-[80vh] bg-black md:rounded-sm rounded-t-sm border border-[#1e2126] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300">
+      <div className="w-full md:max-w-[480px] max-h-[85vh] md:max-h-[80vh] bg-white md:rounded-sm rounded-t-sm border border-amazon-border flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300">
         {/* ── Header ── */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#1e2126] bg-[#151515]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-amazon-border bg-neutral-50">
           <div>
-            <h3 className="font-oswald font-black uppercase tracking-widest text-lg text-white">{title}</h3>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">
+            <h3 className="font-oswald font-black uppercase tracking-widest text-lg text-amazon-text">{title}</h3>
+            <p className="text-[10px] font-bold text-amazon-textMuted uppercase tracking-widest mt-0.5">
               {eligibleCount}/{vouchers.length} voucher(s) available
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-[#202030] rounded-sm transition-colors"
+            className="p-1.5 hover:bg-neutral-200 rounded-sm transition-colors"
             aria-label="Close"
           >
-            <X className="w-5 h-5 text-gray-400 hover:text-white" />
+            <X className="w-5 h-5 text-amazon-textMuted hover:text-amazon-text" />
           </button>
         </div>
 
         {/* ── Code Input ── */}
-        <div className="px-5 py-3 border-b border-[#1e2126] bg-black">
+        <div className="px-5 py-3 border-b border-amazon-border bg-white">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amazon-textMuted" />
             <input
               type="text"
               value={codeInput}
@@ -399,7 +399,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
               }}
               onKeyDown={(e) => e.key === "Enter" && handleApplyCode()}
               placeholder="Enter voucher code"
-              className="w-full pl-9 pr-24 py-3 text-[11px] font-bold uppercase tracking-widest border border-[#1e2126] bg-[#151515] text-white rounded-sm focus:border-[#f5d800] focus:ring-1 focus:ring-[#f5d800]/30 outline-none transition placeholder:text-gray-600"
+              className="w-full pl-9 pr-24 py-3 text-[11px] font-bold uppercase tracking-widest border border-amazon-border bg-white text-amazon-text rounded-sm focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/30 outline-none transition placeholder:text-neutral-400"
             />
             <button
               type="button"
@@ -407,8 +407,8 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
               onClick={handleApplyCode}
               className={`absolute right-1.5 top-1/2 -translate-y-1/2 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-sm transition-colors ${
                 codeInput.trim()
-                  ? "bg-[#f5d800] text-black hover:bg-[#ffe500]"
-                  : "bg-[#202030] text-gray-500 cursor-not-allowed border border-[#1e2126]"
+                  ? "bg-amazon-btnSecondary text-amazon-text hover:brightness-95 border border-amazon-border"
+                  : "bg-neutral-200 text-amazon-textMuted cursor-not-allowed border border-amazon-border"
               }`}
             >
               Apply
@@ -425,7 +425,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
         {/* ── Voucher List ── */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
           {sortedVouchers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+            <div className="flex flex-col items-center justify-center py-12 text-amazon-textMuted">
               <Ticket className="w-10 h-10 opacity-20 mb-3" />
               <p className="text-sm">No vouchers available</p>
             </div>
@@ -466,9 +466,9 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
         </div>
 
         {/* ── Footer ── */}
-        <div className="px-5 py-4 border-t border-[#1e2126] bg-[#151515]">
+        <div className="px-5 py-4 border-t border-amazon-border bg-neutral-50">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+            <span className="text-[10px] font-black uppercase tracking-widest text-amazon-textMuted">
               {localSelectedCodes.size > 0
                 ? `Selected ${localSelectedCodes.size} voucher(s)`
                 : "No voucher selected"}
@@ -477,7 +477,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
               <button
                 type="button"
                 onClick={() => setLocalSelectedCodes(new Set())}
-                className="text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-red-500 transition-colors"
+                className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted hover:text-red-600 transition-colors"
               >
                 Deselect all
               </button>
@@ -486,7 +486,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
           <div className="flex gap-2">
             <button
               onClick={handleConfirm}
-              className="w-full py-4 text-[13px] font-black uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 flex items-center justify-center gap-2 bg-[#f5d800] text-black hover:bg-[#ffe500] shadow-[0_0_15px_rgba(245,216,0,0.3)]"
+              className="w-full py-4 text-[13px] font-black uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 flex items-center justify-center gap-2 bg-amazon-btnPrimary text-amazon-text hover:brightness-95 shadow-md"
             >
               Confirm Selection
             </button>

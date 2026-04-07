@@ -47,16 +47,16 @@ const defaultCards: [SplitPromoCard, SplitPromoCard] = [
 const CornerBrackets: FC = () => (
   <>
     {/* Top-Left */}
-    <div className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-white opacity-0 group-hover:opacity-80 transition-all duration-700 ease-out z-20 pointer-events-none" />
+    <div className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-[#FFD814] opacity-0 group-hover:opacity-80 transition-all duration-700 ease-out z-20 pointer-events-none" />
 
     {/* Top-Right */}
-    <div className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-white opacity-0 group-hover:opacity-80 transition-all duration-700 ease-out z-20 pointer-events-none" />
+    <div className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-[#FFD814] opacity-0 group-hover:opacity-80 transition-all duration-700 ease-out z-20 pointer-events-none" />
 
     {/* Bottom-Left */}
-    <div className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-white opacity-0 group-hover:opacity-80 transition-all duration-700 ease-out z-20 pointer-events-none" />
+    <div className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-[#FFD814] opacity-0 group-hover:opacity-80 transition-all duration-700 ease-out z-20 pointer-events-none" />
 
     {/* Bottom-Right */}
-    <div className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-white opacity-0 group-hover:opacity-80 transition-all duration-700 ease-out z-20 pointer-events-none" />
+    <div className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-[#FFD814] opacity-0 group-hover:opacity-80 transition-all duration-700 ease-out z-20 pointer-events-none" />
   </>
 );
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
@@ -65,14 +65,14 @@ export const SplitPromoSection: FC<SplitPromoSectionProps> = ({
   cards = defaultCards,
 }) => {
   return (
-    <section className="w-full bg-black text-white py-6 overflow-hidden">
+    <section className="w-full bg-amazon-bgSecondary text-amazon-text py-6 overflow-hidden">
       <div className="w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 lg:gap-2">
           {cards.map((card, index) => (
             <Link
               key={index}
               href={card.ctaHref}
-              className="relative w-full h-[500px] lg:h-[500px] bg-[#151515] overflow-hidden group cursor-pointer block"
+              className="relative w-full h-[500px] lg:h-[500px] bg-white overflow-hidden group cursor-pointer block shadow-sm"
             >
               {/* Background Image */}
               <Image
@@ -97,7 +97,7 @@ export const SplitPromoSection: FC<SplitPromoSectionProps> = ({
                 <p className="text-[11px] lg:text-xs font-bold text-gray-300 uppercase tracking-[0.2em] mb-8">
                   {card.subtitle}
                 </p>
-                <span className="bg-[#f5d800] text-black px-10 py-3.5 text-[11px] font-black uppercase tracking-widest hover:bg-white transition-colors duration-300 inline-block">
+                <span className="bg-amazon-btnPrimary text-amazon-text px-10 py-3.5 text-[11px] font-black uppercase tracking-widest hover:brightness-95 transition-all duration-300 inline-block rounded-md shadow-sm">
                   {card.ctaText}
                 </span>
               </div>

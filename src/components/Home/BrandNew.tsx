@@ -28,7 +28,7 @@ export const BrandNew: FC = () => {
   }, []);
 
   return (
-    <section className="w-full py-12 bg-black ">
+    <section className="w-full py-12 bg-amazon-bg">
       <div className="max-w-[1920px] mx-auto px-4 lg:px-8 relative ">
         {/* --- HEADER --- */}
         <div className="mb-8">
@@ -38,10 +38,10 @@ export const BrandNew: FC = () => {
             viewport={{ once: true }}
             className="space-y-2"
           >
-            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-white">
+            <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tighter text-amazon-text">
               Brand New
             </h2>
-            <div className="h-1 w-12 bg-[#ce2a32]"></div>
+            <div className="h-1 w-12 bg-amazon-btnSecondary"></div>
           </motion.div>
         </div>
 

@@ -28,12 +28,12 @@ export const ProductSpecs = ({ specs }: ProductSpecsProps) => {
         {rows.map((row, idx) => (
           <div
             key={idx}
-            className="grid grid-cols-1 md:grid-cols-12 py-3.5 border-b border-white/10 gap-2 md:gap-4 hover:bg-white/[0.03] transition-colors"
+            className="grid grid-cols-1 md:grid-cols-12 py-3.5 border-b border-amazon-border gap-2 md:gap-4 hover:bg-neutral-50 transition-colors"
           >
-            <div className="md:col-span-5 text-[10px] font-black uppercase tracking-widest text-gray-500">
+            <div className="md:col-span-5 text-[10px] font-black uppercase tracking-widest text-amazon-textMuted">
               {row.label}
             </div>
-            <div className="md:col-span-7 text-sm text-white font-medium">
+            <div className="md:col-span-7 text-sm text-amazon-text font-medium">
               {row.value || "N/A"}
             </div>
           </div>

@@ -74,13 +74,13 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
   // Badge colour logic
   const badgeClass =
     product.tag === "SALE"
-      ? "bg-[#f5d800] text-black"
+      ? "bg-amazon-price text-white"
       : product.tag === "NEW"
-        ? "bg-black text-white"
-        : "bg-[#ce2a32] text-white";
+        ? "bg-amazon-btnSecondary text-amazon-text"
+        : "bg-amazon-price text-white";
 
   return (
-    <div className="group/card relative flex flex-col h-full w-full overflow-hidden rounded-none transition-all duration-300 border border-transparent">
+    <div className="group/card relative flex flex-col h-full w-full overflow-hidden rounded-none bg-white ">
       {/* Yellow power-stripe — appears on hover at the very top */}
       {/* <div className="absolute top-0 inset-x-0 h-[2px] bg-[#f5d800] opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 z-30" /> */}
 
@@ -88,20 +88,11 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
       {/* IMAGE AREA */}
       <Link
         href={href || `/shop/product/${product.slug}`}
-        className="relative block w-full aspect-square overflow-hidden shrink-0"
-        style={{
-          // Đã đổi sang tone xám đen nguyên bản, không ám xanh
-          background:
-            "radial-gradient(ellipse at center, #242424 0%, #0f0f0f 100%)",
-        }}
+        className="relative block w-full aspect-square overflow-hidden shrink-0 bg-white"
       >
         {/* Diagonal stripe texture overlay */}
         <div
           className="absolute inset-0 z-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse at center, #222324ff 38%, #141415ff 70%)",
-          }}
         />
 
         {/* Badge */}
@@ -136,20 +127,20 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
       </Link>
 
       {/* Thin separator */}
-      <div className="w-full h-px  shrink-0" />
+      {/* <div className="w-full h-px  shrink-0" /> */}
 
       {/* INFO AREA */}
-      <div className="px-4 py-4 flex flex-col flex-grow">
+      <div className="px-4 py-2 flex flex-col flex-grow">
         {/* Product Name */}
-        <h3 className="text-[13px] font-bold text-white leading-snug uppercase tracking-wide line-clamp-2 min-h-[40px] mb-3 ">
+        <h3 className="text-[13px] font-bold text-amazon-link hover:text-amazon-hover leading-snug uppercase tracking-wide line-clamp-2 min-h-[25px]  ">
           <Link href={href || `/shop/product/${product.slug}`}>
             {product.name}
           </Link>
         </h3>
 
         {/* Price */}
-        <div className="mb-3">
-          <p className="text-[18px] font-black text-white leading-none">
+        <div className="mb-1">
+          <p className="text-[18px] font-bold text-amazon-price leading-none">
             {new Intl.NumberFormat("vi-VN", {
               style: "currency",
               currency: "VND",
@@ -163,7 +154,7 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
         <button
           onClick={handleAddToCart}
           disabled={isAddingToCart}
-          className="mt-auto flex items-center gap-2 text-[#f5d800] hover:text-[#ffe500] hover:underline text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer w-fit disabled:opacity-60 disabled:cursor-not-allowed"
+          className="mt-auto flex items-center gap-2 text-amazon-text text-[12px] hover:text-amazon-focus hover:underline font-bold uppercase tracking-wider transition-colors cursor-pointer w-fit disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isAddingToCart ? (
             <Loader2 className="w-5 h-5 shrink-0 animate-spin" />

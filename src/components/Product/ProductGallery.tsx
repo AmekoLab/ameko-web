@@ -46,8 +46,8 @@ const KeyboardViewer = dynamic(
     ssr: false,
     loading: () => (
       <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 animate-pulse">
-        <Box className="w-12 h-12 animate-bounce mb-4 text-[#f5d800]" />
-        <span className="text-xs font-black uppercase tracking-widest text-gray-400">
+        <Box className="w-12 h-12 animate-bounce mb-4 text-amazon-link" />
+        <span className="text-xs font-black uppercase tracking-widest text-amazon-textMuted">
           Loading 3D Viewer...
         </span>
       </div>
@@ -171,18 +171,18 @@ export const ProductGallery = ({
     <>
       {/* Screenshot Notification */}
       {screenshotNotification && (
-        <div className="fixed top-4 right-4 z-[10000] bg-[#f5d800] text-black px-4 py-2 shadow-2xl flex items-center gap-2">
+        <div className="fixed top-4 right-4 z-[10000] bg-amazon-btnSecondary text-amazon-text border border-amazon-border px-4 py-2 shadow-sm flex items-center gap-2">
           <Camera className="w-4 h-4" />
           <span className="text-sm font-black uppercase tracking-wider">Screenshot saved!</span>
         </div>
       )}
 
       {/* MAIN GALLERY — Corsair cinematic layout */}
-      <div className="relative flex flex-col-reverse lg:flex-row w-full h-[600px] lg:h-[calc(100vh-104px)] select-none bg-[radial-gradient(circle_at_center,_#2a2c33_0%,_#111216_70%,_#0a0a0c_100%)] overflow-hidden">
+      <div className="relative flex flex-col-reverse lg:flex-row w-full h-[600px] lg:h-[calc(100vh-104px)] select-none bg-white overflow-hidden">
 
         {/* ── Absolute Breadcrumb Overlay ── */}
-        <div className="absolute top-6 left-6 lg:left-[136px] z-20 text-gray-500 text-[11px] font-medium tracking-wide pointer-events-none select-none hidden lg:block">
-          Home / Shop / <span className="text-gray-300">{productName}</span>
+        <div className="absolute top-6 left-6 lg:left-[136px] z-20 text-amazon-textMuted text-[11px] font-medium tracking-wide pointer-events-none select-none hidden lg:block">
+          Home / Shop / <span className="text-amazon-text font-bold">{productName}</span>
         </div>
 
         {/* ── Thumbnail Column ── */}
@@ -193,7 +193,7 @@ export const ProductGallery = ({
           aria-label="Product images"
         >
           {/* Up caret — desktop only */}
-          <ChevronUp className="hidden lg:block w-5 h-5 text-gray-500 hover:text-white cursor-pointer transition-colors shrink-0 mb-1" />
+          <ChevronUp className="hidden lg:block w-5 h-5 text-amazon-textMuted hover:text-amazon-text cursor-pointer transition-colors shrink-0 mb-1" />
 
           {/* 3D View Thumbnail */}
           <button
@@ -207,14 +207,14 @@ export const ProductGallery = ({
             disabled={isLoadingModel}
             className={`
               relative w-[72px] h-[72px] rounded-lg shrink-0 overflow-hidden transition-all duration-200 border-2
-              bg-gradient-to-br from-[#1a1a1a] to-black
+              bg-white
               flex flex-col items-center justify-center gap-1 group backdrop-blur-sm
               ${
                 is3DAvailable
-                  ? "border-[#f5d800]/40 text-[#f5d800] hover:border-[#f5d800] cursor-pointer"
+                  ? "border-amazon-link/40 text-amazon-link hover:border-amazon-focus cursor-pointer"
                   : modelError
                     ? "border-red-600/40 text-red-400 cursor-pointer hover:border-red-500"
-                    : "border-transparent text-gray-600 cursor-not-allowed"
+                    : "border-transparent text-amazon-textMuted cursor-not-allowed"
               }
             `}
             aria-label={
@@ -243,8 +243,8 @@ export const ProductGallery = ({
                 relative w-[72px] h-[72px] rounded-lg shrink-0 overflow-hidden transition-all duration-200 border-2
                 ${
                   selectedImage === img
-                    ? "border-[#00f0ff] bg-black/40 opacity-100"
-                    : "border-transparent bg-black/20 hover:bg-black/40 opacity-50 hover:opacity-100"
+                    ? "border-amazon-focus shadow-sm bg-white opacity-100"
+                    : "border-amazon-border bg-white opacity-60 hover:opacity-100"
                 }
               `}
               role="tab"
@@ -263,7 +263,7 @@ export const ProductGallery = ({
           ))}
 
           {/* Down caret — desktop only */}
-          <ChevronDown className="hidden lg:block w-5 h-5 text-gray-500 hover:text-white cursor-pointer transition-colors shrink-0 mt-1" />
+          <ChevronDown className="hidden lg:block w-5 h-5 text-amazon-textMuted hover:text-amazon-text cursor-pointer transition-colors shrink-0 mt-1" />
         </div>
 
         {/* ── Main Image Display ── */}
@@ -298,7 +298,7 @@ export const ProductGallery = ({
                   e.stopPropagation();
                   setActiveModal(MODAL_TYPES.THREE_D);
                 }}
-                className="flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:text-[#f5d800] hover:border-[#f5d800] transition-colors"
+                className="flex items-center gap-2 bg-white/90 shadow-sm backdrop-blur-md border border-amazon-border px-4 py-2 text-[10px] font-black uppercase tracking-widest text-amazon-text hover:text-amazon-focus hover:border-amazon-focus transition-colors"
                 aria-label="Open 360° 3D view"
                 type="button"
               >
@@ -310,7 +310,7 @@ export const ProductGallery = ({
 
           {/* Zoom hint */}
           <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            <div className="bg-black/60 backdrop-blur-md px-3 py-2 text-gray-400 flex items-center gap-2 border border-white/10">
+            <div className="bg-white/90 shadow-sm backdrop-blur-md px-3 py-2 text-amazon-textMuted flex items-center gap-2 border border-amazon-border">
               <ZoomIn className="w-4 h-4" />
               <span className="text-[10px] font-black uppercase tracking-widest">Click to Zoom</span>
             </div>
@@ -318,7 +318,7 @@ export const ProductGallery = ({
         </div>
 
         {/* ── MORE FEATURES — bottom left absolute ── */}
-        <div className="absolute bottom-8 left-6 lg:left-10 z-20 flex items-center gap-3 text-[#f5d800] hover:text-[#ffe500] cursor-pointer transition-colors group/feat">
+        <div className="absolute bottom-8 left-6 lg:left-10 z-20 flex items-center gap-3 text-amazon-link hover:text-amazon-focus cursor-pointer transition-colors group/feat">
           <div className="border-[1.5px] border-current p-0.5">
             <Star className="w-4 h-4" />
           </div>

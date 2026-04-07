@@ -2,9 +2,9 @@ import { Header } from "@/src/components/Header/Header";
 import "../../../globals.css";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 import { Footer } from "@/src/components/Footer/Footer";
-import { Oswald, Inter } from "next/font/google";
+import { Oswald } from "next/font/google";
 
-// 1. Cấu hình Font Oswald (Cho Header)
+// Cấu hình Font Oswald (Giữ lại dạng biến phòng trường hợp cần dùng cho điểm nhấn)
 const oswald = Oswald({
   subsets: ["latin", "vietnamese"],
   weight: ["300", "400", "500", "700"],
@@ -12,12 +12,7 @@ const oswald = Oswald({
   variable: "--font-oswald",
 });
 
-// 2. Cấu hình Font Inter (Cho nội dung trang)
-const inter = Inter({
-  subsets: ["latin", "vietnamese"],
-  display: "swap",
-  variable: "--font-inter",
-});
+// Đã xóa font Inter vì dự án giờ dùng Amazon Ember làm mặc định
 
 export const metadata = {
   title: "AMEKO - Community",
@@ -31,10 +26,10 @@ export default function ProductLayout({
 }) {
   return (
     <div
-      className={`flex flex-col min-h-screen bg-[#000] ${inter.className} ${oswald.variable}`}
+      className={`flex flex-col min-h-screen bg-amazon-bgSecondary text-amazon-text font-sans ${oswald.variable}`}
     >
       <LayoutWrapper>
-        <div className={`${oswald.className} sticky top-0 z-40`}>
+        <div className="sticky top-0 z-40">
           <Header />
         </div>
 

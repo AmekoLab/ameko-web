@@ -51,7 +51,7 @@ const StartChatButton: FC<StartChatButtonProps> = ({
       className="
         inline-flex items-center gap-2
         px-4 py-2 rounded-xl
-        bg-[#f5d800] text-black text-sm font-bold
+        bg-amazon-btnPrimary text-amazon-text text-sm font-bold
         hover:bg-[#e6cc00] active:scale-95
         transition-all duration-150
         disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100
@@ -63,7 +63,7 @@ const StartChatButton: FC<StartChatButtonProps> = ({
       ) : (
         <MessageSquare className="w-4 h-4" />
       )}
-      {isLoading ? "Đang mở…" : "Chat với Shop"}
+      {isLoading ? "Opening..." : "Chat with Shop"}
     </button>
   );
 };

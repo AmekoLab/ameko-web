@@ -53,38 +53,38 @@ const ROUTES = {
 
 // ─── Loading Skeleton ──────────────────────────────────────
 const CartSkeleton: FC = () => (
-  <div className="min-h-screen bg-black">
+  <div className="min-h-screen bg-amazon-bgSecondary">
     <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 lg:py-12 animate-pulse">
-      <div className="h-8 w-48 bg-[#202030] rounded-sm mb-8" />
+      <div className="h-8 w-48 bg-neutral-200 rounded-sm mb-8" />
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1 space-y-4">
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="bg-[#151515] rounded-sm border border-[#1e2126] p-4 space-y-4"
+              className="bg-white rounded-sm border border-amazon-border p-4 space-y-4 shadow-sm"
             >
               <div className="flex gap-3">
-                <div className="w-5 h-5 bg-[#202030] rounded-sm" />
-                <div className="w-5 h-5 bg-[#202030] rounded-sm" />
-                <div className="h-5 w-32 bg-[#202030] rounded-sm" />
+                <div className="w-5 h-5 bg-neutral-200 rounded-sm" />
+                <div className="w-5 h-5 bg-neutral-200 rounded-sm" />
+                <div className="h-5 w-32 bg-neutral-200 rounded-sm" />
               </div>
               <div className="flex gap-3 items-center">
-                <div className="w-5 h-5 bg-[#202030] rounded-sm" />
-                <div className="w-20 h-20 bg-[#202030] rounded-sm" />
+                <div className="w-5 h-5 bg-neutral-200 rounded-sm" />
+                <div className="w-20 h-20 bg-neutral-200 rounded-sm" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 w-3/4 bg-[#202030] rounded-sm" />
-                  <div className="h-4 w-1/2 bg-[#202030] rounded-sm" />
+                  <div className="h-4 w-3/4 bg-neutral-200 rounded-sm" />
+                  <div className="h-4 w-1/2 bg-neutral-200 rounded-sm" />
                 </div>
-                <div className="h-4 w-20 bg-[#202030] rounded-sm" />
+                <div className="h-4 w-20 bg-neutral-200 rounded-sm" />
               </div>
             </div>
           ))}
         </div>
         <div className="w-full lg:w-[380px] shrink-0">
-          <div className="bg-[#151515] border border-[#1e2126] rounded-sm p-6 space-y-4">
-            <div className="h-6 w-40 bg-[#202030] rounded-sm" />
-            <div className="h-10 w-full bg-[#202030] rounded-sm" />
-            <div className="h-12 w-full bg-[#202030] rounded-sm" />
+          <div className="bg-white border border-amazon-border rounded-sm p-6 space-y-4 shadow-sm">
+            <div className="h-6 w-40 bg-neutral-200 rounded-sm" />
+            <div className="h-10 w-full bg-neutral-200 rounded-sm" />
+            <div className="h-12 w-full bg-neutral-200 rounded-sm" />
           </div>
         </div>
       </div>
@@ -95,17 +95,17 @@ const CartSkeleton: FC = () => (
 // ─── Empty Cart ────────────────────────────────────────────
 const EmptyCart: FC = () => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
-    <ShoppingBag className="w-16 h-16 text-[#f5d800] opacity-50 mb-6" />
-    <h1 className="text-3xl font-oswald font-black text-white mb-4 uppercase tracking-widest">
-      Your Cart is Empty
+    <ShoppingBag className="w-16 h-16 text-neutral-300 mb-6" />
+    <h1 className="text-3xl font-black text-amazon-text mb-4 uppercase tracking-widest">
+      Shopping Cart is Empty
     </h1>
-    <p className="text-gray-400 mb-8 max-w-md font-medium text-sm">
+    <p className="text-amazon-textMuted mb-8 max-w-md font-medium text-sm">
       Looks like you haven&apos;t added anything yet. Browse our collection to
       find your perfect custom build.
     </p>
     <Link
       href={ROUTES.SHOP}
-      className="bg-[#f5d800] text-black px-8 py-3 text-sm font-black uppercase tracking-widest hover:bg-[#ffe500] transition-colors duration-200 rounded-sm shadow-[0_0_15px_rgba(245,216,0,0.3)]"
+      className="bg-amazon-btnPrimary text-amazon-text px-8 py-3 text-sm font-black uppercase tracking-widest hover:brightness-95 transition-colors duration-200 rounded-sm shadow-md"
     >
       Continue Shopping
     </Link>
@@ -114,9 +114,9 @@ const EmptyCart: FC = () => (
 
 // ─── Component Row (inside accordion) ──────────────────────
 const ComponentRow: FC<{ component: OrderItemComponent }> = ({ component }) => (
-  <div className="flex items-center gap-3 py-3 pl-4 border-l border-[#1e2126]">
+  <div className="flex items-center gap-3 py-3 pl-4 border-l border-amazon-border">
     {/* Part image */}
-    <div className="relative w-12 h-12 bg-[#202030] shrink-0 border border-[#1e2126] rounded-sm overflow-hidden">
+    <div className="relative w-12 h-12 bg-neutral-100 shrink-0 border border-amazon-border rounded-sm overflow-hidden">
       {component.partImageUrl ? (
         <Image
           src={component.partImageUrl}
@@ -126,7 +126,7 @@ const ComponentRow: FC<{ component: OrderItemComponent }> = ({ component }) => (
           className="object-contain p-1"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+        <div className="w-full h-full flex items-center justify-center text-gray-400 text-[10px] font-bold uppercase tracking-widest">
           N/A
         </div>
       )}
@@ -134,14 +134,14 @@ const ComponentRow: FC<{ component: OrderItemComponent }> = ({ component }) => (
 
     {/* Part info */}
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-bold text-gray-300 truncate uppercase tracking-wide">
+      <p className="text-sm font-bold text-amazon-text truncate uppercase tracking-wide">
         {component.partName}
       </p>
-      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Qty: {component.quantity}</p>
+      <p className="text-[11px] font-bold text-amazon-textMuted uppercase tracking-widest">Qty: {component.quantity}</p>
     </div>
 
     {/* Part price */}
-    <span className="text-[13px] font-bold text-gray-400 tabular-nums shrink-0">
+    <span className="text-[13px] font-bold text-amazon-textMuted tabular-nums shrink-0">
       {component.partPriceSnapshot > 0
         ? `${component.partPriceSnapshot.toLocaleString()}₫`
         : "Included"}
@@ -180,8 +180,8 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
   return (
     <div
-      className={`border-b border-[#1e2126] last:border-b-0 transition-colors ${
-        selected ? "bg-[#202030]/30" : "hover:bg-[#151515]"
+      className={` last:border-b-0 transition-colors ${
+        selected ? "bg-bgSecondary" : "hover:bg-bgSecondary"
       }`}
     >
       {/* Main row */}
@@ -192,13 +192,13 @@ const CartItemCard: FC<CartItemCardProps> = ({
             type="checkbox"
             checked={selected}
             onChange={() => onToggleSelect(item.orderItemId)}
-            className="w-4 h-4 accent-[#f5d800] cursor-pointer"
+            className="w-4 h-4 accent-amazon-btnPrimary cursor-pointer"
             aria-label={`Select ${item.productName}`}
           />
         </div>
 
         {/* Image */}
-        <div className="relative w-20 h-20 shrink-0 rounded-sm border border-[#1e2126] overflow-hidden bg-[#151515]">
+        <div className="relative w-20 h-20 shrink-0 overflow-hidden bg-bgSecondary">
           {displayImage ? (
             <Image
               src={displayImage}
@@ -209,20 +209,20 @@ const CartItemCard: FC<CartItemCardProps> = ({
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-gray-600" />
+              <ShoppingBag className="w-6 h-6 text-gray-400" />
             </div>
           )}
         </div>
 
         {/* Product Details */}
         <div className="flex-1 min-w-0 pr-2">
-          <p className="text-[13px] font-black text-white line-clamp-2 uppercase tracking-wider leading-snug">
+          <p className="text-[13px] font-black text-amazon-text line-clamp-2 uppercase tracking-wider leading-snug">
             {item.productName}
           </p>
           {isCustom && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors mt-1.5 w-fit"
+              className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted hover:text-amazon-link transition-colors mt-1.5 w-fit"
             >
               {expanded ? (
                 <>
@@ -238,23 +238,23 @@ const CartItemCard: FC<CartItemCardProps> = ({
           )}
           {/* Mobile: price, qty, action */}
           <div className="md:hidden flex items-center gap-3 mt-2">
-            <span className="text-sm font-bold text-[#f5d800]">
+            <span className="text-sm font-bold text-amazon-price">
               {item.totalPrice.toLocaleString()}₫
             </span>
-            <div className="flex items-center border border-[#1e2126] bg-[#151515] rounded-sm ml-auto">
+            <div className="flex items-center border border-amazon-border bg-white rounded-sm ml-auto">
               <button
                 onClick={() =>
                   onUpdateQuantity(item.orderItemId, item.quantity - 1)
                 }
                 disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
-                className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                className="w-7 h-7 flex items-center justify-center text-amazon-textMuted hover:text-amazon-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label="Decrease quantity"
               >
                 <Minus className="w-3 h-3" />
               </button>
-              <span className="w-8 h-7 flex items-center justify-center text-xs font-bold text-white border-x border-[#1e2126] tabular-nums">
+              <span className="w-8 h-7 flex items-center justify-center text-xs font-bold text-amazon-text border-x border-amazon-border tabular-nums">
                 {updatingQuantity ? (
-                  <Loader2 className="w-3 h-3 animate-spin text-gray-500" />
+                  <Loader2 className="w-3 h-3 animate-spin text-amazon-textMuted" />
                 ) : (
                   item.quantity
                 )}
@@ -264,7 +264,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
                   onUpdateQuantity(item.orderItemId, item.quantity + 1)
                 }
                 disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
-                className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                className="w-7 h-7 flex items-center justify-center text-amazon-textMuted hover:text-amazon-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label="Increase quantity"
               >
                 <Plus className="w-3 h-3" />
@@ -273,7 +273,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
             <button
               onClick={() => onRemove(item.orderItemId)}
               disabled={removing}
-              className="text-gray-500 hover:text-red-500 transition-colors disabled:opacity-40"
+              className="text-amazon-textMuted hover:text-red-600 transition-colors disabled:opacity-40"
               aria-label={`Remove ${item.productName}`}
             >
               {removing ? (
@@ -287,27 +287,27 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
         {/* Desktop: Unit Price */}
         <div className="hidden md:flex w-28 justify-center shrink-0">
-          <span className="text-[13px] font-bold text-gray-400 uppercase tracking-widest">
+          <span className="text-[13px] font-bold text-amazon-textMuted uppercase tracking-widest">
             {item.unitPrice.toLocaleString()}₫
           </span>
         </div>
 
         {/* Desktop: Quantity */}
         <div className="hidden md:flex w-32 justify-center shrink-0">
-          <div className="flex items-center border border-[#1e2126] bg-[#151515] rounded-sm">
+          <div className="flex items-center border border-amazon-border bg-white rounded-sm">
             <button
               onClick={() =>
                 onUpdateQuantity(item.orderItemId, item.quantity - 1)
               }
               disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
-              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-8 h-8 flex items-center justify-center text-amazon-textMuted hover:text-amazon-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Decrease quantity"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
-            <span className="w-10 h-8 flex items-center justify-center text-[13px] font-bold text-white border-x border-[#1e2126] tabular-nums">
+            <span className="w-10 h-8 flex items-center justify-center text-[13px] font-bold text-amazon-text border-x border-amazon-border tabular-nums">
               {updatingQuantity ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-500" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-amazon-textMuted" />
               ) : (
                 item.quantity
               )}
@@ -317,7 +317,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
                 onUpdateQuantity(item.orderItemId, item.quantity + 1)
               }
               disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
-              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-8 h-8 flex items-center justify-center text-amazon-textMuted hover:text-amazon-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Increase quantity"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -327,7 +327,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
         {/* Desktop: Total Price */}
         <div className="hidden md:flex w-28 justify-center shrink-0">
-          <span className="text-[14px] font-black text-[#f5d800] uppercase tracking-widest">
+          <span className="text-[14px] font-black text-amazon-price uppercase tracking-widest">
             {item.totalPrice.toLocaleString()}₫
           </span>
         </div>
@@ -337,7 +337,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
           <button
             onClick={() => onRemove(item.orderItemId)}
             disabled={removing}
-            className="p-1.5 text-gray-500 hover:text-red-500 transition-colors disabled:opacity-40"
+            className="p-1.5 text-amazon-textMuted hover:text-red-600 transition-colors disabled:opacity-40"
             aria-label={`Remove ${item.productName}`}
           >
             {removing ? (
@@ -351,8 +351,8 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
       {/* Accordion: Component list for custom builds */}
       {isCustom && expanded && (
-        <div className="mx-4 mb-4 ml-[7.5rem] bg-black border border-[#1e2126] rounded-sm p-3">
-          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 px-4">
+        <div className="mx-4 mb-4 ml-[7.5rem] bg-neutral-50 border border-amazon-border rounded-sm p-3">
+          <p className="text-[10px] font-black text-amazon-textMuted uppercase tracking-widest mb-2 px-4">
             Build Components
           </p>
           {item.orderItemComponents.map((comp) => (
@@ -447,35 +447,35 @@ const OrderSummary: FC<OrderSummaryProps> = ({
 
   return (
     <div className="w-full lg:w-[380px] shrink-0">
-      <div className="bg-black border border-[#1e2126] rounded-sm p-6 sticky top-28">
-        <h3 className="font-oswald font-black text-white text-lg uppercase tracking-widest mb-4 border-b border-[#1e2126] pb-2">
+      <div className="bg-white shadow-sm border border-amazon-border rounded-sm p-6 sticky top-28">
+        <h3 className=" font-black text-amazon-text text-lg uppercase tracking-widest mb-4 border-b border-amazon-border pb-2">
           Order Summary
         </h3>
 
         {/* Ameko Platform Voucher */}
-        <div className="mb-3 p-3 rounded-sm border border-[#1e2126] bg-[#151515] transition-colors hover:border-[#f5d800]">
+        <div className="mb-3 p-3 rounded-sm border border-amazon-border bg-neutral-50 transition-colors hover:border-amazon-focus/50">
           <button
             type="button"
             onClick={onOpenSystemVoucher}
             className="w-full flex items-center justify-between cursor-pointer group"
           >
             <div className="flex items-center gap-2">
-              <Ticket className="w-5 h-5 text-[#f5d800]" />
-              <span className="font-bold text-[13px] text-white uppercase tracking-wider">Ameko Voucher</span>
+              <Ticket className="w-5 h-5 text-amazon-btnSecondary" />
+              <span className="font-bold text-[13px] text-amazon-text uppercase tracking-wider">Ameko Voucher</span>
             </div>
             <div className="flex items-center gap-1">
               {selectedSystemCode ? (
-                <span className="text-[11px] font-bold text-[#f5d800] uppercase tracking-widest">
+                <span className="text-[11px] font-bold text-amazon-btnSecondary uppercase tracking-widest">
                   Selected 1
                 </span>
               ) : availableSystemVouchersCount > 0 ? (
-                <span className="text-[11px] font-bold text-[#f5d800] uppercase tracking-widest">
+                <span className="text-[11px] font-bold text-amazon-btnSecondary uppercase tracking-widest">
                   Available ({availableSystemVouchersCount})
                 </span>
               ) : (
-                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Select</span>
+                <span className="text-[11px] font-bold text-amazon-textMuted uppercase tracking-widest">Select</span>
               )}
-              <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
+              <ChevronRight className="w-4 h-4 text-amazon-textMuted group-hover:text-amazon-text transition-colors" />
             </div>
           </button>
           {/* System voucher error */}
@@ -488,8 +488,8 @@ const OrderSummary: FC<OrderSummaryProps> = ({
 
         {/* Applied Vouchers Breakdown */}
         {hasAppliedVouchers && (
-          <div className="mb-4 space-y-1.5 py-2 border-t border-[#1e2126]">
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 px-1">
+          <div className="mb-4 space-y-1.5 py-2 border-t border-amazon-border">
+            <p className="text-[10px] font-black text-amazon-textMuted uppercase tracking-widest mb-1 px-1">
               Applied Vouchers
             </p>
 
@@ -497,22 +497,22 @@ const OrderSummary: FC<OrderSummaryProps> = ({
             {selectedSystemVoucher && (
               <div className="flex items-center justify-between text-[11px] font-bold">
                 <div className="flex items-center gap-1.5 pt-1">
-                  <Ticket className="w-3 h-3 text-[#f5d800]" />
-                  <span className="text-white uppercase tracking-wider">
+                  <Ticket className="w-3 h-3 text-amazon-btnSecondary" />
+                  <span className="text-amazon-text uppercase tracking-wider">
                     {selectedSystemVoucher.code}
                   </span>
-                  <span className="text-gray-500 uppercase tracking-wider">(System)</span>
+                  <span className="text-amazon-textMuted uppercase tracking-wider">(System)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   {systemDiscountAmount > 0 && (
-                    <span className="text-green-500">
+                    <span className="text-green-600">
                       -{formatCurrency(systemDiscountAmount)}
                     </span>
                   )}
                   <button
                     type="button"
                     onClick={() => dispatch(setSelectedSystemVoucher(null))}
-                    className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                    className="p-1 text-amazon-textMuted hover:text-red-600 transition-colors"
                     aria-label="Remove system voucher"
                   >
                     <X className="w-3 h-3" />
@@ -528,13 +528,13 @@ const OrderSummary: FC<OrderSummaryProps> = ({
                 className="flex items-center justify-between text-[11px] font-bold"
               >
                 <div className="flex items-center gap-1.5 pt-1">
-                  <Ticket className="w-3 h-3 text-[#f5d800]" />
-                  <span className="text-white uppercase tracking-wider">{sv.codes.join(", ")}</span>
-                  <span className="text-gray-500 uppercase tracking-wider">({sv.shopName})</span>
+                  <Ticket className="w-3 h-3 text-amazon-btnSecondary" />
+                  <span className="text-amazon-text uppercase tracking-wider">{sv.codes.join(", ")}</span>
+                  <span className="text-amazon-textMuted uppercase tracking-wider">({sv.shopName})</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   {sv.discountAmount > 0 && (
-                    <span className="text-green-500">
+                    <span className="text-green-600">
                       -{formatCurrency(sv.discountAmount)}
                     </span>
                   )}
@@ -548,7 +548,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
                         }),
                       )
                     }
-                    className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                    className="p-1 text-amazon-textMuted hover:text-red-600 transition-colors"
                     aria-label={`Remove vouchers for ${sv.shopName}`}
                   >
                     <X className="w-3 h-3" />
@@ -560,17 +560,17 @@ const OrderSummary: FC<OrderSummaryProps> = ({
         )}
 
         {/* Selected items info */}
-        <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
+        <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
           <span>Selected items</span>
-          <span className="text-white">
+          <span className="text-amazon-text">
             {selectedItemIds.size} item{selectedItemIds.size !== 1 ? "s" : ""}
           </span>
         </div>
 
         {/* Subtotal */}
-        <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
+        <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
           <span>Subtotal</span>
-          <span className="text-white">
+          <span className="text-amazon-text">
             {isCalculatingPreview ? (
               <Loader2 className="w-4 h-4 animate-spin inline" />
             ) : (
@@ -580,27 +580,27 @@ const OrderSummary: FC<OrderSummaryProps> = ({
         </div>
 
         {/* Shipping — Pay on Delivery (excluded from Stripe total) */}
-        <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
+        <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
           <span>Shipping</span>
-          <span className="italic text-gray-400 normal-case text-xs">Pay on delivery</span>
+          <span className="italic text-amazon-textMuted normal-case text-xs">Pay on delivery</span>
         </div>
 
         {/* Discount */}
         {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (
-          <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
+          <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
             <span>Discount</span>
-            <span className="text-green-500">
+            <span className="text-green-600">
               -{formatCurrency(cartPreview!.totalDiscountAmount)}
             </span>
           </div>
         )}
 
         {/* Total = Subtotal - Discount (shipping is COD, excluded from Stripe) */}
-        <div className="flex justify-between items-end mb-2 mt-4 pt-3 border-t border-[#1e2126]">
-          <span className="text-[13px] font-black text-white uppercase tracking-widest">
+        <div className="flex justify-between items-end mb-2 mt-4 pt-3 border-t border-amazon-border">
+          <span className="text-[13px] font-black text-amazon-text uppercase tracking-widest">
             Estimated Total
           </span>
-          <span className="text-xl font-black text-[#f5d800]">
+          <span className="text-xl font-black text-amazon-price">
             {isCalculatingPreview ? (
               <Loader2 className="w-5 h-5 animate-spin inline" />
             ) : (
@@ -611,7 +611,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
           </span>
         </div>
 
-        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-6 text-right">
+        <p className="text-[10px] text-amazon-textMuted mb-6 text-right">
           Taxes and shipping calculated at checkout
         </p>
 
@@ -622,8 +622,8 @@ const OrderSummary: FC<OrderSummaryProps> = ({
             disabled={!hasSelection || isCalculatingPreview}
             className={`w-full py-4 text-[13px] font-black uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 ${
               hasSelection && !isCalculatingPreview
-                ? "bg-[#f5d800] text-black hover:bg-[#ffe500] shadow-[0_0_15px_rgba(245,216,0,0.3)]"
-                : "bg-[#202030] text-gray-500 cursor-not-allowed border border-[#1e2126]"
+                ? "bg-amazon-btnPrimary text-amazon-text hover:brightness-95 shadow-md"
+                : "bg-neutral-200 text-amazon-textMuted cursor-not-allowed border border-amazon-border"
             }`}
           >
             {isCalculatingPreview ? (
@@ -819,7 +819,7 @@ export default function CartPage() {
         : 0;
       setVoucherModal({
         isOpen: true,
-        title: `Chọn Voucher từ ${shopName}`,
+        title: `Select voucher from ${shopName}`,
         vouchers: group?.vouchers ?? [],
         subtotal: shopSubtotal,
         brandLabel: shopName,
@@ -959,7 +959,7 @@ export default function CartPage() {
         <p className="text-red-500 mb-4">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="bg-black text-white px-6 py-2 text-sm font-bold uppercase hover:bg-gray-900 transition-colors"
+          className="bg-amazon-btnPrimary text-amazon-text shadow-sm px-6 py-2 text-sm font-bold uppercase hover:brightness-95 transition-colors"
         >
           Try Again
         </button>
@@ -974,26 +974,26 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
 
   // Main cart content
   return (
-    <div className="min-h-screen bg-black">
-      <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 lg:py-12">
+    <div className="min-h-screen bg-amazon-bgSecondary text-amazon-text">
+      <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 lg:py-4">
         {/* Header */}
         <header className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl md:text-3xl font-oswald font-black uppercase tracking-widest text-white">
-            Your Cart
+          <h1 className="text-2xl md:text-3xl  font-black uppercase tracking-widest text-amazon-text">
+            Shopping Cart
           </h1>
-          <Link
+          {/* <Link
             href={ROUTES.SHOP}
-            className="hidden md:flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors"
+            className="hidden md:flex items-center gap-2 text-sm  tracking-widest text-amazon-textMuted hover:text-amazon-text transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Continue Shopping
-          </Link>
+          </Link> */}
         </header>
 
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Product List */}
           <div className="flex-1 space-y-4">
             {/* Column Header (Desktop) */}
-            <div className="hidden md:flex items-center bg-[#151515] border border-[#1e2126] rounded-sm px-4 py-3 text-[11px] font-black text-gray-400 uppercase tracking-widest">
+            <div className="hidden md:flex items-center bg-white border border-amazon-border shadow-sm rounded-sm px-4 py-3 text-[11px] font-black text-amazon-textMuted uppercase tracking-widest">
               <div className="flex items-center gap-3 shrink-0">
                 <input
                   type="checkbox"
@@ -1002,7 +1002,7 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
                     cart.orderItems.length > 0
                   }
                   onChange={handleToggleSelectAll}
-                  className="w-4 h-4 accent-[#f5d800] cursor-pointer"
+                  className="w-4 h-4 accent-amazon-btnPrimary cursor-pointer"
                   aria-label="Select all items"
                 />
               </div>
@@ -1014,7 +1014,7 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
             </div>
 
             {/* Mobile: Select All */}
-            <div className="md:hidden flex items-center gap-2 bg-[#151515] border border-[#1e2126] rounded-sm px-4 py-3">
+            <div className="md:hidden flex items-center gap-2 bg-white border border-amazon-border shadow-sm rounded-sm px-4 py-3">
               <input
                 type="checkbox"
                 checked={
@@ -1022,10 +1022,10 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
                   cart.orderItems.length > 0
                 }
                 onChange={handleToggleSelectAll}
-                className="w-4 h-4 accent-[#f5d800] cursor-pointer"
+                className="w-4 h-4 accent-amazon-btnPrimary cursor-pointer"
                 aria-label="Select all items"
               />
-              <span className="text-[11px] font-black text-white uppercase tracking-widest">
+              <span className="text-[11px] font-black text-amazon-text uppercase tracking-widest">
                 Select All ({cart.orderItems.length})
               </span>
             </div>
@@ -1043,22 +1043,22 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
               return (
                 <div
                   key={shopId}
-                  className="bg-[#151515] border border-[#1e2126] rounded-sm overflow-hidden"
+                  className="bg-white  rounded-sm overflow-hidden"
                 >
                   {/* Shop Header */}
-                  <div className="flex items-center p-4 border-b border-[#1e2126]">
+                  <div className="flex items-center p-4 ">
                     <input
                       type="checkbox"
                       checked={allShopSelected}
                       onChange={() => handleToggleShopSelect(shopId)}
-                      className="w-4 h-4 accent-[#f5d800] cursor-pointer shrink-0"
+                      className="w-4 h-4 accent-amazon-btnPrimary cursor-pointer shrink-0"
                       aria-label={`Select all from ${shopName}`}
                     />
-                    <Store className="w-[18px] h-[18px] text-gray-500 ml-3" />
-                    <span className="text-[13px] font-black text-white ml-2 truncate uppercase tracking-widest">
+                    <Store className="w-[18px] h-[18px] text-amazon-textMuted ml-3" />
+                    <span className="text-[13px] font-black text-amazon-text ml-2 truncate uppercase tracking-widest">
                       {shopName}
                     </span>
-                    <ChevronRight className="w-4 h-4 text-gray-500 ml-1 shrink-0" />
+                    <ChevronRight className="w-4 h-4 text-amazon-textMuted ml-1 shrink-0" />
                   </div>
 
                   {/* Product Rows */}
@@ -1076,10 +1076,10 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
                   ))}
 
                   {/* Shop Voucher Footer */}
-                  <div className="p-4 border-t border-[#1e2126] bg-black">
+                  <div className="p-4 ">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-                        <Ticket className="w-4 h-4 text-[#f5d800]" />
+                      <div className="flex items-center gap-2 text-[12px] font-bold text-amazon-textMuted uppercase tracking-widest">
+                        <Ticket className="w-4 h-4 text-amazon-btnSecondary" />
                         <span>Shop Voucher</span>
                       </div>
                       {vouchers.length > 0 ? (
@@ -1088,12 +1088,12 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
                           onClick={() =>
                             handleOpenShopVoucherModal(shopId, shopName)
                           }
-                          className="text-[11px] font-black text-[#f5d800] hover:text-[#ffe500] hover:underline uppercase tracking-widest transition-colors"
+                          className="text-[12px] text-amazon-btnSecondary hover:brightness-95 hover:underline tracking-widest transition-colors"
                         >
                           Select or enter code ({vouchers.length} available)
                         </button>
                       ) : (
-                        <span className="text-[11px] font-bold text-gray-600 uppercase tracking-widest">
+                        <span className="text-[12px] text-amazon-textMuted tracking-widest">
                           Select or enter code
                         </span>
                       )}

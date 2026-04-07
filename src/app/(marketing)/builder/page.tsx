@@ -25,6 +25,7 @@ import { BuilderProduct, SelectedPart } from "@/src/types/builder";
 import { PartItem } from "@/src/types/part.types";
 import { orderService } from "@/src/services/order.service";
 import { toast } from "react-toastify";
+import { Logo } from "@/src/components/Header/Logo";
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 const getZIndex = (categorySlug?: string) => {
@@ -43,10 +44,10 @@ const LAYER_ORDER = ["case", "pcb", "plate", "switch", "keycap"];
 
 // Cutting-mat grid — shared between visualizer area and kit-select page
 const GRID_BG_STYLE: React.CSSProperties = {
-  backgroundColor: "#111111",
+  backgroundColor: "#f9f9f9", // neutral-50 matching theme
   backgroundImage: `
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
+    linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px)
   `,
   backgroundSize: "40px 40px",
 };
@@ -150,8 +151,7 @@ const Visualizer = memo(
         {!hasAnySelection && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div
-              className="w-64 h-40 rounded-2xl border border-white/5"
-              style={{ background: "rgba(255,255,255,0.02)" }}
+              className="w-64 h-40 rounded-sm border border-amazon-border bg-neutral-100 shadow-sm"
             />
           </div>
         )}
@@ -183,14 +183,13 @@ const ProductItem = memo(
       <div
         className={`
           w-24 h-24 rounded-full relative overflow-hidden flex-shrink-0
-          transition-all duration-150 ease-out
+          transition-all duration-150 ease-out flex items-center justify-center bg-white
           ${
             isSelected
-              ? "border-2 border-yellow-400 shadow-[0_0_20px_rgba(234,179,8,0.35)]"
-              : "border border-gray-700 hover:border-gray-400"
+              ? "border-[2.5px] border-amazon-focus shadow-md ring-1 ring-amazon-focus/20"
+              : "border border-amazon-border hover:border-neutral-400 shadow-sm"
           }
         `}
-        style={{ background: "#1a1a1a" }}
       >
         <Image
           src={product.thumbnailUrl}
@@ -205,13 +204,13 @@ const ProductItem = memo(
       {/* Label */}
       <div className="text-center w-full px-0.5">
         <p
-          className={`text-[11px] font-bold uppercase tracking-wide leading-tight transition-colors ${
-            isSelected ? "text-yellow-400" : "text-gray-200 group-hover:text-white"
+          className={`text-[11px] font-black uppercase tracking-wide leading-tight transition-colors ${
+            isSelected ? "text-amazon-text" : "text-amazon-textMuted group-hover:text-amazon-text"
           }`}
         >
           {product.name}
         </p>
-        <p className="text-[11px] text-gray-400 font-medium mt-0.5">
+        <p className="text-[11px] text-amazon-price font-bold mt-0.5">
           {product.price > 0
             ? `+${product.price.toLocaleString()}₫`
             : "Included"}
@@ -230,12 +229,10 @@ const KitCard = memo(
     return (
       <div
         onClick={() => onClick(kit)}
-        className="group cursor-pointer border border-white/8 rounded-2xl p-5 hover:border-yellow-400/60 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10 hover:scale-[1.02]"
-        style={{ background: "rgba(255,255,255,0.04)" }}
+        className="group cursor-pointer border border-amazon-border bg-white rounded-sm p-5 hover:border-amazon-focus transition-all duration-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 shadow-sm"
       >
         <div
-          className="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-5 border border-white/5"
-          style={{ background: "rgba(0,0,0,0.4)" }}
+          className="relative w-full aspect-[4/3] rounded-sm overflow-hidden mb-5 border border-amazon-border bg-neutral-100"
         >
           {kit.thumbnailUrl ? (
             <Image
@@ -247,34 +244,29 @@ const KitCard = memo(
               sizes="(max-width: 768px) 50vw, 25vw"
             />
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-600">
+            <div className="flex items-center justify-center h-full text-amazon-textMuted opacity-50">
               <span className="text-5xl">⌨️</span>
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none" />
         </div>
-        <h3 className="text-white font-black text-lg uppercase tracking-tight truncate mb-1">
+        <h3 className="text-amazon-text font-black text-lg uppercase tracking-tight truncate mb-1">
           {kit.name}
         </h3>
         {kit.description && (
-          <p className="text-gray-500 text-xs mt-1 line-clamp-2 leading-relaxed">
+          <p className="text-amazon-textMuted text-xs mt-1 line-clamp-2 leading-relaxed font-medium">
             {kit.description}
           </p>
         )}
         <div
-          className="flex items-center justify-between mt-4 pt-3"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+          className="flex items-center justify-between mt-4 pt-3 border-t border-amazon-border"
         >
-          <span className="text-yellow-400 font-black text-xl tracking-tight">
+          <span className="text-amazon-price font-black text-xl tracking-tight">
             {kit.price.toLocaleString()}₫
           </span>
           {specs?.workflow && (
             <span
-              className="text-[10px] text-gray-500 uppercase font-bold px-2 py-1 rounded-full"
-              style={{
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.1)",
-              }}
+              className="text-[10px] text-amazon-textMuted bg-neutral-100 uppercase font-bold px-2 py-1 rounded-sm border border-amazon-border"
             >
               {specs.workflow.length} steps
             </span>
@@ -496,55 +488,51 @@ function BuilderContent() {
   // =============================================
   if (!session) {
     return (
-      <div className="h-screen flex flex-col overflow-hidden text-white" style={{ background: "#111111" }}>
+      <div className="min-h-screen flex flex-col text-amazon-text bg-amazon-bgSecondary">
         {/* HEADER */}
         <div
-          className="h-16 flex items-center justify-between px-6 lg:px-10 z-50 shrink-0"
-          style={{ background: "#0a0a0a", borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+          className="h-16 flex items-center justify-between px-6 lg:px-10 z-50 shrink-0 bg-white border-b border-amazon-border shadow-sm"
         >
           <div
             onClick={handleLogoClick}
             className="flex flex-col cursor-pointer select-none"
           >
-            <span className="font-black text-base leading-tight tracking-tight text-white">
-              // AMEKO
-            </span>
-            <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-gray-500 leading-tight">
-              Custom Lab
-            </span>
+              <div className="brightness-0 invert-0">
+                  <Logo />
+              </div>
           </div>
-          <h1 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">
+          <h1 className="text-xs font-black uppercase tracking-[0.2em] text-amazon-textMuted">
             Keyboard Builder
           </h1>
           <div />
         </div>
 
         {/* KIT GRID */}
-        <div className="flex-1 overflow-y-auto p-8 lg:p-14" style={GRID_BG_STYLE}>
+        <div className="flex-1 overflow-y-auto p-8 lg:p-4" style={GRID_BG_STYLE}>
           {loadingKits ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="animate-spin w-10 h-10 border-4 border-gray-700 border-t-yellow-400 rounded-full" />
+            <div className="flex items-center justify-center h-[50vh]">
+              <div className="animate-spin w-10 h-10 border-4 border-amazon-border border-t-amazon-btnSecondary rounded-full" />
             </div>
           ) : error ? (
-            <div className="flex flex-col items-center justify-center h-full gap-4">
-              <p className="text-red-400 font-medium">{error}</p>
+            <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
+              <p className="text-red-500 font-bold">{error}</p>
               <button
                 onClick={() => shopId && dispatch(fetchBaseKits(shopId))}
-                className="px-4 py-2 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-300 transition-all"
+                className="px-6 py-2 bg-amazon-btnPrimary text-amazon-text font-black uppercase tracking-widest shadow-sm rounded-sm hover:brightness-95 transition-all text-sm"
               >
                 Retry
               </button>
             </div>
           ) : (
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-6xl mx-auto py-4">
               <div className="text-center mb-12">
-                <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-yellow-400/60 mb-3">
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-amazon-textMuted mb-3">
                   Ameko Custom Lab
                 </p>
-                <h2 className="text-4xl lg:text-5xl font-black text-white uppercase tracking-tight">
+                <h2 className="text-4xl lg:text-5xl font-black text-amazon-text uppercase tracking-tight">
                   Choose Your Kit
                 </h2>
-                <p className="text-gray-500 mt-4 text-sm max-w-md mx-auto leading-relaxed">
+                <p className="text-amazon-textMuted font-bold mt-4 text-sm max-w-md mx-auto leading-relaxed">
                   Select a base kit to start building your custom keyboard
                 </p>
               </div>
@@ -572,19 +560,18 @@ function BuilderContent() {
   const addOnsTotal = session.totalPrice - baseKitPrice;
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden text-white" style={{ background: "#111111" }}>
+    <div className="h-screen flex flex-col overflow-hidden text-amazon-text bg-amazon-bgSecondary">
 
       {/* ═══════════════════════════════════════
           HEADER — Corsair style
       ═══════════════════════════════════════ */}
       <div
-        className="h-16 flex items-center z-50 shrink-0 px-4 gap-0"
-        style={{ background: "#0a0a0a", borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+        className="h-16 flex items-center z-50 shrink-0 px-4 gap-0 bg-white border-b border-amazon-border shadow-sm"
       >
-        {/* Exit Lab */}
+       
         <button
           onClick={handleLogoClick}
-          className="flex items-center gap-1.5 text-yellow-400 text-xs font-black uppercase tracking-widest hover:text-yellow-300 transition-colors shrink-0 mr-6"
+          className="flex items-center gap-1.5 text-amazon-link text-[11px] font-black uppercase tracking-widest hover:underline transition-colors shrink-0 mr-6"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
@@ -592,14 +579,11 @@ function BuilderContent() {
           Exit Lab
         </button>
 
-        {/* Logo */}
+      
         <div className="flex flex-col shrink-0 mr-8 select-none">
-          <span className="font-black text-base leading-tight tracking-tight text-white">
-            // AMEKO
-          </span>
-          <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-gray-500 leading-tight">
-            Custom Lab
-          </span>
+          <div className="brightness-0 invert-0">
+              <Logo />
+          </div>
         </div>
 
         {/* Step nav — Corsair: name only, white underline active */}
@@ -616,14 +600,14 @@ function BuilderContent() {
                 key={step.slug}
                 onClick={() => isClickable && handleStepClick(step.slug)}
                 className={`
-                  relative h-full px-4 lg:px-5 flex items-center font-bold text-[11px] uppercase tracking-[0.15em]
+                  relative h-full px-4 lg:px-5 flex items-center font-black text-[11px] uppercase tracking-[0.15em]
                   transition-colors whitespace-nowrap shrink-0
                   ${
                     step.isActive
-                      ? "text-white border-b-2 border-white cursor-default"
+                      ? "text-amazon-text border-b border-amazon-text cursor-default"
                       : isClickable
-                        ? "text-gray-500 border-b-2 border-transparent cursor-pointer hover:text-gray-300"
-                        : "text-gray-700 border-b-2 border-transparent cursor-not-allowed"
+                        ? "text-amazon-textMuted border-b border-transparent cursor-pointer hover:text-amazon-link hover:underline"
+                        : "text-gray-300 border-b border-transparent cursor-not-allowed"
                   }
                 `}
               >
@@ -644,8 +628,8 @@ function BuilderContent() {
           className="flex-[62] relative flex flex-col items-center justify-center overflow-hidden"
           style={GRID_BG_STYLE}
         >
-          {/* Radial vignette */}
-          <div
+          {/* Radial vignette removed for light theme since we just want clean minimal white grid */}
+            <div
             className="absolute inset-0 pointer-events-none z-0"
             style={{
               background:
@@ -656,24 +640,23 @@ function BuilderContent() {
             backgroundSize: "cover",
             }}
           />
-
+          
           {/* Keyboard layers */}
           <div className="relative z-10 w-full h-full flex items-center justify-center">
             <Visualizer selection={session.selection} viewMode={viewMode} />
           </div>
 
           {/* View toggle — bottom-left */}
-          <div className="absolute bottom-6 left-6 z-20 flex">
+          <div className="absolute bottom-6 left-6 z-20 flex gap-2">
             {(["top", "side", "angled"] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setViewMode(mode)}
                 className={`
-                  px-5 py-2.5 font-black uppercase text-[10px] tracking-widest transition-all
-                  border border-white/15
+                  px-4 py-2 font-black shadow-sm uppercase text-[10px] tracking-widest transition-all rounded-sm border
                   ${viewMode === mode
-                    ? "bg-white text-black"
-                    : "bg-black text-white hover:bg-white/10"
+                    ? "bg-amazon-btnSecondary text-amazon-text border-amazon-border"
+                    : "bg-white text-amazon-textMuted hover:text-amazon-text border-amazon-border hover:bg-neutral-50"
                   }
                 `}
               >
@@ -685,11 +668,7 @@ function BuilderContent() {
 
         {/* ── RIGHT: CONFIGURATOR / SUMMARY ── */}
         <div
-          className="hidden lg:flex flex-[38] flex-col z-10"
-          style={{
-            background: "#0d0d0d",
-            borderLeft: "1px solid rgba(255,255,255,0.07)",
-          }}
+          className="hidden lg:flex flex-[38] flex-col z-10 bg-white border-l border-amazon-border shadow-2xl"
         >
           {currentStepName === "summary" ? (
             /* ─────────────────────────────────────
@@ -698,31 +677,28 @@ function BuilderContent() {
             <>
               {/* Header */}
               <div
-                className="px-7 pt-7 pb-5 shrink-0"
-                style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
+                className="px-7 pt-4 pb-2 shrink-0 border-b border-amazon-border"
               >
-                <p className="text-[9px] text-gray-500 uppercase font-bold tracking-[0.3em] mb-1">
+                <p className="text-[9px] text-amazon-textMuted uppercase font-bold tracking-[0.3em] mb-1">
                   {kitDisplayName}
                 </p>
-                <h2 className="text-4xl font-black uppercase text-white tracking-tight">
+                <h2 className="text-2xl font-black uppercase text-amazon-btnSecondary tracking-tight">
                   Build Summary
                 </h2>
               </div>
 
               {/* BOM list */}
-              <div className="flex-1 overflow-y-auto px-5 py-4 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto px-5 py-4 custom-scrollbar bg-neutral-50">
                 <div className="space-y-2">
                   {Object.entries(session.selection).map(([stepName, part]) => (
                     <div
                       key={stepName}
-                      className="flex items-center gap-3 p-3 cursor-pointer transition-all group/bom rounded"
-                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+                      className="flex items-center gap-3 p-3 cursor-pointer transition-all group/bom"
                       onClick={() => handleStepClick(stepName)}
                       title={`Edit ${stepName}`}
                     >
                       <div
-                        className="w-14 h-14 relative shrink-0 overflow-hidden"
-                        style={{ background: "#000" }}
+                        className="w-14 h-14 relative shrink-0 overflow-hidden bg-neutral-100 rounded border border-amazon-border"
                       >
                         <Image
                           src={part.thumbnailUrl}
@@ -733,19 +709,19 @@ function BuilderContent() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-[9px] text-gray-600 uppercase font-bold tracking-[0.2em]">
+                        <div className="text-[9px] text-amazon-textMuted uppercase font-bold tracking-[0.2em]">
                           {stepName}
                         </div>
-                        <h4 className="text-white font-bold text-sm truncate">{part.name}</h4>
-                        <div className="text-gray-500 text-xs">
-                          ×{part.quantity} —{" "}
+                        <h4 className="text-amazon-text font-black tracking-wide text-[13px] truncate">{part.name}</h4>
+                        <div className="text-amazon-price text-[11px] font-bold">
+                          <span className="text-amazon-textMuted mr-1">×{part.quantity} —</span>
                           {part.price > 0
                             ? `+${(part.price * part.quantity).toLocaleString()}₫`
                             : "Included"}
                         </div>
                       </div>
                       <svg
-                        className="w-3.5 h-3.5 text-gray-700 shrink-0 group-hover/bom:text-gray-400 transition-colors"
+                        className="w-3.5 h-3.5 text-amazon-textMuted shrink-0 group-hover/bom:text-amazon-link transition-colors"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -764,53 +740,47 @@ function BuilderContent() {
 
               {/* Footer — Subtotal breakdown + BACK / ADD TO CART */}
               <div
-                className="shrink-0 px-7 py-6"
-                style={{
-                  background: "#0a0a0a",
-                  borderTop: "1px solid rgba(255,255,255,0.1)",
-                }}
+                className="shrink-0 px-7 py-6 bg-white border-t border-amazon-border"
               >
                 {/* Breakdown */}
                 <div className="space-y-1 mb-4">
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span className="uppercase font-bold tracking-wider">Base Kit</span>
+                  <div className="flex justify-between text-xs text-amazon-text font-bold">
+                    <span className="uppercase tracking-wider text-amazon-textMuted">Base Kit</span>
                     <span>{baseKitPrice > 0 ? `${baseKitPrice.toLocaleString()}₫` : "Included"}</span>
                   </div>
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span className="uppercase font-bold tracking-wider">Add-ons</span>
+                  <div className="flex justify-between text-xs text-amazon-text font-bold">
+                    <span className="uppercase tracking-wider text-amazon-textMuted">Add-ons</span>
                     <span>+{addOnsTotal > 0 ? addOnsTotal.toLocaleString() : "0"}₫</span>
                   </div>
                   <div
-                    className="my-2"
-                    style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
+                    className="my-2 border-t border-amazon-border"
                   />
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-black tracking-[0.25em] text-gray-400">
+                    <span className="text-[10px] uppercase font-black tracking-[0.25em] text-amazon-textMuted">
                       Subtotal
                     </span>
-                    <span className="text-yellow-400 font-black text-2xl tracking-tight">
+                    <span className="text-amazon-price font-black text-2xl tracking-tight">
                       {session.totalPrice.toLocaleString()}₫
                     </span>
                   </div>
                 </div>
 
                 {/* BACK + ADD TO CART */}
-                <div className="flex gap-0">
+                <div className="flex gap-2">
                   <button
                     onClick={() => handleStepClick(workflowSteps[workflowSteps.length - 1])}
-                    className="flex-1 py-4 font-black uppercase tracking-widest text-sm text-white transition-all hover:bg-white/5 active:scale-[0.98]"
-                    style={{ border: "1px solid rgba(255,255,255,0.2)" }}
+                    className="flex-1 py-3 font-black uppercase tracking-widest text-[11px] text-amazon-text bg-white border border-amazon-border transition-all hover:bg-neutral-50 shadow-sm rounded-sm active:scale-[0.98]"
                   >
                     Back
                   </button>
                   <button
                     onClick={handleAddToCart}
                     disabled={addingToCart}
-                    className="flex-1 py-4 bg-yellow-400 text-black font-black uppercase tracking-widest text-sm hover:bg-yellow-300 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-[2] py-3 bg-amazon-btnPrimary text-amazon-text font-black rounded-sm shadow-sm uppercase tracking-widest text-[11px] hover:brightness-95 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {addingToCart ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-amazon-text/30 border-t-amazon-text rounded-full animate-spin" />
                         Adding...
                       </>
                     ) : (
@@ -827,20 +797,18 @@ function BuilderContent() {
             <>
               {/* Step Header */}
               <div
-                className="px-7 pt-7 pb-5 shrink-0"
-                style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
+                className="px-7 pt-7 pb-5 shrink-0 border-b border-amazon-border"
               >
-                <p className="text-[9px] text-gray-500 uppercase font-bold tracking-[0.3em] mb-1">
+                <p className="text-[9px] text-amazon-textMuted uppercase font-bold tracking-[0.3em] mb-1">
                   {kitDisplayName}
                 </p>
-                <h2 className="text-4xl font-black uppercase text-white tracking-tight">
+                <h2 className="text-4xl font-black uppercase text-amazon-link tracking-tight">
                   {currentStepName || "Select Component"}
                 </h2>
 
                 {/* Help me choose */}
                 <button
-                  className="mt-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-white px-4 py-1.5 rounded-full transition-all hover:bg-white/5"
-                  style={{ border: "1px solid rgba(255,255,255,0.2)" }}
+                  className="mt-3 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-amazon-link px-4 py-1.5 rounded-sm transition-all hover:bg-neutral-50 border border-amazon-border shadow-sm"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
@@ -851,7 +819,7 @@ function BuilderContent() {
               </div>
 
               {/* Product grid — 3 circles per row */}
-              <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar bg-neutral-50">
                 <div
                   key={currentStepName}
                   className="grid grid-cols-3 gap-x-4 gap-y-7 animate-fadeIn"
@@ -873,39 +841,34 @@ function BuilderContent() {
 
               {/* Footer — Subtotal + BACK / NEXT */}
               <div
-                className="shrink-0 px-7 py-5"
-                style={{
-                  background: "#0a0a0a",
-                  borderTop: "1px solid rgba(255,255,255,0.1)",
-                }}
+                className="shrink-0 px-7 py-5 bg-white border-t border-amazon-border"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-[10px] uppercase font-black tracking-[0.25em] text-gray-500">
+                  <span className="text-[10px] uppercase font-black tracking-[0.25em] text-amazon-textMuted">
                     Subtotal
                   </span>
-                  <span className="text-yellow-400 font-black text-2xl tracking-tight">
+                  <span className="text-amazon-price font-black text-2xl tracking-tight">
                     {session.totalPrice.toLocaleString()}₫
                   </span>
                 </div>
 
                 {/* BACK + NEXT — half-width, sharp corners */}
-                <div className="flex gap-0">
+                <div className="flex gap-2">
                   <button
                     onClick={handleBackStep}
                     disabled={processing}
-                    className="flex-1 py-4 font-black uppercase tracking-widest text-sm text-white transition-all hover:bg-white/5 active:scale-[0.98] disabled:opacity-40"
-                    style={{ border: "1px solid rgba(255,255,255,0.2)" }}
+                    className="flex-1 py-3 font-black uppercase tracking-widest text-[11px] text-amazon-text bg-white border border-amazon-border transition-all hover:bg-neutral-50 shadow-sm rounded-sm active:scale-[0.98] disabled:opacity-40"
                   >
                     Back
                   </button>
                   <button
                     onClick={handleNextStep}
                     disabled={processing}
-                    className="flex-1 py-4 bg-yellow-400 text-black font-black uppercase tracking-widest text-sm hover:bg-yellow-300 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-amazon-btnPrimary text-amazon-text font-black rounded-sm shadow-sm uppercase tracking-widest text-[11px] hover:brightness-95 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {processing ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-amazon-text/30 border-t-amazon-text rounded-full animate-spin" />
                         Saving...
                       </>
                     ) : (
@@ -928,10 +891,9 @@ export default function BuilderPage() {
     <Suspense
       fallback={
         <div
-          className="min-h-screen flex items-center justify-center"
-          style={{ background: "#111111" }}
+          className="min-h-screen flex items-center justify-center bg-amazon-bgSecondary text-amazon-text"
         >
-          <div className="animate-spin w-10 h-10 border-4 border-gray-700 border-t-yellow-400 rounded-full" />
+          <div className="animate-spin w-10 h-10 border-4 border-amazon-border border-t-amazon-btnSecondary rounded-full" />
         </div>
       }
     >

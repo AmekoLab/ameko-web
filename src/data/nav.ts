@@ -5,5 +5,5 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "COMMUNITY", href: "/community" },
   { label: "COMMISSIONS POOL", href: "/commissions-pool" },
 
-  { label: "RESELLERS", href: "/resellers" },
+  { label: "BUILD YOUR OWN KEYBOARD", href: "/custom-build" },
 ];
