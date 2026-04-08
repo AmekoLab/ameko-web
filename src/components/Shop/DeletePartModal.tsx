@@ -61,16 +61,16 @@ export default function DeletePartModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+      <div className="relative bg-white rounded-sm shadow-xl w-full max-w-md mx-4 overflow-hidden border border-amazon-border">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-red-50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-amazon-border bg-red-50">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Delete Part</h2>
-              <p className="text-xs text-gray-500">
+              <h2 className="text-lg font-black text-amazon-text uppercase tracking-widest">Delete Part</h2>
+              <p className="text-[10px]  font-bold tracking-widest text-red-700 mt-0.5">
                 This action cannot be undone
               </p>
             </div>
@@ -78,36 +78,36 @@ export default function DeletePartModal({
           <button
             onClick={handleClose}
             disabled={deleting}
-            className="p-1.5 rounded-lg hover:bg-red-100 transition text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            className="p-1.5 rounded-sm hover:bg-red-100 transition text-red-600/60 hover:text-red-700 disabled:opacity-50"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 space-y-4">
-          <p className="text-sm text-gray-600">
+        <div className="px-6 py-5 space-y-5">
+          <p className="text-[13px] font-bold  tracking-widest text-amazon-textMuted">
             You are about to permanently delete the part:
           </p>
 
           {/* Part info card */}
-          <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-            <p className="font-bold text-gray-900 text-sm">{part.name}</p>
-            <p className="text-xs text-gray-500 mt-1">
+          <div className="bg-neutral-50 rounded-sm border border-amazon-border p-4">
+            <p className="font-black uppercase tracking-widest text-amazon-text text-[11px]">{part.name}</p>
+            <p className="text-[12px] font-bold  tracking-widest text-amazon-textMuted mt-2">
               Type:{" "}
-              <span className="font-semibold capitalize">{part.partType}</span>{" "}
+              <span className="font-black capitalize">{part.partType}</span>{" "}
               &middot; Category:{" "}
-              <span className="font-semibold capitalize">
+              <span className="font-black capitalize">
                 {part.categoryName}
               </span>
             </p>
-            <p className="text-xs text-gray-400 mt-1 font-mono">{part.id}</p>
+            {/* <p className="text-[9px] text-amazon-textMuted mt-1 font-mono uppercase tracking-widest">{part.id}</p> */}
           </div>
 
           {/* Confirmation input */}
           <div>
-            <label className="block text-sm text-gray-600 mb-1.5">
-              Type <span className="font-bold text-gray-900">{part.name}</span>{" "}
+            <label className="block text-[13px] font-bold  tracking-widest text-amazon-textMuted mb-2">
+              Type <span className="font-black text-amazon-text">{part.name}</span>{" "}
               to confirm:
             </label>
             <input
@@ -116,28 +116,28 @@ export default function DeletePartModal({
               onChange={(e) => setConfirmText(e.target.value)}
               disabled={deleting}
               placeholder={part.name}
-              className="text-black w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition disabled:opacity-50 disabled:bg-gray-50"
+              className="text-amazon-text text-[11px] font-bold uppercase tracking-widest w-full px-3 py-2 border border-amazon-border rounded-sm focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition disabled:opacity-50 disabled:bg-neutral-50 placeholder:text-neutral-400"
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-amazon-border bg-neutral-50/50">
           <button
             onClick={handleClose}
             disabled={deleting}
-            className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+            className="px-5 py-2.5 text-[13px] font-black  tracking-widest text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
           >
             Cancel
           </button>
           <button
             onClick={handleDelete}
             disabled={!canDelete || deleting}
-            className="px-4 py-2 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-5 py-2.5 text-[13px] font-black  tracking-widest text-white bg-red-600 border border-red-600 rounded-sm hover:bg-red-700 hover:border-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
           >
             {deleting ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
                 Deleting...
               </>
             ) : (

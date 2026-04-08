@@ -372,8 +372,8 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
         {/* ── Header ── */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-amazon-border bg-neutral-50">
           <div>
-            <h3 className="font-oswald font-black uppercase tracking-widest text-lg text-amazon-text">{title}</h3>
-            <p className="text-[10px] font-bold text-amazon-textMuted uppercase tracking-widest mt-0.5">
+            <h3 className="font-black uppercase  text-lg text-amazon-text">{title}</h3>
+            <p className="text-[10px] text-amazon-textMuted tracking-widest mt-0.5">
               {eligibleCount}/{vouchers.length} voucher(s) available
             </p>
           </div>

@@ -98,10 +98,10 @@ export const ProfileView: FC<{
   }, [currentTab, profile.id, hasFetchedShop]);
 
   const ProductSkeleton = () => (
-    <div className="bg-[#151515] rounded-sm border border-[#1e2126] p-3 space-y-3">
-      <div className="bg-[#202030] animate-pulse aspect-square w-full rounded-sm" />
-      <div className="h-4 bg-[#202030] animate-pulse rounded w-3/4" />
-      <div className="h-4 bg-[#202030] animate-pulse rounded w-1/2" />
+    <div className="bg-white rounded-sm border border-amazon-border p-3 space-y-3">
+      <div className="bg-neutral-200 animate-pulse aspect-square w-full rounded-sm" />
+      <div className="h-4 bg-neutral-200 animate-pulse rounded w-3/4" />
+      <div className="h-4 bg-neutral-200 animate-pulse rounded w-1/2" />
     </div>
   );
 
@@ -135,13 +135,13 @@ export const ProfileView: FC<{
   }, [currentTab, profile.id, hasFetchedReviews]);
 
   const ReviewSkeleton = () => (
-    <div className="bg-[#151515] p-6 rounded-sm border border-[#1e2126] mb-4 animate-pulse">
+    <div className="bg-white p-6 rounded-sm border border-amazon-border mb-4 animate-pulse">
       <div className="flex gap-4">
-        <div className="w-10 h-10 bg-[#202030] rounded-full" />
+        <div className="w-10 h-10 bg-neutral-200 rounded-full" />
         <div className="flex-1 space-y-2">
-          <div className="w-1/4 h-4 bg-[#202030] rounded" />
-          <div className="w-3/4 h-4 bg-[#202030] rounded" />
-          <div className="w-full h-16 bg-[#202030] rounded mt-2" />
+          <div className="w-1/4 h-4 bg-neutral-200 rounded" />
+          <div className="w-3/4 h-4 bg-neutral-200 rounded" />
+          <div className="w-full h-16 bg-neutral-200 rounded mt-2" />
         </div>
       </div>
     </div>
@@ -151,7 +151,7 @@ export const ProfileView: FC<{
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
       {/* SIDEBAR */}
       <div className="lg:col-span-4 xl:col-span-3">
-        <div className="sticky top-28">
+        <div >
           <ProfileSidebar profile={profile} />
         </div>
       </div>
@@ -159,7 +159,7 @@ export const ProfileView: FC<{
       {/* MAIN CONTENT */}
       <div className="lg:col-span-8 xl:col-span-9">
         {/* TABS NAVIGATION */}
-        <div className="bg-[#151515] rounded-sm shadow-sm border border-[#1e2126] mb-6  top-[70px] z-30">
+        <div className="bg-white rounded-sm shadow-sm border border-amazon-border mb-3  top-[70px] z-30">
           <div className="flex overflow-x-auto no-scrollbar">
             {[
               { id: "posts", label: "Posts", icon: List },
@@ -173,8 +173,8 @@ export const ProfileView: FC<{
                 className={clsx(
                   "flex items-center gap-2 px-6 py-4 text-sm font-bold uppercase tracking-wide whitespace-nowrap border-b-2 transition-colors outline-none",
                   currentTab === tab.id
-                    ? "border-[#f5d800] text-[#f5d800]"
-                    : "border-transparent text-gray-400 hover:text-white hover:bg-[#202030]",
+                    ? "border-amazon-focus text-amazon-focus"
+                    : "border-transparent text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50",
                 )}
               >
                 <tab.icon className="w-4 h-4" />
@@ -205,11 +205,11 @@ export const ProfileView: FC<{
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-16 bg-[#151515] rounded-sm border border-dashed border-white/10">
-                  <div className="bg-[#202030] p-4 rounded-full mb-3">
-                    <PackageOpen className="w-8 h-8 text-gray-400" />
+                <div className="flex flex-col items-center justify-center py-16 bg-white rounded-sm border border-amazon-border">
+                  <div className="bg-neutral-50 p-4 rounded-full mb-3">
+                    <PackageOpen className="w-8 h-8 text-neutral-400" />
                   </div>
-                  <p className="text-gray-400 font-medium">
+                  <p className="text-amazon-textMuted font-medium">
                     No products found.
                   </p>
                 </div>
@@ -218,9 +218,9 @@ export const ProfileView: FC<{
           )}
 
           {currentTab === "showcase" && (
-            <div className="bg-[#151515] p-16 text-center rounded-sm border border-dashed border-white/10">
-              <ImageIcon className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-400 font-medium">
+            <div className="bg-white p-16 text-center rounded-sm border border-amazon-border">
+              <ImageIcon className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
+              <p className="text-amazon-textMuted font-medium">
                 Showcase is being updated...
               </p>
             </div>
@@ -230,7 +230,7 @@ export const ProfileView: FC<{
             <div>
               {loadingReviews ? (
                 <>
-                  <div className="h-32 bg-[#151515] mb-6 rounded-sm border border-[#1e2126] animate-pulse" />{" "}
+                  <div className="h-32 bg-white mb-6 rounded-sm border border-amazon-border animate-pulse" />{" "}
                   <ReviewSkeleton />
                   <ReviewSkeleton />
                 </>
@@ -243,9 +243,9 @@ export const ProfileView: FC<{
                     ))}
                   </div>
                   {reviews.length === 0 && (
-                    <div className="bg-[#151515] p-16 text-center rounded-sm border border-dashed border-white/10">
-                      <Star className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-400 font-medium">
+                    <div className="bg-white p-16 text-center rounded-sm border border-amazon-border">
+                      <Star className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
+                      <p className="text-amazon-textMuted font-medium">
                         No reviews yet.
                       </p>
                     </div>

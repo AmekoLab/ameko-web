@@ -189,7 +189,7 @@ export const Header: FC = () => {
               >
                 <span className="text-xs font-sans leading-tight whitespace-nowrap">
                   {isAuthenticated && user
-                    ? `Hi, ${user.firstName || user.username}`
+                    ? `Hi, ${user.username || user.firstName}`
                     : "Hi, Sign in"}
                 </span>
                 <span className="text-sm font-bold font-sans leading-tight whitespace-nowrap">

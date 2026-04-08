@@ -502,9 +502,9 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
             type="button"
             onClick={() => setIsVoucherModalOpen(true)}
             className={`
-              shrink-0 ${compact ? "w-8 h-8" : "w-10 h-10"} rounded-full bg-white text-amazon-textMuted
+              shrink-0 ${compact ? "w-8 h-8" : "w-10 h-10"} rounded-full bg-btnPrimary text-amazon-btnPrimary
               flex items-center justify-center transition-all shadow-sm
-              hover:bg-neutral-50 hover:text-amazon-link active:scale-95 self-end border border-amazon-border
+              hover:bg-neutral-50 hover:text-amazon-btnPrimary active:scale-95 self-end border border-amazon-border
             `}
             title="Gift a Voucher"
           >

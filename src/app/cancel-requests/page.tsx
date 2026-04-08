@@ -50,21 +50,21 @@ export default function CancelRequestsPage() {
   };
 
   return (
-    <div className="bg-[#0a0a0a] min-h-screen p-4 md:p-8 text-white">
+    <div className="bg-amazon-bgSecondary min-h-screen p-4 md:p-8 text-amazon-text">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
-          <Ban className="w-8 h-8 text-[#f5d800]" />
-          <h1 className="font-oswald uppercase tracking-widest text-2xl text-white">
+          <Ban className="w-8 h-8 text-orange-500" />
+          <h1 className="font-oswald uppercase tracking-widest text-2xl text-amazon-text">
             My Cancel Requests
           </h1>
         </div>
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#f5d800]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amazon-btnPrimary"></div>
           </div>
         ) : issues.length === 0 ? (
-          <div className="text-center text-gray-400 py-12 bg-[#151515] border border-[#1e2126] rounded-sm">
+          <div className="text-center text-amazon-textMuted py-12 bg-white border border-amazon-border rounded-sm shadow-sm">
             <h3 className="text-lg">You have no cancellation requests.</h3>
           </div>
         ) : (
@@ -73,18 +73,18 @@ export default function CancelRequestsPage() {
               <div
                 key={issue.id}
                 onClick={() => router.push(`/cancel-requests/${issue.id}`)}
-                className="bg-[#151515] border border-[#1e2126] rounded-sm p-5 flex flex-col gap-3 relative overflow-hidden transition-all duration-300 hover:border-[#f5d800]/50 cursor-pointer"
+                className="bg-white border border-amazon-border shadow-sm rounded-sm p-5 flex flex-col gap-3 relative overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
               >
-                <div className="flex justify-between items-start border-b border-[#1e2126] pb-3">
+                <div className="flex justify-between items-start border-b border-amazon-border pb-3">
                   <div>
-                    <span className="text-gray-400 text-xs block mb-1">
+                    <span className="text-amazon-textMuted text-xs block mb-1">
                       Order ID
                     </span>
-                    <span className="text-[#f5d800] font-bold text-sm tracking-wider break-all">
+                    <span className="text-amazon-text font-bold text-sm tracking-wider break-all">
                       {issue.orderId}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1 text-gray-500 text-xs">
+                  <div className="flex items-center gap-1 text-amazon-textMuted text-xs">
                     <Clock className="w-3 h-3" />
                     {formatDate(issue.createdAt)}
                   </div>
@@ -92,40 +92,40 @@ export default function CancelRequestsPage() {
 
                 <div className="flex flex-col gap-2 mt-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-xs">Total Amount</span>
-                    <span className="text-white font-semibold flex items-center gap-1">
+                    <span className="text-amazon-textMuted text-xs">Total Amount</span>
+                    <span className="text-amazon-price font-bold flex items-center gap-1">
                       {formatCurrency(issue.orderTotalAmount)}
                     </span>
                   </div>
 
                   <div className="mt-2">
-                    <span className="text-gray-400 text-xs block mb-1">
+                    <span className="text-amazon-textMuted text-xs block mb-1">
                       Reason
                     </span>
-                    <p className="text-sm text-gray-300 font-semibold border-l-2 border-red-500 pl-2">
+                    <p className="text-sm text-amazon-text font-semibold border-l-2 border-orange-500 pl-2">
                       {issue.reason}
                     </p>
                   </div>
 
                   <div>
-                    <span className="text-gray-400 text-xs block mb-1">
+                    <span className="text-amazon-textMuted text-xs block mb-1">
                       Description
                     </span>
-                    <p className="text-xs text-gray-400 italic bg-[#0a0a0a] p-2 rounded-sm">
+                    <p className="text-xs text-amazon-textMuted italic bg-neutral-50 p-2 rounded-sm border border-amazon-border">
                       "{issue.description}"
                     </p>
                   </div>
                 </div>
 
                 {issue.shopResponse && (
-                  <div className="mt-2 bg-[#1a1c20] p-3 rounded-sm border-l-2 border-[#f5d800] flex flex-col gap-2">
-                    <div className="flex items-center gap-2 text-[#f5d800]">
+                  <div className="mt-2 bg-neutral-50 p-3 rounded-sm border-l-2 border-blue-500 flex flex-col gap-2 border border-amazon-border">
+                    <div className="flex items-center gap-2 text-blue-700">
                       <MessageSquare className="w-4 h-4" />
                       <span className="text-xs font-semibold uppercase tracking-wider">
                         Shop Response
                       </span>
                     </div>
-                    <p className="text-xs text-gray-300">
+                    <p className="text-xs text-amazon-text">
                       {issue.shopResponse}
                     </p>
                   </div>

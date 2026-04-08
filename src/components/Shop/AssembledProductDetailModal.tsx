@@ -33,29 +33,29 @@ export default function AssembledProductDetailModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-sm shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto border border-amazon-border">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-200">
-          <h2 className="text-lg font-bold text-gray-800">
+        <div className="flex items-center justify-between p-5 border-b border-amazon-border bg-neutral-50 shrink-0">
+          <h2 className="text-lg font-black text-amazon-text uppercase tracking-widest">
             Assembled Product Details
           </h2>
           <button
             onClick={handleClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition"
+            className="p-1 rounded-sm hover:bg-white border border-transparent hover:border-amazon-border transition shadow-sm"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-amazon-textMuted hover:text-amazon-text" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-5">
+        <div className="p-6">
           {detailLoading ? (
-            <div className="flex items-center justify-center py-16 text-gray-400 gap-2">
+            <div className="flex items-center justify-center py-16 text-amazon-textMuted gap-2">
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span className="text-sm">Loading product details...</span>
+              <span className="text-[13px] tracking-widest">Loading product details...</span>
             </div>
           ) : !selectedProduct ? (
-            <div className="py-16 text-center text-gray-400 text-sm">
+            <div className="py-16 text-center text-amazon-textMuted text-[13px] tracking-widest">
               Product not found.
             </div>
           ) : (
@@ -64,10 +64,10 @@ export default function AssembledProductDetailModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end p-5 border-t border-gray-100">
+        <div className="flex justify-end px-6 py-5 border-t border-amazon-border bg-neutral-50/50 shrink-0">
           <button
             onClick={handleClose}
-            className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+            className="px-5 py-2.5 text-[13px] tracking-widest text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition shadow-sm"
           >
             Close
           </button>
@@ -85,14 +85,14 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
   return (
     <div className="space-y-6">
       {/* Images + basic info */}
-      <div className="flex flex-col sm:flex-row gap-5">
+      <div className="flex flex-col sm:flex-row gap-6">
         {/* Images */}
         {images.length > 0 && (
-          <div className="flex gap-2 shrink-0">
+          <div className="flex gap-3 shrink-0">
             {images.map((img, idx) => (
               <div
                 key={idx}
-                className="w-24 h-24 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center"
+                className="w-24 h-24 rounded-sm bg-neutral-50 border border-amazon-border overflow-hidden flex items-center justify-center shadow-sm"
               >
                 <Image
                   src={img}
@@ -108,23 +108,23 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
         )}
 
         {/* Info */}
-        <div className="flex-1 min-w-0 space-y-2">
+        <div className="flex-1 min-w-0 space-y-3">
           <div>
-            <h3 className="text-xl font-bold text-gray-900">{product.name}</h3>
+            <h3 className="text-xl font-black text-amazon-text uppercase tracking-widest truncate">{product.name}</h3>
             {product.slug && (
-              <p className="text-xs text-gray-400 mt-0.5">{product.slug}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mt-1 truncate">{product.slug}</p>
             )}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-lg font-black text-blue-600">
+            <span className="text-lg font-black text-amazon-price tracking-widest">
               {formatPrice(product.price)}
             </span>
-            <span className="text-xs text-gray-500">
+            <span className="text-[10px] font-bold text-amazon-textMuted uppercase tracking-widest ml-2 border border-amazon-border px-2 py-0.5 rounded-sm shadow-sm bg-white">
               Qty: {product.quantity}
             </span>
           </div>
           {product.description && (
-            <p className="text-sm text-gray-600 leading-relaxed line-clamp-4">
+            <p className="text-[11px] text-amazon-textMuted font-bold tracking-widest leading-relaxed line-clamp-4 uppercase">
               {product.description}
             </p>
           )}
@@ -137,11 +137,11 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
         product.pcb ||
         product.connection ||
         product.battery) && (
-        <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
-          <p className="text-sm font-bold text-indigo-800 mb-3">
+        <div className="p-5 bg-indigo-50 border border-indigo-200 rounded-sm shadow-sm">
+          <p className="text-[14px] font-black tracking-widest text-indigo-800 mb-4">
             Keyboard Specifications
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {product.layout && (
               <SpecCard label="Layout" value={product.layout} />
             )}
@@ -161,7 +161,7 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard label="Price" value={formatPrice(product.price)} />
+        <StatCard label="Price" value={formatPrice(product.price)} valueColor="text-amazon-price" />
         <StatCard label="Quantity" value={String(product.quantity)} />
         {product.shopName && <StatCard label="Shop" value={product.shopName} />}
         <StatCard label="ID" value={product.id.slice(0, 8) + "..."} small />
@@ -169,22 +169,22 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
 
       {/* Components */}
       {product.details && product.details.length > 0 && (
-        <div className="space-y-3">
-          <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+        <div className="p-5 bg-neutral-50 border border-amazon-border rounded-sm space-y-4 shadow-sm">
+          <p className="text-[11px] font-black uppercase tracking-widest text-amazon-text flex items-center gap-2">
             <Cpu className="w-4 h-4" />
             Components ({product.details.length})
           </p>
-          <div className="divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
+          <div className="divide-y divide-amazon-border rounded-sm overflow-hidden">
             {product.details.map((detail, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between px-4 py-3 bg-white hover:bg-gray-50 transition"
+                className="flex items-center justify-between p-4 hover:bg-neutral-50 transition"
               >
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-800">
+                  <p className="text-[13px] font-black  tracking-widest text-amazon-text">
                     {detail.componentName || detail.componentId}
                   </p>
-                  <p className="text-xs text-gray-400 truncate">
+                  <p className="text-[12px] font-bold  tracking-widest text-amazon-textMuted mt-0.5 truncate">
                     Kit: {detail.baseKitName || detail.baseKitId}
                   </p>
                   {detail.soundUrl && (
@@ -192,14 +192,14 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
                       href={detail.soundUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-0.5"
+                      className="text-[9px] font-bold tracking-widest text-amazon-btnPrimary hover:opacity-80 flex items-center gap-1 mt-1 uppercase"
                     >
                       Sound test
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   )}
                 </div>
-                <span className="text-sm font-bold text-gray-700 shrink-0 ml-4">
+                <span className="text-[12px] font-black text-amazon-text shrink-0 ml-4">
                   x{detail.quantity}
                 </span>
               </div>
@@ -210,41 +210,21 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
 
       {/* 3D Model Link */}
       {product.view3DUrl && (
-        <div className="flex items-center gap-2 text-xs text-gray-400">
+        <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest text-amazon-textMuted bg-neutral-50 border border-amazon-border p-2 rounded-sm shadow-sm">
           <Box className="w-3.5 h-3.5 shrink-0" />
-          <span className="font-semibold shrink-0">3D Model:</span>
+          <span className="font-black text-amazon-text uppercase shrink-0">3D Model:</span>
           <a
             href={product.view3DUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="truncate hover:text-blue-500 transition flex items-center gap-1"
+            className="truncate hover:text-amazon-btnPrimary transition flex items-center gap-1 uppercase"
           >
             {product.view3DUrl}
-            <ExternalLink className="w-3 h-3 shrink-0" />
+            <ExternalLink className="w-3 h-3 shrink-0 ml-1" />
           </a>
         </div>
       )}
 
-      {/* Image URLs */}
-      <div className="space-y-1">
-        {images.map((url, idx) => (
-          <div
-            key={idx}
-            className="flex items-center gap-2 text-xs text-gray-400"
-          >
-            <span className="font-semibold shrink-0">Image {idx + 1}:</span>
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="truncate hover:text-blue-500 transition flex items-center gap-1"
-            >
-              {url}
-              <ExternalLink className="w-3 h-3 shrink-0" />
-            </a>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
@@ -261,12 +241,12 @@ function StatCard({
   small?: boolean;
 }) {
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-      <p className="text-xs text-gray-400 font-semibold uppercase mb-0.5">
+    <div className="bg-white border border-amazon-border rounded-sm p-4 shadow-sm flex flex-col justify-center">
+      <p className="text-[9px] text-amazon-textMuted font-bold uppercase tracking-widest mb-1.5">
         {label}
       </p>
       <p
-        className={`font-bold truncate ${small ? "text-xs" : "text-sm"} ${valueColor || "text-gray-900"}`}
+        className={`font-black uppercase tracking-widest truncate ${small ? "text-[10px]" : "text-[13px]"} ${valueColor || "text-amazon-text"}`}
       >
         {value}
       </p>
@@ -276,9 +256,9 @@ function StatCard({
 
 function SpecCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-white border border-indigo-100 rounded-lg p-2.5">
-      <p className="text-xs text-indigo-500 font-semibold mb-0.5">{label}</p>
-      <p className="text-sm font-bold text-gray-800">{value}</p>
+    <div className="bg-white border border-indigo-100 rounded-sm p-3 shadow-sm">
+      <p className="text-[12px] text-indigo-500 font-bold  tracking-widest mb-1">{label}</p>
+      <p className="text-[13px] font-black  tracking-widest text-indigo-900 truncate">{value}</p>
     </div>
   );
 }

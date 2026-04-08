@@ -34,7 +34,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           className={`flex flex-col min-h-screen bg-black ${inter.className} ${oswald.variable}`}
         >
           <div className={`${oswald.className} sticky top-0 z-50 w-full`}>
-            <Header />
+            {/* <Header /> */}
           </div>
 
           <div className="flex flex-1 min-h-0">
@@ -45,7 +45,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </main>
           </div>
 
-          <Footer />
+          {/* <Footer /> */}
         </div>
       </AuthWrapper>
     </LayoutWrapper>

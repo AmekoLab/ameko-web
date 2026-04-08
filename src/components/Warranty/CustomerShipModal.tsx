@@ -64,7 +64,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
       setValue("evidenceUrl", url, { shouldValidate: true });
       setPreviewUrl(url);
     } catch {
-      toast.error("Tải ảnh lên thất bại, vui lòng thử lại");
+      toast.error("Upload failed, please try again");
     } finally {
       setIsUploading(false);
     }
@@ -85,7 +85,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
       onSuccess();
     } catch (err: unknown) {
       const error = err as string;
-      toast.error(error || "Gửi thông tin thất bại");
+      toast.error(error || "Failed to submit return information");
     }
   };
 
@@ -100,8 +100,8 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
   if (!isOpen) return null;
 
   const inputClass =
-    "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors";
-  const labelClass = "block text-sm font-medium text-gray-700 mb-1.5";
+    "w-full rounded-lg border border-amazon-border px-3 py-2.5 text-sm text-amazon-text placeholder-neutral-400 focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary outline-none transition-colors";
+  const labelClass = "block text-sm font-medium text-amazon-text mb-1.5";
   const errorClass = "text-xs text-red-500 mt-1";
 
   return (
@@ -115,28 +115,28 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
       {/* Modal */}
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white rounded-t-2xl border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-lg font-bold text-gray-900">
+        <div className="sticky top-0 bg-white rounded-t-2xl border-b border-amazon-border px-6 py-4 flex items-center justify-between z-10">
+          <h2 className="text-lg font-bold text-amazon-text">
             Submit Return Information
           </h2>
           <button
             onClick={handleClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1 rounded-lg hover:bg-neutral-100 transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-amazon-textMuted" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 space-y-5">
           {/* Subtext */}
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-amazon-textMuted">
             Please take a photo of the shipping invoice from the post office or
             clearly write the tracking code so the Shop can verify.
           </p>
 
           {/* Timeline Section */}
-          <div className="border border-gray-200 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
+          <div className="border border-amazon-border rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-amazon-text mb-3 uppercase tracking-wide">
               Action history
             </h3>
             <WarrantyTimeline issueId={issueId} />
@@ -147,7 +147,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
             <label className={labelClass}>Shipping invoice image</label>
             <div className="relative">
               {previewUrl ? (
-                <div className="relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
+                <div className="relative w-full h-48 rounded-lg overflow-hidden border border-amazon-border">
                   <Image
                     src={previewUrl}
                     alt="Shipping evidence"
@@ -160,33 +160,33 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
                       setPreviewUrl(null);
                       setValue("evidenceUrl", "", { shouldValidate: true });
                     }}
-                    className="absolute top-2 right-2 p-1 bg-white rounded-full shadow hover:bg-gray-100 transition-colors"
+                    className="absolute top-2 right-2 p-1 bg-white rounded-full shadow hover:bg-neutral-100 transition-colors"
                   >
-                    <X className="w-4 h-4 text-gray-600" />
+                    <X className="w-4 h-4 text-amazon-textMuted" />
                   </button>
                 </div>
               ) : (
                 <label
                   className={`flex flex-col items-center justify-center w-full h-40 rounded-lg border-2 border-dashed transition-colors cursor-pointer ${
                     isUploading
-                      ? "border-gray-300 bg-gray-50"
-                      : "border-gray-300 hover:border-blue-400 hover:bg-blue-50/30"
+                      ? "border-amazon-border bg-neutral-50"
+                      : "border-amazon-border hover:border-amazon-btnPrimary hover:bg-yellow-50"
                   }`}
                 >
                   {isUploading ? (
                     <div className="flex flex-col items-center gap-2">
-                      <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-                      <span className="text-sm text-gray-500">
+                      <Loader2 className="w-8 h-8 text-amazon-btnPrimary animate-spin" />
+                      <span className="text-sm text-amazon-textMuted">
                         Uploading...
                       </span>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2">
-                      <ImagePlus className="w-8 h-8 text-gray-400" />
-                      <span className="text-sm text-gray-500">
+                      <ImagePlus className="w-8 h-8 text-neutral-400" />
+                      <span className="text-sm text-amazon-textMuted">
                         Click to upload image
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-amazon-textMuted">
                         PNG, JPG up to 5MB
                       </span>
                     </div>
@@ -229,14 +229,14 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
               type="button"
               onClick={handleClose}
               disabled={isSubmittingShipment}
-              className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="px-5 py-2.5 text-sm font-medium text-amazon-text bg-white border border-amazon-border rounded-lg hover:bg-neutral-50 transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmittingShipment || isUploading}
-              className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+              className="px-5 py-2.5 text-sm font-medium text-amazon-text bg-amazon-btnPrimary rounded-lg hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
             >
               {isSubmittingShipment && (
                 <Loader2 className="w-4 h-4 animate-spin" />

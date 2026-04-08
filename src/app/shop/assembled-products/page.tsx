@@ -112,27 +112,27 @@ export default function AssembledProductsPage() {
   }, [assembledProducts, searchQuery]);
 
   return (
-    <div className="p-8 bg-black min-h-screen">
+    <div className="p-8 bg-amazon-bgSecondary min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-end mb-6 border-b border-[#1e2126] pb-4">
+        <div className="flex justify-between items-end mb-6 border-b border-amazon-border pb-4">
           <div>
-            <h1 className="text-3xl font-oswald font-black text-white mb-2 uppercase tracking-widest flex items-center gap-3">
-              <Puzzle className="w-8 h-8 text-[#f5d800]" />
+            <h1 className="text-3xl font-black text-amazon-text mb-2 uppercase tracking-widest flex items-center gap-3">
+              <Puzzle className="w-8 h-8 text-amazon-text" />
               Assembled Products
             </h1>
-            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+            <p className="text-[11px] font-bold text-amazon-textMuted uppercase tracking-widest">
               Manage your shop&apos;s assembled keyboard products.{" "}
-              <span className="font-black text-[#f5d800]">{total}</span>{" "}
+              <span className="font-black text-amazon-text">{total}</span>{" "}
               products total.
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsCreateOpen(true)}
-              className="px-5 py-2.5 bg-[#f5d800] text-black text-[11px] font-black uppercase tracking-widest rounded-sm hover:bg-[#ffe500] transition flex items-center gap-2 shadow-[0_0_15px_rgba(245,216,0,0.3)]"
+              className="px-5 py-2.5 bg-amazon-btnPrimary text-amazon-text text-[11px] font-black uppercase tracking-widest rounded-sm hover:opacity-90 transition flex items-center gap-2 shadow-sm"
             >
-              <Plus className="w-4 h-4 text-black" />
+              <Plus className="w-4 h-4 text-amazon-text" />
               Create Product
             </button>
           </div>
@@ -167,56 +167,56 @@ export default function AssembledProductsPage() {
         {/* Search */}
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amazon-textMuted" />
             <input
               type="text"
-              placeholder="Search assembled products..."
+              placeholder="SEARCH ASSEMBLED PRODUCTS..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-[#1e2126] rounded-sm text-[11px] font-bold uppercase tracking-widest bg-[#151515] text-white focus:outline-none focus:border-[#f5d800] focus:ring-1 focus:ring-[#f5d800]/30 transition placeholder:text-gray-600"
+              className="w-full pl-9 pr-3 py-2 border border-amazon-border rounded-sm text-[11px] font-bold uppercase tracking-widest bg-white text-amazon-text focus:outline-none focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary transition placeholder:text-neutral-400"
             />
           </div>
         </div>
 
         {/* Table */}
-        <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
+        <div className="bg-white rounded-sm border border-amazon-border overflow-hidden shadow-sm">
           {loading ? (
-            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500">
+            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
               Loading assembled products...
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500">
+            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
               No assembled products found.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-black border-b border-[#1e2126] text-left">
-                    <th className="px-4 py-3 font-black text-gray-500 uppercase tracking-widest text-[10px]">
+                  <tr className="bg-neutral-50/50 border-b border-amazon-border text-left">
+                    <th className="px-4 py-3 font-black text-amazon-textMuted uppercase tracking-widest text-[10px]">
                       Product
                     </th>
-                    <th className="px-4 py-3 font-black text-gray-500 uppercase tracking-widest text-[10px]">
+                    <th className="px-4 py-3 font-black text-amazon-textMuted uppercase tracking-widest text-[10px]">
                       Layout
                     </th>
-                    <th className="px-4 py-3 font-black text-gray-500 uppercase tracking-widest text-[10px] text-right">
+                    <th className="px-4 py-3 font-black text-amazon-textMuted uppercase tracking-widest text-[10px] text-right">
                       Price
                     </th>
-                    <th className="px-4 py-3 font-black text-gray-500 uppercase tracking-widest text-[10px] text-right">
+                    <th className="px-4 py-3 font-black text-amazon-textMuted uppercase tracking-widest text-[10px] text-right">
                       Qty
                     </th>
-                    <th className="px-4 py-3 font-black text-gray-500 uppercase tracking-widest text-[10px]">
+                    <th className="px-4 py-3 font-black text-amazon-textMuted uppercase tracking-widest text-[10px]">
                       Specs
                     </th>
-                    <th className="px-4 py-3 font-black text-gray-500 uppercase tracking-widest text-[10px] text-center">
+                    <th className="px-4 py-3 font-black text-amazon-textMuted uppercase tracking-widest text-[10px] text-center">
                       Components
                     </th>
-                    <th className="px-4 py-3 font-black text-gray-500 uppercase tracking-widest text-[10px] text-center">
+                    <th className="px-4 py-3 font-black text-amazon-textMuted uppercase tracking-widest text-[10px] text-center">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#1e2126]">
+                <tbody className="divide-y divide-amazon-border">
                   {filteredProducts.map((product) => (
                     <ProductRow
                       key={product.id}
@@ -249,29 +249,29 @@ function ProductRow({
   onDelete: (product: AssembledProductItem) => void;
 }) {
   return (
-    <tr className="hover:bg-[#202030] transition-colors">
+    <tr className="hover:bg-neutral-50 transition-colors">
       {/* Product info */}
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-sm bg-black border border-[#1e2126] overflow-hidden shrink-0 flex items-center justify-center">
+          <div className="w-16 h-16 rounded-sm bg-neutral-50 overflow-hidden shrink-0 flex items-center justify-center">
             {product.image1 ? (
               <Image
                 src={product.image1}
                 alt={product.name}
-                width={40}
-                height={40}
+                width={50}
+                height={50}
                 className="object-cover w-full h-full"
                 unoptimized
               />
             ) : (
-              <Puzzle className="w-4 h-4 text-gray-500" />
+              <Puzzle className="w-4 h-4 text-neutral-300" />
             )}
           </div>
           <div className="min-w-0">
-            <p className="font-black text-[11px] text-white uppercase tracking-wider truncate max-w-[200px]">
+            <p className="font-black text-[13px] text-amazon-text  tracking-wider truncate max-w-[200px]">
               {product.name}
             </p>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest truncate max-w-[200px]">
+            <p className="text-[10px] font-bold text-amazon-textMuted tracking-widest truncate max-w-[200px] mt-0.5">
               {product.slug || product.id.slice(0, 12) + "..."}
             </p>
           </div>
@@ -281,17 +281,17 @@ function ProductRow({
       {/* Layout */}
       <td className="px-4 py-3">
         {product.layout ? (
-          <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm bg-[#202030] text-[#f5d800] border border-[#f5d800]/20">
+          <span className="inline-flex items-center gap-1 text-[13px] font-black tracking-widest px-2 py-0.5 rounded-sm bg-neutral-50 text-amazon-text border border-amazon-border shadow-sm">
             {product.layout}
           </span>
         ) : (
-          <span className="text-[10px] font-bold text-gray-600">—</span>
+          <span className="text-[13px] font-bold text-amazon-textMuted">—</span>
         )}
       </td>
 
       {/* Price */}
       <td className="px-4 py-3 text-right">
-        <span className="font-black text-[#f5d800] text-[11px] uppercase tracking-widest">
+        <span className="font-black text-amazon-price text-[13px] tracking-widest">
           {formatPrice(product.price)}
         </span>
       </td>
@@ -299,12 +299,12 @@ function ProductRow({
       {/* Quantity */}
       <td className="px-4 py-3 text-right">
         <span
-          className={`font-black text-[11px] uppercase tracking-widest ${
+          className={`font-black text-[13px] tracking-widest ${
             (product.quantity ?? 0) <= 0
-              ? "text-red-500"
+              ? "text-red-600"
               : (product.quantity ?? 0) < 5
-                ? "text-[#f5d800]"
-                : "text-white"
+                ? "text-amber-600"
+                : "text-amazon-text"
           }`}
         >
           {product.quantity ?? 0}
@@ -313,30 +313,30 @@ function ProductRow({
 
       {/* Specs */}
       <td className="px-4 py-3">
-        <div className="text-[10px] font-bold uppercase tracking-widest space-y-0.5 max-w-[180px]">
+        <div className="text-[13px] font-bold  tracking-widest space-y-0.5 max-w-[180px]">
           {product.mounting && (
             <p>
-              <span className="text-gray-400">
+              <span className="text-amazon-textMuted">
                 {product.mounting}
               </span>
             </p>
           )}
           {product.connection && (
             <p>
-              <span className="text-gray-400">
+              <span className="text-amazon-textMuted">
                 {product.connection}
               </span>
             </p>
           )}
           {!product.mounting && !product.connection && (
-            <span className="text-gray-600">—</span>
+            <span className="text-amazon-textMuted">—</span>
           )}
         </div>
       </td>
 
       {/* Components count */}
       <td className="px-4 py-3 text-center">
-        <span className="inline-flex items-center justify-center gap-1 text-[11px] font-black text-gray-400">
+        <span className="inline-flex items-center justify-center gap-1 text-[13px] font-black text-amazon-textMuted">
           <Cpu className="w-3.5 h-3.5" />
           {product.details?.length || 0}
         </span>
@@ -347,21 +347,21 @@ function ProductRow({
         <div className="flex items-center justify-center gap-1.5">
           <button
             onClick={() => onView(product.id)}
-            className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] hover:border-[#f5d800] text-gray-500 hover:text-[#f5d800] transition shrink-0"
+            className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 hover:border-amazon-btnPrimary text-amazon-textMuted hover:text-amazon-btnPrimary transition shrink-0 shadow-sm"
             title="View product"
           >
             <Eye className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onEdit(product)}
-            className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] hover:border-[#f5d800] text-gray-500 hover:text-[#f5d800] transition shrink-0"
+            className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 hover:border-amazon-btnPrimary text-amazon-textMuted hover:text-amazon-btnPrimary transition shrink-0 shadow-sm"
             title="Edit product"
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onDelete(product)}
-            className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] hover:border-red-500 text-gray-500 hover:text-red-500 transition shrink-0"
+            className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-red-50 hover:border-red-500 text-amazon-textMuted hover:text-red-500 transition shrink-0 shadow-sm"
             title="Delete product"
           >
             <Trash2 className="w-3.5 h-3.5" />

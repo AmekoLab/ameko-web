@@ -95,43 +95,43 @@ export default function CheckStockModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden max-h-[85vh] flex flex-col">
+      <div className="relative bg-white rounded-sm shadow-xl w-full max-w-lg mx-4 overflow-hidden max-h-[85vh] flex flex-col border border-amazon-border">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-emerald-50 shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-amazon-border bg-emerald-50 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
               <ClipboardCheck className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Check Stock</h2>
-              <p className="text-xs text-gray-500">
+              <h2 className="text-lg font-black text-amazon-text uppercase tracking-widest">Check Stock</h2>
+              <p className="text-[10px] font-bold  tracking-widest text-emerald-700 mt-0.5">
                 Search and verify part inventory
               </p>
             </div>
           </div>
           <button
             onClick={handleClose}
-            className="p-1.5 rounded-lg hover:bg-emerald-100 transition text-gray-400 hover:text-gray-600"
+            className="p-1.5 rounded-sm hover:bg-emerald-100 transition text-emerald-600/60 hover:text-emerald-700"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Search input */}
-        <div className="px-6 pt-4 pb-3 shrink-0">
+        <div className="px-6 pt-5 pb-3 shrink-0">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amazon-textMuted" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Type part name to search..."
               autoFocus
-              className="text-black w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+              className="text-amazon-text  tracking-widest text-[11px] w-full pl-9 pr-3 py-2.5 border border-amazon-border rounded-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition placeholder:text-neutral-400"
             />
           </div>
           {selectedIds.size > 0 && (
-            <p className="text-xs text-emerald-600 font-semibold mt-2">
+            <p className="text-[10px]  font-black tracking-widest text-emerald-600 mt-3">
               {selectedIds.size} part{selectedIds.size > 1 ? "s" : ""} selected
             </p>
           )}
@@ -140,13 +140,13 @@ export default function CheckStockModal({
         {/* Results list */}
         <div className="flex-1 overflow-y-auto px-6 pb-3 min-h-0">
           {query.trim() === "" ? (
-            <div className="py-8 text-center text-gray-400 text-sm">
-              <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <div className="py-8 text-center text-amazon-textMuted text-[11px] font-bold  tracking-widest">
+              <Search className="w-8 h-8 mx-auto mb-3 opacity-30" />
               Type a part name to start searching
             </div>
           ) : matchedParts.length === 0 ? (
-            <div className="py-8 text-center text-gray-400 text-sm">
-              <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <div className="py-8 text-center text-amazon-textMuted text-[11px] font-bold uppercase tracking-widest">
+              <AlertCircle className="w-8 h-8 mx-auto mb-3 opacity-30" />
               No parts match &quot;{query}&quot;
             </div>
           ) : (
@@ -154,7 +154,7 @@ export default function CheckStockModal({
               {/* Select all toggle */}
               <button
                 onClick={selectAll}
-                className="w-full text-left text-xs font-bold text-emerald-600 hover:text-emerald-700 px-2 py-1.5 transition"
+                className="w-full text-left text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 px-2 py-2 transition"
               >
                 {allMatchedSelected ? "Deselect all" : "Select all"} (
                 {matchedParts.length})
@@ -171,18 +171,18 @@ export default function CheckStockModal({
                   <div
                     key={part.id}
                     onClick={() => toggleSelect(part.id)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition border ${
+                    className={`flex items-center gap-3 px-3 py-3 rounded-sm cursor-pointer transition border ${
                       isSelected
                         ? "bg-emerald-50 border-emerald-200"
-                        : "bg-white border-gray-100 hover:bg-gray-50"
+                        : "bg-white border-amazon-border hover:bg-neutral-50"
                     }`}
                   >
                     {/* Checkbox */}
                     <div
-                      className={`w-4 h-4 rounded border-2 shrink-0 flex items-center justify-center transition ${
+                      className={`w-4 h-4 rounded-sm border shrink-0 flex items-center justify-center transition ${
                         isSelected
                           ? "bg-emerald-600 border-emerald-600"
-                          : "border-gray-300"
+                          : "border-amazon-border"
                       }`}
                     >
                       {isSelected && (
@@ -200,10 +200,10 @@ export default function CheckStockModal({
 
                     {/* Part info */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 truncate">
+                      <p className="text-[13px] font-black  tracking-widest text-amazon-text truncate leading-tight">
                         {part.name}
                       </p>
-                      <p className="text-xs text-gray-400 truncate">
+                      <p className="text-[11px] font-bold  tracking-widest text-amazon-textMuted truncate mt-1">
                         <span className="capitalize">{part.partType}</span>
                         {" · "}
                         {part.categoryName}
@@ -212,14 +212,14 @@ export default function CheckStockModal({
 
                     {/* Current stock */}
                     <div className="text-right shrink-0">
-                      <p className="text-xs text-gray-400">Current</p>
+                      <p className="text-[11px] font-bold tracking-widest text-amazon-textMuted mb-1">Current</p>
                       <p
-                        className={`text-sm font-bold ${
+                        className={`text-[11px] font-black tracking-widest ${
                           part.stockQuantity <= 0
                             ? "text-red-600"
                             : part.stockQuantity < 100
                               ? "text-amber-600"
-                              : "text-gray-700"
+                              : "text-amazon-text"
                         }`}
                       >
                         {part.stockQuantity.toLocaleString("vi-VN")}
@@ -228,11 +228,11 @@ export default function CheckStockModal({
 
                     {/* Verified stock result */}
                     {stockResult !== null && (
-                      <div className="text-right shrink-0 pl-2 border-l border-gray-200">
-                        <p className="text-xs text-emerald-500 font-semibold">
+                      <div className="text-right shrink-0 pl-3 ml-1 border-l border-amazon-border">
+                        <p className="text-[9px] uppercase font-bold tracking-widest text-emerald-600 mb-1">
                           Verified
                         </p>
-                        <p className="text-sm font-bold text-emerald-700">
+                        <p className="text-[11px] font-black tracking-widest text-emerald-700">
                           {stockResult.toLocaleString("vi-VN")}
                         </p>
                       </div>
@@ -245,21 +245,21 @@ export default function CheckStockModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50 shrink-0">
+        <div className="flex items-center justify-between px-6 py-5 border-t border-amazon-border bg-neutral-50/50 shrink-0">
           <button
             onClick={handleClose}
-            className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+            className="px-5 py-2.5 text-[13px] font-black  tracking-widest text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition shadow-sm"
           >
             Close
           </button>
           <button
             onClick={handleCheck}
             disabled={selectedIds.size === 0 || checkingStock}
-            className="px-5 py-2 text-sm font-bold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-5 py-2.5 text-[13px] font-black  tracking-widest text-white bg-emerald-600 border border-emerald-600 rounded-sm hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
           >
             {checkingStock ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
                 Checking...
               </>
             ) : (

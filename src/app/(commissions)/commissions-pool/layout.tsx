@@ -2,7 +2,7 @@ import { Header } from "@/src/components/Header/Header";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 import { Oswald } from "next/font/google";
 
-// Cấu hình Font Oswald (Giữ lại dạng biến phòng trường hợp cần dùng cho điểm nhấn)
+
 const oswald = Oswald({
   subsets: ["latin", "vietnamese"],
   weight: ["300", "400", "500", "700"],

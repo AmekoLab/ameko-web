@@ -77,12 +77,12 @@ function VnPayReturnContent() {
               Payment successful!
             </h2>
             <p className="text-sm text-gray-400 mb-1">{message}</p>
-            {orderId && (
+            {/* {orderId && (
               <p className="text-xs text-gray-500 break-all">
                 Transaction ID:{" "}
                 <span className="text-gray-300 font-mono">{orderId}</span>
               </p>
-            )}
+            )} */}
             <Link
               href="/orders"
               className="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-lg mt-6 block w-full font-medium transition-colors"

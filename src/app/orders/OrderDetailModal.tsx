@@ -175,16 +175,16 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-[#151515] border border-[#1e2126] rounded-sm shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white border border-amazon-border rounded-sm shadow-xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e2126] bg-[#1a1c20]">
-          <h2 className="text-xl font-oswald font-black uppercase text-white tracking-widest flex items-center gap-2">
-            <Package className="w-5 h-5 text-[#f5d800]" />
+        <div className="flex items-center justify-between px-6 py-4 border-b border-amazon-border bg-neutral-50">
+          <h2 className="text-xl font-oswald font-black uppercase text-amazon-text tracking-widest flex items-center gap-2">
+            <Package className="w-5 h-5 text-amazon-text" />
             Order Details
           </h2>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-white transition-colors hover:bg-white/10 rounded-sm"
+            className="p-2 text-amazon-textMuted hover:text-amazon-text transition-colors hover:bg-neutral-100 rounded-sm"
           >
             <X className="w-5 h-5" />
           </button>
@@ -194,13 +194,13 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <Loader2 className="w-10 h-10 text-[#f5d800] animate-spin mb-4" />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
+              <Loader2 className="w-10 h-10 text-amazon-link animate-spin mb-4" />
+              <p className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
                 Loading order details...
               </p>
             </div>
           ) : !order ? (
-            <div className="text-center py-20 text-gray-500 text-[11px] font-bold uppercase tracking-widest">
+            <div className="text-center py-20 text-amazon-textMuted text-[11px] font-bold uppercase tracking-widest">
               No order data found.
             </div>
           ) : (
@@ -209,13 +209,13 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Shipping Info */}
                 <div>
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-[#f5d800] mb-3 flex items-center gap-2">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-amazon-text mb-3 flex items-center gap-2">
                     Shipping Address
                     {isBuyerContext && order.orderStatus === 'Processing' && !isEditingAddress && (
                       <button
                         type="button"
                         onClick={startEditingAddress}
-                        className="ml-auto p-1 text-gray-500 hover:text-[#f5d800] transition-colors rounded-sm hover:bg-white/5"
+                        className="ml-auto p-1 text-amazon-textMuted hover:text-amazon-text transition-colors rounded-sm hover:bg-neutral-100"
                         title="Edit shipping address"
                       >
                         <Pencil className="w-3.5 h-3.5" />
@@ -224,34 +224,34 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                   </h3>
 
                   {isEditingAddress ? (
-                    <div className="bg-[#1a1c20] p-4 rounded-sm border border-[#f5d800]/30 space-y-3">
+                    <div className="bg-white p-4 rounded-sm border border-amazon-border space-y-3">
                       <div>
-                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Name</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mb-1">Name</label>
                         <input
                           type="text"
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
-                          className="w-full bg-[#111111] border border-[#2a2d35] rounded-sm px-3 py-2 text-[12px] font-bold text-white focus:outline-none focus:border-[#f5d800]/50 placeholder-gray-600"
+                          className="w-full bg-white border border-amazon-border rounded-sm px-3 py-2 text-[12px] font-bold text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus placeholder-neutral-400"
                           placeholder="Receiver name"
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Phone</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mb-1">Phone</label>
                         <input
                           type="text"
                           value={editPhone}
                           onChange={(e) => setEditPhone(e.target.value)}
-                          className="w-full bg-[#111111] border border-[#2a2d35] rounded-sm px-3 py-2 text-[12px] font-bold text-white focus:outline-none focus:border-[#f5d800]/50 placeholder-gray-600"
+                          className="w-full bg-white border border-amazon-border rounded-sm px-3 py-2 text-[12px] font-bold text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus placeholder-neutral-400"
                           placeholder="Phone number"
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Address</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mb-1">Address</label>
                         <input
                           type="text"
                           value={editAddress}
                           onChange={(e) => setEditAddress(e.target.value)}
-                          className="w-full bg-[#111111] border border-[#2a2d35] rounded-sm px-3 py-2 text-[12px] font-bold text-white focus:outline-none focus:border-[#f5d800]/50 placeholder-gray-600"
+                          className="w-full bg-white border border-amazon-border rounded-sm px-3 py-2 text-[12px] font-bold text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus placeholder-neutral-400"
                           placeholder="Shipping address"
                         />
                       </div>
@@ -260,7 +260,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                           type="button"
                           onClick={() => setIsEditingAddress(false)}
                           disabled={isSavingAddress}
-                          className="flex-1 py-2 rounded-sm text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-[#111111] hover:bg-[#252830] transition-colors border border-[#2a2d35]"
+                          className="flex-1 py-2 rounded-sm text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted hover:bg-neutral-50 bg-white transition-colors border border-amazon-border"
                         >
                           Cancel
                         </button>
@@ -268,7 +268,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                           type="button"
                           onClick={handleSaveAddress}
                           disabled={isSavingAddress}
-                          className="flex-1 py-2 rounded-sm text-[10px] font-black uppercase tracking-widest text-black bg-[#f5d800] hover:bg-[#e6cc00] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                          className="flex-1 py-2 rounded-sm text-[10px] font-bold text-amazon-text bg-amazon-btnPrimary hover:brightness-95 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                           {isSavingAddress && <Loader2 className="w-3 h-3 animate-spin" />}
                           Save
@@ -276,36 +276,36 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-[#1a1c20] p-4 rounded-sm border border-[#1e2126]">
-                      <p className="text-[12px] font-bold text-white mb-1 uppercase tracking-wider">{order.receiverName}</p>
-                      <p className="text-[11px] font-bold text-gray-400 mb-2">{order.receiverPhone}</p>
-                      <p className="text-[11px] text-gray-500 leading-relaxed">{order.shippingAddress}</p>
+                    <div className="bg-white p-4 rounded-sm border border-amazon-border">
+                      <p className="text-[12px] font-bold text-amazon-text mb-1 uppercase tracking-wider">{order.receiverName}</p>
+                      <p className="text-[11px] font-bold text-amazon-textMuted mb-2">{order.receiverPhone}</p>
+                      <p className="text-[11px] text-amazon-textMuted leading-relaxed">{order.shippingAddress}</p>
                     </div>
                   )}
                 </div>
 
                 {/* Status Summary */}
                 <div>
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-[#f5d800] mb-3 flex items-center gap-2">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-amazon-text mb-3 flex items-center gap-2">
                     Order Summary
                   </h3>
-                  <div className="bg-[#1a1c20] p-4 rounded-sm border border-[#1e2126] space-y-3">
+                  <div className="bg-white p-4 rounded-sm border border-amazon-border space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 flex items-center gap-1.5"><Package className="w-3.5 h-3.5"/> Status</span>
-                      <span className="text-[11px] font-black text-white">{order.orderStatus}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted flex items-center gap-1.5"><Package className="w-3.5 h-3.5"/> Status</span>
+                      <span className="text-[11px] font-black text-amazon-text">{order.orderStatus}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5"/> Payment</span>
-                      <span className="text-[11px] font-black text-white">{order.paymentStatus}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5"/> Payment</span>
+                      <span className="text-[11px] font-black text-amazon-text">{order.paymentStatus}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5"/> Date</span>
-                      <span className="text-[11px] font-bold text-gray-400">{formatDate(order.createdAt)}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5"/> Date</span>
+                      <span className="text-[11px] font-bold text-amazon-textMuted">{formatDate(order.createdAt)}</span>
                     </div>
                     {order.note && (
-                      <div className="pt-2 border-t border-[#1e2126]">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 block mb-1">Note:</span>
-                        <p className="text-[11px] text-gray-400 italic">"{order.note}"</p>
+                      <div className="pt-2 border-t border-amazon-border">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted block mb-1">Note:</span>
+                        <p className="text-[11px] text-amazon-textMuted italic">"{order.note}"</p>
                       </div>
                     )}
                     
@@ -330,8 +330,8 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
 
                     {/* SHOP ACTIONS: Update Status */}
                     {!isBuyerContext && (order.orderStatus === 'Processing' || order.orderStatus === 'Shipped') && (
-                      <div className="pt-3 mt-3 border-t border-[#1e2126] flex flex-col gap-2">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 block mb-1">Shop Actions:</span>
+                      <div className="pt-3 mt-3 border-t border-amazon-border flex flex-col gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted block mb-1">Shop Actions:</span>
                         <div className="flex gap-2">
                           
                           {order.orderStatus === 'Processing' && (
@@ -371,13 +371,13 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                                 Cancel Order
                               </button>
                             ) : (
-                              <div className="border border-red-500/30 rounded-sm p-3 bg-red-500/5 space-y-2">
-                                <label className="block text-[10px] font-bold uppercase tracking-widest text-red-400 mb-1">Cancellation Reason</label>
+                              <div className="border border-red-200 rounded-sm p-3 bg-red-50 space-y-2">
+                                <label className="block text-[10px] font-bold uppercase tracking-widest text-red-700 mb-1">Cancellation Reason</label>
                                 <textarea
                                   value={shopCancelReason}
                                   onChange={(e) => setShopCancelReason(e.target.value)}
                                   rows={2}
-                                  className="w-full bg-[#111111] border border-[#2a2d35] rounded-sm px-3 py-2 text-[11px] text-white focus:outline-none focus:border-red-500/50 placeholder-gray-600 resize-none"
+                                  className="w-full bg-white border border-amazon-border rounded-sm px-3 py-2 text-[11px] text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus placeholder-neutral-400 resize-none"
                                   placeholder="Why are you cancelling this order?"
                                 />
                                 <div className="flex gap-2">
@@ -385,7 +385,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                                     type="button"
                                     onClick={() => { setIsShopCancelOpen(false); setShopCancelReason(""); }}
                                     disabled={isCancellingOrder}
-                                    className="flex-1 py-1.5 rounded-sm text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-[#111111] hover:bg-[#252830] transition-colors border border-[#2a2d35]"
+                                    className="flex-1 py-1.5 rounded-sm text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted hover:bg-neutral-50 bg-white transition-colors border border-amazon-border"
                                   >
                                     Back
                                   </button>
@@ -411,53 +411,53 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
 
               {/* Items List */}
               <div>
-                <h3 className="text-[11px] font-black uppercase tracking-widest text-[#f5d800] mb-3">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-amazon-text mb-3">
                   Items ({order.orderItems.length})
                 </h3>
-                <div className="border border-[#1e2126] rounded-sm divide-y divide-[#1e2126] bg-[#1a1c20]">
+                <div className="divide-y divide-amazon-border bg-white">
                   {order.orderItems.map((item) => (
-                    <div key={item.orderItemId} className="p-4">
-                      <div className="flex items-start gap-4">
-                        <div className="relative w-16 h-16 bg-black border border-[#1e2126] rounded-sm flex-shrink-0 overflow-hidden">
+                    <div key={item.orderItemId} className="p-12">
+                      <div className="flex items-start gap-8">
+                        <div className="relative w-28 h-28 bg-white flex-shrink-0 overflow-hidden border border-amazon-border rounded-sm">
                           {item.productImage ? (
                             <Image src={item.productImage} alt={item.productName} fill className="object-cover" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Keyboard className="w-6 h-6 text-gray-600" />
+                            <div className="w-full h-full flex items-center justify-center bg-neutral-50">
+                              <Keyboard className="w-6 h-6 text-amazon-textMuted" />
                             </div>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[12px] font-black uppercase tracking-wider text-white truncate pr-4">{item.productName}</p>
+                          <p className="text-[12px] font-black uppercase tracking-wider text-amazon-text truncate pr-4">{item.productName}</p>
                           <div className="flex items-center justify-between mt-1">
-                            <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
-                              Qty: <span className="text-[#f5d800]">{item.quantity}</span> × {formatCurrency(item.unitPrice)}
+                            <p className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
+                              Qty: <span className="text-amazon-link">{item.quantity}</span> × {formatCurrency(item.unitPrice)}
                             </p>
-                            <p className="text-[13px] font-oswald font-black text-white">{formatCurrency(item.totalPrice)}</p>
+                            {/* <p className="text-[13px] font-oswald font-black text-amazon-text">Total:{" "} {formatCurrency(item.totalPrice)}</p> */}
                           </div>
                         </div>
                       </div>
 
                       {/* Custom Components Nesting */}
                       {item.isCustom && item.orderItemComponents && item.orderItemComponents.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-[#1e2126]/50 pl-6 bg-black/20 rounded-sm p-3 border-l-2 border-l-[#f5d800]/50">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-3 block">Includes Custom Parts:</p>
+                        <div className="mt-4 pt-4 border-t border-amazon-border pl-6 bg-neutral-50 rounded-sm p-3 border-l-4 border-l-amazon-btnSecondary">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-amazon-textMuted mb-3 block">Includes Custom Parts:</p>
                           <div className="space-y-3">
                             {item.orderItemComponents.map((part) => (
                               <div key={part.partId} className="flex items-center gap-3">
-                                <div className="relative w-10 h-10 bg-black border border-[#1e2126] rounded-sm flex-shrink-0 overflow-hidden">
+                                <div className="relative w-10 h-10 bg-white border border-amazon-border rounded-sm flex-shrink-0 overflow-hidden">
                                   {part.partImageUrl ? (
                                     <Image src={part.partImageUrl} alt={part.partName} fill className="object-cover" />
                                   ) : (
-                                    <div className="w-full h-full flex items-center justify-center">
-                                      <Package className="w-4 h-4 text-gray-600" />
+                                    <div className="w-full h-full flex items-center justify-center bg-neutral-50">
+                                      <Package className="w-4 h-4 text-amazon-textMuted" />
                                     </div>
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-[11px] font-bold uppercase tracking-wider text-gray-300 truncate">{part.partName}</p>
-                                  <p className="text-[10px] font-bold text-gray-500">
-                                    Qty: <span className="text-white">{part.quantity}</span> × {formatCurrency(part.partPriceSnapshot)}
+                                  <p className="text-[11px] font-bold uppercase tracking-wider text-amazon-text truncate">{part.partName}</p>
+                                  <p className="text-[10px] font-bold text-amazon-textMuted">
+                                    Qty: <span className="text-amazon-link">{part.quantity}</span> × {formatCurrency(part.partPriceSnapshot)}
                                   </p>
                                 </div>
                               </div>
@@ -482,24 +482,24 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
 
         {/* Footer */}
         {order && !loading && (
-          <div className="px-6 py-4 border-t border-[#1e2126] bg-[#1a1c20] space-y-2">
-            <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest text-gray-400">
+          <div className="px-6 py-4 border-t border-amazon-border bg-neutral-50 space-y-2">
+            <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
               <span>Subtotal:</span>
               <span>{formatCurrency(order.subTotal)}</span>
             </div>
-            <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest text-gray-400">
+            <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
               <span>Shipping Fee:</span>
               <span>{formatCurrency(order.shippingFee)}</span>
             </div>
             {order.discountAmount > 0 && (
-              <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest text-green-400">
+              <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest text-green-600">
                 <span>Discount:</span>
                 <span>-{formatCurrency(order.discountAmount)}</span>
               </div>
             )}
-            <div className="pt-2 border-t border-[#1e2126] flex justify-between items-center">
-              <span className="text-[12px] font-black uppercase tracking-widest text-white">Final Total:</span>
-              <span className="text-xl font-oswald font-black text-[#f5d800]">{formatCurrency(order.totalAmount)}</span>
+            <div className="pt-2 border-t border-amazon-border flex justify-between items-center">
+              <span className="text-[12px] font-black uppercase tracking-widest text-amazon-text">Final Total:</span>
+              <span className="text-xl font-oswald font-black text-amazon-price">{formatCurrency(order.totalAmount)}</span>
             </div>
           </div>
         )}

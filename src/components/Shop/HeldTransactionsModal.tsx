@@ -66,36 +66,36 @@ export default function HeldTransactionsModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden max-h-[85vh] flex flex-col">
+      <div className="relative bg-white rounded-sm shadow-xl border border-amazon-border w-full max-w-lg mx-4 overflow-hidden max-h-[85vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
+        <div className="flex items-center justify-between p-6 border-b border-amazon-border shrink-0">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500">
-              <Clock className="h-5 w-5 text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100">
+              <Clock className="h-5 w-5 text-neutral-600" />
             </div>
-            <h2 className="text-lg font-black uppercase tracking-tight text-black font-oswald">
+            <h2 className="text-lg font-black uppercase tracking-tight text-amazon-text ">
               Số dư đang chờ xử lý
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-sm hover:bg-neutral-100 transition-colors"
           >
-            <X className="h-5 w-5 text-gray-500" />
+            <X className="h-5 w-5 text-amazon-textMuted" />
           </button>
         </div>
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-6">
           {loadingHeld ? (
-            <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+            <div className="flex flex-col items-center justify-center py-16 text-amazon-textMuted">
               <Loader2 className="h-8 w-8 animate-spin mb-3" />
               <p className="text-sm">Đang tải...</p>
             </div>
           ) : heldTransactions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+            <div className="flex flex-col items-center justify-center py-16 text-amazon-textMuted">
               <Inbox className="h-12 w-12 mb-3 opacity-40" />
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-amazon-textMuted">
                 Không có khoản tiền nào đang bị đóng băng.
               </p>
             </div>
@@ -104,21 +104,21 @@ export default function HeldTransactionsModal({
               {heldTransactions.map((tx) => (
                 <div
                   key={tx.transactionId}
-                  className="rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-colors hover:bg-gray-50"
+                  className="rounded-sm border border-amazon-border bg-neutral-50 p-4 transition-colors hover:bg-white hover:shadow-sm"
                 >
                   {/* Top row */}
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex-1 min-w-0">
                       {/* Amount */}
-                      <p className="text-lg font-black text-orange-500 font-oswald">
+                      <p className="text-lg font-black text-amazon-price ">
                         {tx.amount.toLocaleString("vi-VN")}
                         <span className="text-sm ml-1">₫</span>
                       </p>
 
                       {/* Order ID */}
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-amazon-textMuted mt-1">
                         Đơn hàng:{" "}
-                        <span className="font-mono text-blue-600 hover:underline cursor-pointer">
+                        <span className="font-mono text-amazon-link hover:text-amazon-focus hover:underline cursor-pointer">
                           {tx.orderId.slice(0, 8)}…
                         </span>
                       </p>
@@ -131,15 +131,15 @@ export default function HeldTransactionsModal({
                   </div>
 
                   {/* Bottom row */}
-                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-                    <p className="text-[11px] text-gray-400">
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-amazon-border">
+                    <p className="text-[11px] text-neutral-400">
                       {formatDate(tx.date)}
                     </p>
                   </div>
 
                   {/* Reason */}
                   {tx.reason && (
-                    <p className="text-xs text-gray-400 italic mt-1.5">
+                    <p className="text-xs text-neutral-400 italic mt-1.5">
                       {tx.reason}
                     </p>
                   )}

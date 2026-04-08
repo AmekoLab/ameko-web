@@ -580,10 +580,10 @@ const OrderSummary: FC<OrderSummaryProps> = ({
         </div>
 
         {/* Shipping — Pay on Delivery (excluded from Stripe total) */}
-        <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
+        {/* <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
           <span>Shipping</span>
           <span className="italic text-amazon-textMuted normal-case text-xs">Pay on delivery</span>
-        </div>
+        </div> */}
 
         {/* Discount */}
         {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (

@@ -86,10 +86,10 @@ function PinInput({
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             onPaste={handlePaste}
-            className={` w-12 h-14 text-center text-xl font-bold rounded-lg border-2 outline-none transition-all ${
+            className={` w-12 h-14 text-center text-xl font-bold rounded-sm border outline-none transition-all ${
               error
-                ? "border-red-400 focus:border-red-500"
-                : "border-gray-300 focus:border-black"
+                ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                : "border-amazon-border focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus"
             }`}
           />
         ))}
@@ -153,13 +153,13 @@ export default function PinSetupPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* ─── Main Form Card ─────────────────────────── */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+          <div className="bg-white rounded-sm shadow-sm border border-amazon-border p-8">
             {/* Header */}
             <div className="flex items-center gap-3 mb-8">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black">
-                <ShieldCheck className="h-6 w-6 text-white" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
+                <ShieldCheck className="h-6 w-6 text-neutral-600" />
               </div>
-              <h1 className="text-xl font-black uppercase tracking-tight text-black font-oswald">
+              <h1 className="text-xl font-black uppercase tracking-tight text-amazon-text font-oswald">
                 Set up withdrawal PIN
               </h1>
             </div>
@@ -167,17 +167,17 @@ export default function PinSetupPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {/* Current Password */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-amazon-text mb-2">
                   Current Password
                 </label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your account password"
-                    className={`text-black w-full border-2 rounded-lg p-3 pr-12 outline-none transition-all ${
+                    className={`text-amazon-text bg-white w-full border rounded-sm p-3 pr-12 outline-none transition-all ${
                       errors.currentPassword
-                        ? "border-red-400 focus:border-red-500"
-                        : "border-gray-300 focus:border-black"
+                        ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                        : "border-amazon-border focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus"
                     }`}
                     {...register("currentPassword")}
                   />
@@ -201,8 +201,8 @@ export default function PinSetupPage() {
               </div>
 
               {/* New PIN */}
-              <div className="text-black">
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+              <div className="text-amazon-text">
+                <label className="block text-sm font-semibold text-amazon-text mb-3">
                   New PIN (6 digits)
                 </label>
                 <PinInput
@@ -214,8 +214,8 @@ export default function PinSetupPage() {
               </div>
 
               {/* Confirm PIN */}
-              <div className="text-black">
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+              <div className="text-amazon-text">
+                <label className="block text-sm font-semibold text-amazon-text mb-3">
                   Confirm PIN
                 </label>
                 <PinInput 
@@ -229,7 +229,7 @@ export default function PinSetupPage() {
               <button
                 type="submit"
                 disabled={pinSetupLoading}
-                className="w-full rounded-lg bg-[#ce2a32] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-[#b0242b] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-oswald flex items-center justify-center gap-2"
+                className="w-full rounded-sm bg-amazon-btnPrimary px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-amazon-text transition-all hover:brightness-95 active:scale-[0.98] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed font-oswald flex items-center justify-center gap-2"
               >
                 {pinSetupLoading && (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -242,27 +242,27 @@ export default function PinSetupPage() {
 
         {/* ─── Security Tips Sidebar ──────────────────── */}
         <div className="lg:col-span-1">
-          <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 sticky top-24">
+          <div className="bg-neutral-50 rounded-sm border border-amazon-border p-6 sticky top-24">
             <div className="flex items-center gap-2 mb-4">
-              <Info className="h-5 w-5 text-gray-500" />
-              <h3 className="text-sm font-bold uppercase tracking-wide text-gray-700 font-oswald">
+              <Info className="h-5 w-5 text-amazon-textMuted" />
+              <h3 className="text-sm font-bold uppercase tracking-wide text-amazon-text font-oswald">
                 Security Notes
               </h3>
             </div>
 
-            <ul className="space-y-3 text-sm text-gray-600 leading-relaxed">
+            <ul className="space-y-3 text-sm text-amazon-textMuted leading-relaxed">
               <li className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[#ce2a32] flex-shrink-0" />
+                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-neutral-400 flex-shrink-0" />
                 The PIN is used to confirm withdrawal transactions. Do not share
                 this PIN with anyone.
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[#ce2a32] flex-shrink-0" />
+                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-neutral-400 flex-shrink-0" />
                 Choose a PIN that is not easy to guess, avoid using birth dates
                 or repeated numbers (123456, 000000...).
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[#ce2a32] flex-shrink-0" />
+                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-neutral-400 flex-shrink-0" />
                 If you forget your PIN, you can reset it through account
                 verification.
               </li>

@@ -26,7 +26,7 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
     if (!token) {
       toast.info("Please login to add product to cart", {
         position: "top-right",
-        theme: "dark",
+        theme: "light",
       });
       setTimeout(() => {
         router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
@@ -44,7 +44,7 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
       });
       toast.success(`${product.name} added to cart!`, {
         position: "top-right",
-        theme: "dark",
+        theme: "light",
       });
       dispatch(fetchServerCart());
       dispatch(setCartOpen(true));
@@ -53,7 +53,7 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
       toast.error(
         e2.response?.data?.message ||
           "Failed to add item to cart. Please try again.",
-        { position: "top-right", theme: "dark" },
+        { position: "top-right", theme: "light" },
       );
     } finally {
       setIsAddingToCart(false);
@@ -61,62 +61,52 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
   };
 
   return (
-    <div className="group/card relative flex flex-col h-full w-full overflow-hidden rounded-none transition-all duration-300 border border-transparent">
+    <div className="group/card relative flex flex-col h-full w-full overflow-hidden rounded-sm transition-all duration-300 border border-amazon-border bg-white shadow-sm hover:shadow-md">
       {/* IMAGE AREA */}
-      <Link
-        href={`/shop/assembled-product/${product.id}`}
-        className="relative block w-full aspect-square overflow-hidden shrink-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, #242424 0%, #0f0f0f 100%)",
-        }}
+      <div
+        className="relative block w-full aspect-square overflow-hidden shrink-0 bg-neutral-50"
       >
-        {/* Diagonal stripe texture overlay */}
-        <div
-          className="absolute inset-0 z-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse at center, #222324ff 38%, #141415ff 70%)",
-          }}
-        />
+        {/* Diagonal stripe texture overlay removed for light theme */}
 
         {/* Badge */}
         {product.status !== "In Stock" && (
-          <span className="absolute top-0 left-0 z-20 text-[11px] font-black uppercase tracking-wider px-3 py-1.5 rounded-none bg-black text-white">
+          <span className="absolute top-0 left-0 z-20 text-[11px] font-black uppercase tracking-wider px-3 py-1.5 rounded-br-sm bg-neutral-200 text-amazon-text border-b border-r border-amazon-border">
             {product.status}
           </span>
         )}
 
         {/* Product Image */}
-        <Image
-          src={product.image || "/images/placeholder.png"}
-          alt={product.name}
-          fill
-          className="object-contain relative z-10 transition-transform duration-500 ease-out group-hover/card:scale-[1.1]"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-        />
-      </Link>
+        <Link href={`/shop/assembled-product/${product.id}`}>
+          <Image
+            src={product.image || "/images/placeholder.png"}
+            alt={product.name}
+            fill
+            className="object-contain relative z-10 transition-transform duration-500 ease-out group-hover/card:scale-[1.1]"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+          />
+        </Link>
+      </div>
 
       {/* Thin separator */}
       <div className="w-full h-px shrink-0" />
 
       {/* INFO AREA */}
-      <div className="px-4 py-4 flex flex-col flex-grow">
+      <div className="px-4 py-4 flex flex-col flex-grow bg-white border-t border-amazon-border">
         {/* Category */}
-        <p className="text-[10px] text-gray-500 font-bold uppercase mb-1 tracking-wider">
+        <p className="text-[10px] text-amazon-textMuted font-bold uppercase mb-1 tracking-wider">
           {product.category}
         </p>
 
         {/* Product Name */}
-        <h3 className="text-[13px] font-bold text-white leading-snug uppercase tracking-wide line-clamp-2 min-h-[40px] mb-3">
-          <Link href={`/shop/assembled-product/${product.id}`}>
+        <h3 className="text-[13px] font-bold text-amazon-link leading-snug uppercase tracking-wide line-clamp-2 min-h-[25px] mb-1">
+          <Link href={`/shop/assembled-product/${product.id}`} className="hover:text-amazon-link hover:underline transition-colors">
             {product.name}
           </Link>
         </h3>
 
         {/* Price */}
-        <div className="mb-3">
-          <p className="text-[18px] font-black text-white leading-none">
+        <div className="mb-1">
+          <p className="text-[18px] font-black text-amazon-price leading-none">
             {product.price}
           </p>
         </div>
@@ -125,7 +115,7 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
         <button
           onClick={handleAddToCart}
           disabled={isAddingToCart}
-          className="mt-auto flex items-center gap-2 text-[#f5d800] hover:text-[#ffe500] hover:underline text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer w-fit disabled:opacity-60 disabled:cursor-not-allowed"
+          className="mt-auto flex items-center gap-2 text-amazon-text hover:text-amazon-focus hover:underline text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer w-fit disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isAddingToCart ? (
             <Loader2 className="w-5 h-5 shrink-0 animate-spin" />

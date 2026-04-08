@@ -56,7 +56,7 @@ function PinInput({
 
   return (
     <div>
-      <label className="block text-sm font-semibold text-gray-700 mb-3">
+      <label className="block text-sm font-semibold text-amazon-text mb-3">
         {label}
       </label>
       <div className="flex gap-2 justify-center">
@@ -73,10 +73,10 @@ function PinInput({
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             onPaste={handlePaste}
-            className={`w-11 h-13 text-center text-xl font-bold rounded-lg border-2 outline-none transition-all ${
+            className={`w-11 h-13 text-center text-xl font-bold rounded-sm border outline-none transition-all ${
               error
-                ? "border-red-400 focus:border-red-500"
-                : "border-gray-300 focus:border-black"
+                ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                : "border-amazon-border focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus"
             }`}
           />
         ))}
@@ -175,22 +175,22 @@ export default function ChangePinModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+      <div className="relative bg-white rounded-sm shadow-xl border border-amazon-border w-full max-w-md mx-4 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+        <div className="flex items-center justify-between p-6 border-b border-amazon-border">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black">
-              <KeyRound className="h-5 w-5 text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100">
+              <KeyRound className="h-5 w-5 text-neutral-600" />
             </div>
-            <h2 className="text-lg font-black uppercase tracking-tight text-black font-oswald">
+            <h2 className="text-lg font-black uppercase tracking-tight text-amazon-text ">
               Change Withdrawal PIN
             </h2>
           </div>
           <button
             onClick={handleClose}
-            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-sm hover:bg-neutral-100 transition-colors"
           >
-            <X className="h-5 w-5 text-gray-500" />
+            <X className="h-5 w-5 text-amazon-textMuted" />
           </button>
         </div>
 
@@ -233,8 +233,8 @@ export default function ChangePinModal({
           <button
             type="submit"
             disabled={isChangingPin}
-            className="w-full rounded-lg bg-[#ce2a32] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-[#b0242b] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-oswald flex items-center justify-center gap-2"
-          >
+            className="w-full rounded-sm bg-amazon-btnPrimary px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-amazon-text transition-all hover:brightness-95 active:scale-[0.98] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed  flex items-center justify-center gap-2"
+          > 
             {isChangingPin && <Loader2 className="h-4 w-4 animate-spin" />}
             {isChangingPin ? "Processing..." : "Change PIN"}
           </button>

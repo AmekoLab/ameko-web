@@ -211,9 +211,9 @@ export default function EditAssembledProductModal({
   if (!isOpen || !product) return null;
 
   const inputClass =
-    "text-black w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
-  const labelClass = "block text-sm font-semibold text-gray-700 mb-1";
-  const errorClass = "text-xs text-red-500 mt-1";
+    "w-full px-3 py-2 border border-amazon-border rounded-sm text-[13px] tracking-widest text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition placeholder:text-neutral-400";
+  const labelClass = "block text-[13px] tracking-widest text-amazon-textMuted mb-2 font-black uppercase";
+  const errorClass = "text-[13px] font-bold tracking-widest text-red-500 mt-1 uppercase";
 
   function formatPrice(price: number) {
     return new Intl.NumberFormat("vi-VN", {
@@ -230,37 +230,37 @@ export default function EditAssembledProductModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-sm shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto border border-amazon-border">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-200">
+        <div className="flex items-center justify-between p-5 border-b border-amazon-border">
           <div>
-            <h2 className="text-lg font-bold text-gray-800">
+            <h2 className="text-lg font-black text-amazon-text tracking-widest">
               Edit Assembled Product
             </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-[10px] tracking-widest text-amazon-textMuted mt-0.5 uppercase">
               Update the assembled product details.
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition"
+            className="p-1 rounded-sm hover:bg-neutral-50 transition"
             disabled={updating}
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-amazon-textMuted hover:text-amazon-text" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-200 px-5">
+        <div className="flex border-b border-amazon-border px-5 uppercase">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               type="button"
               onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition -mb-px ${
+              className={`px-4 py-3 text-[13px] font-black tracking-widest border-b-2 transition -mb-px ${
                 activeTab === tab.key
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  ? "border-amazon-btnPrimary text-amazon-btnPrimary"
+                  : "border-transparent text-amazon-textMuted hover:text-amazon-text"
               }`}
             >
               {tab.label}
@@ -325,10 +325,10 @@ export default function EditAssembledProductModal({
               </div>
 
               <div className="space-y-3">
-                <p className="text-sm font-bold text-gray-700">Image URLs</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <p className="text-[14px] font-black uppercase tracking-widest text-amazon-text">Image URLs</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                    <label className="block text-[11px] font-black text-amazon-textMuted uppercase tracking-widest mb-2">
                       Image 1
                     </label>
                     <input
@@ -338,7 +338,7 @@ export default function EditAssembledProductModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                    <label className="block text-[11px] font-black text-amazon-textMuted uppercase tracking-widest mb-2">
                       Image 2
                     </label>
                     <input
@@ -348,7 +348,7 @@ export default function EditAssembledProductModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                    <label className="block text-[11px] font-black text-amazon-textMuted uppercase tracking-widest mb-2">
                       Image 3
                     </label>
                     <input
@@ -374,8 +374,8 @@ export default function EditAssembledProductModal({
           {/* Tab: Specifications */}
           {activeTab === "specs" && (
             <div className="space-y-4">
-              <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
-                <p className="text-sm font-bold text-indigo-800 mb-3">
+              <div className="p-5 bg-indigo-50 border border-indigo-200 rounded-sm shadow-sm">
+                <p className="text-[11px] font-black uppercase tracking-widest text-indigo-800 mb-4">
                   Keyboard Specifications
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -428,7 +428,7 @@ export default function EditAssembledProductModal({
           {activeTab === "components" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-gray-700">
+                <p className="text-[14px] font-black uppercase tracking-widest text-amazon-text">
                   Component Details ({fields.length})
                 </p>
                 <button
@@ -441,7 +441,7 @@ export default function EditAssembledProductModal({
                       soundUrl: "",
                     })
                   }
-                  className="px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition flex items-center gap-1"
+                  className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amazon-text bg-amazon-bgSecondary border border-amazon-btnPrimary/20 rounded-sm hover:bg-amazon-btnPrimary/20 transition flex items-center gap-1 shadow-sm"
                 >
                   <Plus className="w-3 h-3" />
                   Add Component
@@ -458,33 +458,33 @@ export default function EditAssembledProductModal({
                 {fields.map((field, index) => (
                   <div
                     key={field.id}
-                    className="p-4 bg-gray-50 border border-gray-200 rounded-lg space-y-3 relative"
+                    className="p-5 bg-neutral-50 border border-amazon-border rounded-sm space-y-4 relative shadow-sm"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-gray-500">
+                      <span className="text-[11px] font-black uppercase tracking-widest text-amazon-textMuted">
                         Component #{index + 1}
                       </span>
                       {fields.length > 1 && (
                         <button
                           type="button"
                           onClick={() => remove(index)}
-                          className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition"
+                          className="p-1 rounded-sm border border-transparent text-red-400 hover:text-red-600 hover:bg-red-50 hover:border-red-200 transition"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                        <label className="block text-[11px] font-black uppercase tracking-widest text-amazon-textMuted mb-2">
                           Base Kit *
                         </label>
                         <select
                           {...register(`details.${index}.baseKitId`)}
                           className={inputClass}
                         >
-                          <option value="">— Select a kit —</option>
+                          <option value="">— SELECT A KIT —</option>
                           {kitParts.map((kit) => (
                             <option key={kit.id} value={kit.id}>
                               {kit.name} ({kit.slug})
@@ -498,14 +498,14 @@ export default function EditAssembledProductModal({
                         )}
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                        <label className="block text-[11px] font-black uppercase tracking-widest text-amazon-textMuted mb-2">
                           Component *
                         </label>
                         <select
                           {...register(`details.${index}.componentId`)}
                           className={inputClass}
                         >
-                          <option value="">— Select a component —</option>
+                          <option value="">— SELECT A COMPONENT —</option>
                           {Object.entries(partsByType).map(([type, items]) => (
                             <optgroup
                               key={type}
@@ -528,7 +528,7 @@ export default function EditAssembledProductModal({
                         )}
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                        <label className="block text-[11px] font-black uppercase tracking-widest text-amazon-textMuted mb-2">
                           Quantity *
                         </label>
                         <input
@@ -544,7 +544,7 @@ export default function EditAssembledProductModal({
                         )}
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                        <label className="block text-[11px] font-black uppercase tracking-widest text-amazon-textMuted mb-2">
                           Sound URL
                         </label>
                         <input
@@ -561,21 +561,21 @@ export default function EditAssembledProductModal({
           )}
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-3 border-t border-gray-100">
+          <div className="flex justify-end gap-3 pt-5 border-t border-amazon-border mt-6">
             <button
               type="button"
               onClick={handleClose}
               disabled={updating}
-              className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition disabled:opacity-50"
+              className="px-5 py-2.5 text-[13px] tracking-widest text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={updating}
-              className="px-5 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2.5 text-[13px] font-black tracking-widest text-amazon-text bg-amazon-btnPrimary rounded-sm hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
             >
-              {updating && <Loader2 className="w-4 h-4 animate-spin" />}
+              {updating && <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />}
               {updating ? "Updating..." : "Update Product"}
             </button>
           </div>
