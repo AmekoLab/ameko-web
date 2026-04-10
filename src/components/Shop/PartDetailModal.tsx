@@ -69,7 +69,7 @@ export default function PartDetailModal({
       <div className="bg-white rounded-sm shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto border border-amazon-border">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-amazon-border bg-neutral-50 shrink-0">
-          <h2 className="text-lg font-black text-amazon-text uppercase tracking-widest">Part Details</h2>
+          <h2 className="text-lg font-bold text-amazon-text">Part Details</h2>
           <button
             onClick={handleClose}
             className="p-1 rounded-sm hover:bg-white border border-transparent hover:border-amazon-border transition shadow-sm"
@@ -83,10 +83,10 @@ export default function PartDetailModal({
           {detailLoading ? (
             <div className="flex items-center justify-center py-16 text-amazon-textMuted gap-2">
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span className="text-[13px]  tracking-widest">Loading part details...</span>
+              <span className="text-[13px] font-medium">Loading part details...</span>
             </div>
           ) : !selectedPart ? (
-            <div className="py-16 text-center text-amazon-textMuted text-[13px]  tracking-widest">
+            <div className="py-16 text-center text-amazon-textMuted text-[13px] font-medium">
               Part not found.
             </div>
           ) : (
@@ -98,7 +98,7 @@ export default function PartDetailModal({
         <div className="flex justify-end px-6 py-5 border-t border-amazon-border bg-neutral-50/50 shrink-0">
           <button
             onClick={handleClose}
-            className="px-5 py-2.5 text-[11px] font-black uppercase tracking-widest text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition shadow-sm"
+            className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition shadow-sm"
           >
             Close
           </button>
@@ -160,26 +160,26 @@ function PartDetailContent({ part }: { part: PartItem }) {
         {/* Info */}
         <div className="flex-1 min-w-0 space-y-3">
           <div>
-            <h3 className="text-xl font-black text-amazon-text uppercase tracking-widest truncate">{part.name}</h3>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mt-1 truncate">{part.slug}</p>
+            <h3 className="text-[18px] font-bold text-amazon-text truncate">{part.name}</h3>
+            <p className="text-[12px] text-amazon-textMuted mt-1 truncate">{part.slug}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <span
-              className={`text-[9px] font-black px-2 py-0.5 rounded-sm uppercase tracking-widest ${typeStyle.bg} ${typeStyle.color}`}
+              className={`text-[11px] font-medium px-2 py-0.5 rounded-sm ${typeStyle.bg} ${typeStyle.color}`}
             >
               {typeStyle.label}
             </span>
             <span
-              className={`text-[9px] font-black px-2 py-0.5 rounded-sm uppercase tracking-widest ${statusInfo.cls}`}
+              className={`text-[11px] font-medium px-2 py-0.5 rounded-sm ${statusInfo.cls}`}
             >
               {statusInfo.label}
             </span>
-            <span className="text-[10px] font-bold text-amazon-textMuted uppercase tracking-widest border border-amazon-border px-2 py-0.5 rounded-sm shadow-sm bg-white">
+            <span className="text-[12px] font-medium text-amazon-textMuted border border-amazon-border px-2 py-0.5 rounded-sm shadow-sm bg-white">
               {part.categoryName}
             </span>
           </div>
           {part.description && (
-            <p className="text-[11px] text-amazon-textMuted font-bold tracking-widest leading-relaxed mt-2 uppercase">
+            <p className="text-[13px] text-amazon-textMuted font-normal leading-relaxed mt-2">
               {part.description}
             </p>
           )}
@@ -207,24 +207,24 @@ function PartDetailContent({ part }: { part: PartItem }) {
       {/* Recipe (kit) */}
       {(part.recipeSwitchCount > 0 || part.recipeStabilizerCount > 0) && (
         <div className="p-5 bg-purple-50 border border-purple-200 rounded-sm shadow-sm">
-          <p className="text-[11px] font-black uppercase tracking-widest text-purple-800 mb-4">Kit Recipe</p>
+          <p className="text-[13px] font-bold text-purple-800 mb-4">Kit Recipe</p>
           <div className="flex gap-8">
             {part.recipeSwitchCount > 0 && (
               <div className="text-center">
-                <p className="text-3xl font-black text-purple-700">
+                <p className="text-[24px] font-bold text-purple-700">
                   {part.recipeSwitchCount}
                 </p>
-                <p className="text-[10px] uppercase tracking-widest text-purple-500 font-bold mt-1">
+                <p className="text-[12px] font-medium text-purple-600 mt-1">
                   Switches
                 </p>
               </div>
             )}
             {part.recipeStabilizerCount > 0 && (
               <div className="text-center">
-                <p className="text-3xl font-black text-purple-700">
+                <p className="text-[24px] font-bold text-purple-700">
                   {part.recipeStabilizerCount}
                 </p>
-                <p className="text-[10px] uppercase tracking-widest text-purple-500 font-bold mt-1">
+                <p className="text-[12px] font-medium text-purple-600 mt-1">
                   Stabilizers
                 </p>
               </div>
@@ -236,7 +236,7 @@ function PartDetailContent({ part }: { part: PartItem }) {
       {/* Specifications / Workflow */}
       {specs && (
         <div className="p-5 bg-neutral-50 border border-amazon-border rounded-sm space-y-4 shadow-sm">
-          <p className="text-[11px] font-black uppercase tracking-widest text-amazon-text">
+          <p className="text-[13px] font-bold text-amazon-text">
             Specifications (Workflow)
           </p>
           <div className="divide-y divide-amazon-border">
@@ -246,17 +246,17 @@ function PartDetailContent({ part }: { part: PartItem }) {
                 className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
               >
                 <div className="flex items-center gap-4">
-                  <span className="w-7 h-7 rounded-full bg-white border border-amazon-border text-amazon-text text-[11px] font-black flex items-center justify-center shadow-sm">
+                  <span className="w-7 h-7 rounded-full bg-white border border-amazon-border text-amazon-text text-[12px] font-bold flex items-center justify-center shadow-sm">
                     {idx + 1}
                   </span>
                   <div>
-                    <p className="text-[11px] font-black uppercase tracking-widest text-amazon-text">
+                    <p className="text-[13px] font-medium text-amazon-text">
                       {step.title}
                     </p>
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-amazon-textMuted mt-0.5">{step.step}</p>
+                    <p className="text-[11px] text-amazon-textMuted mt-0.5">{step.step}</p>
                   </div>
                 </div>
-                <span className="text-[12px] text-amazon-text">
+                <span className="text-[13px] font-bold text-amazon-text">
                   x{step.quantity}
                 </span>
               </div>
@@ -285,11 +285,11 @@ function StatCard({
 }) {
   return (
     <div className="bg-white border border-amazon-border rounded-sm p-4 shadow-sm flex flex-col justify-center">
-      <p className="text-[9px] text-amazon-textMuted font-bold uppercase tracking-widest mb-1.5">
+      <p className="text-[11px] text-amazon-textMuted font-medium mb-1">
         {label}
       </p>
       <p
-        className={`font-black uppercase tracking-widest truncate ${small ? "text-[10px]" : "text-[13px]"} ${valueColor || "text-amazon-text"}`}
+        className={`font-bold truncate ${small ? "text-[12px]" : "text-[14px]"} ${valueColor || "text-amazon-text"}`}
       >
         {value}
       </p>
@@ -299,13 +299,13 @@ function StatCard({
 
 function ImageLink({ label, url }: { label: string; url: string }) {
   return (
-    <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest text-amazon-textMuted bg-neutral-50 border border-amazon-border p-2 rounded-sm shadow-sm">
-      <span className="font-black text-amazon-text uppercase shrink-0">{label}:</span>
+    <div className="flex items-center gap-3 text-[12px] text-amazon-textMuted bg-neutral-50 border border-amazon-border p-2 rounded-sm shadow-sm">
+      <span className="font-medium text-amazon-text shrink-0">{label}:</span>
       <a
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="truncate hover:text-amazon-btnPrimary transition flex items-center gap-1 uppercase"
+        className="truncate hover:text-amazon-btnPrimary transition flex items-center gap-1"
       >
         {url}
         <ExternalLink className="w-3 h-3 shrink-0 ml-1" />

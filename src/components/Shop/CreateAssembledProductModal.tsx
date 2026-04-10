@@ -221,9 +221,9 @@ export default function CreateAssembledProductModal({
   if (!isOpen) return null;
 
   const inputClass =
-    "w-full px-3 py-2 border border-amazon-border rounded-sm text-[13px] tracking-widest text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition placeholder:text-neutral-400";
-  const labelClass = "block text-[14px] tracking-widest text-amazon-textMuted mb-2 font-black uppercase";
-  const errorClass = "text-[13px] font-bold tracking-widest text-red-500 mt-1 uppercase";
+    "w-full px-3 py-2 border border-amazon-border rounded-sm text-[13px] font-medium text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition placeholder:text-neutral-400";
+  const labelClass = "block text-[13px] font-medium text-amazon-text mb-1";
+  const errorClass = "text-[11px] font-medium text-red-500 mt-1";
 
   function formatPrice(price: number) {
     return new Intl.NumberFormat("vi-VN", {
@@ -271,10 +271,10 @@ export default function CreateAssembledProductModal({
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-amazon-border">
           <div>
-            <h2 className="text-lg font-black text-amazon-text tracking-widest">
+            <h2 className="text-lg font-bold text-amazon-text">
               Create Assembled Product
             </h2>
-            <p className="text-[10px] tracking-widest text-amazon-textMuted mt-0.5 uppercase">
+            <p className="text-[12px] text-amazon-textMuted mt-0.5">
               Add a new assembled keyboard product to your shop.
             </p>
           </div>
@@ -288,13 +288,13 @@ export default function CreateAssembledProductModal({
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-amazon-border px-5 uppercase">
+        <div className="flex border-b border-amazon-border px-5">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               type="button"
               onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-3 text-[11px] font-black tracking-widest border-b-2 transition -mb-px ${
+              className={`px-4 py-3 text-[13px] font-medium border-b-2 transition -mb-px ${
                 activeTab === tab.key
                   ? "border-amazon-btnPrimary text-amazon-btnPrimary"
                   : "border-transparent text-amazon-textMuted hover:text-amazon-text"
@@ -369,11 +369,11 @@ export default function CreateAssembledProductModal({
 
               {/* Image Uploads */}
               <div className="space-y-3">
-                <p className="text-[14px] font-black uppercase tracking-widest text-amazon-text">Product Images</p>
+                <p className="text-[14px] font-bold text-amazon-text">Product Images</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {imageFields.map(({ label, field, ref, isUploading, setUploading, watched }) => (
                     <div key={field}>
-                      <label className="block text-[11px] font-black text-amazon-textMuted uppercase tracking-widest mb-2">
+                      <label className="block text-[12px] font-medium text-amazon-textMuted mb-2">
                         {label}
                       </label>
                       {/* Hidden file input */}
@@ -414,7 +414,7 @@ export default function CreateAssembledProductModal({
                           ) : (
                             <Upload className="w-5 h-5" />
                           )}
-                          <span className="text-[10px] font-bold uppercase tracking-widest">
+                          <span className="text-[12px] font-medium">
                             {isUploading ? "Uploading..." : "Click to upload"}
                           </span>
                         </button>
@@ -453,8 +453,8 @@ export default function CreateAssembledProductModal({
                   <div className="relative w-full h-20 rounded-sm border border-emerald-500 bg-emerald-50 flex items-center justify-center gap-3 px-4 shadow-sm">
                     <Box className="w-5 h-5 text-emerald-600 shrink-0" />
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[11px] font-black uppercase tracking-widest text-emerald-700">3D Model Uploaded</span>
-                      <span className="text-[10px] font-bold tracking-widest text-emerald-600 truncate max-w-[200px]">{watchedView3D.split("/").pop()}</span>
+                      <span className="text-[12px] font-medium text-emerald-700">3D Model Uploaded</span>
+                      <span className="text-[12px] text-emerald-600 truncate max-w-[200px]">{watchedView3D.split("/").pop()}</span>
                     </div>
                     <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
                     <button
@@ -478,7 +478,7 @@ export default function CreateAssembledProductModal({
                     ) : (
                       <Box className="w-5 h-5" />
                     )}
-                    <span className="text-[10px] font-bold uppercase tracking-widest">
+                    <span className="text-[12px] font-medium">
                       {isUploading3D ? "Uploading..." : "Click to upload .glb"}
                     </span>
                   </button>
@@ -491,7 +491,7 @@ export default function CreateAssembledProductModal({
           {activeTab === "specs" && (
             <div className="space-y-4">
               <div className="p-5 bg-indigo-50 border border-indigo-200 rounded-sm shadow-sm">
-                <p className="text-[11px] font-black uppercase tracking-widest text-indigo-800 mb-4">
+                <p className="text-[13px] font-bold text-indigo-800 mb-4">
                   Keyboard Specifications
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -544,7 +544,7 @@ export default function CreateAssembledProductModal({
           {activeTab === "components" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-[14px] font-black uppercase tracking-widest text-amazon-text">
+                <p className="text-[14px] font-bold text-amazon-text">
                   Component Details ({fields.length})
                 </p>
                 <button
@@ -557,7 +557,7 @@ export default function CreateAssembledProductModal({
                       soundUrl: "",
                     })
                   }
-                  className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amazon-btnPrimary bg-amazon-btnPrimary/10 border border-amazon-btnPrimary/20 rounded-sm hover:bg-amazon-btnPrimary/20 transition flex items-center gap-1 shadow-sm"
+                  className="px-3 py-1.5 text-[12px] font-medium text-amazon-btnPrimary bg-amazon-btnPrimary/10 border border-amazon-btnPrimary/20 rounded-sm hover:bg-amazon-btnPrimary/20 transition flex items-center gap-1 shadow-sm"
                 >
                   <Plus className="w-3 h-3" />
                   Add Component
@@ -577,7 +577,7 @@ export default function CreateAssembledProductModal({
                     className="p-5 bg-neutral-50 border border-amazon-border rounded-sm space-y-4 relative shadow-sm"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-black uppercase tracking-widest text-amazon-textMuted">
+                      <span className="text-[13px] font-bold text-amazon-textMuted">
                         Component #{index + 1}
                       </span>
                       {fields.length > 1 && (
@@ -593,14 +593,14 @@ export default function CreateAssembledProductModal({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[11px] font-black uppercase tracking-widest text-amazon-textMuted mb-2">
+                        <label className="block text-[13px] font-medium text-amazon-text mb-1">
                           Base Kit *
                         </label>
                         <select
                           {...register(`details.${index}.baseKitId`)}
                           className={inputClass}
                         >
-                          <option value="">— SELECT A KIT —</option>
+                          <option value="">— Select a kit —</option>
                           {kitParts.map((kit) => (
                             <option key={kit.id} value={kit.id}>
                               {kit.name} ({kit.slug})
@@ -614,14 +614,14 @@ export default function CreateAssembledProductModal({
                         )}
                       </div>
                       <div>
-                        <label className="block text-[11px] font-black uppercase tracking-widest text-amazon-textMuted mb-2">
+                        <label className="block text-[13px] font-medium text-amazon-text mb-1">
                           Component *
                         </label>
                         <select
                           {...register(`details.${index}.componentId`)}
                           className={inputClass}
                         >
-                          <option value="">— SELECT A COMPONENT —</option>
+                          <option value="">— Select a component —</option>
                           {Object.entries(partsByType).map(([type, items]) => (
                             <optgroup
                               key={type}
@@ -644,7 +644,7 @@ export default function CreateAssembledProductModal({
                         )}
                       </div>
                       <div>
-                        <label className="block text-[11px] font-black uppercase tracking-widest text-amazon-textMuted mb-2">
+                        <label className="block text-[13px] font-medium text-amazon-text mb-1">
                           Quantity *
                         </label>
                         <input
@@ -661,7 +661,7 @@ export default function CreateAssembledProductModal({
                         )}
                       </div>
                       <div>
-                        <label className="block text-[11px] font-black uppercase tracking-widest text-amazon-textMuted mb-2">
+                        <label className="block text-[13px] font-medium text-amazon-text mb-1">
                           Sound URL
                         </label>
                         <input
@@ -683,14 +683,14 @@ export default function CreateAssembledProductModal({
               type="button"
               onClick={handleClose}
               disabled={creating}
-              className="px-5 py-2.5 text-[13px] tracking-widest text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
+              className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={creating}
-              className="px-5 py-2.5 text-[13px] font-black tracking-widest text-amazon-text bg-amazon-btnPrimary rounded-sm hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
+              className="px-5 py-2 text-[13px] font-medium text-amazon-text bg-amazon-btnPrimary border border-amazon-border rounded-sm hover:brightness-95 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
             >
               {creating && <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />}
               {creating ? "Creating..." : "Create Product"}

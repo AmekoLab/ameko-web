@@ -14,7 +14,11 @@ import Image from "next/image";
 const commissionSchema = z
   .object({
     title: z.string().min(1, "Title cannot be empty"),
-    description: z.string().min(1, "Description cannot be empty"),
+    layout: z.string().min(1, "Please specify a layout"),
+    switchPref: z.string().min(1, "Please specify switch preferences"),
+    keycapPref: z.string().min(1, "Please specify keycap preferences"),
+    casePlatePref: z.string().min(1, "Please specify case & plate preferences"),
+    additionalNotes: z.string().optional(),
     quantity: z.number().min(1, "Minimum quantity is 1"),
     minBudget: z.number().min(0, "Minimum budget must be >= 0"),
     maxBudget: z.number().min(0, "Maximum budget must be >= 0"),
@@ -58,7 +62,11 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
     resolver: zodResolver(commissionSchema),
     defaultValues: {
       title: "",
-      description: "",
+      layout: "",
+      switchPref: "",
+      keycapPref: "",
+      casePlatePref: "",
+      additionalNotes: "",
       quantity: 1,
       minBudget: 0,
       maxBudget: 0,
@@ -86,12 +94,22 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
 
   const onSubmit = async (data: CommissionFormData) => {
     const isDraft = submitType === "draft";
+
+    // Compile the detailed description
+    const compiledDescription = `
+Layout: ${data.layout}
+Switch Preferences: ${data.switchPref}
+Keycap Preferences: ${data.keycapPref}
+Case & Plate: ${data.casePlatePref}
+Additional Notes: ${data.additionalNotes || "None"}
+    `.trim();
+
     try {
       await dispatch(
         createCommissionRequest({
           ...(targetedShopId ? { targetedShopId } : {}),
           title: data.title,
-          description: data.description,
+          description: compiledDescription,
           referenceImages: data.referenceImages,
           minBudget: data.minBudget,
           maxBudget: data.maxBudget,
@@ -168,22 +186,85 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
             )}
           </div>
 
-          {/* Description */}
+          {/* Layout */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
-              Detailed description <span className="text-red-600">*</span>
+              Layout <span className="text-red-600">*</span>
+            </label>
+            <select
+              {...register("layout")}
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
+            >
+              <option value="">Select layout</option>
+              <option value="60%">60%</option>
+              <option value="65%">65%</option>
+              <option value="75%">75%</option>
+              <option value="TKL (80%)">TKL (80%)</option>
+              <option value="Full-size (100%)">Full-size (100%)</option>
+              <option value="Alice/Arisu">Alice/Arisu</option>
+              <option value="Other">Other</option>
+            </select>
+            {errors.layout && (
+              <p className="text-xs text-red-500 mt-1">{errors.layout.message}</p>
+            )}
+          </div>
+
+          {/* Switch Preferences */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
+              Switch Preferences <span className="text-red-600">*</span>
+            </label>
+            <input
+              {...register("switchPref")}
+              placeholder="e.g., Thocky linear, tactile, silent, etc."
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
+            />
+            {errors.switchPref && (
+              <p className="text-xs text-red-500 mt-1">{errors.switchPref.message}</p>
+            )}
+          </div>
+
+          {/* Keycap Preferences */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
+              Keycap Preferences <span className="text-red-600">*</span>
+            </label>
+            <input
+              {...register("keycapPref")}
+              placeholder="e.g., Cherry profile, PBT material, dark colors"
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
+            />
+            {errors.keycapPref && (
+              <p className="text-xs text-red-500 mt-1">{errors.keycapPref.message}</p>
+            )}
+          </div>
+
+          {/* Case & Plate */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
+              Case & Plate <span className="text-red-600">*</span>
+            </label>
+            <input
+              {...register("casePlatePref")}
+              placeholder="e.g., Aluminum case (black), FR4 plate"
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
+            />
+            {errors.casePlatePref && (
+              <p className="text-xs text-red-500 mt-1">{errors.casePlatePref.message}</p>
+            )}
+          </div>
+
+          {/* Additional Notes */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
+              Additional Notes
             </label>
             <textarea
-              {...register("description")}
-              rows={3}
-              placeholder="Describe your request..."
-              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors resize-none placeholder-gray-400"
+              {...register("additionalNotes")}
+              rows={2}
+              placeholder="Any other specific requirements?"
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors resize-none placeholder-gray-400"
             />
-            {errors.description && (
-              <p className="text-xs text-red-500 mt-1">
-                {errors.description.message}
-              </p>
-            )}
           </div>
 
           {/* Quantity */}

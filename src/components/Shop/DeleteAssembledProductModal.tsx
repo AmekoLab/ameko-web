@@ -64,10 +64,10 @@ export default function DeleteAssembledProductModal({
               <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
             <div>
-              <h2 className="text-[14px] font-black tracking-widest text-red-900 uppercase">
+              <h2 className="text-lg font-bold text-red-900">
                 Delete Assembled Product
               </h2>
-              <p className="text-[10px] font-bold tracking-widest text-red-700  mt-0.5">
+              <p className="text-[12px] font-medium text-red-700 mt-0.5">
                 This action cannot be undone
               </p>
             </div>
@@ -83,18 +83,18 @@ export default function DeleteAssembledProductModal({
 
         {/* Body */}
         <div className="px-6 py-5 space-y-4">
-          <p className="text-[11px] font-bold tracking-widest text-amazon-textMuted ">
+          <p className="text-[13px] font-medium text-amazon-textMuted">
             You are about to permanently delete the assembled product:
           </p>
 
           {/* Product info card */}
           <div className="bg-neutral-50 rounded-sm border border-amazon-border p-4 shadow-sm">
-            <p className="font-black text-amazon-text text-[11px] tracking-widest uppercase">{product.name}</p>
-            <p className="text-[10px] font-bold text-amazon-textMuted  tracking-widest mt-1">
+            <p className="font-bold text-amazon-text text-[13px]">{product.name}</p>
+            <p className="text-[12px] text-amazon-textMuted mt-1">
               Layout:{" "}
-              <span className="font-black text-amazon-text">{product.layout || "N/A"}</span>{" "}
+              <span className="font-medium text-amazon-text">{product.layout || "N/A"}</span>{" "}
               &middot; Components:{" "}
-              <span className="font-black text-amazon-text">
+              <span className="font-medium text-amazon-text">
                 {product.details?.length || 0}
               </span>
             </p>
@@ -103,9 +103,9 @@ export default function DeleteAssembledProductModal({
 
           {/* Confirmation input */}
           <div className="pt-2">
-            <label className="block text-[11px] text-amazon-textMuted tracking-widest  font-bold mb-2">
+            <label className="block text-[13px] text-amazon-textMuted font-medium mb-2">
               Type{" "}
-              <span className="font-black text-amazon-btnPrimary">{product.name}</span> to
+              <span className="font-bold text-amazon-text">{product.name}</span> to
               confirm:
             </label>
             <input
@@ -114,7 +114,7 @@ export default function DeleteAssembledProductModal({
               onChange={(e) => setConfirmText(e.target.value)}
               disabled={deleting}
               placeholder={product.name}
-              className="w-full px-3 py-2 border border-amazon-border rounded-sm text-[13px] tracking-widest text-amazon-text focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition disabled:opacity-50 disabled:bg-neutral-50 mb-2 placeholder:text-neutral-300"
+              className="w-full px-3 py-2 border border-amazon-border rounded-sm text-[13px] font-medium text-amazon-text focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition disabled:opacity-50 disabled:bg-neutral-50 mb-2 placeholder:text-neutral-300"
             />
           </div>
         </div>
@@ -124,14 +124,14 @@ export default function DeleteAssembledProductModal({
           <button
             onClick={handleClose}
             disabled={deleting}
-            className="px-5 py-2.5 text-[13px] font-black tracking-widest  text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
+            className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
           >
             Cancel
           </button>
           <button
             onClick={handleDelete}
             disabled={!canDelete || deleting}
-            className="px-5 py-2.5 text-[13px] font-black tracking-widest  text-white bg-red-600 rounded-sm hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+            className="px-5 py-2 text-[13px] font-medium text-white bg-red-600 rounded-sm hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
           >
             {deleting ? (
               <>

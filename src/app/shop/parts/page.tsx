@@ -190,32 +190,32 @@ export default function ShopPartsPage() {
   ];
 
   return (
-    <div className="py-6 px-2 md:px-6 relative bg-amazon-bgSecondary min-h-screen">
+    <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary min-h-screen">
       <div className="max-w-[1440px] w-full mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-end mb-6 border-b border-amazon-border pb-4">
+        <div className="flex justify-between items-end mb-5 border-b border-amazon-border pb-4">
           <div>
-            <h1 className="text-3xl font-black text-amazon-text mb-2 uppercase tracking-widest flex items-center gap-3">
-              <Package className="w-8 h-8 text-amazon-text" />
+            <h1 className="text-2xl font-bold text-amazon-text mb-1 flex items-center gap-2">
+              {/* <Package className="w-7 h-7 text-amazon-textMuted" /> */}
               Part Management
             </h1>
-            <p className="text-[11px] font-bold text-amazon-textMuted  tracking-widest">
+            <p className="text-[13px] font-medium text-amazon-textMuted">
               Manage your shop&apos;s parts and components.{" "}
-              <span className="font-black text-amazon-text">{total}</span> parts
+              <span className="font-bold text-amazon-text">{total}</span> parts
               total.
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsCheckStockOpen(true)}
-              className="px-5 py-2.5 bg-white border border-amazon-border text-amazon-textMuted text-[11px] font-black uppercase tracking-widest rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition flex items-center gap-2 shadow-sm"
+              className="px-5 py-2 bg-white border border-amazon-border text-amazon-textMuted text-[13px] font-medium rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition flex items-center gap-2 shadow-sm"
             >
               <ClipboardCheck className="w-4 h-4" />
               Check Stock
             </button>
             <button
               onClick={() => setIsCreateOpen(true)}
-              className="px-5 py-2.5 bg-amazon-btnPrimary text-amazon-text text-[11px] font-black uppercase tracking-widest rounded-sm hover:opacity-90 transition flex items-center gap-2 shadow-sm"
+              className="px-5 py-2 bg-amazon-btnPrimary border border-amazon-border text-amazon-text text-[13px] font-medium rounded-sm hover:brightness-95 transition flex items-center gap-2 shadow-sm"
             >
               <Plus className="w-4 h-4" />
               Create Part
@@ -268,7 +268,7 @@ export default function ShopPartsPage() {
               placeholder="Search parts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-amazon-border rounded-sm text-[13px] tracking-widest bg-white text-amazon-text focus:outline-none focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary transition placeholder:text-neutral-400"
+              className="w-full pl-9 pr-3 py-2 border border-amazon-border rounded-sm text-[13px] font-medium bg-white text-amazon-text focus:outline-none focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary transition placeholder:text-neutral-400"
             />
           </div>
 
@@ -282,14 +282,14 @@ export default function ShopPartsPage() {
                   <button
                     key={type}
                     onClick={() => setActiveType(type)}
-                    className={`px-4 py-2 text-[13px] font-black  tracking-widest rounded-sm border transition-colors ${
+                    className={`px-4 py-2 text-[13px] font-medium rounded-sm border transition-colors ${
                       isActive
                         ? "bg-amazon-btnPrimary text-amazon-text border-amazon-btnPrimary shadow-sm"
                         : "bg-white text-amazon-textMuted border-amazon-border hover:bg-neutral-50 hover:text-amazon-text"
                     }`}
                   >
                     All
-                    <span className="ml-1 bg-white/40 px-1 py-0.5 rounded-sm">{count}</span>
+                    <span className="ml-1 bg-white/40 border border-amazon-border/20 px-1 py-0.5 text-[11px] rounded-sm">{count}</span>
                   </button>
                 );
               }
@@ -298,7 +298,7 @@ export default function ShopPartsPage() {
                 <button
                   key={type}
                   onClick={() => setActiveType(type)}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-sm border transition-colors flex items-center gap-2 ${
+                  className={`px-4 py-2 text-[13px] font-medium rounded-sm border transition-colors flex items-center gap-2 ${
                     isActive
                       ? "bg-amazon-btnPrimary text-amazon-text border-amazon-btnPrimary shadow-sm"
                       : "bg-white text-amazon-textMuted border-amazon-border hover:bg-neutral-50 hover:text-amazon-text"
@@ -306,7 +306,7 @@ export default function ShopPartsPage() {
                 >
                   <cfg.icon className="w-3.5 h-3.5" />
                   {cfg.label}
-                  <span className="bg-white/40 px-1 py-0.5 rounded-sm">{count}</span>
+                  <span className="bg-white/40 border border-amazon-border/20 px-1 py-0.5 text-[11px] rounded-sm">{count}</span>
                 </button>
               );
             })}
@@ -316,18 +316,18 @@ export default function ShopPartsPage() {
         {/* Table */}
         <div className="bg-white rounded-sm border border-amazon-border overflow-hidden shadow-sm">
           {loading ? (
-            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
+            <div className="p-12 text-center text-[13px] font-medium text-amazon-textMuted">
               Loading parts...
             </div>
           ) : filteredParts.length === 0 ? (
-            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
+            <div className="p-12 text-center text-[13px] font-medium text-amazon-textMuted">
               No parts found.
             </div>
           ) : (
             <div className="min-w-full overflow-x-auto">
-              <table className="w-full text-[13px] font-black  tracking-widest text-left">
-                <thead>
-                  <tr className="bg-neutral-50 border-b border-amazon-border text-amazon-textMuted">
+              <table className="w-full text-[13px] font-medium text-left">
+                <thead className="bg-neutral-50 text-[11px] font-medium text-amazon-textMuted border-b border-amazon-border">
+                  <tr>
                     <th className="px-3 py-3">Part</th>
                     <th className="px-2 py-2">Type</th>
                     <th className="px-2 py-2">Category</th>
@@ -406,8 +406,8 @@ function PartRow({
             )}
           </div>
           <div className="min-w-0 max-w-[120px] lg:max-w-[200px]">
-            <p className="font-black text-amazon-text text-[14px] tracking-wider truncate">{part.name}</p>
-            <p className="text-[10px] font-bold text-amazon-textMuted tracking-widest truncate">{part.slug}</p>
+            <p className="font-medium text-amazon-text text-[13px] truncate">{part.name}</p>
+            <p className="text-[12px] text-amazon-textMuted truncate">{part.slug}</p>
           </div>
         </div>
       </td>
@@ -415,7 +415,7 @@ function PartRow({
       {/* Type */}
       <td className="px-2 py-2">
         <span
-          className={`inline-flex items-center gap-1 text-[13px] font-black px-1.5 py-0.5 rounded-sm tracking-widest ${typeCfg.bgColor} ${typeCfg.color}`}
+          className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-sm ${typeCfg.bgColor} ${typeCfg.color}`}
         >
           <TypeIcon className="w-2.5 h-2.5" />
           {typeCfg.label}
@@ -424,14 +424,14 @@ function PartRow({
 
       {/* Category */}
       <td className="px-2 py-2">
-        <span className="text-[13px] font-bold text-amazon-textMuted tracking-widest truncate max-w-[100px] lg:max-w-[140px] block">
+        <span className="text-[13px] font-medium text-amazon-textMuted truncate max-w-[100px] lg:max-w-[140px] block">
           {part.categoryName}
         </span>
       </td>
 
       {/* Price */}
       <td className="px-3 py-3 text-right">
-        <span className="font-black text-amazon-price text-[13px] tracking-wider">
+        <span className="font-bold text-amazon-price text-[13px]">
           {formatPrice(part.price)}
         </span>
       </td>
@@ -439,7 +439,7 @@ function PartRow({
       {/* Stock */}
       <td className="px-2.5 py-2.5 text-right">
         <span
-          className={`font-black text-[13px] tracking-wider ${
+          className={`font-medium text-[13px] ${
             part.stockQuantity <= 0
               ? "text-red-600"
               : part.stockQuantity < 100
@@ -454,7 +454,7 @@ function PartRow({
       {/* Status */}
       <td className="px-2.5 py-2.5 text-center">
         <span
-          className={`text-[10px] px-1.5 py-0.5 rounded-sm font-black uppercase tracking-widest ${statusInfo.cls}`}
+          className={`text-[11px] px-2 py-0.5 rounded-sm font-medium ${statusInfo.cls}`}
         >
           {statusInfo.label}
         </span>
@@ -463,10 +463,10 @@ function PartRow({
       {/* Recipe (for kit type) */}
       <td className="px-2 py-2">
         {hasRecipe ? (
-          <div className="text-[10px] font-bold tracking-widest text-amazon-textMuted space-y-0.5">
+          <div className="text-[11px] font-medium text-amazon-textMuted space-y-0.5">
             {part.recipeSwitchCount > 0 && (
                <p>
-                <span className="font-black text-amazon-text">
+                <span className="text-amazon-text font-medium border border-amazon-border px-1 py-[1px] bg-white rounded-[2px] shadow-sm">
                   {part.recipeSwitchCount}
                 </span>{" "}
                 switches
@@ -474,7 +474,7 @@ function PartRow({
             )}
             {part.recipeStabilizerCount > 0 && (
               <p>
-                <span className="font-black text-amazon-text">
+                <span className="text-amazon-text font-medium border border-amazon-border px-1 py-[1px] bg-white rounded-[2px] shadow-sm">
                   {part.recipeStabilizerCount}
                 </span>{" "}
                 stabs
@@ -482,7 +482,7 @@ function PartRow({
             )}
           </div>
         ) : (
-          <span className="text-neutral-300 font-black">—</span>
+          <span className="text-neutral-300 font-medium">—</span>
         )}
       </td>
 

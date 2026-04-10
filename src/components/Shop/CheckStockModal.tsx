@@ -103,8 +103,8 @@ export default function CheckStockModal({
               <ClipboardCheck className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-amazon-text uppercase tracking-widest">Check Stock</h2>
-              <p className="text-[10px] font-bold  tracking-widest text-emerald-700 mt-0.5">
+              <h2 className="text-lg font-bold text-amazon-text">Check Stock</h2>
+              <p className="text-[12px] font-medium text-emerald-700 mt-0.5">
                 Search and verify part inventory
               </p>
             </div>
@@ -127,11 +127,11 @@ export default function CheckStockModal({
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Type part name to search..."
               autoFocus
-              className="text-amazon-text  tracking-widest text-[11px] w-full pl-9 pr-3 py-2.5 border border-amazon-border rounded-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition placeholder:text-neutral-400"
+              className="text-amazon-text font-medium text-[13px] w-full pl-9 pr-3 py-2 border border-amazon-border rounded-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition placeholder:text-neutral-400"
             />
           </div>
           {selectedIds.size > 0 && (
-            <p className="text-[10px]  font-black tracking-widest text-emerald-600 mt-3">
+            <p className="text-[11px] font-medium text-emerald-600 mt-1.5">
               {selectedIds.size} part{selectedIds.size > 1 ? "s" : ""} selected
             </p>
           )}
@@ -140,12 +140,12 @@ export default function CheckStockModal({
         {/* Results list */}
         <div className="flex-1 overflow-y-auto px-6 pb-3 min-h-0">
           {query.trim() === "" ? (
-            <div className="py-8 text-center text-amazon-textMuted text-[11px] font-bold  tracking-widest">
+            <div className="py-8 text-center text-amazon-textMuted text-[13px] font-medium">
               <Search className="w-8 h-8 mx-auto mb-3 opacity-30" />
               Type a part name to start searching
             </div>
           ) : matchedParts.length === 0 ? (
-            <div className="py-8 text-center text-amazon-textMuted text-[11px] font-bold uppercase tracking-widest">
+            <div className="py-8 text-center text-amazon-textMuted text-[13px] font-medium">
               <AlertCircle className="w-8 h-8 mx-auto mb-3 opacity-30" />
               No parts match &quot;{query}&quot;
             </div>
@@ -154,7 +154,7 @@ export default function CheckStockModal({
               {/* Select all toggle */}
               <button
                 onClick={selectAll}
-                className="w-full text-left text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 px-2 py-2 transition"
+                className="w-full text-left text-[12px] font-medium text-emerald-600 hover:text-emerald-700 px-2 py-2 transition"
               >
                 {allMatchedSelected ? "Deselect all" : "Select all"} (
                 {matchedParts.length})
@@ -200,10 +200,10 @@ export default function CheckStockModal({
 
                     {/* Part info */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-black  tracking-widest text-amazon-text truncate leading-tight">
+                      <p className="text-[13px] font-medium text-amazon-text truncate leading-tight">
                         {part.name}
                       </p>
-                      <p className="text-[11px] font-bold  tracking-widest text-amazon-textMuted truncate mt-1">
+                      <p className="text-[12px] text-amazon-textMuted truncate mt-1">
                         <span className="capitalize">{part.partType}</span>
                         {" · "}
                         {part.categoryName}
@@ -212,9 +212,9 @@ export default function CheckStockModal({
 
                     {/* Current stock */}
                     <div className="text-right shrink-0">
-                      <p className="text-[11px] font-bold tracking-widest text-amazon-textMuted mb-1">Current</p>
+                      <p className="text-[11px] font-medium text-amazon-textMuted mb-1">Current</p>
                       <p
-                        className={`text-[11px] font-black tracking-widest ${
+                        className={`text-[13px] font-bold ${
                           part.stockQuantity <= 0
                             ? "text-red-600"
                             : part.stockQuantity < 100
@@ -229,10 +229,10 @@ export default function CheckStockModal({
                     {/* Verified stock result */}
                     {stockResult !== null && (
                       <div className="text-right shrink-0 pl-3 ml-1 border-l border-amazon-border">
-                        <p className="text-[9px] uppercase font-bold tracking-widest text-emerald-600 mb-1">
+                        <p className="text-[11px] font-medium text-emerald-600 mb-1">
                           Verified
                         </p>
-                        <p className="text-[11px] font-black tracking-widest text-emerald-700">
+                        <p className="text-[13px] font-bold text-emerald-700">
                           {stockResult.toLocaleString("vi-VN")}
                         </p>
                       </div>
@@ -248,14 +248,14 @@ export default function CheckStockModal({
         <div className="flex items-center justify-between px-6 py-5 border-t border-amazon-border bg-neutral-50/50 shrink-0">
           <button
             onClick={handleClose}
-            className="px-5 py-2.5 text-[13px] font-black  tracking-widest text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition shadow-sm"
+            className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition shadow-sm"
           >
             Close
           </button>
           <button
             onClick={handleCheck}
             disabled={selectedIds.size === 0 || checkingStock}
-            className="px-5 py-2.5 text-[13px] font-black  tracking-widest text-white bg-emerald-600 border border-emerald-600 rounded-sm hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+            className="px-5 py-2 text-[13px] font-medium text-white bg-emerald-600 border border-emerald-600 rounded-sm hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
           >
             {checkingStock ? (
               <>

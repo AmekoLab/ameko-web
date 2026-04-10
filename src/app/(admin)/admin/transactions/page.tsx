@@ -3,21 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { fetchAdminTransactions } from "@/src/store/slices/adminWalletSlice";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  Receipt,
-  Calendar,
-  Eye,
-  X,
-  SlidersHorizontal,
-  RotateCcw,
-  Search,
-} from "lucide-react";
 import { TransactionItem } from "@/src/services/wallet.service";
 import {
   parseTransactionDescription,
@@ -52,50 +37,58 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50];
 const TYPE_BADGE: Record<string, { label: string; className: string }> = {
   Withdrawal: {
     label: "Withdrawal",
-    className: "bg-blue-500/10 text-blue-400 border border-blue-500/20",
+    className: "bg-blue-50 text-blue-700 border-blue-200",
   },
   OrderPayment: {
     label: "Payment",
-    className: "bg-green-500/10 text-green-400 border border-green-500/20",
+    className: "bg-green-50 text-green-700 border-green-200",
   },
   ManualAdjustment: {
     label: "Adjustment",
-    className: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
+    className: "bg-orange-50 text-orange-700 border-orange-200",
   },
   RefundToWallet: {
     label: "Refund",
-    className: "bg-purple-500/10 text-purple-400 border border-purple-500/20",
+    className: "bg-purple-50 text-purple-700 border-purple-200",
   },
   OrderRefund: {
     label: "Refund",
-    className: "bg-purple-500/10 text-purple-400 border border-purple-500/20",
+    className: "bg-purple-50 text-purple-700 border-purple-200",
   },
   SalesPending: {
     label: "Pending Revenue",
-    className: "bg-[#f5d800]/10 text-[#f5d800] border border-[#f5d800]/20",
+    className: "bg-yellow-50 text-yellow-700 border-yellow-200",
   },
   SalesRevenue: {
     label: "Revenue",
-    className: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
+    className: "bg-emerald-50 text-emerald-700 border-emerald-200",
   },
   Deposit: {
     label: "Deposit",
-    className: "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20",
+    className: "bg-cyan-50 text-cyan-700 border-cyan-200",
   },
 };
 
 const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   Paid: {
     label: "Success",
-    className: "bg-green-500/10 text-green-400 border border-green-500/20",
+    className: "bg-green-50 text-green-700 border-green-200",
   },
   Failed: {
     label: "Failed",
-    className: "bg-red-500/10 text-red-500 border border-red-500/20",
+    className: "bg-red-50 text-red-700 border-red-200",
   },
   Pending: {
     label: "Pending",
-    className: "bg-[#f5d800]/10 text-[#f5d800] border border-[#f5d800]/20",
+    className: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  },
+  Completed: {
+    label: "Completed",
+    className: "bg-green-50 text-green-700 border-green-200",
+  },
+  Cancelled: {
+    label: "Cancelled",
+    className: "bg-neutral-100 text-neutral-600 border-neutral-300",
   },
 };
 
@@ -108,14 +101,14 @@ function truncateText(text: string, max = 30) {
 function DescriptionCell({ parsed }: { parsed: ParsedTransactionInfo }) {
   if (!parsed.rawDescription) {
     return (
-      <span className="text-[10px] font-bold text-gray-600 italic">—</span>
+      <span className="text-[10px] text-amazon-textMuted">—</span>
     );
   }
 
   if (!parsed.isManualAction) {
     return (
       <span
-        className="text-[10px] font-bold text-gray-400"
+        className="text-[10px] font-medium text-amazon-text"
         title={parsed.rawDescription}
       >
         {truncateText(parsed.rawDescription)}
@@ -126,17 +119,17 @@ function DescriptionCell({ parsed }: { parsed: ParsedTransactionInfo }) {
   return (
     <div className="flex items-center gap-2">
       <span
-        className={`inline-block text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm border whitespace-nowrap ${
+        className={`inline-block text-[10px] font-semibold px-1.5 py-0.5 rounded-sm border whitespace-nowrap ${
           parsed.action === "APPROVED"
-            ? "bg-green-500/10 text-green-400 border-green-500/20"
-            : "bg-red-500/10 text-red-500 border-red-500/20"
+            ? "bg-green-50 text-green-700 border-green-200"
+            : "bg-red-50 text-red-700 border-red-200"
         }`}
       >
         {parsed.action === "APPROVED" ? "Approved" : "Rejected"}
       </span>
       {parsed.note && (
         <span
-          className="text-[10px] font-bold text-gray-500"
+          className="text-[10px] font-medium text-amazon-textMuted"
           title={parsed.note}
         >
           {truncateText(parsed.note, 20)}
@@ -235,21 +228,21 @@ export default function AdminTransactionsPage() {
   // ── Rendering helpers ───────────────────────────────────
   const formatCurrency = (amount: number) => {
     const formatted = Math.abs(amount).toLocaleString("vi-VN");
-    return `${amount < 0 ? "-" : ""}${formatted}₫`;
+    return `${amount < 0 ? "-" : "+"}${formatted}₫`;
   };
 
   const renderTypeBadge = (type: string) => {
     const config = TYPE_BADGE[type];
     if (!config) {
       return (
-        <span className="text-[10px] font-black uppercase tracking-widest bg-gray-500/10 text-gray-500 border border-gray-500/20 px-2.5 py-1 rounded-sm">
+        <span className="text-[10px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200 px-1.5 py-0.5 rounded-sm">
           {type}
         </span>
       );
     }
     return (
       <span
-        className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-sm whitespace-nowrap ${config.className}`}
+        className={`text-[10px] font-medium px-1.5 py-0.5 rounded-sm whitespace-nowrap border ${config.className}`}
       >
         {config.label}
       </span>
@@ -260,14 +253,14 @@ export default function AdminTransactionsPage() {
     const config = STATUS_BADGE[status];
     if (!config) {
       return (
-        <span className="text-[10px] font-black uppercase tracking-widest bg-gray-500/10 text-gray-500 border border-gray-500/20 px-2.5 py-1 rounded-sm">
+        <span className="text-[10px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200 px-1.5 py-0.5 rounded-sm">
           {status}
         </span>
       );
     }
     return (
       <span
-        className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-sm whitespace-nowrap ${config.className}`}
+        className={`text-[10px] font-medium px-1.5 py-0.5 rounded-sm whitespace-nowrap border ${config.className}`}
       >
         {config.label}
       </span>
@@ -278,69 +271,66 @@ export default function AdminTransactionsPage() {
   const totalCount = transactionsPagination?.totalCount ?? 0;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-black min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className="w-full flex flex-col gap-4">
+      <div className="max-w-7xl mx-auto w-full">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 border-b border-[#1e2126] pb-4 gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-2">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-oswald font-black text-white mb-2 uppercase tracking-widest flex items-center gap-3">
-              <Receipt className="w-7 h-7 sm:w-8 sm:h-8 text-[#f5d800]" />
+            <h1 className="text-2xl font-bold text-amazon-text leading-tight">
               Transaction History
             </h1>
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+            <p className="text-[11px] text-amazon-textMuted mt-0.5">
               View all wallet transactions in the system.
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+            <span className="text-[10px] text-amazon-textMuted">
               Total:{" "}
-              <strong className="text-white">{totalCount}</strong>{" "}
+              <strong className="text-amazon-text mx-1">{totalCount}</strong>{" "}
               transactions
             </span>
             <button
               onClick={() => setShowFilters((prev) => !prev)}
-              className={`p-2 rounded-sm border transition ${
+              className={`px-3 py-1.5 text-[10px] font-medium rounded-sm border transition-colors ${
                 showFilters
-                  ? "border-[#f5d800]/50 bg-[#f5d800]/10 text-[#f5d800]"
-                  : "border-[#1e2126] bg-[#151515] text-gray-400 hover:text-white hover:bg-[#202030]"
+                  ? "bg-amazon-btnPrimary text-amazon-text border-amazon-btnPrimary shadow-sm"
+                  : "bg-white text-amazon-textMuted border-amazon-border hover:bg-neutral-50 hover:text-amazon-text"
               }`}
               title="Toggle filters"
             >
-              <SlidersHorizontal className="w-4 h-4" />
+              Filters
             </button>
           </div>
         </div>
 
         {/* ── Filters Card ──────────────────────────────── */}
         {showFilters && (
-          <div className="mb-6 rounded-sm border border-[#1e2126] bg-[#151515] p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                <Search className="w-3.5 h-3.5" />
+          <div className="mb-4 rounded-md border border-amazon-border bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-[11px] font-bold text-amazon-text">
                 Filter Transactions
               </h2>
               {hasActiveFilters && (
                 <button
                   onClick={handleClearFilters}
-                  className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-[#f5d800] transition-colors"
+                  className="text-[10px] font-medium text-blue-600 hover:text-blue-800 transition-colors"
                 >
-                  <RotateCcw className="w-3 h-3" />
                   Clear all
                 </button>
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {/* Type filter */}
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1.5">
+                <label className="block text-[10px] font-medium text-amazon-textMuted mb-1">
                   Type
                 </label>
                 <select
                   id="admin-filter-type"
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
-                  className="w-full rounded-sm border border-[#1e2126] bg-black px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white outline-none transition-colors focus:border-[#f5d800]/50"
+                  className="w-full rounded-sm border border-amazon-border bg-white px-2 py-1.5 text-[11px] font-medium text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary"
                 >
                   {TRANSACTION_TYPES.map((t) => (
                     <option key={t.value} value={t.value}>
@@ -352,14 +342,14 @@ export default function AdminTransactionsPage() {
 
               {/* Status filter */}
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1.5">
+                <label className="block text-[10px] font-medium text-amazon-textMuted mb-1">
                   Status
                 </label>
                 <select
                   id="admin-filter-status"
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full rounded-sm border border-[#1e2126] bg-black px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white outline-none transition-colors focus:border-[#f5d800]/50"
+                  className="w-full rounded-sm border border-amazon-border bg-white px-2 py-1.5 text-[11px] font-medium text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary"
                 >
                   {TRANSACTION_STATUSES.map((s) => (
                     <option key={s.value} value={s.value}>
@@ -371,7 +361,7 @@ export default function AdminTransactionsPage() {
 
               {/* From date */}
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1.5">
+                <label className="block text-[10px] font-medium text-amazon-textMuted mb-1">
                   From Date
                 </label>
                 <input
@@ -379,13 +369,13 @@ export default function AdminTransactionsPage() {
                   type="date"
                   value={filterFromDate}
                   onChange={(e) => setFilterFromDate(e.target.value)}
-                  className="w-full rounded-sm border border-[#1e2126] bg-black px-3 py-2 text-[11px] font-bold text-white outline-none transition-colors focus:border-[#f5d800]/50"
+                  className="w-full rounded-sm border border-amazon-border bg-white px-2 py-1.5 text-[11px] font-medium text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary"
                 />
               </div>
 
               {/* To date */}
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1.5">
+                <label className="block text-[10px] font-medium text-amazon-textMuted mb-1">
                   To Date
                 </label>
                 <input
@@ -393,23 +383,22 @@ export default function AdminTransactionsPage() {
                   type="date"
                   value={filterToDate}
                   onChange={(e) => setFilterToDate(e.target.value)}
-                  className="w-full rounded-sm border border-[#1e2126] bg-black px-3 py-2 text-[11px] font-bold text-white outline-none transition-colors focus:border-[#f5d800]/50"
+                  className="w-full rounded-sm border border-amazon-border bg-white px-2 py-1.5 text-[11px] font-medium text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary"
                 />
               </div>
             </div>
 
-            <div className="mt-4 flex items-center gap-3">
+            <div className="mt-3 flex items-center gap-3">
               <button
                 id="btn-admin-apply-filters"
                 onClick={handleApplyFilters}
-                className="rounded-sm bg-[#f5d800] px-5 py-2 text-[10px] font-black uppercase tracking-widest text-black transition-all hover:bg-[#f5d800]/90 active:scale-[0.97]"
+                className="rounded-sm bg-amazon-btnPrimary border border-amazon-btnPrimary px-4 py-1.5 text-[11px] font-medium text-amazon-text transition-colors hover:brightness-95 shadow-sm"
               >
                 Apply Filters
               </button>
               {hasActiveFilters && (
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                  Showing {filteredTransactions.length} of {transactions.length}{" "}
-                  on this page
+                <span className="text-[10px] text-amazon-textMuted">
+                  Showing {filteredTransactions.length} of {transactions.length} on this page
                 </span>
               )}
             </div>
@@ -417,15 +406,15 @@ export default function AdminTransactionsPage() {
         )}
 
         {/* ── Page Size Control ─────────────────────────── */}
-        <div className="mb-4 flex items-center justify-end gap-2">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
+        <div className="mb-3 flex items-center justify-end gap-2">
+          <label className="text-[10px] font-medium text-amazon-textMuted">
             Per page:
           </label>
           <select
             id="admin-page-size"
             value={pageSize}
             onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-            className="rounded-sm border border-[#1e2126] bg-[#151515] px-2 py-1 text-[11px] font-bold text-white outline-none focus:border-[#f5d800]/50"
+            className="rounded-sm border border-amazon-border bg-white px-2 py-1 text-[10px] font-medium text-amazon-text outline-none focus:border-amazon-btnPrimary"
           >
             {PAGE_SIZE_OPTIONS.map((size) => (
               <option key={size} value={size}>
@@ -436,26 +425,26 @@ export default function AdminTransactionsPage() {
         </div>
 
         {/* ── TABLE ─────────────────────────────────────── */}
-        <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
+        <div className="bg-white rounded-md border border-amazon-border flex flex-col shadow-sm">
           {loadingTransactions && transactions.length === 0 ? (
-            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500">
+            <div className="p-12 text-center text-[11px] font-medium text-amazon-textMuted">
               Loading data...
             </div>
           ) : (
             <div className="w-full overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-black text-gray-500 text-[10px] uppercase font-black tracking-widest border-b border-[#1e2126]">
-                    <th className="px-4 py-3 whitespace-nowrap">ID</th>
-                    <th className="px-4 py-3 whitespace-nowrap">Date</th>
-                    <th className="px-4 py-3 whitespace-nowrap">Type</th>
-                    <th className="px-4 py-3 whitespace-nowrap">Amount</th>
-                    <th className="px-4 py-3 whitespace-nowrap">Fee</th>
-                    <th className="px-4 py-3 whitespace-nowrap">Status</th>
-                    <th className="px-4 py-3">Details</th>
+              <table className="w-full text-left border-collapse whitespace-nowrap">
+                <thead className="bg-neutral-50 border-b border-amazon-border">
+                  <tr className="text-left text-[10px] text-amazon-textMuted">
+                    <th className="px-4 py-2 font-medium">ID</th>
+                    <th className="px-4 py-2 font-medium">Date</th>
+                    <th className="px-4 py-2 font-medium">Type</th>
+                    <th className="px-4 py-2 font-medium">Amount</th>
+                    <th className="px-4 py-2 font-medium">Fee</th>
+                    <th className="px-4 py-2 font-medium">Status</th>
+                    <th className="px-4 py-2 font-medium">Details</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#1e2126]">
+                <tbody className="divide-y divide-amazon-border">
                   {filteredTransactions.map((item: TransactionItem) => {
                     const parsed = parseTransactionDescription(
                       item.description,
@@ -463,12 +452,12 @@ export default function AdminTransactionsPage() {
                     return (
                       <tr
                         key={item.id}
-                        className="hover:bg-[#202030] transition-colors"
+                        className="hover:bg-neutral-50 transition-colors"
                       >
                         {/* ID */}
                         <td className="px-4 py-3 whitespace-nowrap">
                           <span
-                            className="text-[11px] font-bold text-gray-500 uppercase tracking-widest cursor-pointer hover:text-white transition-colors"
+                            className="text-[11px] font-mono text-amazon-textMuted cursor-pointer hover:text-amazon-text transition-colors"
                             title={item.id}
                           >
                             {item.id.slice(0, 8)}…
@@ -477,26 +466,23 @@ export default function AdminTransactionsPage() {
 
                         {/* Date */}
                         <td className="px-4 py-3 whitespace-nowrap">
-                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-400">
-                            <Calendar className="w-3.5 h-3.5 flex-shrink-0 text-gray-600" />
-                            <span>
-                              {new Date(item.createdAt).toLocaleDateString(
+                          <div className="text-[11px] text-amazon-text">
+                            {new Date(item.createdAt).toLocaleDateString(
+                              "en-US",
+                              {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              },
+                            )}
+                            <span className="ml-1.5 text-amazon-textMuted text-[10px]">
+                              {new Date(item.createdAt).toLocaleTimeString(
                                 "en-US",
                                 {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
                                 },
                               )}
-                              <span className="ml-1.5 text-gray-600">
-                                {new Date(item.createdAt).toLocaleTimeString(
-                                  "en-US",
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  },
-                                )}
-                              </span>
                             </span>
                           </div>
                         </td>
@@ -506,27 +492,20 @@ export default function AdminTransactionsPage() {
 
                         {/* Amount */}
                         <td className="px-4 py-3 whitespace-nowrap">
-                          <div className="flex items-center gap-1.5">
-                            {item.amount >= 0 ? (
-                              <ArrowDownLeft className="w-4 h-4 text-green-400 flex-shrink-0" />
-                            ) : (
-                              <ArrowUpRight className="w-4 h-4 text-red-500 flex-shrink-0" />
-                            )}
-                            <span
-                              className={`font-black text-[13px] tracking-wider ${
-                                item.amount >= 0
-                                  ? "text-green-400"
-                                  : "text-red-500"
-                              }`}
-                            >
-                              {formatCurrency(item.amount)}
-                            </span>
-                          </div>
+                          <span
+                            className={`font-bold text-[11px] ${
+                              item.amount >= 0
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
+                            {formatCurrency(item.amount)}
+                          </span>
                         </td>
 
                         {/* Fee */}
                         <td className="px-4 py-3 whitespace-nowrap">
-                          <span className="text-[11px] font-bold text-gray-500">
+                          <span className="text-[11px] text-amazon-textMuted">
                             {item.feeAmount > 0
                               ? `${item.feeAmount.toLocaleString("vi-VN")}₫`
                               : "—"}
@@ -545,12 +524,12 @@ export default function AdminTransactionsPage() {
                             {parsed.proofUrl && (
                               <button
                                 onClick={() =>
-                                  setPreviewImage(parsed.proofUrl)
+                                  setPreviewImage(parsed.proofUrl!)
                                 }
-                                className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] text-gray-500 hover:text-[#f5d800] hover:border-[#f5d800]/50 transition flex-shrink-0"
+                                className="px-2 py-0.5 rounded border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:border-blue-300 text-[10px] font-medium flex-shrink-0 transition-colors"
                                 title="View evidence"
                               >
-                                <Eye className="w-3.5 h-3.5" />
+                                View
                               </button>
                             )}
                           </div>
@@ -563,7 +542,7 @@ export default function AdminTransactionsPage() {
                     <tr>
                       <td
                         colSpan={7}
-                        className="p-12 text-center text-[10px] font-bold uppercase tracking-widest text-gray-600 italic"
+                        className="p-12 text-center text-[10px] text-amazon-textMuted"
                       >
                         {hasActiveFilters
                           ? "No transactions match your filters."
@@ -578,10 +557,10 @@ export default function AdminTransactionsPage() {
 
           {/* ── Pagination ──────────────────────────────── */}
           {transactionsPagination && transactionsPagination.totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-t border-[#1e2126] bg-black gap-3">
-              <p className="text-[10px] uppercase font-bold tracking-widest text-gray-500">
+            <div className="flex flex-col sm:flex-row items-center justify-between p-3 border-t border-amazon-border bg-neutral-50/50 gap-3">
+              <p className="text-[10px] text-amazon-textMuted">
                 Page{" "}
-                <strong className="text-white">
+                <strong className="text-amazon-text mx-0.5">
                   {transactionsPagination.currentPage} /{" "}
                   {transactionsPagination.totalPages}
                 </strong>{" "}
@@ -594,9 +573,9 @@ export default function AdminTransactionsPage() {
                   id="btn-admin-page-first"
                   onClick={() => setCurrentPage(1)}
                   disabled={!transactionsPagination.hasPreviousPage}
-                  className="p-2 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] disabled:opacity-40 disabled:cursor-not-allowed transition text-gray-400 hover:text-white"
+                  className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 text-amazon-text transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <ChevronsLeft className="w-4 h-4" />
+                  First
                 </button>
                 {/* Prev */}
                 <button
@@ -605,9 +584,9 @@ export default function AdminTransactionsPage() {
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={!transactionsPagination.hasPreviousPage}
-                  className="p-2 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] disabled:opacity-40 disabled:cursor-not-allowed transition text-gray-400 hover:text-white"
+                  className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 text-amazon-text transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  Prev
                 </button>
 
                 {/* Page numbers */}
@@ -631,10 +610,10 @@ export default function AdminTransactionsPage() {
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`min-w-[32px] p-2 rounded-sm border transition text-[11px] font-black uppercase tracking-widest ${
+                      className={`min-w-[28px] px-2 py-1 rounded-sm border transition-colors text-[10px] font-bold ${
                         page === current
-                          ? "border-[#f5d800]/50 bg-[#f5d800]/10 text-[#f5d800]"
-                          : "border-[#1e2126] bg-[#151515] text-gray-400 hover:bg-[#202030] hover:text-white"
+                          ? "border-amazon-btnPrimary bg-amazon-btnPrimary text-amazon-text"
+                          : "border-amazon-border bg-white text-amazon-text hover:bg-neutral-50"
                       }`}
                     >
                       {page}
@@ -651,9 +630,9 @@ export default function AdminTransactionsPage() {
                     )
                   }
                   disabled={!transactionsPagination.hasNextPage}
-                  className="p-2 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] disabled:opacity-40 disabled:cursor-not-allowed transition text-gray-400 hover:text-white"
+                  className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 text-amazon-text transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  Next
                 </button>
                 {/* Last */}
                 <button
@@ -662,9 +641,9 @@ export default function AdminTransactionsPage() {
                     setCurrentPage(transactionsPagination.totalPages)
                   }
                   disabled={!transactionsPagination.hasNextPage}
-                  className="p-2 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] disabled:opacity-40 disabled:cursor-not-allowed transition text-gray-400 hover:text-white"
+                  className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 text-amazon-text transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <ChevronsRight className="w-4 h-4" />
+                  Last
                 </button>
               </div>
             </div>
@@ -674,24 +653,24 @@ export default function AdminTransactionsPage() {
 
       {/* ─── Image Preview Modal ────────────────────────── */}
       {previewImage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm"
             onClick={() => setPreviewImage(null)}
           />
-          <div className="relative max-w-2xl w-full mx-4">
+          <div className="relative max-w-2xl w-full mx-auto animate-in zoom-in-95 duration-200">
             <Image
               src={previewImage}
               alt="Evidence"
               width={800}
               height={600}
-              className="w-full h-auto rounded-sm shadow-2xl object-contain border border-[#1e2126]"
+              className="w-full h-auto rounded-md shadow-xl object-contain border border-amazon-border bg-white"
             />
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute top-3 right-3 bg-black/80 border border-[#1e2126] hover:border-[#f5d800]/50 rounded-sm p-2 hover:bg-[#202030] transition shadow"
+              className="absolute -top-3 -right-3 bg-white border border-amazon-border rounded-full px-2 py-1 text-[11px] font-medium text-amazon-text hover:bg-neutral-50 transition shadow-sm"
             >
-              <X className="w-5 h-5 text-gray-400 hover:text-[#f5d800]" />
+              Close
             </button>
           </div>
         </div>

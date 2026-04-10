@@ -205,9 +205,9 @@ export default function EditPartModal({
   if (!isOpen) return null;
 
   const inputClass =
-    "w-full px-3 py-2 border border-amazon-border rounded-sm text-[13px]  tracking-widest text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition placeholder:text-neutral-400";
-  const labelClass = "block text-[14px]  tracking-widest text-amazon-textMuted mb-2";
-  const errorClass = "text-[13px] font-bold tracking-widest text-red-500 mt-1";
+    "w-full px-3 py-2 border border-amazon-border rounded-sm text-[13px] font-medium text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition placeholder:text-neutral-400";
+  const labelClass = "block text-[13px] font-medium text-amazon-text mb-1";
+  const errorClass = "text-[11px] font-medium text-red-500 mt-1";
 
   const PART_TYPES: { value: PartType; label: string }[] = [
     { value: "kit", label: "Kit" },
@@ -221,8 +221,8 @@ export default function EditPartModal({
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-amazon-border">
           <div>
-            <h2 className="text-lg font-black text-amazon-text uppercase tracking-widest">Edit Part</h2>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mt-0.5">
+            <h2 className="text-lg font-bold text-amazon-text">Edit Part</h2>
+            <p className="text-[12px] text-amazon-textMuted mt-0.5">
               Update part information.{" "}
               {part && <span className="opacity-70">({part.slug})</span>}
             </p>
@@ -316,7 +316,7 @@ export default function EditPartModal({
           <div>
             <label className={labelClass}>
               Description{" "}
-              <span className="font-normal text-gray-400">(optional)</span>
+              <span className="font-normal text-amazon-textMuted">(optional)</span>
             </label>
             <textarea
               {...register("description")}
@@ -329,7 +329,7 @@ export default function EditPartModal({
           {/* Kit-specific: Recipe counts */}
           {isKit && (
             <div className="p-5 bg-purple-50 border border-purple-200 rounded-sm space-y-4">
-              <p className="text-[11px] font-black uppercase tracking-widest text-purple-800">
+              <p className="text-[13px] font-bold text-purple-800">
                 Kit Recipe Configuration
               </p>
               <div className="grid grid-cols-2 gap-4">
@@ -354,7 +354,7 @@ export default function EditPartModal({
                   />
                 </div>
               </div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-purple-600 mt-2">
+              <p className="text-[11px] font-medium text-purple-600 mt-2">
                 Specifications (recipe + workflow) will be auto-generated and
                 sent as JSON.
               </p>
@@ -367,7 +367,7 @@ export default function EditPartModal({
             <div>
               <label className={labelClass}>
                 Thumbnail Image{" "}
-                <span className="font-bold opacity-70">(optional)</span>
+                <span className="font-normal text-amazon-textMuted">(optional)</span>
               </label>
               {thumbnailPreview ? (
                 <div className="relative w-full h-36 rounded-sm border border-amazon-border overflow-hidden bg-neutral-50 shadow-sm">
@@ -392,7 +392,7 @@ export default function EditPartModal({
                   className="w-full h-28 border border-dashed border-amazon-border rounded-sm flex flex-col items-center justify-center gap-2 text-amazon-textMuted hover:border-amazon-btnPrimary hover:text-amazon-btnPrimary hover:bg-neutral-50 transition"
                 >
                   <Upload className="w-5 h-5" />
-                  <span className="text-[11px] font-black uppercase tracking-widest">Thumbnail</span>
+                  <span className="text-[12px] font-medium">Thumbnail</span>
                 </button>
               )}
               <input
@@ -408,7 +408,7 @@ export default function EditPartModal({
             <div>
               <label className={labelClass}>
                 Layer Image{" "}
-                <span className="font-bold opacity-70">(optional)</span>
+                <span className="font-normal text-amazon-textMuted">(optional)</span>
               </label>
               {layerPreview ? (
                 <div className="relative w-full h-36 rounded-sm border border-amazon-border overflow-hidden bg-neutral-50 shadow-sm">
@@ -433,7 +433,7 @@ export default function EditPartModal({
                   className="w-full h-28 border border-dashed border-amazon-border rounded-sm flex flex-col items-center justify-center gap-2 text-amazon-textMuted hover:border-amazon-btnPrimary hover:text-amazon-btnPrimary hover:bg-neutral-50 transition"
                 >
                   <ImageIcon className="w-5 h-5" />
-                  <span className="text-[11px] font-black uppercase tracking-widest">Layer Image</span>
+                  <span className="text-[12px] font-medium">Layer Image</span>
                 </button>
               )}
               <input
@@ -447,19 +447,19 @@ export default function EditPartModal({
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-5 border-t border-amazon-border">
+          <div className="flex justify-end gap-3 pt-3 border-t border-amazon-border">
             <button
               type="button"
               onClick={handleClose}
               disabled={updating}
-              className="px-5 py-2.5 text-[13px]  tracking-widest text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
+              className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={updating}
-              className="px-5 py-2.5 text-[13px]  tracking-widest text-amazon-text bg-amazon-btnPrimary rounded-sm hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
+              className="px-5 py-2 text-[13px] font-medium text-amazon-text bg-amazon-btnPrimary border border-amazon-border rounded-sm hover:brightness-95 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
             >
               {updating && <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />}
               {updating ? "Updating..." : "Update Part"}

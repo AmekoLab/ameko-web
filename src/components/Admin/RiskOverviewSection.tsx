@@ -1,13 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Loader2,
-  ShieldAlert,
-  AlertTriangle,
-  Flag,
-  XCircle,
-} from "lucide-react";
 import { RiskOverviewData } from "@/src/types/admin.types";
 import { adminService } from "@/src/services/admin.service";
 
@@ -36,13 +29,12 @@ export default function RiskOverviewSection() {
 
   if (isLoading) {
     return (
-      <div className="mt-8">
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <ShieldAlert className="h-5 w-5 text-yellow-500" />
+      <div className="flex flex-col h-full w-full gap-2 min-h-0">
+        <h2 className="text-sm font-bold text-amazon-text mb-0 shrink-0">
           Risk &amp; Dispute Overview
         </h2>
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <div className="flex items-center justify-center flex-1">
+          <p className="text-amazon-textMuted text-sm font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -50,12 +42,11 @@ export default function RiskOverviewSection() {
 
   if (!data) {
     return (
-      <div className="mt-8">
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <ShieldAlert className="h-5 w-5 text-yellow-500" />
+      <div className="flex flex-col h-full w-full gap-2 min-h-0">
+        <h2 className="text-sm font-bold text-amazon-text mb-0 shrink-0">
           Risk &amp; Dispute Overview
         </h2>
-        <p className="text-gray-400 text-sm">
+        <p className="text-amazon-textMuted text-sm">
           Failed to load risk overview data.
         </p>
       </div>
@@ -69,10 +60,8 @@ export default function RiskOverviewSection() {
       id: "risk-rates",
       label: "Risk Rates",
       value: `${data.cancelRate}%`,
-      icon: AlertTriangle,
-      iconColor: "text-yellow-500",
       sub: (
-        <span className="text-xs text-gray-500">
+        <span className="text-[11px] text-amazon-textMuted leading-tight mt-1">
           Refund Rate: {data.refundRate}% | Issue Rate: {data.issueRate}%
         </span>
       ),
@@ -81,10 +70,8 @@ export default function RiskOverviewSection() {
       id: "active-requests",
       label: "Active Requests & Issues",
       value: data.openIssues,
-      icon: Flag,
-      iconColor: "text-orange-500",
       sub: (
-        <span className="text-xs text-gray-500">
+        <span className="text-[11px] text-amazon-textMuted leading-tight mt-1">
           Cancel Req: {data.cancelRequests} | Refund Req:{" "}
           {data.refundRequests} | Disputes: {data.disputeRequests}
         </span>
@@ -94,10 +81,8 @@ export default function RiskOverviewSection() {
       id: "order-impact",
       label: "Order Impact",
       value: data.cancelledOrders,
-      icon: XCircle,
-      iconColor: "text-red-500",
       sub: (
-        <span className="text-xs text-gray-500">
+        <span className="text-[11px] text-amazon-textMuted leading-tight mt-1">
           Refunded: {data.refundedOrders} | Total Orders: {data.totalOrders}
         </span>
       ),
@@ -107,38 +92,24 @@ export default function RiskOverviewSection() {
   // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="mt-8">
-      <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-        <ShieldAlert className="h-5 w-5 text-yellow-500" />
+    <div className="flex flex-col h-full w-full gap-2 min-h-0">
+      <h2 className="text-sm font-bold text-amazon-text mb-0 shrink-0 pt-4">
         Risk &amp; Dispute Overview
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
         {cards.map((card) => {
-          const Icon = card.icon;
           return (
             <div
               key={card.id}
-              className="bg-[#111111] border border-[#1e2126] rounded-xl p-5 shadow-sm flex flex-col gap-2 hover:border-[#f5d800]/50 transition-colors group"
+              className="bg-white border border-amazon-border shadow-sm rounded-md px-4 py-3 flex flex-col gap-0.5 h-fit transition-colors hover:bg-neutral-50"
             >
-              {/* Icon + Label */}
-              <div className="flex items-center gap-3 mb-1">
-                <div
-                  className={`p-2 rounded-lg bg-white/5 ${card.iconColor}`}
-                >
-                  <Icon className="h-5 w-5" />
-                </div>
-                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-                  {card.label}
-                </span>
-              </div>
-
-              {/* Value */}
-              <p className="text-2xl font-oswald font-black text-white tracking-wider">
+              <span className="text-xs font-medium text-amazon-textMuted">
+                {card.label}
+              </span>
+              <p className="text-lg font-bold text-amazon-text leading-none mt-1">
                 {card.value}
               </p>
-
-              {/* Subtitle / Breakdown */}
               {card.sub}
             </div>
           );

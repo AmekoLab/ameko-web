@@ -484,7 +484,7 @@ export default function ShopView() {
               <select
                 value={sortBy}
                 onChange={(e) => handleSortChange(e.target.value as SortOption)}
-                className="appearance-none bg-white pl-0 pr-8 py-2 text-sm font-bold text-amazon-text border border-amazon-border focus:ring-0 cursor-pointer uppercase tracking-wide rounded-sm shadow-sm"
+                className="appearance-none bg-white pl-0 pr-8 py-2 pl-4 text-sm font-bold text-amazon-text border border-amazon-border focus:ring-0 cursor-pointer uppercase tracking-wide rounded-sm shadow-sm"
                 aria-label="Sort products"
               >
                 <option value="featured" className="bg-white text-amazon-text">Featured</option>

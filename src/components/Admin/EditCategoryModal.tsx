@@ -121,8 +121,8 @@ export default function EditCategoryModal({
 
   const inputClass =
     "w-full px-3 py-2 border border-amazon-border rounded-sm text-sm text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition";
-  const labelClass = "block text-[11px] font-black uppercase tracking-widest text-amazon-textMuted mb-2";
-  const errorClass = "text-xs font-bold uppercase tracking-widest text-red-500 mt-1";
+  const labelClass = "block text-[13px] font-medium text-amazon-text mb-1";
+  const errorClass = "text-[11px] font-medium text-red-500 mt-1";
 
   // Exclude the current category from parent options to prevent self-parenting
   const rootParents = parentOptions.filter(
@@ -135,8 +135,8 @@ export default function EditCategoryModal({
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-amazon-border">
           <div>
-            <h2 className="text-lg font-black text-amazon-text uppercase tracking-widest">Edit Category</h2>
-            <p className="text-[10px] font-bold  tracking-widest text-amazon-textMuted mt-0.5">
+            <h2 className="text-lg font-bold text-amazon-text">Edit Category</h2>
+            <p className="text-[12px] text-amazon-textMuted mt-0.5">
               {category.categoryType === "global"
                 ? "Global category"
                 : "Private category"}{" "}
@@ -169,7 +169,7 @@ export default function EditCategoryModal({
           <div>
             <label className={labelClass}>
               Parent Category{" "}
-              <span className="font-bold opacity-70">(optional)</span>
+              <span className="font-normal text-amazon-textMuted">(optional)</span>
             </label>
             <select {...register("parentId")} className={inputClass}>
               <option value="">— None (root category) —</option>
@@ -185,7 +185,7 @@ export default function EditCategoryModal({
           <div>
             <label className={labelClass}>
               Thumbnail Image{" "}
-              <span className="font-bold opacity-70">(optional)</span>
+              <span className="font-normal text-amazon-textMuted">(optional)</span>
             </label>
             {thumbnailPreview ? (
               <div className="relative w-full h-36 border border-amazon-border overflow-hidden bg-neutral-50 rounded-sm">
@@ -211,7 +211,7 @@ export default function EditCategoryModal({
                 className="w-full h-28 border border-dashed border-amazon-border rounded-sm flex flex-col items-center justify-center gap-2 text-amazon-textMuted hover:border-amazon-btnPrimary hover:text-amazon-btnPrimary hover:bg-neutral-50 transition"
               >
                 <Upload className="w-5 h-5" />
-                <span className="text-[11px] font-black uppercase tracking-widest">Click to upload</span>
+                <span className="text-[12px] font-medium">Click to upload</span>
               </button>
             )}
             <input
@@ -233,26 +233,26 @@ export default function EditCategoryModal({
             />
             <label
               htmlFor="editIsActive"
-              className="text-[11px] font-black uppercase tracking-widest text-amazon-text mt-[2px]"
+              className="text-[13px] font-medium text-amazon-text mt-[1px]"
             >
               Set as Active
             </label>
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-5 border-t border-amazon-border">
+          <div className="flex justify-end gap-3 pt-3 border-t border-amazon-border">
             <button
               type="button"
               onClick={handleClose}
               disabled={updating}
-              className="px-5 py-2.5 text-[13px] font-black  tracking-widest text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
+              className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={updating}
-              className="px-5 py-2.5 text-[13px] font-black  tracking-widest text-amazon-text bg-amazon-btnPrimary rounded-sm hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
+              className="px-5 py-2 text-[13px] font-medium text-amazon-text bg-amazon-btnPrimary border border-amazon-border rounded-sm hover:brightness-95 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
             >
               {updating && <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />}
               {updating ? "Saving..." : "Save Changes"}

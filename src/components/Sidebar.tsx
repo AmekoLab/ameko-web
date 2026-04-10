@@ -174,7 +174,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
 
   return (
     <aside
-      className={`bg-black border-r border-[#1e2126] h-[calc(100vh-64px)] sticky top-16 flex flex-col transition-all duration-300 ease-in-out flex-shrink-0 z-40 ${
+      className={`bg-white border-r border-amazon-border h-full flex flex-col transition-all duration-300 ease-in-out flex-shrink-0 z-40 ${
         isCollapsed ? "w-20" : "w-64"
       }`}
     >
@@ -195,8 +195,8 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
                 <div
                   className={`w-12 h-12 mx-auto rounded-sm flex items-center justify-center cursor-pointer transition-colors ${
                     isGroupActive
-                      ? "bg-[#151515] text-[#f5d800] border border-[#f5d800]/20 shadow-[0_0_10px_rgba(245,216,0,0.1)]"
-                      : "text-gray-400 hover:text-white hover:bg-[#151515]"
+                      ? "bg-neutral-50 text-amazon-focus border border-amazon-border shadow-sm"
+                      : "text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50"
                   }`}
                   onClick={() => {
                     setIsCollapsed(false);
@@ -213,10 +213,10 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
                 // Expanded State: Full header with Accordion setup
                 <button
                   onClick={() => toggleGroup(group.groupName)}
-                  className={`flex items-center justify-between p-3 rounded-sm transition-colors text-[10px] font-black uppercase tracking-widest ${
+                  className={`flex items-center justify-between p-3 rounded-sm transition-colors text-sm ${
                     isGroupActive && !isExpanded
-                      ? "text-[#f5d800]"
-                      : "text-gray-400 hover:text-white hover:bg-[#151515]"
+                      ? "text-amazon-text font-bold"
+                      : "text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 font-medium"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -246,10 +246,10 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
                       <Link
                         key={item.path}
                         href={item.path}
-                        className={`flex items-center p-3 pl-10 rounded-r-sm transition-colors text-[11px] uppercase tracking-widest border-l-2 ${
+                        className={`flex items-center p-3 pl-10 rounded-r-sm transition-colors text-[13px] border-l-2 ${
                           active
-                            ? "bg-[#151515] text-[#f5d800] font-black border-[#f5d800]"
-                            : "text-gray-400 font-bold border-transparent hover:bg-[#151515] hover:text-white"
+                            ? "bg-neutral-50 text-amazon-text font-bold border-amazon-btnSecondary"
+                            : "text-amazon-textMuted hover:bg-neutral-50 hover:text-amazon-text font-medium border-transparent"
                         }`}
                       >
                         {item.name}
@@ -264,16 +264,16 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
       </div>
 
       {/* Footer Toggle */}
-      <div className="border-t border-[#1e2126] p-4 flex justify-center items-center bg-black">
+      <div className="border-t border-amazon-border p-4 flex justify-center items-center bg-white">
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="w-full flex items-center justify-center p-2 rounded-sm text-gray-500 hover:text-white hover:bg-[#151515] transition-colors"
+          className="w-full flex items-center justify-center p-2 rounded-sm text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 transition-colors"
           title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
           {isCollapsed ? (
             <ChevronRight className="w-5 h-5" />
           ) : (
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+            <div className="flex items-center gap-2 text-sm font-medium">
               <ChevronLeft className="w-4 h-4" />
               Collapse Sidebar
             </div>

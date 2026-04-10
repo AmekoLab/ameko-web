@@ -16,12 +16,14 @@ import {
   ShoppingBag,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   Loader2,
   Trash2,
   Minus,
   Plus,
   Ticket,
   Store,
+  Tag,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
@@ -667,7 +669,7 @@ export const CartSidebar: FC = memo(() => {
                   </div>
 
                   {/* Shop Voucher Footer */}
-                  <div className="px-1 py-2 border-t border-amazon-border mt-2">
+                  <div className="px-1 py-2 border-t border-amazon-border mt-2 flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 text-xs text-amazon-textMuted">
                         <Ticket className="w-3.5 h-3.5 text-amazon-btnSecondary" />
@@ -687,12 +689,56 @@ export const CartSidebar: FC = memo(() => {
                         <span className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">Enter Code</span>
                       )}
                     </div>
+
                     {/* Shop voucher error */}
                     {shopPreview?.shopVoucherError && (
                       <p className="text-red-500 text-[10px] mt-1 font-bold uppercase tracking-wide">
                         {shopPreview.shopVoucherError}
                       </p>
                     )}
+
+                    {/* Applied Vouchers Breakdown UI (Sidebar Optimized) */}
+                    {(() => {
+                      const appliedVouchers = shopPreview?.appliedVoucherBreakdowns || [];
+                      if (appliedVouchers.length === 0) return null;
+
+                      return (
+                        <div className="p-2.5 bg-neutral-50 border border-amazon-border border-dashed rounded-sm mt-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Tag className="w-3 h-3 text-amazon-focus" />
+                            <span className="text-[10px] font-black text-amazon-text uppercase tracking-widest">
+                              Applied Discounts
+                            </span>
+                          </div>
+                          <div className="space-y-1">
+                            {appliedVouchers.map((voucher: any, idx: number) => (
+                              <div key={idx} className="flex justify-between items-center text-[11px]">
+                                <span className="text-amazon-textMuted flex items-center gap-1 font-bold uppercase tracking-wider text-[10px]">
+                                  <span className="font-black text-amazon-text">{voucher.voucherCode}</span>
+                                  {voucher.discountType === "FixedAmount" && (
+                                    <span className="text-[8px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded-sm font-black tracking-widest">FIXED</span>
+                                  )}
+                                  {voucher.discountType === "Percentage" && (
+                                    <span className="text-[8px] bg-green-100 text-green-700 px-1 py-0.5 rounded-sm font-black tracking-widest">% OFF</span>
+                                  )}
+                                </span>
+                                <span className="font-black text-green-600 text-[11px]">
+                                  - {voucher.discountAmount.toLocaleString()}₫
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                          {appliedVouchers.length > 1 && (
+                            <div className="flex justify-between items-center mt-1.5 pt-1.5 border-t border-amazon-border">
+                              <span className="font-bold text-amazon-text uppercase tracking-widest text-[9px]">Total Shop Discount:</span>
+                              <span className="font-black text-green-600 text-[12px]">
+                                - {(shopPreview?.shopDiscountAmount || 0).toLocaleString()}₫
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               );
@@ -703,49 +749,54 @@ export const CartSidebar: FC = memo(() => {
         {/* FOOTER */}
         {items.length > 0 && (
           <div className="border-t border-amazon-border p-6 space-y-4 bg-neutral-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-            {/* Ameko Platform Voucher button */}
+            {/* COMPACT Ameko Platform Voucher */}
             {systemVouchers.length > 0 && (
-              <div>
+              <div className="pb-3 border-b border-amazon-border/50 mb-3">
                 <div
                   role="button"
                   tabIndex={0}
                   onClick={handleOpenSystemVoucherModal}
                   onKeyDown={(e) => e.key === 'Enter' && handleOpenSystemVoucherModal()}
-                  className="w-full flex items-center justify-between gap-2 px-3 py-3 border border-amazon-border rounded-sm text-sm text-amazon-text hover:border-amazon-focus transition-colors cursor-pointer bg-white"
+                  className="flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted hover:text-amazon-text transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center gap-2">
-                    <Ticket className="w-4 h-4 shrink-0 text-amazon-btnSecondary" />
-                    <span className="font-bold text-[11px] tracking-wider">
-                      {selectedSystemVoucherCode
-                        ? `Selected 1 system voucher`
-                        : `Platform Voucher (${systemVouchers.length} available)`}
-                    </span>
+                  <div className="flex items-center gap-1.5">
+                    <Ticket className="w-4 h-4 text-amazon-btnSecondary" />
+                    <span>Ameko Voucher</span>
                   </div>
-                  {!!selectedSystemVoucherCode && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        dispatch(setSelectedSystemVoucher(null));
-                      }}
-                      className="p-1 text-amazon-textMuted hover:text-red-600 transition-colors"
-                      aria-label="Remove system voucher"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {selectedSystemVoucherCode ? (
+                      <div className="flex items-center gap-1.5 bg-neutral-100 px-2 py-1 rounded-sm border border-amazon-border">
+                        <span className="text-amazon-text">{selectedSystemVoucherCode}</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dispatch(setSelectedSystemVoucher(null));
+                          }}
+                          className="text-amazon-textMuted hover:text-red-600 transition-colors ml-1"
+                          aria-label="Remove system voucher"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-amazon-btnSecondary">
+                        Select ({systemVouchers.length}) <ChevronRight className="w-3 h-3 inline" />
+                      </span>
+                    )}
+                  </div>
                 </div>
                 {/* System voucher error */}
                 {cartPreview?.systemVoucherError && (
-                  <p className="text-red-500 text-[10px] uppercase font-bold tracking-wider mt-1 px-1">
+                  <p className="text-red-500 text-[9px] uppercase font-bold tracking-wider mt-1.5 text-right">
                     {cartPreview.systemVoucherError}
                   </p>
                 )}
               </div>
             )}
 
-            {/* Select All */}
-            <div className="flex items-center justify-between">
+            {/* Select All & Selection Count */}
+            <div className="flex items-center justify-between mb-1">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -765,126 +816,43 @@ export const CartSidebar: FC = memo(() => {
               </span>
             </div>
 
-            <p className="text-amazon-textMuted text-[10px]">
+            <p className="text-amazon-textMuted text-[10px] mb-1">
               Shipping & taxes calculated at checkout
             </p>
 
-            {/* Applied Vouchers Summary */}
-            {(!!selectedSystemVoucherCode ||
-              Object.values(selectedShopVoucherCodesMap).some(
-                (v) => v && v.length > 0,
-              )) && (
-              <div className="space-y-1.5 py-2 border-t border-amazon-border">
-                <span className="text-[10px] font-black text-amazon-textMuted uppercase tracking-widest">
-                  Applied Vouchers
-                </span>
+            {/* Note: The old redundant 'Applied System Voucher' block was completely removed here to save space! */}
 
-                {/* System voucher */}
-                {selectedSystemVoucherCode &&
-                  applicableVouchers?.systemVouchers && (() => {
-                    const sv = applicableVouchers.systemVouchers.find(
-                      (v) => v.code === selectedSystemVoucherCode,
-                    );
-                    if (!sv) return null;
-                    const totalShopDiscount =
-                      cartPreview?.shopPreviews?.reduce(
-                        (sum, shop) => sum + (shop.shopDiscountAmount || 0),
-                        0,
-                      ) || 0;
-                    const systemDiscountAmount =
-                      (cartPreview?.totalDiscountAmount || 0) - totalShopDiscount;
-                    return (
-                      <div className="flex items-center justify-between text-[11px] font-bold">
-                        <div className="flex items-center gap-1.5 pt-1">
-                          <Ticket className="w-3 h-3 text-amazon-btnSecondary" />
-                          <span className="text-amazon-text uppercase tracking-wider">{sv.code}</span>
-                          <span className="text-amazon-textMuted uppercase tracking-wider">(System)</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          {systemDiscountAmount > 0 && (
-                            <span className="text-green-600">
-                              -{formatCurrency(systemDiscountAmount)}
-                            </span>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => dispatch(setSelectedSystemVoucher(null))}
-                            className="p-1 text-amazon-textMuted hover:text-red-600 transition-colors"
-                            aria-label="Remove system voucher"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                {/* Shop vouchers — iterate through ALL applied codes per shop */}
-                {applicableVouchers?.shopVoucherGroups &&
-                  Object.entries(selectedShopVoucherCodesMap).map(
-                    ([shopId, vCodes]) => {
-                      if (!vCodes || vCodes.length === 0) return null;
-                      const group = applicableVouchers.shopVoucherGroups.find(
-                        (g) => g.shopId === shopId,
-                      );
-                      if (!group) return null;
-                      const shopPreview = cartPreview?.shopPreviews.find(
-                        (s) => s.shopId === shopId,
-                      );
-
-                      return vCodes.map((code) => {
-                        const voucher = group.vouchers.find((v) => v.code === code);
-                        if (!voucher) return null;
-
-                        return (
-                          <div
-                            key={`${shopId}-${code}`}
-                            className="flex items-center justify-between text-[11px] font-bold mt-1"
-                          >
-                            <div className="flex items-center gap-1.5 pt-1">
-                              <Ticket className="w-3 h-3 text-amazon-btnSecondary" />
-                              <span className="text-amazon-text uppercase tracking-wider">
-                                {voucher.code}
-                              </span>
-                              <span className="text-amazon-textMuted uppercase tracking-wider">
-                                ({shopPreview?.shopName ?? shopId})
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const newCodes = vCodes.filter((c) => c !== code);
-                                  dispatch(
-                                    setSelectedShopVouchers({
-                                      shopId,
-                                      voucherCodes: newCodes,
-                                    }),
-                                  );
-                                }}
-                                className="p-1 text-amazon-textMuted hover:text-red-600 transition-colors"
-                                aria-label={`Remove voucher ${voucher.code}`}
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      });
-                    },
+            {/* Split Discounts for transparency */}
+            {(() => {
+              const totalShopDiscount =
+                cartPreview?.shopPreviews?.reduce(
+                  (sum, shop) => sum + (shop.shopDiscountAmount || 0),
+                  0,
+                ) || 0;
+              const systemDiscountAmount =
+                (cartPreview?.totalDiscountAmount || 0) - totalShopDiscount;
+              if (totalShopDiscount <= 0 && systemDiscountAmount <= 0) return null;
+              return (
+                <div className="space-y-1.5 pt-2 border-t border-amazon-border mt-2">
+                  {totalShopDiscount > 0 && (
+                    <div className="flex items-center justify-between text-[11px] font-bold">
+                      <span className="text-amazon-textMuted uppercase tracking-widest">Shop Discount</span>
+                      <span className="text-green-600">
+                        -{formatCurrency(totalShopDiscount)}
+                      </span>
+                    </div>
                   )}
-
-                {/* Total discount */}
-                {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (
-                  <div className="flex items-center justify-between text-[11px] font-bold pt-2 border-t border-amazon-border mt-2">
-                    <span className="text-amazon-textMuted uppercase tracking-widest">Total Discount</span>
-                    <span className="text-green-600">
-                      -{formatCurrency(cartPreview!.totalDiscountAmount)}
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
+                  {systemDiscountAmount > 0 && (
+                    <div className="flex items-center justify-between text-[11px] font-bold">
+                      <span className="text-amazon-textMuted uppercase tracking-widest">Platform Discount</span>
+                      <span className="text-green-600">
+                        -{formatCurrency(systemDiscountAmount)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             <div className="space-y-3">
               {/* Checkout Button */}

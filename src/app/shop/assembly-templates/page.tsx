@@ -46,13 +46,13 @@ export default function AssemblyTemplatesPage() {
   }, []);
 
   return (
-    <div className="bg-black min-h-[calc(100vh-64px)] p-4 md:p-8">
-      <div className="max-w-[1440px] w-full mx-auto">
+    <div className="max-w-[1440px] w-full mx-auto">
+      <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary min-h-screen">
         {/* ── Header ── */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <ListOrdered  className="w-8 h-8 text-[#f5d800]" />
-            <h1 className="text-3xl font-oswald font-black text-white mb-2 uppercase tracking-widest flex items-center gap-3">
+            {/* <ListOrdered className="w-8 h-8 text-amazon-link" /> */}
+            <h1 className="text-2xl font-bold text-amazon-text flex items-center gap-3">
               Assembly Templates
             </h1>
           </div>
@@ -63,42 +63,42 @@ export default function AssemblyTemplatesPage() {
               setEditingTemplate(null);
               setIsFormOpen(true);
             }}
-            className="flex items-center gap-2 bg-[#f5d800] text-black font-black uppercase tracking-widest text-[11px] px-4 py-2.5 hover:bg-yellow-300 transition-colors duration-150"
+            className="flex items-center gap-2 bg-amazon-btnPrimary text-amazon-text font-medium text-sm px-4 py-2.5 rounded-md hover:brightness-95 transition-all duration-150 shadow-sm"
           >
-            <Plus size={14} />
+            <Plus size={16} />
             Create Template
           </button>
         </div>
 
         {/* ── Table ── */}
-        <div className="bg-[#151515] border border-[#1e2126] rounded-sm overflow-hidden">
+        <div className="bg-white border border-amazon-border rounded-md shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <Loader2
                 size={32}
-                className="animate-spin text-[#f5d800]"
+                className="animate-spin text-amazon-link"
               />
             </div>
           ) : templates.length === 0 ? (
             <div className="flex items-center justify-center py-20">
-              <p className="text-gray-500 text-sm uppercase tracking-widest">
+              <p className="text-amazon-textMuted text-sm font-medium">
                 No assembly templates found.
               </p>
             </div>
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#1e2126]">
-                  <th className="text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">
+                <tr className="border-b border-amazon-border bg-neutral-50">
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-amazon-textMuted">
                     Order
                   </th>
-                  <th className="text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-amazon-textMuted">
                     Step Name
                   </th>
-                  <th className="text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-amazon-textMuted">
                     Required
                   </th>
-                  <th className="text-right px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">
+                  <th className="text-right px-6 py-4 text-xs font-semibold text-amazon-textMuted">
                     Actions
                   </th>
                 </tr>
@@ -107,20 +107,18 @@ export default function AssemblyTemplatesPage() {
                 {templates.map((template, idx) => (
                   <tr
                     key={template.templateId}
-                    className={`border-b border-[#1e2126] last:border-0 hover:bg-[#1a1a1a] transition-colors duration-100 ${
-                      idx % 2 === 0 ? "bg-transparent" : "bg-[#111111]"
-                    }`}
+                    className="bg-white border-b border-amazon-border last:border-0 hover:bg-neutral-50 transition-colors duration-100"
                   >
                     {/* Order */}
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-sm bg-gray-800 text-gray-300 text-xs font-bold">
+                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-neutral-100 text-amazon-text text-sm font-medium border border-amazon-border">
                         {template.stepOrder}
                       </span>
                     </td>
 
                     {/* Step Name */}
                     <td className="px-6 py-4">
-                      <span className="text-white font-bold text-[12px] uppercase tracking-wider">
+                      <span className="text-amazon-text font-medium text-sm">
                         {template.stepName}
                       </span>
                     </td>
@@ -128,13 +126,13 @@ export default function AssemblyTemplatesPage() {
                     {/* Required Badge */}
                     <td className="px-6 py-4">
                       {template.isRequired ? (
-                        <span className="inline-flex items-center gap-1.5 bg-green-900/40 border border-green-700/50 text-green-400 px-2.5 py-1 rounded-sm text-[9px] font-black uppercase tracking-widest">
-                          <CheckCircle size={10} />
+                        <span className="inline-flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-700 px-2.5 py-1 rounded-md text-xs font-semibold">
+                          <CheckCircle size={14} />
                           Required
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 bg-gray-800/60 border border-gray-700/50 text-gray-400 px-2.5 py-1 rounded-sm text-[9px] font-black uppercase tracking-widest">
-                          <XCircle size={10} />
+                        <span className="inline-flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-600 px-2.5 py-1 rounded-md text-xs font-semibold">
+                          <XCircle size={14} />
                           Optional
                         </span>
                       )}
@@ -148,20 +146,20 @@ export default function AssemblyTemplatesPage() {
                             setEditingTemplate(template);
                             setIsFormOpen(true);
                           }}
-                          className="p-2 rounded-sm text-gray-500 hover:text-white hover:bg-[#202030] transition-all duration-150"
+                          className="p-2 rounded-md text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-100 transition-all duration-150"
                           title="Edit"
                         >
-                          <Pencil size={14} />
+                          <Pencil size={16} />
                         </button>
                         <button
                           onClick={() => {
                             setDeletingTemplate(template);
                             setIsDeleteOpen(true);
                           }}
-                          className="p-2 rounded-sm text-gray-500 hover:text-red-400 hover:bg-red-950/30 transition-all duration-150"
+                          className="p-2 rounded-md text-amazon-textMuted hover:text-red-600 hover:bg-red-50 transition-all duration-150"
                           title="Delete"
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>

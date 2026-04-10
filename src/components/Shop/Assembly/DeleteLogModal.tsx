@@ -35,20 +35,20 @@ export default function DeleteLogModal({ isOpen, log, onClose, onSuccess }: Prop
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="bg-white rounded-md p-6 max-w-sm w-full">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <div className="bg-white border border-amazon-border rounded-sm p-6 max-w-sm w-full shadow-2xl relative">
         <h2 className="text-red-600 font-bold text-lg mb-4">Delete Assembly Step</h2>
         
-        <p className="text-gray-700 mb-6">
-          Are you sure you want to delete the step: <span className="font-semibold">{log.stepName}</span>? This action cannot be undone.
+        <p className="text-sm text-amazon-textMuted mb-6">
+          Are you sure you want to delete the step: <span className="font-bold text-amazon-text">"{log.stepName}"</span>? This action cannot be undone.
         </p>
 
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 pt-4 border-t border-amazon-border">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-amazon-textMuted hover:text-amazon-text transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
@@ -57,9 +57,9 @@ export default function DeleteLogModal({ isOpen, log, onClose, onSuccess }: Prop
             type="button"
             onClick={handleDelete}
             disabled={loading}
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+            className="px-6 py-2 bg-red-600 text-white rounded-sm hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 font-medium text-sm border border-red-700 shadow-sm"
           >
-            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+            {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
             Delete
           </button>
         </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, FormEvent, Suspense } from "react";
 import { useAppSelector, useAppDispatch } from "@/src/store/hook";
 import { fetchWalletDetails } from "@/src/store/slices/walletSlice";
+import { fetchProfileThunk } from "@/src/store/slices/authSlice";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -14,6 +15,7 @@ import {
   ChevronUp,
   X,
   Store,
+  User,
 } from "lucide-react";
 import { orderService } from "@/src/services/order.service";
 import { CartData, OrderItem } from "@/src/types/order.types";
@@ -167,8 +169,9 @@ function CheckoutContent() {
   const selectedSystemCode = useAppSelector((state) => state.voucher.selectedSystemVoucherCode);
   const selectedShopVoucherCodesMap = useAppSelector((state) => state.voucher.selectedShopVoucherCodes);
 
-  // ── Wallet state ──────────────────────────────────────────────────────
+  // ── Wallet and Auth state ─────────────────────────────────────────────
   const { details: walletDetails } = useAppSelector((state) => state.wallet);
+  const { user } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(fetchWalletDetails());
@@ -177,6 +180,7 @@ function CheckoutContent() {
   const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [activePolicy, setActivePolicy] = useState<"terms" | "privacy" | "returns" | null>(null);
 
@@ -191,36 +195,64 @@ function CheckoutContent() {
 
   // Fetch cart data and pre-fill form if available
   useEffect(() => {
-    const fetchCart = async () => {
+    const fetchCheckoutData = async () => {
       try {
-        const res = await orderService.getCart();
-        if (res.success) {
-          setCart(res.data);
-
-          // Pre-fill form with saved shipping info from cart
-          const cartData = res.data;
-          if (
-            cartData.receiverName ||
-            cartData.receiverPhone ||
-            cartData.shippingAddress
-          ) {
-            setForm((prev) => ({
-              ...prev,
-              receiverName: cartData.receiverName || prev.receiverName,
-              receiverPhone: cartData.receiverPhone || prev.receiverPhone,
-              shippingAddress: cartData.shippingAddress || prev.shippingAddress,
-              note: cartData.note || prev.note,
-            }));
-          }
+        // 1. Fetch Cart
+        const cartRes = await orderService.getCart();
+        let cartData = null;
+        if (cartRes.success) {
+          cartData = cartRes.data;
+          setCart(cartData);
         }
+
+        // 3. Pre-fill form (Cart data takes precedence over Profile data)
+        setForm((prev) => {
+          return {
+            ...prev,
+            receiverName: cartData?.receiverName || prev.receiverName,
+            receiverPhone: cartData?.receiverPhone || prev.receiverPhone,
+            shippingAddress: cartData?.shippingAddress || prev.shippingAddress,
+            note: cartData?.note || prev.note,
+          };
+        });
+
       } catch {
-        // Cart fetch failed — will show empty state
+        // Fetch failed — will show empty state
       } finally {
         setLoading(false);
       }
     };
-    fetchCart();
-  }, []);
+    fetchCheckoutData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
+
+  const handleAutoFill = async () => {
+    if (!user?.id) {
+       toast.error("Please login to use this feature");
+       return;
+    }
+    
+    setIsAutoFilling(true);
+    try {
+      const profileRes = await dispatch(fetchProfileThunk(user.id));
+      if (fetchProfileThunk.fulfilled.match(profileRes)) {
+        const profileData = profileRes.payload;
+        setForm((prev) => ({
+          ...prev,
+          receiverName: `${profileData.firstName || ""} ${profileData.lastName || ""}`.trim() || prev.receiverName,
+          receiverPhone: profileData.phoneNumber || prev.receiverPhone,
+          shippingAddress: profileData.storeAddress || prev.shippingAddress,
+        }));
+        // toast.success("Filled from your profile!");
+      } else {
+        toast.error("Could not fetch profile data.");
+      }
+    } catch {
+      toast.error("An error occurred while fetching profile data.");
+    } finally {
+      setIsAutoFilling(false);
+    }
+  };
 
   // ── Build voucher codes payload (codes stored directly in state) ─────────
   const payloadCodes = useMemo(() => {
@@ -437,7 +469,23 @@ function CheckoutContent() {
 
           {/* ─── Shipping Information ─────────────────────── */}
           <div className="mb-8">
-            <h2 className="text-lg  tracking-tight text-amazon-text mb-4">Shipping Information</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg tracking-tight text-amazon-text">Shipping Information</h2>
+              <button
+                type="button"
+                onClick={handleAutoFill}
+                disabled={isAutoFilling}
+                title="Auto-fill using your profile data"
+                className="flex items-center gap-1.5 text-[11px] font-bold text-amazon-textMuted hover:text-amazon-link transition-colors disabled:opacity-50"
+              >
+                {isAutoFilling ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <User className="w-3.5 h-3.5" />
+                )}
+                AUTO-FILL
+              </button>
+            </div>
 
             <div className="space-y-3">
               {/* Receiver Name */}

@@ -34,6 +34,7 @@ function formatVND(amount: number): string {
 
 function copyToClipboard(text: string) {
   navigator.clipboard.writeText(text);
+  toast.success("Copied to clipboard!");
 }
 
 function isExpired(endDate: string): boolean {
@@ -44,13 +45,13 @@ function isExpired(endDate: string): boolean {
 
 function TypeBadge({ type }: { type: string }) {
   const map: Record<string, string> = {
-    Promotion: "bg-green-500/10 text-green-500 border-green-500/20",
-    Negotiation: "bg-purple-500/10 text-purple-500 border-purple-500/20",
-    Compensation: "bg-orange-500/10 text-orange-500 border-orange-500/20",
+    Promotion: "bg-green-50 text-green-700 border-green-200",
+    Negotiation: "bg-purple-50 text-purple-700 border-purple-200",
+    Compensation: "bg-orange-50 text-orange-700 border-orange-200",
   };
   return (
     <span
-      className={`inline-block rounded-sm px-1.5 py-0.5 text-[7px] font-black uppercase tracking-widest border ${map[type] ?? "bg-gray-500/10 text-gray-400 border-gray-500/20"}`}
+      className={`inline-block rounded-sm px-1.5 py-0.5 text-[10px] font-medium border ${map[type] ?? "bg-neutral-100 text-amazon-textMuted border-amazon-border"}`}
     >
       {type}
     </span>
@@ -60,18 +61,18 @@ function TypeBadge({ type }: { type: string }) {
 function StatusBadge({ status, endDate }: { status: string; endDate: string }) {
   if (isExpired(endDate)) {
     return (
-      <span className="inline-block rounded-sm bg-gray-500/10 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-gray-500 border border-gray-500/20">
+      <span className="inline-block rounded-sm bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-amazon-textMuted border border-amazon-border">
         Expired
       </span>
     );
   }
   const map: Record<string, string> = {
-    Active: "bg-green-500/10 text-green-500 border-green-500/20",
-    Disabled: "bg-red-500/10 text-red-500 border-red-500/20",
+    Active: "bg-green-50 text-green-700 border-green-200",
+    Disabled: "bg-red-50 text-red-700 border-red-200",
   };
   return (
     <span
-      className={`inline-block rounded-sm px-1.5 py-0.5 text-[7px] font-black uppercase tracking-widest border ${map[status] ?? "bg-gray-500/10 text-gray-400 border-gray-500/20"}`}
+      className={`inline-block rounded-sm px-1.5 py-0.5 text-[10px] font-medium border ${map[status] ?? "bg-neutral-100 text-amazon-textMuted border-amazon-border"}`}
     >
       {status}
     </span>
@@ -84,16 +85,16 @@ function DiscountDisplay({ voucher }: { voucher: Voucher }) {
   if (voucher.discountType === "Percentage") {
     return (
       <div className="flex flex-col">
-        <span className="font-bold text-white">{voucher.value}%</span>
+        <span className="font-medium text-amazon-text">{voucher.value}%</span>
         {voucher.maxDiscountAmount != null && (
-          <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">
+          <span className="text-[10px] text-amazon-textMuted font-medium">
             (Max {formatVND(voucher.maxDiscountAmount)})
           </span>
         )}
       </div>
     );
   }
-  return <span className="font-bold text-white">{formatVND(voucher.value)}</span>;
+  return <span className="font-medium text-amazon-text">{formatVND(voucher.value)}</span>;
 }
 
 // ─── Usage Bar ───────────────────────────────────────────
@@ -108,12 +109,12 @@ function UsageBar({
   const pct = usageLimit > 0 ? (usedCount / usageLimit) * 100 : 0;
   return (
     <div>
-      <span className="text-[10px] font-bold text-gray-400">
+      <span className="text-[10px] font-medium text-amazon-textMuted">
         {usedCount}/{usageLimit}
       </span>
-      <div className="mt-1 h-1.5 w-full rounded-full bg-[#1e2126]">
+      <div className="mt-1 h-1.5 w-full rounded-full bg-neutral-200">
         <div
-          className="h-1.5 rounded-full bg-[#f5d800] transition-all"
+          className="h-1.5 rounded-full bg-amazon-focus transition-all"
           style={{ width: `${Math.min(pct, 100)}%` }}
         />
       </div>
@@ -123,7 +124,7 @@ function UsageBar({
 
 // ─── Page Component ──────────────────────────────────────
 
-export default function ShopVoucherPage() {
+export default function AdminVoucherPage() {
   const dispatch = useAppDispatch();
   const { vouchers, pagination, loadingVouchers } = useAppSelector(
     (state) => state.voucher,
@@ -142,14 +143,14 @@ export default function ShopVoucherPage() {
 
   const handleDelete = async (voucher: Voucher) => {
     const confirmed = window.confirm(
-      `Bạn có chắc chắn muốn xóa mã giảm giá "${voucher.code}" không?`,
+      `Are you sure you want to delete the voucher "${voucher.code}"?`,
     );
     if (!confirmed) return;
     try {
       const result = await dispatch(deleteVoucherThunk(voucher.id)).unwrap();
       toast.success(result.message || "Voucher deleted successfully");
     } catch (err: unknown) {
-      toast.error(typeof err === "string" ? err : "Xoá voucher thất bại");
+      toast.error(typeof err === "string" ? err : "Failed to delete voucher");
     }
   };
 
@@ -160,9 +161,7 @@ export default function ShopVoucherPage() {
       ).unwrap();
       toast.success(result.message || "Voucher status updated successfully");
     } catch (err: unknown) {
-      toast.error(
-        typeof err === "string" ? err : "Cập nhật trạng thái thất bại",
-      );
+      toast.error(typeof err === "string" ? err : "Failed to update status");
     }
   };
 
@@ -174,194 +173,198 @@ export default function ShopVoucherPage() {
   // ── Loading ──
   if (loadingVouchers) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-black">
+      <div className="min-h-[60vh] flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-10 h-10 animate-spin text-[#f5d800]" />
-          <p className="text-gray-500 text-[11px] font-bold uppercase tracking-widest">Loading vouchers...</p>
+          <Loader2 className="w-10 h-10 animate-spin text-amazon-textMuted" />
+          <p className="text-amazon-textMuted text-[11px] font-medium">Loading vouchers...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="py-6 px-2 md:px-6 relative">
+    <div className="w-full flex flex-col gap-4">
       <div className="max-w-[1440px] w-full mx-auto">
-        <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#1e2126] pb-4">
+        <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-amazon-border pb-4">
           <div>
-            <h1 className="text-2xl font-black font-oswald uppercase tracking-widest text-white">
+            <h1 className="text-2xl font-bold text-amazon-text">
               Voucher Management
             </h1>
-            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-1.5">
-              Manage your shop's vouchers and promotions.
+            <p className="text-amazon-textMuted text-[11px] font-medium mt-1.5">
+              Manage vouchers and promotions across the platform.
             </p>
           </div>
           <button
             type="button"
             onClick={() => setShowCreateForm(true)}
-            className="inline-flex items-center gap-1.5 rounded-sm bg-[#f5d800] px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-black transition hover:bg-[#ffe500] shadow-[0_0_15px_rgba(245,216,0,0.3)]"
+            className="inline-flex items-center gap-1.5 rounded-sm bg-amazon-btnPrimary border border-amazon-border px-3 py-1.5 text-[11px] font-medium text-amazon-text transition hover:brightness-95 shadow-sm"
           >
             <Plus className="h-3.5 w-3.5" /> Create Voucher
           </button>
         </div>
 
-      {/* Create Voucher Modal */}
-      <CreatePromotionVoucherForm
-        isOpen={showCreateForm}
-        onClose={() => setShowCreateForm(false)}
-      />
-
-      {/* Update Voucher Modal */}
-      {editingVoucher && (
-        <UpdateVoucherModal
-          voucher={editingVoucher}
-          onClose={() => setEditingVoucher(null)}
+        {/* Create Voucher Modal */}
+        <CreatePromotionVoucherForm
+          isOpen={showCreateForm}
+          onClose={() => setShowCreateForm(false)}
         />
-      )}
 
-      {/* Voucher Details Modal */}
-      <VoucherDetailsModal
-        isOpen={showDetailsModal}
-        onClose={() => setShowDetailsModal(false)}
-      />
+        {/* Update Voucher Modal */}
+        {editingVoucher && (
+          <UpdateVoucherModal
+            voucher={editingVoucher}
+            onClose={() => setEditingVoucher(null)}
+          />
+        )}
 
-      {/* ── Table ── */}
-      <div className="overflow-x-auto rounded-sm bg-[#151515] shadow-sm border border-[#1e2126]">
-        <table className="w-full text-left text-xs text-white">
-          <thead className="border-b border-[#1e2126] bg-black text-[11px] font-black uppercase tracking-widest text-gray-500">
-            <tr>
-              <th className="px-2 py-2">Code</th>
-              <th className="px-2 py-2">Name & Description</th>
-              <th className="px-2 py-2">Type</th>
-              <th className="px-3 py-3">Discount</th>
-              <th className="px-3 py-3">Min Order</th>
-              <th className="px-2 py-2">Used</th>
-              <th className="px-2 py-2">Status</th>
-              <th className="px-2 py-2 text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#1e2126]">
-            {vouchers.map((v) => (
-              <tr key={v.id} className="hover:bg-[#202030] transition-colors">
-                {/* Code */}
-                <td className="whitespace-nowrap px-2 py-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-xs font-bold text-[#f5d800]">
-                      {v.code}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(v.code)}
-                      className="text-gray-500 hover:text-white transition-colors"
-                      title="Copy code"
-                    >
-                      <Copy className="h-2 w-2" />
-                    </button>
-                  </div>
-                </td>
+        {/* Voucher Details Modal */}
+        <VoucherDetailsModal
+          isOpen={showDetailsModal}
+          onClose={() => setShowDetailsModal(false)}
+        />
 
-                {/* Name & Description */}
-                <td className="px-3 py-3 max-w-[130px] lg:max-w-[180px]">
-                  <p className="font-bold text-white truncate">{v.name}</p>
-                  <p className="text-[10px] font-medium text-gray-400 truncate mt-0.5">
-                    {v.description}
-                  </p>
-                </td>
-
-                {/* Type */}
-                <td className="px-2 py-2 whitespace-nowrap">
-                  <TypeBadge type={v.type} />
-                </td>
-
-                {/* Discount */}
-                <td className="px-2 py-2 whitespace-nowrap">
-                  <DiscountDisplay voucher={v} />
-                </td>
-
-                {/* Min Order */}
-                <td className="px-2 py-2 whitespace-nowrap font-medium text-gray-300">
-                  {formatVND(v.minOrderValue)}
-                </td>
-
-                {/* Usage */}
-                <td className="px-2 py-2 min-w-[90px]">
-                  <UsageBar usedCount={v.usedCount} usageLimit={v.usageLimit} />
-                </td>
-
-                {/* Status */}
-                <td className="px-2 py-2 whitespace-nowrap">
-                  <StatusBadge status={v.status} endDate={v.endDate} />
-                </td>
-
-                {/* Actions */}
-                <td className="px-2 py-2">
-                  <div className="flex items-center justify-end gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => handleViewDetails(v.id)}
-                      className="rounded-sm p-1 text-gray-500 hover:bg-black hover:text-white transition-colors border border-transparent hover:border-[#1e2126]"
-                      title="View details"
-                    >
-                      <Eye className="h-3 w-3" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditingVoucher(v)}
-                      className="rounded-sm p-1 text-gray-500 hover:bg-black hover:text-[#f5d800] transition-colors border border-transparent hover:border-[#1e2126]"
-                      title="Edit"
-                    >
-                      <Pencil className="h-3 w-3" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleToggleStatus(v)}
-                      disabled={isExpired(v.endDate)}
-                      className="rounded-sm p-1 text-gray-500 hover:bg-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed border border-transparent hover:border-[#1e2126]"
-                      title={
-                        v.status === "Active"
-                          ? "Disable voucher"
-                          : "Enable voucher"
-                      }
-                    >
-                      {v.status === "Active" ? (
-                        <ToggleRight className="h-3 w-3 text-green-500" />
-                      ) : (
-                        <ToggleLeft className="h-3 w-3 text-gray-500" />
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(v)}
-                      className="rounded-sm p-1 text-gray-500 hover:bg-black hover:text-red-500 transition-colors border border-transparent hover:border-[#1e2126]"
-                      title="Delete"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-
-            {vouchers.length === 0 && (
+        {/* ── Table ── */}
+        <div className="overflow-x-auto rounded-sm bg-white shadow-sm border border-amazon-border flex flex-col">
+       
+          <table className="w-full text-left text-xs text-amazon-text">
+            <thead className="border-b border-amazon-border bg-neutral-50 text-[11px] font-medium text-amazon-textMuted">
               <tr>
-                <td
-                  colSpan={8}
-                  className="py-10 text-center text-gray-500 text-[10px] font-bold uppercase tracking-widest"
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    <Trash2 className="h-6 w-6 text-[#1e2126]" />
-                    No vouchers found.
-                  </div>
-                </td>
+           
+                <th className="px-3 py-3">Code</th>
+                <th className="px-3 py-3">Name & Description</th>
+                <th className="px-2 py-2">Type</th>
+                <th className="px-3 py-3">Discount</th>
+                <th className="px-3 py-3">Min Order</th>
+                <th className="px-2 py-2">Used</th>
+                <th className="px-2 py-2">Status</th>
+                <th className="px-2 py-2 text-right">Action</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-amazon-border">
+              {vouchers.map((v) => (
+                <tr key={v.id} className="hover:bg-neutral-50 transition-colors">
+                  {/* Code */}
+                  <td className="whitespace-nowrap px-3 py-3">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-xs font-medium text-amazon-text">
+                        {v.code}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(v.code)}
+                        className="text-amazon-textMuted hover:text-amazon-text transition-colors"
+                        title="Copy code"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </td>
+
+                  {/* Name & Description */}
+                  
+                 <td className="px-3 py-3 max-w-[130px] lg:max-w-[180px]">
+                    <p className="font-medium text-amazon-text truncate capitalize">{v.name}</p>
+                    <p className="text-[11px] font-normal text-amazon-textMuted truncate mt-0.5">
+                      {v.description}
+                    </p>
+                  </td>
+
+                  {/* Type */}
+                  <td className="px-2 py-2 whitespace-nowrap">
+                    <TypeBadge type={v.type} />
+                  </td>
+
+                  {/* Discount */}
+                  <td className="px-2 py-2 whitespace-nowrap">
+                    <DiscountDisplay voucher={v} />
+                  </td>
+
+                  {/* Min Order */}
+                  <td className="px-2 py-2 whitespace-nowrap font-medium text-amazon-textMuted">
+                    {formatVND(v.minOrderValue)}
+                  </td>
+
+                  {/* Usage */}
+                  
+                  <td className="px-2 py-2 min-w-[90px]">
+                    <UsageBar usedCount={v.usedCount} usageLimit={v.usageLimit} />
+                  </td>
+
+                  {/* Status */}
+                  <td className="px-2 py-2 whitespace-nowrap">
+                    <StatusBadge status={v.status} endDate={v.endDate} />
+                  </td>
+
+                  {/* Actions */}
+                  <td className="px-2 py-2">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleViewDetails(v.id)}
+                        className="rounded-sm p-1.5 text-amazon-textMuted hover:bg-neutral-100 hover:text-amazon-text transition-colors border border-transparent hover:border-amazon-border"
+                        title="View details"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingVoucher(v)}
+                        className="rounded-sm p-1.5 text-amazon-textMuted hover:bg-neutral-100 hover:text-amazon-focus transition-colors border border-transparent hover:border-amazon-border"
+                        title="Edit"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleStatus(v)}
+                        disabled={isExpired(v.endDate)}
+                        className="rounded-sm p-1.5 text-amazon-textMuted hover:bg-neutral-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed border border-transparent hover:border-amazon-border"
+                        title={
+                          v.status === "Active"
+                            ? "Disable voucher"
+                            : "Enable voucher"
+                        }
+                      >
+                        {v.status === "Active" ? (
+                          <ToggleRight className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <ToggleLeft className="h-4 w-4 text-amazon-textMuted" />
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(v)}
+                        className="rounded-sm p-1.5 text-amazon-textMuted hover:bg-neutral-100 hover:text-red-500 transition-colors border border-transparent hover:border-amazon-border"
+                        title="Delete"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+              {vouchers.length === 0 && !loadingVouchers && (
+                <tr>
+                  <td
+                    colSpan={8}
+                    className="py-10 text-center text-amazon-textMuted text-[11px] font-medium"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <Trash2 className="h-6 w-6 text-neutral-300" />
+                      No vouchers found.
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
         {/* ── Pagination ── */}
-        <div className="mt-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-[10px] font-black uppercase tracking-widest text-gray-500">
+        <div className="mt-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-[11px] font-medium text-amazon-textMuted">
           <span>
-            Page {pagination.currentPage} / {pagination.totalPages} &middot;{" "}
+            Page <strong className="text-amazon-text">{pagination.currentPage}</strong> / {pagination.totalPages} &middot;{" "}
             {pagination.totalCount} voucher(s)
           </span>
           <div className="flex gap-2">
@@ -369,7 +372,7 @@ export default function ShopVoucherPage() {
               type="button"
               disabled={!pagination.hasPreviousPage}
               onClick={() => goToPage(pagination.currentPage - 1)}
-              className="inline-flex items-center gap-1 rounded-sm border border-[#1e2126] bg-[#151515] px-2.5 py-1.5 transition-colors hover:bg-[#202030] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed text-gray-400"
+              className="inline-flex items-center gap-1 rounded-sm border border-amazon-border bg-white px-2.5 py-1.5 transition-colors hover:bg-neutral-50 hover:text-amazon-text disabled:opacity-40 disabled:cursor-not-allowed text-amazon-textMuted"
             >
               <ChevronLeft className="h-3 w-3" /> Previous
             </button>
@@ -377,7 +380,7 @@ export default function ShopVoucherPage() {
               type="button"
               disabled={!pagination.hasNextPage}
               onClick={() => goToPage(pagination.currentPage + 1)}
-              className="inline-flex items-center gap-1 rounded-sm border border-[#1e2126] bg-[#151515] px-2.5 py-1.5 transition-colors hover:bg-[#202030] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed text-gray-400"
+              className="inline-flex items-center gap-1 rounded-sm border border-amazon-border bg-white px-2.5 py-1.5 transition-colors hover:bg-neutral-50 hover:text-amazon-text disabled:opacity-40 disabled:cursor-not-allowed text-amazon-textMuted"
             >
               Next <ChevronRight className="h-3 w-3" />
             </button>

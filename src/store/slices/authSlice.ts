@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { UserData } from "@/src/types/auth.types";
+import { authService } from "@/src/services/authServices";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -16,6 +17,21 @@ const initialState: AuthState = {
   error: null,
   isInitialized: false, //Mặc định là false (Chưa check xong)
 };
+
+export const fetchProfileThunk = createAsyncThunk(
+  "auth/fetchProfile",
+  async (userId: string, { rejectWithValue }) => {
+    try {
+      const response = await authService.getProfile(userId);
+      if (response.success) {
+        return response.data;
+      }
+      return rejectWithValue(response.message || "Failed to fetch profile");
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Error fetching profile");
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -56,6 +72,16 @@ const authSlice = createSlice({
     setInitialized: (state) => {
       state.isInitialized = true;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchProfileThunk.fulfilled, (state, action) => {
+      // Update the user state with the latest profile data
+      if (state.user && state.user.id === action.payload.id) {
+         state.user = { ...state.user, ...action.payload };
+      } else if (!state.user) {
+         state.user = action.payload;
+      }
+    });
   },
 });
 

@@ -24,18 +24,18 @@ import ShopReviewModal from "@/src/components/Warranty/ShopReviewModal";
 const PAGE_SIZE = 10;
 
 const STATUS_STYLES: Record<string, { bg: string; label: string }> = {
-  InProgress: { bg: "bg-[#f5d800]/10 text-[#f5d800] border border-[#f5d800]/20", label: "Pending" },
-  AwaitingReturn: { bg: "bg-blue-500/10 text-blue-400 border border-blue-500/20", label: "Awaiting Return" },
-  ShopAccepted: { bg: "bg-teal-500/10 text-teal-400 border border-teal-500/20", label: "Accepted" },
-  Rejected: { bg: "bg-red-500/10 text-red-500 border border-red-500/20", label: "Rejected" },
+  InProgress: { bg: "bg-yellow-50 text-yellow-700 border border-yellow-200", label: "Pending" },
+  AwaitingReturn: { bg: "bg-yellow-50 text-yellow-700 border border-yellow-200", label: "Awaiting Return" },
+  ShopAccepted: { bg: "bg-green-50 text-green-700 border border-green-200", label: "Accepted" },
+  Rejected: { bg: "bg-red-50 text-red-700 border border-red-200", label: "Rejected" },
   AdminReviewing: {
-    bg: "bg-purple-500/10 text-purple-400 border border-purple-500/20",
+    bg: "bg-blue-50 text-blue-700 border border-blue-200",
     label: "Admin Reviewing",
   },
-  Completed: { bg: "bg-green-500/10 text-green-400 border border-green-500/20", label: "Completed" },
-  AutoCancelled: { bg: "bg-gray-500/10 text-gray-500 border border-gray-500/20", label: "Auto Cancelled" },
-  Returning: { bg: "bg-blue-500/10 text-blue-400 border border-blue-500/20", label: "Returning" },
-  Returned: { bg: "bg-blue-400/10 text-blue-300 border border-blue-400/20", label: "Returned" },
+  Completed: { bg: "bg-green-50 text-green-700 border border-green-200", label: "Completed" },
+  AutoCancelled: { bg: "bg-red-50 text-red-700 border border-red-200", label: "Auto Cancelled" },
+  Returning: { bg: "bg-blue-50 text-blue-700 border border-blue-200", label: "Returning" },
+  Returned: { bg: "bg-blue-50 text-blue-700 border border-blue-200", label: "Returned" },
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -60,7 +60,7 @@ const formatDate = (dateStr: string): string => {
 
 const getStatus = (statusName: string): { bg: string; label: string } =>
   STATUS_STYLES[statusName] || {
-    bg: "bg-gray-500/10 text-gray-500 border border-gray-500/20",
+    bg: "bg-neutral-50 text-neutral-700 border border-neutral-200",
     label: statusName,
   };
 
@@ -69,31 +69,31 @@ const getTypeLabel = (typeName: string): string =>
 
 // ─── Table Skeleton ────────────────────────────────────────
 const TableSkeleton: FC = () => (
-  <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-12 lg:py-20 animate-pulse bg-black min-h-screen">
-    <div className="h-10 w-80 bg-[#1e2126] rounded-sm mb-8" />
-    <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
+  <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-12 lg:py-20 animate-pulse bg-amazon-bgSecondary min-h-screen">
+    <div className="h-10 w-80 bg-neutral-200 rounded-sm mb-8" />
+    <div className="bg-white rounded-md shadow-sm border border-amazon-border overflow-hidden">
       {/* Header row */}
-      <div className="grid grid-cols-7 gap-4 px-6 py-4 border-b border-[#1e2126] bg-black">
+      <div className="grid grid-cols-7 gap-4 px-6 py-4 border-b border-amazon-border bg-neutral-50">
         {Array.from({ length: 7 }).map((_, i) => (
-          <div key={i} className="h-4 bg-[#1e2126] rounded-sm w-full" />
+          <div key={i} className="h-4 bg-neutral-200 rounded-sm w-full" />
         ))}
       </div>
       {/* Body rows */}
       {[1, 2, 3, 4, 5].map((i) => (
         <div
           key={i}
-          className="grid grid-cols-7 gap-4 px-6 py-4 border-b border-[#1e2126] bg-[#151515]"
+          className="grid grid-cols-7 gap-4 px-6 py-4 border-b border-amazon-border bg-white"
         >
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-[#1e2126]" />
-            <div className="h-4 w-20 bg-[#1e2126] rounded-sm" />
+            <div className="w-8 h-8 rounded-full bg-neutral-200" />
+            <div className="h-4 w-20 bg-neutral-200 rounded-sm" />
           </div>
-          <div className="h-4 w-24 bg-[#1e2126] rounded-sm" />
-          <div className="h-4 w-32 bg-[#1e2126] rounded-sm" />
-          <div className="h-4 w-20 bg-[#1e2126] rounded-sm" />
-          <div className="h-4 w-28 bg-[#1e2126] rounded-sm" />
-          <div className="h-6 w-20 bg-[#1e2126] rounded-sm" />
-          <div className="h-8 w-24 bg-[#1e2126] rounded-sm" />
+          <div className="h-4 w-24 bg-neutral-200 rounded-sm" />
+          <div className="h-4 w-32 bg-neutral-200 rounded-sm" />
+          <div className="h-4 w-20 bg-neutral-200 rounded-sm" />
+          <div className="h-4 w-28 bg-neutral-200 rounded-sm" />
+          <div className="h-6 w-20 bg-neutral-200 rounded-sm" />
+          <div className="h-8 w-24 bg-neutral-200 rounded-sm" />
         </div>
       ))}
     </div>
@@ -102,14 +102,14 @@ const TableSkeleton: FC = () => (
 
 // ─── Empty State ───────────────────────────────────────────
 const EmptyState: FC = () => (
-  <div className="flex flex-col items-center justify-center py-20 text-center bg-[#151515] rounded-sm border border-[#1e2126]">
-    <div className="w-16 h-16 rounded-full bg-black border border-[#1e2126] flex items-center justify-center mb-5">
-      <ShieldCheck className="w-8 h-8 text-[#f5d800]" />
+  <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-md shadow-sm border border-amazon-border">
+    <div className="w-16 h-16 rounded-full bg-neutral-50 border border-amazon-border flex items-center justify-center mb-5">
+      <ShieldCheck className="w-8 h-8 text-neutral-400" />
     </div>
-    <h2 className="text-[13px] font-black uppercase tracking-widest text-white mb-2">
+    <h2 className="text-[14px] font-medium text-amazon-text mb-2">
       No requests yet
     </h2>
-    <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 max-w-sm">
+    <p className="text-[13px] text-amazon-textMuted max-w-sm">
       The shop has not received any warranty or return requests from customers.
     </p>
   </div>
@@ -132,7 +132,7 @@ const TableRow: FC<RowProps> = ({
   const status = getStatus(request.statusName);
 
   return (
-    <tr className="border-b border-[#1e2126] hover:bg-[#202030] transition-colors">
+    <tr className="border-b border-amazon-border hover:bg-neutral-50 transition-colors">
       {/* Customer */}
       <td className="px-5 py-3.5">
         <div className="flex items-center gap-2.5">
@@ -142,46 +142,46 @@ const TableRow: FC<RowProps> = ({
               alt={request.customerName || ""}
               width={32}
               height={32}
-              className="rounded-full object-cover border border-[#1e2126]"
+              className="rounded-full object-cover border border-amazon-border"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-black border border-[#1e2126] flex items-center justify-center">
-              <User className="w-4 h-4 text-gray-500" />
+            <div className="w-8 h-8 rounded-full bg-neutral-50 border border-amazon-border flex items-center justify-center">
+              <User className="w-4 h-4 text-amazon-textMuted" />
             </div>
           )}
-          <span className="text-[11px] font-black uppercase tracking-widest text-white truncate max-w-[120px]">
+          <span className="text-sm font-medium text-amazon-text truncate max-w-[120px]">
             {request.customerName || "N/A"}
           </span>
         </div>
       </td>
       {/* Type */}
       <td className="px-5 py-3.5">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+        <span className="text-sm text-amazon-text">
           {getTypeLabel(request.typeName)}
         </span>
       </td>
       {/* Reason */}
       <td className="px-5 py-3.5">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 line-clamp-2">
+        <span className="text-sm text-amazon-text line-clamp-2">
           {request.reason}
         </span>
       </td>
       {/* Refund Amount */}
       <td className="px-5 py-3.5">
-        <span className="text-[11px] font-black uppercase tracking-widest text-[#f5d800]">
+        <span className="text-sm font-bold text-amazon-price">
           {formatCurrency(request.refundAmount)}
         </span>
       </td>
       {/* Date */}
       <td className="px-5 py-3.5">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 whitespace-nowrap">
+        <span className="text-sm text-amazon-text whitespace-nowrap">
           {formatDate(request.createdAt)}
         </span>
       </td>
       {/* Status */}
       <td className="px-5 py-3.5">
         <span
-          className={`inline-block text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-sm whitespace-nowrap ${status.bg}`}
+          className={`inline-block text-xs font-medium px-2.5 py-1 rounded-sm whitespace-nowrap ${status.bg}`}
         >
           {status.label}
         </span>
@@ -191,20 +191,20 @@ const TableRow: FC<RowProps> = ({
         {request.status === 1 ? (
           <button
             onClick={() => onReviewClick(request)}
-            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-black bg-[#f5d800] px-3.5 py-2 rounded-sm hover:bg-[#ffe500] transition-colors whitespace-nowrap shadow-[0_0_15px_rgba(245,216,0,0.3)]"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-amazon-text bg-amazon-btnPrimary px-4 py-2 rounded-sm hover:brightness-95 transition-colors whitespace-nowrap shadow-sm"
           >
-            <Eye className="w-3.5 h-3.5 text-black" />
+            <Eye className="w-3.5 h-3.5 text-amazon-text" />
             View & Process
           </button>
         ) : request.status === 5 ? (
-          <span className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+          <span className="text-amazon-textMuted text-sm font-medium">
             Wait Return
           </span>
         ) : request.status === 6 ? (
           <button
             onClick={() => onConfirmReceive(request.id)}
             disabled={isConfirmingReceipt}
-            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white bg-green-600 px-3.5 py-2 rounded-sm hover:bg-green-700 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-green-600 px-4 py-2 rounded-sm hover:bg-green-700 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             <CheckCircle className="w-3.5 h-3.5" />
             Confirm Rcpt
@@ -212,7 +212,7 @@ const TableRow: FC<RowProps> = ({
         ) : (
           <button
             onClick={() => onReviewClick(request)}
-            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-gray-400 bg-black border border-[#1e2126] px-3.5 py-2 rounded-sm hover:bg-[#202030] hover:text-white transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-amazon-textMuted bg-white border border-amazon-border px-4 py-2 rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition-colors whitespace-nowrap shadow-sm"
           >
             <FileText className="w-3.5 h-3.5" />
             View Info
@@ -234,24 +234,24 @@ const Pagination: FC<PaginationProps> = ({ current, total, onChange }) => {
   if (total <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between py-5 text-[10px] font-black uppercase tracking-widest text-gray-500">
-      <span className="text-gray-400">
-        Page <span className="text-white">{current}</span> / {total}
+    <div className="flex items-center justify-between py-5 text-sm font-medium text-amazon-textMuted border-t border-amazon-border">
+      <span className="text-amazon-textMuted">
+        Page <span className="text-amazon-text font-bold">{current}</span> / {total}
       </span>
       <div className="flex items-center gap-2">
         <button
           disabled={current <= 1}
           onClick={() => onChange(current - 1)}
-          className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] text-gray-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 text-amazon-textMuted hover:text-amazon-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
         >
-          <ChevronLeft className="w-3.5 h-3.5" />
+          <ChevronLeft className="w-4 h-4" />
         </button>
         <button
           disabled={current >= total}
           onClick={() => onChange(current + 1)}
-          className="p-1.5 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] text-gray-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 text-amazon-textMuted hover:text-amazon-text disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
         >
-          <ChevronRight className="w-3.5 h-3.5" />
+          <ChevronRight className="w-4 h-4" />
         </button>
       </div>
     </div>
@@ -312,15 +312,15 @@ const ShopWarrantyDashboard: FC = () => {
   if (loadingShopWarranties) return <TableSkeleton />;
 
   return (
-    <div className="p-8 bg-black min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-end mb-6 border-b border-[#1e2126] pb-4">
+    <div className="max-w-[1440px] w-full mx-auto">
+      <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary min-h-screen">
+        <div className="flex justify-between items-end mb-6 border-b border-amazon-border pb-4">
           <div>
-            <h1 className="text-3xl font-oswald font-black text-white mb-2 uppercase tracking-widest flex items-center gap-3">
-              <ShieldCheck className="w-8 h-8 text-[#f5d800]" />
+            <h1 className="text-2xl font-bold text-amazon-text mb-2 flex items-center gap-3">
+              {/* <ShieldCheck className="w-8 h-8 text-neutral-400" /> */}
               Warranty Requests
             </h1>
-            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+            <p className="text-[11px] text-amazon-textMuted">
               Manage return & warranty requests from customers.
             </p>
           </div>
@@ -329,11 +329,11 @@ const ShopWarrantyDashboard: FC = () => {
         {shopWarrantyList.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
+          <div className="bg-white shadow-sm rounded-md border border-amazon-border overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-white">
+              <table className="w-full text-left text-sm text-amazon-text">
                 <thead>
-                  <tr className="bg-black border-b border-[#1e2126] text-[10px] font-black uppercase tracking-widest text-gray-500">
+                  <tr className="bg-neutral-50 border-b border-amazon-border font-medium text-amazon-text">
                     <th className="px-5 py-4">Customer</th>
                     <th className="px-5 py-4">Type</th>
                     <th className="px-5 py-4 max-w-[200px]">Reason</th>

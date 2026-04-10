@@ -3,7 +3,7 @@
 import { useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle, ArrowRight, Package } from "lucide-react";
+import { CheckCircle, Loader2, Package } from "lucide-react";
 import { useAppDispatch } from "@/src/store/hook";
 import { clearCart } from "@/src/store/slices/cartSlice";
 
@@ -11,10 +11,13 @@ function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
   const sessionId = searchParams.get("session_id");
+  const orderId = searchParams.get("orderId");
+  
+  const referenceId = sessionId || orderId;
 
   // Clear local cart state once payment is confirmed
   useEffect(() => {
-    if (sessionId) {
+    if (referenceId) {
       dispatch(clearCart());
       // Also clear localStorage cart
       try {
@@ -23,82 +26,78 @@ function PaymentSuccessContent() {
         // Ignore storage errors
       }
     }
-  }, [sessionId, dispatch]);
+  }, [referenceId, dispatch]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="max-w-lg w-full text-center">
-        {/* Success Icon */}
-        <div className="mb-8 flex justify-center">
-          <div className="relative">
-            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center animate-[scale-in_0.5s_ease-out]">
-              <CheckCircle className="w-14 h-14 text-green-500" />
-            </div>
-            {/* Decorative ring */}
-            <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-green-200 animate-ping opacity-20" />
-          </div>
-        </div>
-
-        {/* Heading */}
-        <h1 className="text-3xl md:text-4xl font-oswald font-bold text-black uppercase tracking-wide mb-3">
-          Thank You for Your Order!
+    <div className="min-h-screen flex flex-col items-center justify-center bg-amazon-bgSecondary p-4 text-amazon-text font-sans">
+      <Link href="/" className="mb-6">
+        <h1 className="text-2xl font-black uppercase tracking-tight text-amazon-text">
+          AMEKO STORE
         </h1>
+      </Link>
 
-        <p className="text-gray-500 text-base mb-6 max-w-md mx-auto">
-          Your payment was successful. We&apos;re preparing your custom keyboard
-          build and will notify you once it ships.
-        </p>
-
-        {/* Transaction Reference */}
-        {sessionId && (
-          <div className="bg-white border border-gray-200 rounded-lg p-4 mb-8 mx-auto max-w-sm">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">
-              Transaction Reference
-            </p>
-            <p className="text-sm text-gray-700 font-mono break-all select-all">
-              {sessionId}
-            </p>
+      <div className="bg-white border border-amazon-border rounded-md p-6 sm:p-8 max-w-[420px] w-full text-center shadow-sm flex flex-col items-center">
+        {/* Success Icon */}
+        <div className="py-2 w-full">
+          <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100 animate-[scale-in_0.5s_ease-out]">
+            <CheckCircle className="text-green-600 w-8 h-8" />
           </div>
-        )}
+          
+          <h2 className="text-xl font-bold text-amazon-text mb-2 tracking-tight">
+            Order Confirmed!
+          </h2>
+          
+          <p className="text-[13px] text-amazon-textMuted mb-2 leading-relaxed">
+            Your payment was successful. We're processing your order and will notify you once it ships.
+          </p>
 
-        {/* Confirmation Details */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8 text-left max-w-sm mx-auto">
-          <div className="flex items-center gap-3 mb-3">
-            <Package className="w-5 h-5 text-gray-400" />
-            <span className="text-sm font-medium text-gray-700">
-              What happens next?
-            </span>
-          </div>
-          <ul className="space-y-2 text-sm text-gray-500">
-            <li className="flex items-start gap-2">
-              <span className="w-5 h-5 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                1
-              </span>
-              Order confirmation sent to your email
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="w-5 h-5 bg-gray-100 text-gray-500 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                2
-              </span>
-              Your keyboard will be assembled
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="w-5 h-5 bg-gray-100 text-gray-500 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                3
-              </span>
-              Shipped and tracking number provided
-            </li>
-          </ul>
-        </div>
+          {/* Transaction Details */}
+          {referenceId && (
+            <div className="mt-6 mb-6 text-left border border-amazon-border rounded-sm bg-neutral-50 p-4 w-full">
+              <h3 className="text-[11px] font-bold text-amazon-textMuted mb-3 uppercase tracking-wider border-b border-amazon-border pb-2">
+                Transaction Details
+              </h3>
+              <div className="space-y-2.5 text-[13px]">
+                <div className="flex justify-between items-center gap-4">
+                  <span className="text-amazon-textMuted font-medium shrink-0">Reference</span>
+                  <span className="font-bold font-mono text-[11px] text-amazon-text bg-white px-1.5 py-0.5 rounded border border-amazon-border line-clamp-1 break-all flex-1 text-right ml-4">
+                    {referenceId}
+                  </span>
+                </div>
+                <div className="flex items-start gap-3 mt-4 pt-4 border-t border-amazon-border">
+                  <Package className="w-4 h-4 text-amazon-textMuted shrink-0 mt-0.5" />
+                  <div className="flex flex-col gap-2 w-full">
+                     <span className="text-[12px] font-bold text-amazon-text">Order Timeline</span>
+                     <div className="flex items-center gap-2 text-[11px] text-amazon-textMuted font-medium">
+                       <span className="w-4 h-4 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0">1</span>
+                       Confirmation sent to email
+                     </div>
+                     <div className="flex items-center gap-2 text-[11px] text-amazon-textMuted font-medium">
+                       <span className="w-4 h-4 bg-neutral-200 text-neutral-600 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0">2</span>
+                       Order is processed & packed
+                     </div>
+                     <div className="flex items-center gap-2 text-[11px] text-amazon-textMuted font-medium">
+                       <span className="w-4 h-4 bg-neutral-200 text-neutral-600 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0">3</span>
+                       Tracking number provided
+                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
-            href="/"
-            className="bg-black text-white px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-[#ce2a32] transition-colors duration-200 rounded-sm flex items-center gap-2"
+            href="/orders"
+            className="bg-amazon-btnPrimary text-amazon-text hover:brightness-95 py-3 px-6 rounded-sm block w-full font-bold uppercase tracking-widest text-[13px] transition-all shadow-sm"
           >
-            Return to Home
-            <ArrowRight className="w-4 h-4" />
+            Check Order Status
+          </Link>
+          
+          <Link
+            href="/shop/all-products"
+            className="mt-3 bg-white border border-amazon-border hover:bg-neutral-50 text-amazon-text py-3 px-6 rounded-sm block w-full font-bold uppercase tracking-widest text-[13px] transition-all shadow-sm"
+          >
+            Continue Shopping
           </Link>
         </div>
       </div>
@@ -110,8 +109,8 @@ export default function PaymentSuccessPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin w-8 h-8 border-4 border-gray-200 border-t-black rounded-full" />
+        <div className="min-h-screen flex items-center justify-center bg-amazon-bgSecondary text-amazon-text">
+          <Loader2 className="w-8 h-8 animate-spin text-amazon-textMuted" />
         </div>
       }
     >

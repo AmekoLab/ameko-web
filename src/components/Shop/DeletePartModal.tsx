@@ -69,8 +69,8 @@ export default function DeletePartModal({
               <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-amazon-text uppercase tracking-widest">Delete Part</h2>
-              <p className="text-[10px]  font-bold tracking-widest text-red-700 mt-0.5">
+              <h2 className="text-lg font-bold text-amazon-text">Delete Part</h2>
+              <p className="text-[12px] font-medium text-red-700 mt-0.5">
                 This action cannot be undone
               </p>
             </div>
@@ -86,18 +86,18 @@ export default function DeletePartModal({
 
         {/* Body */}
         <div className="px-6 py-5 space-y-5">
-          <p className="text-[13px] font-bold  tracking-widest text-amazon-textMuted">
+          <p className="text-[14px] font-medium text-amazon-textMuted">
             You are about to permanently delete the part:
           </p>
 
           {/* Part info card */}
           <div className="bg-neutral-50 rounded-sm border border-amazon-border p-4">
-            <p className="font-black uppercase tracking-widest text-amazon-text text-[11px]">{part.name}</p>
-            <p className="text-[12px] font-bold  tracking-widest text-amazon-textMuted mt-2">
+            <p className="font-bold text-amazon-text text-[14px]">{part.name}</p>
+            <p className="text-[13px] font-medium text-amazon-textMuted mt-1">
               Type:{" "}
-              <span className="font-black capitalize">{part.partType}</span>{" "}
+              <span className="font-medium text-amazon-text capitalize">{part.partType}</span>{" "}
               &middot; Category:{" "}
-              <span className="font-black capitalize">
+              <span className="font-medium text-amazon-text capitalize">
                 {part.categoryName}
               </span>
             </p>
@@ -106,8 +106,8 @@ export default function DeletePartModal({
 
           {/* Confirmation input */}
           <div>
-            <label className="block text-[13px] font-bold  tracking-widest text-amazon-textMuted mb-2">
-              Type <span className="font-black text-amazon-text">{part.name}</span>{" "}
+            <label className="block text-[13px] font-medium text-amazon-textMuted mb-2">
+              Type <span className="font-bold text-amazon-text">{part.name}</span>{" "}
               to confirm:
             </label>
             <input
@@ -116,7 +116,7 @@ export default function DeletePartModal({
               onChange={(e) => setConfirmText(e.target.value)}
               disabled={deleting}
               placeholder={part.name}
-              className="text-amazon-text text-[11px] font-bold uppercase tracking-widest w-full px-3 py-2 border border-amazon-border rounded-sm focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition disabled:opacity-50 disabled:bg-neutral-50 placeholder:text-neutral-400"
+              className="text-[13px] font-medium text-amazon-text w-full px-3 py-2 border border-amazon-border rounded-sm focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition disabled:opacity-50 disabled:bg-neutral-50 placeholder:text-neutral-400"
             />
           </div>
         </div>
@@ -126,14 +126,14 @@ export default function DeletePartModal({
           <button
             onClick={handleClose}
             disabled={deleting}
-            className="px-5 py-2.5 text-[13px] font-black  tracking-widest text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
+            className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
           >
             Cancel
           </button>
           <button
             onClick={handleDelete}
             disabled={!canDelete || deleting}
-            className="px-5 py-2.5 text-[13px] font-black  tracking-widest text-white bg-red-600 border border-red-600 rounded-sm hover:bg-red-700 hover:border-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+            className="px-5 py-2 text-[13px] font-medium text-white bg-red-600 border border-red-600 rounded-sm hover:bg-red-700 hover:border-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
           >
             {deleting ? (
               <>

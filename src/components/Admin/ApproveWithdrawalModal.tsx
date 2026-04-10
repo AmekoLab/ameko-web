@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { approveShopWithdrawal } from "@/src/store/slices/adminWalletSlice";
-import { X, Loader2, Upload, ImageIcon, CheckCircle } from "lucide-react";
 import { uploadImage } from "@/src/utils/uploadImage";
 import { toast } from "react-toastify";
 import Image from "next/image";
@@ -69,7 +68,7 @@ export default function ApproveWithdrawalModal({
       const url = await uploadImage(file);
       setUploadedUrl(url);
     } catch {
-      toast.error("Tải ảnh lên thất bại. Vui lòng thử lại.");
+      toast.error("Upload image failed. Please try again.");
       setImageFile(null);
       setImagePreview(null);
     } finally {
@@ -87,7 +86,7 @@ export default function ApproveWithdrawalModal({
 
   const onSubmit = async (data: ApproveFormData) => {
     if (!uploadedUrl) {
-      toast.error("Vui lòng tải lên ảnh minh chứng chuyển khoản.");
+      toast.error("Please upload transfer evidence image.");
       return;
     }
 
@@ -112,71 +111,66 @@ export default function ApproveWithdrawalModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm"
         onClick={handleClose}
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+      <div className="relative bg-white rounded-md shadow-xl w-full max-w-lg border border-amazon-border overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-600">
-              <CheckCircle className="h-5 w-5 text-white" />
-            </div>
-            <h2 className="text-lg font-black uppercase tracking-tight text-black font-oswald">
-              Approve withdrawal request
-            </h2>
-          </div>
+        <div className="flex items-center justify-between p-4 border-b border-amazon-border bg-white">
+          <h2 className="text-lg font-bold text-amazon-text">
+            Approve Withdrawal
+          </h2>
           <button
+            type="button"
             onClick={handleClose}
-            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            className="px-2 py-1 text-[11px] font-medium text-amazon-textMuted rounded-sm hover:bg-neutral-50 border border-transparent hover:border-amazon-border transition-colors"
           >
-            <X className="h-5 w-5 text-gray-500" />
+            Close
           </button>
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-5">
           {/* Transfer Amount Display */}
-          <div className="bg-red-50 rounded-xl p-5 text-center border border-red-100">
-            <p className="text-xs text-gray-500 uppercase tracking-wide font-oswald mb-1">
+          <div className="bg-neutral-50 rounded-sm p-3 border border-amazon-border text-center flex flex-col gap-1">
+            <p className="text-[11px] text-amazon-textMuted">
               Amount to transfer
             </p>
-            <p className="text-3xl font-black text-[#ce2a32] font-oswald">
-              {amount.toLocaleString("vi-VN")}
-              <span className="text-base ml-1">₫</span>
+            <p className="text-lg font-bold text-green-600">
+              {amount.toLocaleString("vi-VN")}₫
             </p>
           </div>
 
           {/* Reason */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className="space-y-1">
+            <label className="block text-[11px] font-medium text-amazon-text">
               Approval reason
             </label>
             <textarea
-              rows={3}
+              rows={2}
               placeholder="Enter reason..."
-              className={` text-black w-full border-2 rounded-lg p-3 outline-none transition-all resize-none ${
+              className={`w-full border rounded-sm p-2 outline-none transition-colors resize-none text-[11px] text-amazon-text ${
                 errors.reason
                   ? "border-red-400 focus:border-red-500"
-                  : "border-gray-300 focus:border-black"
+                  : "border-amazon-border focus:border-amazon-btnPrimary"
               }`}
               {...register("reason")}
             />
             {errors.reason && (
-              <p className="text-xs text-red-500 mt-1">
+              <p className="text-[10px] text-red-500">
                 {errors.reason.message}
               </p>
             )}
           </div>
 
           {/* Evidence Image Upload */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className="space-y-1">
+            <label className="block text-[11px] font-medium text-amazon-text">
               Transfer evidence image
             </label>
 
@@ -184,43 +178,37 @@ export default function ApproveWithdrawalModal({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center gap-3 hover:border-gray-400 hover:bg-gray-50 transition-all"
+                className="w-full border border-dashed border-amazon-border rounded-sm py-6 flex flex-col items-center justify-center gap-1 hover:bg-neutral-50 transition-colors bg-white"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                  <Upload className="h-6 w-6 text-gray-400" />
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-medium text-gray-600">
-                    Click to upload image
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    PNG, JPG up to 5MB
-                  </p>
-                </div>
+                <p className="text-[11px] font-medium text-blue-600">
+                  Click to upload image
+                </p>
+                <p className="text-[10px] text-amazon-textMuted">
+                  PNG, JPG up to 5MB
+                </p>
               </button>
             ) : (
-              <div className="relative rounded-xl border-2 border-gray-200 overflow-hidden">
+              <div className="relative rounded-sm border border-amazon-border overflow-hidden bg-neutral-100 mt-2">
                 <Image
                   src={imagePreview}
                   alt="Evidence preview"
                   width={500}
                   height={300}
-                  className="w-full h-48 object-contain bg-gray-50"
+                  className="w-full h-40 object-contain"
                 />
 
                 {/* Upload status overlay */}
                 {uploading && (
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <div className="flex items-center gap-2 text-white text-sm font-medium">
-                      <Loader2 className="h-5 w-5 animate-spin" />
+                  <div className="absolute inset-0 bg-neutral-900/40 flex items-center justify-center">
+                    <span className="text-white text-[11px] font-medium">
                       Uploading...
-                    </div>
+                    </span>
                   </div>
                 )}
 
                 {uploadedUrl && !uploading && (
-                  <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
-                    <CheckCircle className="h-4 w-4" />
+                  <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full px-2 py-0.5 text-[10px] font-bold">
+                    Uploaded
                   </div>
                 )}
 
@@ -229,10 +217,9 @@ export default function ApproveWithdrawalModal({
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="absolute bottom-2 right-2 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-white transition-colors shadow-sm border border-gray-200"
+                  className="absolute bottom-2 right-2 rounded-sm bg-white border border-amazon-border px-2 py-1 text-[10px] font-medium text-amazon-text hover:bg-neutral-50 transition-colors shadow-sm disabled:opacity-50"
                 >
-                  <ImageIcon className="h-3.5 w-3.5 inline mr-1" />
-                  Change image
+                  Change
                 </button>
               </div>
             )}
@@ -247,14 +234,22 @@ export default function ApproveWithdrawalModal({
           </div>
 
           {/* Submit */}
-          <button
-            type="submit"
-            disabled={isProcessing || !uploadedUrl}
-            className="w-full rounded-lg bg-green-600 px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-green-700 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-oswald flex items-center justify-center gap-2"
-          >
-            {approveLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {approveLoading ? "Processing..." : "Confirm approval"}
-          </button>
+          <div className="pt-3 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-4 py-1.5 text-[11px] font-medium border border-amazon-border rounded-sm hover:bg-neutral-50 text-amazon-text transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isProcessing || !uploadedUrl}
+              className="px-4 py-1.5 rounded-sm bg-green-600 border border-green-700 text-[11px] font-medium text-white transition-colors hover:bg-green-700 hover:border-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {approveLoading ? "Processing..." : "Confirm Approval"}
+            </button>
+          </div>
         </form>
       </div>
     </div>

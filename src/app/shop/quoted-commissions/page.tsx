@@ -45,20 +45,20 @@ const STATUS_MAP: Record<
 > = {
   PendingUserDecision: {
     label: "Pending approval",
-    bg: "bg-[#f5d800]/10 border border-[#f5d800]/20",
-    text: "text-[#f5d800]",
+    bg: "bg-amber-50 border border-amber-200",
+    text: "text-amber-700",
     icon: <Timer className="w-3.5 h-3.5" />,
   },
   Accepted: {
     label: "Confirmed",
-    bg: "bg-green-500/10 border border-green-500/20",
-    text: "text-green-400",
+    bg: "bg-emerald-50 border border-emerald-200",
+    text: "text-emerald-700",
     icon: <CheckCircle2 className="w-3.5 h-3.5" />,
   },
   Revoked: {
     label: "Revoked",
-    bg: "bg-red-500/10 border border-red-500/20",
-    text: "text-red-500",
+    bg: "bg-red-50 border border-red-200",
+    text: "text-red-700",
     icon: <XCircle className="w-3.5 h-3.5" />,
   },
 };
@@ -66,14 +66,14 @@ const STATUS_MAP: Record<
 const StatusBadge = ({ status }: { status: string }) => {
   const config = STATUS_MAP[status] || {
     label: status,
-    bg: "bg-[#202030] border border-[#1e2126]",
-    text: "text-gray-400",
+    bg: "bg-neutral-50 border border-amazon-border",
+    text: "text-amazon-textMuted",
     icon: null,
   };
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-[10px] uppercase font-black tracking-widest border ${config.bg} ${config.text}`}
+      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm text-[12px] font-medium ${config.bg} ${config.text}`}
     >
       {config.icon}
       {config.label}
@@ -83,19 +83,19 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 // ─── Skeleton Row ──────────────────────────────────────────
 const SkeletonRow = () => (
-  <div className="bg-[#151515] border border-[#1e2126] rounded-sm p-5 mb-4 animate-pulse">
+  <div className="bg-white border border-amazon-border shadow-sm rounded-sm p-5 mb-4 animate-pulse">
     <div className="flex flex-col lg:flex-row lg:items-center gap-4">
       <div className="flex-1 space-y-2">
-        <div className="h-4 bg-[#202030] rounded-sm w-32" />
-        <div className="h-3 bg-[#202030] rounded-sm w-3/4" />
+        <div className="h-4 bg-neutral-100 rounded-sm w-32" />
+        <div className="h-3 bg-neutral-100 rounded-sm w-3/4" />
       </div>
       <div className="flex-1 space-y-2">
-        <div className="h-5 bg-[#202030] rounded-sm w-28" />
-        <div className="h-3 bg-[#202030] rounded-sm w-36" />
+        <div className="h-5 bg-neutral-100 rounded-sm w-28" />
+        <div className="h-3 bg-neutral-100 rounded-sm w-36" />
       </div>
       <div className="flex flex-col items-end space-y-2">
-        <div className="h-6 bg-[#202030] rounded-sm w-28" />
-        <div className="h-3 bg-[#202030] rounded-sm w-24" />
+        <div className="h-6 bg-neutral-100 rounded-sm w-28" />
+        <div className="h-3 bg-neutral-100 rounded-sm w-24" />
       </div>
     </div>
   </div>
@@ -114,14 +114,14 @@ export default function ShopQuotesPage() {
   }, [dispatch]);
 
   return (
-    <div className="bg-black min-h-screen">
-      <div className="max-w-5xl mx-auto py-8 px-4">
+    <div className="min-h-screen">
+      <div className="max-w-[1440px] w-full mx-auto">
         {/* Header */}
-        <div className="mb-8 border-b border-[#1e2126] pb-4">
-          <h1 className="text-3xl font-oswald font-black text-white uppercase tracking-widest">
+        <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary ">
+          <h1 className="text-2xl font-bold text-amazon-text flex items-center gap-3">
             My Quotation History
           </h1>
-          <p className="text-[11px] font-bold text-gray-400 mt-2 uppercase tracking-widest">
+          <p className="text-[13px] text-amazon-textMuted mt-1">
             Review all quotes you have sent to customers
           </p>
         </div>
@@ -137,17 +137,17 @@ export default function ShopQuotesPage() {
 
         {/* Error */}
         {!loadingShopQuotes && error && (
-          <div className="flex flex-col items-center justify-center py-20 text-center bg-[#151515] border border-[#1e2126] rounded-sm">
-            <div className="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
+          <div className="flex flex-col items-center justify-center py-20 text-center bg-white border border-amazon-border shadow-sm rounded-sm">
+            <div className="w-14 h-14 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mb-4">
               <Loader2 className="w-7 h-7 text-red-500" />
             </div>
-            <h2 className="text-[13px] font-black uppercase tracking-widest text-white mb-1.5">
+            <h2 className="text-[14px] font-bold text-amazon-text mb-1">
               Unable to load data
             </h2>
-            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-5 max-w-sm">{error}</p>
+            <p className="text-[13px] font-medium text-amazon-textMuted mb-5 max-w-sm">{error}</p>
             <button
               onClick={() => dispatch(fetchShopQuotes())}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#202030] border border-[#1e2126] hover:bg-[#303040] hover:text-[#f5d800] hover:border-[#f5d800] text-gray-400 text-[11px] font-black uppercase tracking-widest rounded-sm transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2 bg-white border border-amazon-border hover:bg-neutral-50 text-amazon-text font-medium text-[13px] rounded-sm transition-colors shadow-sm"
             >
               <RefreshCw className="w-4 h-4" />
               Retry
@@ -157,14 +157,14 @@ export default function ShopQuotesPage() {
 
         {/* Empty */}
         {!loadingShopQuotes && !error && shopQuotes.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-center bg-[#151515] border border-[#1e2126] rounded-sm">
-            <div className="w-14 h-14 rounded-full bg-black border border-[#1e2126] flex items-center justify-center mb-4">
-              <Inbox className="w-7 h-7 text-[#f5d800]" />
+          <div className="flex flex-col items-center justify-center py-20 text-center bg-white border border-amazon-border shadow-sm rounded-sm">
+            <div className="w-14 h-14 rounded-full bg-neutral-50 border border-amazon-border flex items-center justify-center mb-4">
+              <Inbox className="w-7 h-7 text-amazon-textMuted opacity-50" />
             </div>
-            <h2 className="text-[13px] font-black uppercase tracking-widest text-white mb-1.5">
+            <h2 className="text-[14px] font-bold text-amazon-text mb-1">
               You haven&apos;t sent any quotes
             </h2>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 max-w-sm">
+            <p className="text-[13px] font-medium text-amazon-textMuted max-w-sm">
               Visit the Custom Request Market to find and send quotes to
               customers.
             </p>
@@ -177,30 +177,30 @@ export default function ShopQuotesPage() {
             {shopQuotes.map((quote) => (
               <div
                 key={quote.commissionQuoteId}
-                className="bg-[#151515] border border-[#1e2126] rounded-sm hover:border-[#f5d800]/50 transition-colors p-5 mb-4"
+                className="bg-white border border-amazon-border shadow-sm rounded-sm hover:border-amazon-btnPrimary transition-colors p-5 mb-4"
               >
                 <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                   {/* Column 1: Request Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 text-[13px] font-black text-white tracking-widest uppercase">
-                      <FileText className="w-4 h-4 text-[#f5d800] flex-shrink-0" />
+                    <div className="flex items-center gap-3 text-[14px] font-bold text-amazon-text">
+                      <FileText className="w-4 h-4 text-amazon-textMuted flex-shrink-0" />
                       <span>
                         #{quote.commissionRequestId.slice(0, 8)}
                       </span>
                     </div>
-                    <p className="text-[11px] font-bold tracking-widest uppercase text-gray-500 mt-2 line-clamp-1">
+                    <p className="text-[13px] font-medium text-amazon-textMuted mt-2 line-clamp-1">
                       {quote.shopNotes}
                     </p>
                   </div>
 
                   {/* Column 2: Quote Details */}
                   <div className="flex-1">
-                    <p className="text-[15px] font-black text-[#f5d800] tracking-wider">
+                    <p className="text-[15px] font-bold text-amazon-price">
                       {formatVND(quote.quotedPrice)}
                     </p>
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mt-2 flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-gray-500" />
-                      Complete in: <span className="text-white">{quote.estimatedDays} days</span>
+                    <p className="text-[13px] font-medium text-amazon-textMuted mt-2 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5" />
+                      Complete in: <span className="text-amazon-text">{quote.estimatedDays} days</span>
                     </p>
                   </div>
 
@@ -211,16 +211,16 @@ export default function ShopQuotesPage() {
                       {quote.status === "PendingUserDecision" && (
                         <button
                           onClick={() => setQuoteToRevoke(quote.commissionQuoteId)}
-                          className="w-8 h-8 rounded-sm border border-[#1e2126] bg-black hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-500 flex items-center justify-center transition-colors shrink-0 text-gray-500"
+                          className="w-8 h-8 rounded-sm bg-white border border-amazon-border hover:bg-red-50 hover:border-red-200 hover:text-red-500 flex items-center justify-center transition-colors shrink-0 text-amazon-textMuted shadow-sm"
                           title="Revoke Quote"
                         >
                           <XCircle className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 space-y-1 lg:text-right">
-                      <p>Sent: <span className="text-gray-400">{formatDate(quote.createdAt)}</span></p>
-                      <p>Expires: <span className="text-gray-400">{formatDate(quote.expiredAt)}</span></p>
+                    <div className="text-[12px] font-medium text-amazon-textMuted space-y-1 lg:text-right">
+                      <p>Sent: <span className="text-amazon-text">{formatDate(quote.createdAt)}</span></p>
+                      <p>Expires: <span className="text-amazon-text">{formatDate(quote.expiredAt)}</span></p>
                     </div>
                   </div>
                 </div>
@@ -233,21 +233,21 @@ export default function ShopQuotesPage() {
       {/* Modern Confirm Revoke Modal */}
       {quoteToRevoke && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 animate-in fade-in duration-200"
           onClick={() => setQuoteToRevoke(null)}
         >
           <div
-            className="w-full max-w-md bg-[#151515] border border-[#1e2126] rounded-sm shadow-2xl p-6"
+            className="w-full max-w-md bg-white border border-amazon-border rounded-sm shadow-xl p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mb-4">
                 <AlertTriangle className="w-6 h-6 text-red-500" />
               </div>
-              <h3 className="text-[15px] font-black uppercase text-white tracking-widest mb-2">
+              <h3 className="text-lg font-bold text-amazon-text mb-2">
                 Revoke this quote?
               </h3>
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6">
+              <p className="text-[13px] font-medium text-amazon-textMuted mb-6">
                 Are you sure you want to withdraw this quote? The customer will
                 no longer be able to accept it. This action cannot be undone.
               </p>
@@ -256,7 +256,7 @@ export default function ShopQuotesPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setQuoteToRevoke(null)}
-                className="flex-1 py-3 bg-[#202030] hover:bg-[#2a2a3a] text-white font-bold uppercase tracking-widest text-[11px] rounded-sm transition-colors"
+                className="flex-1 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 transition-colors"
               >
                 Cancel
               </button>
@@ -265,7 +265,7 @@ export default function ShopQuotesPage() {
                   dispatch(revokeCommissionQuote(quoteToRevoke));
                   setQuoteToRevoke(null);
                 }}
-                className="flex-1 py-3 bg-[#ce2a32] hover:bg-[#a12026] text-white font-black uppercase tracking-widest text-[11px] rounded-sm shadow-md transition-all flex items-center justify-center gap-2"
+                className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white font-medium text-[13px] rounded-sm shadow-sm transition-colors flex items-center justify-center gap-2"
               >
                 Yes, Revoke
               </button>

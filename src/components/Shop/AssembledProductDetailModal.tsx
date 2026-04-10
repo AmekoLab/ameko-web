@@ -36,7 +36,7 @@ export default function AssembledProductDetailModal({
       <div className="bg-white rounded-sm shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto border border-amazon-border">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-amazon-border bg-neutral-50 shrink-0">
-          <h2 className="text-lg font-black text-amazon-text uppercase tracking-widest">
+          <h2 className="text-lg font-bold text-amazon-text">
             Assembled Product Details
           </h2>
           <button
@@ -52,10 +52,10 @@ export default function AssembledProductDetailModal({
           {detailLoading ? (
             <div className="flex items-center justify-center py-16 text-amazon-textMuted gap-2">
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span className="text-[13px] tracking-widest">Loading product details...</span>
+              <span className="text-[13px] font-medium">Loading product details...</span>
             </div>
           ) : !selectedProduct ? (
-            <div className="py-16 text-center text-amazon-textMuted text-[13px] tracking-widest">
+            <div className="py-16 text-center text-amazon-textMuted text-[14px] font-medium">
               Product not found.
             </div>
           ) : (
@@ -67,7 +67,7 @@ export default function AssembledProductDetailModal({
         <div className="flex justify-end px-6 py-5 border-t border-amazon-border bg-neutral-50/50 shrink-0">
           <button
             onClick={handleClose}
-            className="px-5 py-2.5 text-[13px] tracking-widest text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition shadow-sm"
+            className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition shadow-sm"
           >
             Close
           </button>
@@ -92,7 +92,7 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
             {images.map((img, idx) => (
               <div
                 key={idx}
-                className="w-24 h-24 rounded-sm bg-neutral-50 border border-amazon-border overflow-hidden flex items-center justify-center shadow-sm"
+                className="w-24 h-24 rounded-sm bg-neutral-50  overflow-hidden flex items-center justify-center shadow-sm"
               >
                 <Image
                   src={img}
@@ -110,21 +110,21 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
         {/* Info */}
         <div className="flex-1 min-w-0 space-y-3">
           <div>
-            <h3 className="text-xl font-black text-amazon-text uppercase tracking-widest truncate">{product.name}</h3>
+            <h3 className="text-xl font-bold text-amazon-text truncate">{product.name}</h3>
             {product.slug && (
-              <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mt-1 truncate">{product.slug}</p>
+              <p className="text-[12px] text-amazon-textMuted mt-1 truncate">{product.slug}</p>
             )}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-lg font-black text-amazon-price tracking-widest">
+            <span className="text-xl font-bold text-amazon-price">
               {formatPrice(product.price)}
             </span>
-            <span className="text-[10px] font-bold text-amazon-textMuted uppercase tracking-widest ml-2 border border-amazon-border px-2 py-0.5 rounded-sm shadow-sm bg-white">
+            <span className="text-[12px] font-medium text-amazon-textMuted ml-2 border border-amazon-border px-2 py-0.5 rounded-sm shadow-sm bg-white">
               Qty: {product.quantity}
             </span>
           </div>
           {product.description && (
-            <p className="text-[11px] text-amazon-textMuted font-bold tracking-widest leading-relaxed line-clamp-4 uppercase">
+            <p className="text-[13px] font-normal text-amazon-textMuted leading-relaxed line-clamp-4">
               {product.description}
             </p>
           )}
@@ -138,7 +138,7 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
         product.connection ||
         product.battery) && (
         <div className="p-5 bg-indigo-50 border border-indigo-200 rounded-sm shadow-sm">
-          <p className="text-[14px] font-black tracking-widest text-indigo-800 mb-4">
+          <p className="text-[14px] font-bold text-indigo-800 mb-4">
             Keyboard Specifications
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -170,7 +170,7 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
       {/* Components */}
       {product.details && product.details.length > 0 && (
         <div className="p-5 bg-neutral-50 border border-amazon-border rounded-sm space-y-4 shadow-sm">
-          <p className="text-[11px] font-black uppercase tracking-widest text-amazon-text flex items-center gap-2">
+          <p className="text-[13px] font-bold text-amazon-text flex items-center gap-2">
             <Cpu className="w-4 h-4" />
             Components ({product.details.length})
           </p>
@@ -181,10 +181,10 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
                 className="flex items-center justify-between p-4 hover:bg-neutral-50 transition"
               >
                 <div className="min-w-0">
-                  <p className="text-[13px] font-black  tracking-widest text-amazon-text">
+                  <p className="text-[13px] font-medium text-amazon-text">
                     {detail.componentName || detail.componentId}
                   </p>
-                  <p className="text-[12px] font-bold  tracking-widest text-amazon-textMuted mt-0.5 truncate">
+                  <p className="text-[12px] text-amazon-textMuted mt-0.5 truncate">
                     Kit: {detail.baseKitName || detail.baseKitId}
                   </p>
                   {detail.soundUrl && (
@@ -192,14 +192,14 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
                       href={detail.soundUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[9px] font-bold tracking-widest text-amazon-btnPrimary hover:opacity-80 flex items-center gap-1 mt-1 uppercase"
+                      className="text-[11px] font-medium text-amazon-btnPrimary hover:opacity-80 flex items-center gap-1 mt-1"
                     >
                       Sound test
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   )}
                 </div>
-                <span className="text-[12px] font-black text-amazon-text shrink-0 ml-4">
+                <span className="text-[13px] font-bold text-amazon-text shrink-0 ml-4">
                   x{detail.quantity}
                 </span>
               </div>
@@ -210,14 +210,14 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
 
       {/* 3D Model Link */}
       {product.view3DUrl && (
-        <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest text-amazon-textMuted bg-neutral-50 border border-amazon-border p-2 rounded-sm shadow-sm">
+        <div className="flex items-center gap-3 text-[12px] font-medium text-amazon-textMuted bg-neutral-50 border border-amazon-border p-2 rounded-sm shadow-sm">
           <Box className="w-3.5 h-3.5 shrink-0" />
-          <span className="font-black text-amazon-text uppercase shrink-0">3D Model:</span>
+          <span className="font-bold text-amazon-text shrink-0">3D Model:</span>
           <a
             href={product.view3DUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="truncate hover:text-amazon-btnPrimary transition flex items-center gap-1 uppercase"
+            className="truncate hover:text-amazon-btnPrimary transition flex items-center gap-1"
           >
             {product.view3DUrl}
             <ExternalLink className="w-3 h-3 shrink-0 ml-1" />
@@ -242,11 +242,11 @@ function StatCard({
 }) {
   return (
     <div className="bg-white border border-amazon-border rounded-sm p-4 shadow-sm flex flex-col justify-center">
-      <p className="text-[9px] text-amazon-textMuted font-bold uppercase tracking-widest mb-1.5">
+      <p className="text-[11px] font-medium text-amazon-textMuted mb-1">
         {label}
       </p>
       <p
-        className={`font-black uppercase tracking-widest truncate ${small ? "text-[10px]" : "text-[13px]"} ${valueColor || "text-amazon-text"}`}
+        className={`font-bold truncate ${small ? "text-[12px]" : "text-[14px]"} ${valueColor || "text-amazon-text"}`}
       >
         {value}
       </p>
@@ -257,8 +257,8 @@ function StatCard({
 function SpecCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="bg-white border border-indigo-100 rounded-sm p-3 shadow-sm">
-      <p className="text-[12px] text-indigo-500 font-bold  tracking-widest mb-1">{label}</p>
-      <p className="text-[13px] font-black  tracking-widest text-indigo-900 truncate">{value}</p>
+      <p className="text-[12px] font-medium text-indigo-500 mb-1">{label}</p>
+      <p className="text-[13px] font-bold text-indigo-900 truncate">{value}</p>
     </div>
   );
 }

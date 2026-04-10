@@ -1,3 +1,4 @@
+import { Footer } from "@/src/components/Footer/Footer";
 import { Header } from "@/src/components/Header/Header";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
 import { Oswald } from "next/font/google";
@@ -30,6 +31,7 @@ export default function CommissionsPoolLayout({
         </div>
 
         <main className="flex-grow">{children}</main>
+        <Footer />
       </LayoutWrapper>
     </div>
   );

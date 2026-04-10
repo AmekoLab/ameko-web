@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Award, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { shopDashboardService } from "@/src/services/shopDashboard.service";
 import type {
   TopSpendersResponse,
@@ -23,9 +22,7 @@ const formatDate = (iso: string): string => {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  }); // Bỏ bớt giờ phút để cột gọn hơn
 };
 
 // ── Component ──
@@ -39,7 +36,6 @@ export default function TopSpendersTable({ filters }: TopSpendersTableProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
 
-  // Reset page when filters change
   const prevFilters = useRef(filters);
   useEffect(() => {
     if (prevFilters.current !== filters) {
@@ -48,10 +44,8 @@ export default function TopSpendersTable({ filters }: TopSpendersTableProps) {
     }
   }, [filters]);
 
-  // Fetch data
   useEffect(() => {
     let cancelled = false;
-
     const fetchData = async () => {
       setIsLoading(true);
       try {
@@ -67,7 +61,6 @@ export default function TopSpendersTable({ filters }: TopSpendersTableProps) {
         if (!cancelled) setIsLoading(false);
       }
     };
-
     fetchData();
     return () => {
       cancelled = true;
@@ -75,92 +68,67 @@ export default function TopSpendersTable({ filters }: TopSpendersTableProps) {
   }, [filters, page]);
 
   const btnClass =
-    "flex items-center gap-1 border border-[#2a2d35] bg-[#1a1a1a] hover:bg-[#222222] text-sm text-white px-3 py-1.5 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors";
+    "border border-amazon-border bg-white hover:bg-neutral-50 text-[11px] font-medium text-amazon-text px-2 py-1 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors";
 
   return (
-    <div className="bg-[#111111] border border-[#1e2126] rounded-xl overflow-hidden mt-6 w-full">
-      {/* Header */}
-      <div className="p-6 border-b border-[#1e2126] flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-yellow-500/10 flex items-center justify-center">
-          <Award className="w-4.5 h-4.5 text-yellow-500" />
-        </div>
-        <h3 className="text-lg font-bold text-white">Top VIP Customers</h3>
+    <div className="flex flex-col h-full w-full min-h-0 bg-white border border-amazon-border shadow-sm rounded-md overflow-hidden">
+      {/* Header - Siêu mỏng, không Icon */}
+      <div className="px-3 py-2.5 border-b border-amazon-border bg-neutral-50 shrink-0">
+        <h3 className="text-sm font-bold text-amazon-text">Top VIP Customers</h3>
       </div>
 
-      {/* Table */}
+      {/* Table Area */}
       {isLoading ? (
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-6 h-6 animate-spin text-[#f5d800]" />
+        <div className="flex-1 flex items-center justify-center min-h-0">
+          <p className="text-xs text-amazon-textMuted">Loading...</p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-[#1a1a1a] text-xs uppercase text-gray-400 font-semibold border-b border-[#2a2d35]">
+            <thead className="sticky top-0 z-10 bg-neutral-50 text-[11px] text-amazon-textMuted font-medium border-b border-amazon-border shadow-sm">
               <tr>
-                <th className="px-6 py-3.5">#</th>
-                <th className="px-6 py-3.5">Customer</th>
-                <th className="px-6 py-3.5">Orders</th>
-                <th className="px-6 py-3.5">Total Spent</th>
-                <th className="px-6 py-3.5">Last Order</th>
+                <th className="px-2 py-1.5 font-medium whitespace-nowrap">#</th>
+                <th className="px-2 py-1.5 font-medium whitespace-nowrap">Customer</th>
+                <th className="px-2 py-1.5 font-medium whitespace-nowrap">Orders</th>
+                <th className="px-2 py-1.5 font-medium whitespace-nowrap">Spent</th>
+                <th className="px-2 py-1.5 font-medium whitespace-nowrap">Last Order</th>
               </tr>
             </thead>
             <tbody>
               {!data?.items?.length ? (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-16 text-center text-gray-500 text-sm"
-                  >
+                  <td colSpan={5} className="px-2 py-6 text-center text-amazon-textMuted text-xs">
                     No data available.
                   </td>
                 </tr>
               ) : (
                 data.items.map((item, idx) => (
-                  <tr
-                    key={item.customerId}
-                    className="border-b border-[#1e2126] hover:bg-[#1a1a1a]/50 transition-colors"
-                  >
+                  <tr key={item.customerId} className="border-b border-amazon-border hover:bg-neutral-50 transition-colors">
                     {/* Rank */}
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs font-bold ${
-                          (data.currentPage - 1) * data.pageSize + idx === 0
-                            ? "bg-yellow-500/20 text-yellow-500"
-                            : (data.currentPage - 1) * data.pageSize + idx === 1
-                              ? "bg-gray-400/20 text-gray-300"
-                              : (data.currentPage - 1) * data.pageSize + idx === 2
-                                ? "bg-orange-500/20 text-orange-400"
-                                : "bg-[#1a1a1a] text-gray-500"
-                        }`}
-                      >
+                    <td className="px-2 py-1.5 w-8">
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-600">
                         {(data.currentPage - 1) * data.pageSize + idx + 1}
                       </span>
                     </td>
-
                     {/* Customer */}
-                    <td className="px-6 py-4">
-                      <div>
-                        <p className="text-white font-medium text-sm">
-                          {item.customerName}
-                        </p>
-                        <p className="text-gray-500 text-xs mt-0.5">
-                          {item.email}
-                        </p>
-                      </div>
+                    <td className="px-2 py-1.5 min-w-[120px]">
+                      <p className="text-amazon-text font-medium text-[11px] leading-tight truncate">
+                        {item.customerName}
+                      </p>
+                      <p className="text-amazon-textMuted text-[10px] leading-tight truncate mt-0.5">
+                        {item.email}
+                      </p>
                     </td>
-
                     {/* Orders */}
-                    <td className="px-6 py-4 text-sm text-white tabular-nums">
+                    <td className="px-2 py-1.5 text-[11px] text-amazon-text tabular-nums">
                       {item.orders}
                     </td>
-
                     {/* Total Spent */}
-                    <td className="px-6 py-4 text-sm font-semibold text-green-400 tabular-nums">
+                    <td className="px-2 py-1.5 text-[11px] font-semibold text-amazon-price tabular-nums whitespace-nowrap">
                       {formatVND(item.totalSpent)}
                     </td>
-
                     {/* Last Order */}
-                    <td className="px-6 py-4 text-sm text-gray-400 tabular-nums">
+                    <td className="px-2 py-1.5 text-[11px] text-amazon-textMuted tabular-nums whitespace-nowrap">
                       {formatDate(item.lastOrderAtUtc)}
                     </td>
                   </tr>
@@ -171,26 +139,19 @@ export default function TopSpendersTable({ filters }: TopSpendersTableProps) {
         </div>
       )}
 
-      {/* Pagination */}
+      {/* Pagination - Ép mỏng */}
       {data && data.totalPages > 0 && (
-        <div className="p-4 flex items-center justify-between border-t border-[#1e2126]">
-          <span className="text-xs text-gray-500">
-            Page{" "}
-            <span className="text-white font-semibold">{data.currentPage}</span>{" "}
-            / {data.totalPages}
-            <span className="ml-2 text-gray-600">
-              ({data.totalCount} total)
-            </span>
+        <div className="px-3 py-1.5 flex items-center justify-between border-t border-amazon-border bg-white shrink-0">
+          <span className="text-[10px] text-amazon-textMuted">
+            Page <span className="font-medium text-amazon-text">{data.currentPage}</span>/{data.totalPages}
           </span>
-
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={!data.hasPreviousPage}
               className={btnClass}
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
-              Previous
+              Prev
             </button>
             <button
               onClick={() => setPage((p) => p + 1)}
@@ -198,7 +159,6 @@ export default function TopSpendersTable({ filters }: TopSpendersTableProps) {
               className={btnClass}
             >
               Next
-              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

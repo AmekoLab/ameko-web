@@ -55,8 +55,8 @@ function CustomTooltip({
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="bg-[#1a1a1a] border border-[#2a2d35] rounded-lg px-4 py-3 shadow-xl">
-      <p className="text-xs text-gray-400 mb-2 font-medium">
+    <div className="bg-white border border-amazon-border rounded-md px-4 py-3 shadow-md">
+      <p className="text-xs text-amazon-textMuted mb-2 font-medium">
         {label ? new Date(label).toLocaleDateString("vi-VN", {
           day: "2-digit",
           month: "short",
@@ -73,9 +73,9 @@ function CustomTooltip({
               className="w-2.5 h-2.5 rounded-full"
               style={{ background: entry.color }}
             />
-            <span className="text-gray-300">{entry.name}</span>
+            <span className="text-amazon-text">{entry.name}</span>
           </span>
-          <span className="font-bold text-white">
+          <span className="font-bold text-amazon-text">
             {entry.dataKey === "revenue"
               ? formatVND(entry.value)
               : entry.value}
@@ -119,19 +119,19 @@ export default function CustomerTrendChart({ filters }: CustomerTrendChartProps)
   }, [filters]);
 
   return (
-    <div className="bg-[#111111] border border-[#1e2126] rounded-xl p-6 mt-6 w-full">
-      <h3 className="text-lg font-bold text-white mb-6"> Trend Customers</h3>
+    <div className="h-full w-full flex flex-col p-4">
+      <h3 className="text-base font-bold text-amazon-text mb-2"> Trend Customers</h3>
 
       {isLoading ? (
-        <div className="flex items-center justify-center h-[350px]">
-          <Loader2 className="w-6 h-6 animate-spin text-[#f5d800]" />
+        <div className="flex-1 flex items-center justify-center min-h-0">
+          <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
         </div>
       ) : data.length === 0 ? (
-        <div className="flex items-center justify-center h-[350px] text-gray-500 text-sm">
+        <div className="flex-1 flex items-center justify-center min-h-0 text-amazon-textMuted text-sm font-medium">
           Không có dữ liệu
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data}>
             {/* Gradient definition */}
             <defs>
@@ -143,13 +143,13 @@ export default function CustomerTrendChart({ filters }: CustomerTrendChartProps)
 
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#2a2d35"
+              stroke="#e5e7eb"
               vertical={false}
             />
 
             <XAxis
               dataKey="bucketStartUtc"
-              stroke="#888888"
+              stroke="#9ca3af"
               fontSize={12}
               tickLine={false}
               axisLine={false}
@@ -161,7 +161,7 @@ export default function CustomerTrendChart({ filters }: CustomerTrendChartProps)
             {/* Left Y-Axis: Revenue */}
             <YAxis
               yAxisId="left"
-              stroke="#888888"
+              stroke="#9ca3af"
               fontSize={12}
               tickLine={false}
               axisLine={false}
@@ -172,7 +172,7 @@ export default function CustomerTrendChart({ filters }: CustomerTrendChartProps)
             <YAxis
               yAxisId="right"
               orientation="right"
-              stroke="#888888"
+              stroke="#9ca3af"
               fontSize={12}
               tickLine={false}
               axisLine={false}
@@ -201,10 +201,10 @@ export default function CustomerTrendChart({ filters }: CustomerTrendChartProps)
               type="monotone"
               dataKey="orders"
               name="Orders"
-              stroke="#f5d800"
+              stroke="#007185"
               strokeWidth={2}
-              dot={{ r: 4, fill: "#f5d800", strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: "#f5d800", strokeWidth: 2, stroke: "#111" }}
+              dot={{ r: 4, fill: "#007185", strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: "#007185", strokeWidth: 2, stroke: "#fff" }}
             />
           </ComposedChart>
         </ResponsiveContainer>

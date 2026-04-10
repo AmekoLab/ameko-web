@@ -13,9 +13,11 @@ import DeleteLogModal from "./DeleteLogModal";
 interface Props {
   orderItemId: string;
   role: "shop" | "user";
+  isCancelled?: boolean;
+  onReadyChange?: (itemId: string, isReady: boolean) => void;
 }
 
-export default function AssemblyTimeline({ orderItemId, role }: Props) {
+export default function AssemblyTimeline({ orderItemId, role, isCancelled, onReadyChange }: Props) {
   const [logs, setLogs] = useState<AssemblyLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [initializing, setInitializing] = useState(false);
@@ -47,6 +49,17 @@ export default function AssemblyTimeline({ orderItemId, role }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderItemId]);
 
+  useEffect(() => {
+    if (onReadyChange) {
+      if (isCancelled) {
+        onReadyChange(orderItemId, false);
+        return;
+      }
+      const isFullyCompleted = logs.length > 0 && logs.every(log => log.status === 2);
+      onReadyChange(orderItemId, isFullyCompleted);
+    }
+  }, [logs, isCancelled, onReadyChange, orderItemId]);
+
   const handleInitialize = async () => {
     setInitializing(true);
     try {
@@ -73,7 +86,7 @@ export default function AssemblyTimeline({ orderItemId, role }: Props) {
     return (
       <div className="flex items-center gap-2 text-amazon-textMuted py-4 ml-3">
         <Loader2 className="w-4 h-4 animate-spin" />
-        <span className="text-[10px] font-bold uppercase tracking-widest">
+        <span className="text-[10px] font-medium">
           Loading Timeline...
         </span>
       </div>
@@ -81,13 +94,13 @@ export default function AssemblyTimeline({ orderItemId, role }: Props) {
   }
 
   if (logs.length === 0) {
-    if (role === "shop") {
+    if (!isCancelled && role === "shop") {
       return (
         <div className="py-2 ml-3">
           <button
             onClick={handleInitialize}
             disabled={initializing}
-            className="bg-amazon-btnPrimary text-amazon-text font-black uppercase tracking-widest text-[10px] px-4 py-2 rounded-sm flex items-center gap-2 hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-amazon-btnPrimary text-amazon-text font-medium text-[10px] px-4 py-2 rounded-sm flex items-center gap-2 hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {initializing ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin text-amazon-text" />
@@ -100,15 +113,20 @@ export default function AssemblyTimeline({ orderItemId, role }: Props) {
       );
     }
     return (
-      <div className="py-2 ml-3 text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
-        No assembly tracking yet.
+      <div className="py-2 ml-3">
+        <div className="text-[10px] font-medium text-amazon-textMuted">
+          No assembly tracking yet.
+        </div>
+        {isCancelled && (
+          <div className="mt-3 p-2 bg-red-50 border border-red-200 text-red-600 text-[11px] font-medium rounded-sm text-center">Assembly stopped. Order cancelled.</div>
+        )}
       </div>
     );
   }
 
   return (
     <div className="mt-4">
-      <h4 className="text-[10px] font-black uppercase tracking-widest text-amazon-text mb-4 pl-3">
+      <h4 className="text-[10px] font-medium text-amazon-text mb-4 pl-3">
         Assembly Timeline
       </h4>
       <div className="border-l border-amazon-border ml-3 pl-4 space-y-4">
@@ -127,18 +145,18 @@ export default function AssemblyTimeline({ orderItemId, role }: Props) {
               
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-[11px] font-bold text-amazon-text uppercase tracking-wider">
+                  <div className="flex items-center justify-between gap-2 w-full">
+                    <p className="text-[11px] font-medium text-amazon-text flex-1">
                       {log.stepName}
                     </p>
-                    {role === "shop" && (
-                      <>
+                    {role === "shop" && !isCancelled && (
+                      <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={() => handleEditClick(log)}
-                          className="p-1 text-amazon-textMuted hover:text-amazon-text transition-colors "
+                          className="p-1 text-amazon-textMuted hover:text-amazon-btnPrimary transition-colors rounded-sm"
                           title="Update Status"
                         >
-                          <Settings className="w-3 h-3" />
+                          <Settings className="w-3.5 h-3.5" />
                         </button>
                         <button
                           type="button"
@@ -146,11 +164,12 @@ export default function AssemblyTimeline({ orderItemId, role }: Props) {
                             setLogToDelete(log);
                             setIsDeleteModalOpen(true);
                           }}
-                          className="text-amazon-textMuted hover:text-red-500 transition-colors ml-2"
+                          className="p-1 text-amazon-textMuted hover:text-red-500 transition-colors rounded-sm"
+                          title="Delete Step"
                         >
-                          <Trash2 size={12} />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
-                      </>
+                      </div>
                     )}
                   </div>
 
@@ -165,7 +184,7 @@ export default function AssemblyTimeline({ orderItemId, role }: Props) {
 
                   {/* Completed time */}
                   {log.completedAt && (
-                    <p className="mt-1 text-[9px] font-bold text-amazon-textMuted uppercase tracking-widest">
+                    <p className="mt-1 text-[9px] font-medium text-amazon-textMuted">
                       {new Date(log.completedAt).toLocaleString()}
                     </p>
                   )}
@@ -188,14 +207,21 @@ export default function AssemblyTimeline({ orderItemId, role }: Props) {
         })}
 
         {/* Ad-hoc Button */}
-        {role === "shop" && (
+        {role === "shop" && !isCancelled && (
           <div className="pt-4 pb-2">
             <button
               onClick={() => setIsAdhocModalOpen(true)}
-              className="mt-4 text-[11px] text-amazon-text border border-amazon-border border-dashed rounded-sm px-4 py-2 hover:border-amazon-btnPrimary hover:bg-yellow-50 transition-colors uppercase font-bold tracking-widest"
+              className="mt-4 text-[11px] text-amazon-text border border-amazon-border border-dashed rounded-sm px-4 py-2 hover:border-amazon-btnPrimary hover:bg-yellow-50 transition-colors font-medium"
             >
               + Add Ad-hoc Step
             </button>
+          </div>
+        )}
+
+        {/* Banner if cancelled */}
+        {isCancelled && logs.length > 0 && (
+          <div className="mt-3 p-2 bg-red-50 border border-red-200 text-red-600 text-[11px] font-medium rounded-sm text-center">
+            Assembly stopped. Order cancelled.
           </div>
         )}
       </div>

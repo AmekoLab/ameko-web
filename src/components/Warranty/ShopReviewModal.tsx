@@ -102,7 +102,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
 
   const isActionable = issue.status === 1;
 
-  const labelClass = "block text-sm font-medium text-gray-700 mb-1.5";
+  const labelClass = "block text-sm font-medium text-amazon-text mb-1.5";
   const errorClass = "text-xs text-red-500 mt-1";
 
   return (
@@ -114,22 +114,22 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-white rounded-md shadow-2xl border border-amazon-border w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white rounded-t-2xl border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-lg font-bold text-gray-900">
+        <div className="sticky top-0 bg-neutral-50 rounded-t-md border-b border-amazon-border px-6 py-4 flex items-center justify-between z-10">
+          <h2 className="text-lg font-bold text-amazon-text">
             Review warranty request
           </h2>
           <button
             onClick={handleClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1 rounded-sm hover:bg-neutral-200 transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-amazon-textMuted" />
           </button>
         </div>
 
         {/* Customer Evidence Section */}
-        <div className="px-6 py-5 border-b border-gray-100 space-y-4 bg-gray-50/50">
+        <div className="px-6 py-5 border-b border-amazon-border space-y-4 bg-white">
           {/* Customer info */}
           <div className="flex items-center gap-3">
             {issue.customerAvatar ? (
@@ -138,16 +138,16 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                 alt={issue.customerName || ""}
                 width={40}
                 height={40}
-                className="rounded-full object-cover"
+                className="rounded-full object-cover border border-amazon-border"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-200" />
+              <div className="w-10 h-10 rounded-full bg-neutral-200 border border-amazon-border" />
             )}
             <div>
-              <p className="text-sm font-semibold text-gray-900">
+              <p className="text-sm font-medium text-amazon-text">
                 {issue.customerName || "Customer"}
               </p>
-              <p className="text-xs text-gray-500 flex items-center gap-1">
+              <p className="text-xs text-amazon-textMuted flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
                 {formatDate(issue.createdAt)}
               </p>
@@ -156,13 +156,13 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
 
           {/* Reason & Description */}
           <div>
-            <p className="text-sm font-bold text-gray-900">{issue.reason}</p>
-            <p className="text-sm text-gray-600 mt-1">{issue.description}</p>
+            <p className="text-sm font-medium text-amazon-text">{issue.reason}</p>
+            <p className="text-sm text-amazon-textMuted mt-1">{issue.description}</p>
           </div>
 
           {/* Evidence Image */}
           {issue.evidenceUrl && (
-            <div className="relative w-full h-48 rounded-lg overflow-hidden border border-gray-200 bg-white">
+            <div className="relative w-full h-48 rounded-sm overflow-hidden borderbg-white">
               <Image
                 src={issue.evidenceUrl}
                 alt="Minh chứng từ khách hàng"
@@ -174,23 +174,23 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
 
           {/* Refund Amount */}
           {issue.refundAmount > 0 && (
-            <div className="flex items-center justify-between p-3 rounded-lg bg-white border border-gray-200">
-              <span className="text-sm text-gray-600">
+            <div className="flex items-center justify-between p-3 rounded-sm bg-neutral-50 border border-amazon-border">
+              <span className="text-sm text-amazon-text">
                 Requested refund amount
               </span>
-              <span className="text-lg font-bold text-[#ce2a32]">
+              <span className="text-lg font-bold text-amazon-price">
                 {formatCurrency(issue.refundAmount)}
               </span>
             </div>
           )}
 
           {/* Expected Action */}
-          <p className="text-xs text-gray-500 italic">{issue.expectedAction}</p>
+          <p className="text-xs text-amazon-textMuted italic">{issue.expectedAction}</p>
         </div>
 
         {/* Timeline Section */}
-        <div className="px-6 py-5 border-b border-gray-100">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
+        <div className="px-6 py-5 border-b border-amazon-border">
+          <h3 className="text-sm font-bold text-amazon-text mb-3">
             Action history
           </h3>
           <WarrantyTimeline issueId={issue.id} />
@@ -214,30 +214,30 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                     <button
                       type="button"
                       onClick={() => field.onChange(true)}
-                      className={`flex items-center gap-3 p-4 rounded-lg border-2 text-left transition-all ${
+                      className={`flex items-center gap-3 p-4 rounded-sm border text-left transition-all ${
                         field.value === true
-                          ? "border-green-500 bg-green-50 ring-1 ring-green-200"
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-green-500 bg-green-50 ring-1 ring-green-500"
+                          : "border-amazon-border hover:bg-neutral-50"
                       }`}
                     >
                       <CheckCircle2
                         className={`w-6 h-6 flex-shrink-0 ${
                           field.value === true
                             ? "text-green-600"
-                            : "text-gray-300"
+                            : "text-amazon-border"
                         }`}
                       />
                       <div>
                         <p
-                          className={`text-sm font-semibold ${
+                          className={`text-sm font-medium ${
                             field.value === true
                               ? "text-green-700"
-                              : "text-gray-700"
+                              : "text-amazon-text"
                           }`}
                         >
                           Approve
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
+                        <p className="text-xs text-amazon-textMuted mt-0.5">
                           Accept request
                         </p>
                       </div>
@@ -247,30 +247,30 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                     <button
                       type="button"
                       onClick={() => field.onChange(false)}
-                      className={`flex items-center gap-3 p-4 rounded-lg border-2 text-left transition-all ${
+                      className={`flex items-center gap-3 p-4 rounded-sm border text-left transition-all ${
                         field.value === false
-                          ? "border-red-500 bg-red-50 ring-1 ring-red-200"
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-red-500 bg-red-50 ring-1 ring-red-500"
+                          : "border-amazon-border hover:bg-neutral-50"
                       }`}
                     >
                       <XCircle
                         className={`w-6 h-6 flex-shrink-0 ${
                           field.value === false
                             ? "text-red-600"
-                            : "text-gray-300"
+                            : "text-amazon-border"
                         }`}
                       />
                       <div>
                         <p
-                          className={`text-sm font-semibold ${
+                          className={`text-sm font-medium ${
                             field.value === false
                               ? "text-red-700"
-                              : "text-gray-700"
+                              : "text-amazon-text"
                           }`}
                         >
                           Reject
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
+                        <p className="text-xs text-amazon-textMuted mt-0.5">
                           Reject request
                         </p>
                       </div>
@@ -292,7 +292,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                 id="shopResponse"
                 rows={4}
                 placeholder="Enter return instructions or reason for rejection..."
-                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors resize-none"
+                className="w-full rounded-sm border border-amazon-border px-3 py-2.5 text-sm text-amazon-text placeholder-neutral-400 focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary outline-none transition-colors resize-none"
                 {...register("shopResponse")}
               />
               {errors.shopResponse && (
@@ -306,17 +306,17 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                 type="button"
                 onClick={handleClose}
                 disabled={isReviewingWarranty}
-                className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                className="px-5 py-2 text-sm font-medium text-amazon-text bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 transition-colors disabled:opacity-50 shadow-sm"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isReviewingWarranty || approveValue === undefined}
-                className={`px-5 py-2.5 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 ${
+                className={`px-6 py-2 text-sm font-medium rounded-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm ${
                   approveValue === false
-                    ? "bg-red-600 hover:bg-red-700"
-                    : "bg-blue-600 hover:bg-blue-700"
+                    ? "bg-red-600 hover:bg-red-700 text-white"
+                    : "bg-amazon-btnPrimary hover:brightness-95 text-amazon-text"
                 }`}
               >
                 {isReviewingWarranty && (
@@ -328,16 +328,16 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
           </form>
         ) : (
           <div className="px-6 py-5">
-            <h3 className="text-sm font-semibold text-gray-900 mb-2">
+            <h3 className="text-sm font-bold text-amazon-text mb-2">
               Shop's response
             </h3>
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-wrap">
+            <div className="bg-white border border-amazon-border rounded-sm p-4 text-sm text-amazon-text whitespace-pre-wrap">
               {issue.shopResponse || "No response"}
             </div>
             <div className="flex justify-end mt-5">
               <button
                 onClick={handleClose}
-                className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-5 py-2 text-sm font-medium text-amazon-text bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 transition-colors shadow-sm"
               >
                 Close
               </button>

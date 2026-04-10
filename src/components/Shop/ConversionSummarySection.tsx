@@ -1,13 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import {
-  Target,
-  CreditCard,
-  CheckCircle,
-  XCircle,
-  Loader2,
-} from "lucide-react";
 import { shopDashboardService } from "@/src/services/shopDashboard.service";
 import type {
   ConversionSummaryData,
@@ -16,38 +9,22 @@ import type {
 
 // ── Rate Card ──
 
-interface RateCardProps {
+interface RateRowProps {
   label: string;
   rate: number;
   detail: string;
-  icon: React.ReactNode;
   accentColor: string;
 }
 
-function RateCard({ label, rate, detail, icon, accentColor }: RateCardProps) {
-  // Clamp for the ring visual (0-100)
+function RateRow({ label, rate, detail, accentColor }: RateRowProps) {
   const clamped = Math.min(100, Math.max(0, rate));
   const circumference = 2 * Math.PI * 40;
   const offset = circumference - (clamped / 100) * circumference;
 
   return (
-    <div className="bg-[#111111] border border-[#1e2126] rounded-xl p-6 flex flex-col justify-center items-center text-center relative overflow-hidden group hover:border-[#2a2d35] transition-colors">
-      {/* Decorative glow */}
-      <div
-        className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-[0.05] blur-3xl pointer-events-none group-hover:opacity-[0.08] transition-opacity"
-        style={{ background: accentColor }}
-      />
-
-      {/* Icon */}
-      <div
-        className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
-        style={{ background: `${accentColor}15` }}
-      >
-        {icon}
-      </div>
-
-      {/* Circular progress ring */}
-      <div className="relative w-28 h-28 mb-4">
+    <div className="flex-1 flex items-center justify-between px-4 py-0 border-b border-amazon-border last:border-b-0 hover:bg-neutral-50 transition-colors">
+      {/* Horizontal Left Box (Progress Ring) */}
+      <div className="relative w-11 h-11 shrink-0">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 96 96">
           {/* Background ring */}
           <circle
@@ -55,8 +32,8 @@ function RateCard({ label, rate, detail, icon, accentColor }: RateCardProps) {
             cy="48"
             r="40"
             fill="none"
-            stroke="#1e2126"
-            strokeWidth="6"
+            stroke="#f9fafb"
+            strokeWidth="8"
           />
           {/* Progress ring */}
           <circle
@@ -65,7 +42,7 @@ function RateCard({ label, rate, detail, icon, accentColor }: RateCardProps) {
             r="40"
             fill="none"
             stroke={accentColor}
-            strokeWidth="6"
+            strokeWidth="8"
             strokeLinecap="round"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
@@ -74,17 +51,17 @@ function RateCard({ label, rate, detail, icon, accentColor }: RateCardProps) {
         </svg>
         {/* Center value */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xl font-bold text-white">
+          <span className="text-[10px] font-bold text-amazon-text">
             {rate.toFixed(1)}%
           </span>
         </div>
       </div>
 
-      {/* Label */}
-      <p className="text-sm font-semibold text-white mb-1">{label}</p>
-
-      {/* Detail */}
-      <span className="text-sm text-gray-500">{detail}</span>
+      {/* Horizontal Right Box (Text) */}
+      <div className="flex flex-col items-end justify-center">
+        <span className="text-xs font-bold text-amazon-text">{label}</span>
+        <span className="text-[11px] font-medium text-amazon-textMuted">{detail}</span>
+      </div>
     </div>
   );
 }
@@ -129,61 +106,58 @@ export default function ConversionSummarySection({
       {
         label: "Paid Rate",
         rate: data.paidRate,
-        detail: `${data.paidOrders} / ${data.totalOrders} orders`,
-        icon: <CreditCard className="w-5 h-5 text-green-500" />,
+        detail: `${data.paidOrders}/${data.totalOrders} ord.`, // Rút gọn chữ orders
         accentColor: "#22c55e",
       },
       {
-        label: "Completion Rate",
+        label: "Completed", // Rút gọn tiêu đề
         rate: data.completionRate,
-        detail: `${data.completedOrders} / ${data.totalOrders} orders`,
-        icon: <CheckCircle className="w-5 h-5 text-blue-500" />,
+        detail: `${data.completedOrders}/${data.totalOrders} ord.`,
         accentColor: "#3b82f6",
       },
       {
         label: "Cancel Rate",
         rate: data.cancelRate,
-        detail: `${data.cancelledOrders} / ${data.totalOrders} orders`,
-        icon: <XCircle className="w-5 h-5 text-red-500" />,
+        detail: `${data.cancelledOrders}/${data.totalOrders} ord.`,
         accentColor: "#ef4444",
       },
     ];
   }, [data]);
 
   return (
-    <section className="mt-6">
+    <div className="h-full w-full bg-white border border-amazon-border shadow-sm rounded-md flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-2.5 mb-4">
-        <Target className="w-5 h-5 text-[#f5d800]" />
-        <h3 className="text-lg font-bold text-white">Order Conversion</h3>
+      <div className="px-4 py-3 border-b border-amazon-border bg-neutral-50 shrink-0">
+        <h3 className="text-sm font-bold text-amazon-text">Order Conversion</h3>
       </div>
 
-      {/* Cards Grid */}
+      {/* Cards Box */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="flex-1 flex flex-col">
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="bg-[#111111] border border-[#1e2126] rounded-xl p-6 flex flex-col items-center animate-pulse"
+              className="flex-1 flex items-center justify-between px-4 border-b border-amazon-border last:border-b-0 animate-pulse"
             >
-              <div className="w-10 h-10 bg-[#1e2126] rounded-xl mb-4" />
-              <div className="w-28 h-28 rounded-full bg-[#1e2126] mb-4" />
-              <div className="h-4 w-28 bg-[#1e2126] rounded mb-2" />
-              <div className="h-3 w-20 bg-[#1e2126] rounded" />
+              <div className="w-11 h-11 rounded-full bg-neutral-100 shrink-0" />
+              <div className="flex flex-col items-end gap-2">
+                <div className="h-3 w-20 bg-neutral-200 rounded" />
+                <div className="h-2 w-16 bg-neutral-100 rounded" />
+              </div>
             </div>
           ))}
         </div>
       ) : data ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="flex-1 flex flex-col">
           {cards.map((card) => (
-            <RateCard key={card.label} {...card} />
+            <RateRow key={card.label} {...card} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 text-gray-500 bg-[#111111] border border-[#1e2126] rounded-xl">
-          <p className="font-medium">No data available.</p>
+        <div className="flex-1 flex items-center justify-center text-amazon-textMuted">
+          <p className="text-xs font-medium">No data.</p>
         </div>
       )}
-    </section>
+    </div>
   );
 }

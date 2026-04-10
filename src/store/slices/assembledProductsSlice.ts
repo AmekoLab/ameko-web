@@ -23,6 +23,24 @@ export const fetchAssembledProducts = createAsyncThunk(
   },
 );
 
+// --- THUNK: GET MY ASSEMBLED PRODUCTS ---
+export const fetchMyAssembledProducts = createAsyncThunk(
+  "assembledProducts/fetchMyList",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await assembledProductService.getMyAssembledProducts();
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch my assembled products",
+      );
+    }
+  },
+);
+
+
+
 // --- THUNK: RESTORE ASSEMBLED PRODUCT ---
 export const restoreAssembledProduct = createAsyncThunk(
   "assembledProducts/restore",
@@ -175,6 +193,28 @@ const assembledProductsSlice = createSlice({
         state.totalPages = data.totalPages ?? 1;
       })
       .addCase(fetchAssembledProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // --- FETCH MY LIST ---
+      .addCase(fetchMyAssembledProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchMyAssembledProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        // The new API returns the array directly, no .items property
+        const items = action.payload as AssembledProductItem[]; 
+        
+        state.assembledProducts = items || [];
+        state.total = items?.length || 0;
+        
+        // Since it's a full list without pagination metadata, set defaults
+        state.currentPage = 1;
+        state.pageSize = items?.length || 50; 
+        state.totalPages = 1;
+      })
+      .addCase(fetchMyAssembledProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })

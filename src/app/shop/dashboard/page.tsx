@@ -16,7 +16,7 @@ import ConversionSummarySection from "@/src/components/Shop/ConversionSummarySec
 const TODAY = new Date().toISOString().split("T")[0];
 
 const inputClass =
-  "bg-[#1a1a1a] text-white border border-[#2a2d35] rounded-md p-2 text-sm focus:border-[#f5d800] outline-none transition-colors";
+  "bg-white text-amazon-text border border-amazon-border rounded-md px-2 py-1 text-xs placeholder-gray-400 focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus outline-none transition-colors";
 
 export default function DashboardPage() {
   // ── Shared filter state ──
@@ -53,23 +53,23 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
-      <main className="max-w-[1800px] mx-auto px-6 md:px-10 py-8 space-y-10">
-        {/* Page Header */}
+    <div className="w-full flex flex-col p-4 md:p-6 gap-5 bg-amazon-bgSecondary min-h-screen">
+      {/* Row 1: Header & Filter Bar */}
+      <div className="shrink-0 flex flex-col xl:flex-row xl:items-end justify-between gap-1">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">
+          <h1 className="text-2xl font-bold text-amazon-text tracking-tight">
             Shop Dashboard
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-[11px] text-amazon-textMuted mt-1">
             Monitor your shop performance and customer insights.
           </p>
         </div>
 
         {/* ── Global Filter Bar ── */}
-        <div className="flex flex-wrap items-end gap-4 p-4 bg-[#111111] border border-[#1e2126] rounded-xl">
+        <div className="flex flex-wrap items-end gap-1 p-1 bg-white border border-amazon-border shadow-sm rounded-md">
           {/* Start Date */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+            <label className="text-xs font-medium text-amazon-textMuted">
               Start Date
             </label>
             <input
@@ -78,13 +78,12 @@ export default function DashboardPage() {
               onChange={(e) => setStartDate(e.target.value)}
               max={endDate || TODAY}
               className={inputClass}
-              style={{ colorScheme: "dark" }}
             />
           </div>
 
           {/* End Date */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+            <label className="text-xs font-medium text-amazon-textMuted">
               End Date
             </label>
             <input
@@ -94,20 +93,18 @@ export default function DashboardPage() {
               min={startDate || undefined}
               max={TODAY}
               className={inputClass}
-              style={{ colorScheme: "dark" }}
             />
           </div>
 
           {/* Granularity */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+            <label className="text-xs font-medium text-amazon-textMuted">
               Granularity
             </label>
             <select
               value={granularity}
               onChange={(e) => setGranularity(e.target.value)}
               className={inputClass}
-              style={{ colorScheme: "dark" }}
             >
               <option value="Day">Day</option>
               <option value="Week">Week</option>
@@ -117,7 +114,7 @@ export default function DashboardPage() {
 
           {/* Churn Days */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+            <label className="text-xs font-medium text-amazon-textMuted">
               Churn Days
             </label>
             <input
@@ -133,7 +130,7 @@ export default function DashboardPage() {
           {hasActiveFilters && (
             <button
               onClick={handleClearFilters}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-[#f5d800] hover:text-[#ffe500] uppercase tracking-wider transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-amazon-link hover:underline transition-colors"
             >
               <FilterX className="w-3.5 h-3.5" />
               Clear
@@ -141,26 +138,35 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* ── Dashboard Sections ── */}
+      </div>
 
-        {/* Customer Overview Cards */}
+      {/* Row 2: High-Level Metrics */}
+      <div className="shrink-0">
         <CustomerOverviewSection filters={currentFilters} />
+      </div>
 
-        {/* Customer Trend Chart */}
-        <CustomerTrendChart filters={currentFilters} />
+      {/* Row 3: Chart & Conversion (Split 2/1) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 flex flex-col h-[320px] bg-white border border-amazon-border rounded-md shadow-sm">
+          <CustomerTrendChart filters={currentFilters} />
+        </div>
+        <div className="lg:col-span-1 flex flex-col h-[320px]">
+          <ConversionSummarySection filters={currentFilters} />
+        </div>
+      </div>
 
-        {/* Purchase Frequency */}
-        <PurchaseFrequencyCards filters={currentFilters} />
+      {/* Row 4: Purchase Frequency */}
+      <PurchaseFrequencyCards filters={currentFilters} />
 
-        {/* Top VIP & Churn Risk – side by side on large screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Row 5: Tables (Split 1/1 with fixed height) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="h-[350px]">
           <TopSpendersTable filters={currentFilters} />
+        </div>
+        <div className="h-[350px]">
           <ChurnRiskTable filters={currentFilters} />
         </div>
-
-        {/* Order Conversion */}
-        <ConversionSummarySection filters={currentFilters} />
-      </main>
+      </div>
     </div>
   );
 }

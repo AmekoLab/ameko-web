@@ -98,23 +98,23 @@ export default function ShopCategoriesPage() {
   ];
 
   return (
-    <div className="p-8 bg-amazon-bgSecondary min-h-screen">
-      <div className="max-w-6xl mx-auto">
+    <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary min-h-screen">
+      <div className="max-w-[1440px] w-full mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-end mb-4 border-b border-amazon-border pb-2">
+        <div className="flex justify-between items-end mb-5 border-b border-amazon-border pb-4">
           <div>
-            <h1 className="text-3xl  font-black text-amazon-text mb-2 uppercase tracking-widest flex items-center gap-3">
-              <FolderTree className="w-8 h-8 text-amazon-text" />
+            <h1 className="text-2xl font-bold text-amazon-text mb-1 flex items-center gap-2">
+         
               Category Management
             </h1>
-            <p className="text-[11px] font-bold text-amazon-textMuted uppercase tracking-widest">
+            <p className="text-[13px] text-amazon-textMuted font-medium">
               Manage your shop categories. Use global categories as parents for
               your private sub-categories.
             </p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-amazon-btnPrimary text-amazon-text text-[11px] font-black uppercase tracking-widest rounded-sm hover:opacity-90 transition shrink-0 shadow-sm"
+            className="flex items-center justify-center gap-2 px-5 py-2 bg-amazon-btnPrimary text-amazon-text text-[13px] font-medium rounded-sm border border-amazon-border hover:brightness-95 transition shrink-0 shadow-sm"
           >
             <Plus className="w-4 h-4" />
             Add Category
@@ -127,14 +127,14 @@ export default function ShopCategoriesPage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-5 py-2 text-[13px] font-black  tracking-widest rounded-sm border transition-colors ${
+              className={`px-5 py-2 text-[13px] font-medium rounded-sm border transition-colors ${
                 activeTab === tab.key
                   ? "bg-amazon-btnPrimary text-amazon-text border-amazon-btnPrimary shadow-sm"
                   : "bg-white text-amazon-textMuted border-amazon-border hover:bg-neutral-50 hover:text-amazon-text"
               }`}
             >
               {tab.label}
-              <span className="ml-2 text-[10px] tracking-widest bg-white/40 px-1.5 py-0.5 rounded-sm">{tab.count}</span>
+              <span className="ml-2 text-[11px] bg-white/40 px-1.5 py-0.5 rounded-sm border border-amazon-border/20">{tab.count}</span>
             </button>
           ))}
         </div>
@@ -142,11 +142,11 @@ export default function ShopCategoriesPage() {
         {/* Table */}
         <div className="bg-white rounded-sm border border-amazon-border overflow-hidden shadow-sm">
           {loading ? (
-            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
+            <div className="p-12 text-center text-[13px] font-medium text-amazon-textMuted">
               Loading categories...
             </div>
           ) : categoryTree.roots.length === 0 ? (
-            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
+            <div className="p-12 text-center text-[13px] font-medium text-amazon-textMuted">
               No categories found.
             </div>
           ) : (
@@ -280,13 +280,13 @@ function CategoryRow({
 
         {/* Name + Slug */}
         <div className="flex-1 min-w-0">
-          <p className="font-black text-[13px] text-amazon-text  tracking-wider truncate">{category.name}</p>
-          <p className="text-[12px] font-bold text-amazon-textMuted  tracking-widest truncate">{category.slug}</p>
+          <p className="font-medium text-[13px] text-amazon-text truncate">{category.name}</p>
+          <p className="text-[12px] text-amazon-textMuted truncate">{category.slug}</p>
         </div>
 
         {/* Type badge */}
         {isPrivate ? (
-          <span className="flex items-center gap-1 text-[12px] font-black  tracking-widest bg-yellow-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-sm shrink-0">
+          <span className="flex items-center gap-1 text-[11px] font-medium bg-yellow-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-sm shrink-0">
             <Lock className="w-3 h-3" />
             Private
             {isOwn && (
@@ -294,27 +294,27 @@ function CategoryRow({
             )}
           </span>
         ) : (
-          <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest bg-neutral-100 text-amazon-textMuted border border-amazon-border px-2 py-0.5 rounded-sm shrink-0">
+          <span className="flex items-center gap-1 text-[11px] font-medium bg-neutral-100 text-amazon-textMuted border border-amazon-border px-2 py-0.5 rounded-sm shrink-0">
             <Globe className="w-3 h-3" />
             Global
           </span>
         )}
 
         {/* Stats */}
-        <div className="flex items-center gap-4 text-[12px] font-black  tracking-widest text-amazon-textMuted shrink-0">
+        <div className="flex items-center gap-4 text-[13px] font-medium text-amazon-textMuted shrink-0">
           <span className="flex items-center gap-1" title="Sub-categories">
-            <Layers className="w-3 h-3" />
+            <Layers className="w-3.5 h-3.5" />
             {category.subCategoryCount}
           </span>
           <span className="flex items-center gap-1" title="Parts">
-            <Package className="w-3 h-3" />
+            <Package className="w-3.5 h-3.5" />
             {category.partCount}
           </span>
         </div>
 
         {/* Active status */}
         <span
-          className={`text-[10px] px-2 py-0.5 rounded-sm font-black uppercase tracking-widest shrink-0 border ${
+          className={`text-[11px] px-2 py-0.5 rounded-sm font-medium shrink-0 border ${
             category.isActive
               ? "bg-neutral-100 text-amazon-text border-amazon-border"
               : "bg-red-50 text-red-600 border-red-200"

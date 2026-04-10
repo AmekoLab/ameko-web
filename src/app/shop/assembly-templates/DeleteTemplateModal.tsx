@@ -40,22 +40,22 @@ export default function DeleteTemplateModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white w-full max-w-sm rounded-md shadow-lg overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm transition-opacity">
+      <div className="bg-white w-full max-w-sm border border-amazon-border rounded-md shadow-xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
         <div className="p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-2">Delete Template</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-lg font-bold text-amazon-text mb-2">Delete Template</h2>
+          <p className="text-sm font-medium text-amazon-textMuted">
             Are you sure you want to delete the step:{" "}
-            <strong className="text-black">{template.stepName}</strong>?
+            <strong className="text-amazon-text">{template.stepName}</strong>?
           </p>
         </div>
 
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+        <div className="px-6 py-4 bg-neutral-50 border-t border-amazon-border flex justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
             disabled={isDeleting}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            className="px-4 py-2.5 text-sm font-medium text-amazon-text bg-white border border-amazon-border rounded-md hover:bg-neutral-50 transition-colors disabled:opacity-70"
           >
             Cancel
           </button>
@@ -63,7 +63,7 @@ export default function DeleteTemplateModal({
             type="button"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="flex items-center justify-center px-4 py-2 text-sm font-bold text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 min-w-[100px]"
+            className="flex items-center justify-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-all shadow-sm disabled:opacity-70 min-w-[100px]"
           >
             {isDeleting ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : "Delete"}
           </button>

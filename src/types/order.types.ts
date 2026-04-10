@@ -141,6 +141,13 @@ export interface CalculatePreviewPayload {
   appliedShopVoucherCodeGroups?: Record<string, string[]>;
 }
 
+/** Breakdown of applied vouchers for a shop */
+export interface AppliedVoucherBreakdown {
+  voucherCode: string;
+  discountType: string;
+  discountAmount: number;
+}
+
 /** Per-shop result from the calculate-preview response */
 export interface ShopPreview {
   shopId: string;
@@ -150,6 +157,7 @@ export interface ShopPreview {
   shopDiscountAmount: number;
   totalAmount: number;
   includedOrderItemIds: string[];
+  appliedVoucherBreakdowns?: AppliedVoucherBreakdown[];
   shopVoucherError: string | null;
 }
 
