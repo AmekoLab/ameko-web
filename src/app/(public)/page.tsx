@@ -14,7 +14,7 @@ import { LatestNews } from "@/src/components/News/LatestNews";
 
 export default function Home() {
   return (
-    <main className="bg-black min-h-screen w-full text-white overflow-x-hidden">
+    <main className="bg-amazon-bgSecondary min-h-screen w-full text-amazon-text overflow-x-hidden">
       <HeroVideoSection />
       {/* <CommunityTrending /> */}
       <SplitPromoSection />

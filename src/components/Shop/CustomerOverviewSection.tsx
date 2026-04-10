@@ -1,13 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import {
-  DollarSign,
-  Receipt,
-  Users,
-  RefreshCw,
-  ShoppingCart,
-} from "lucide-react";
 import { toast } from "react-toastify";
 import { shopDashboardService } from "@/src/services/shopDashboard.service";
 import type {
@@ -33,35 +26,26 @@ interface MetricCardProps {
   label: string;
   value: string;
   subtext?: string;
-  icon: React.ReactNode;
-  iconBg: string;
 }
 
-function MetricCard({ label, value, subtext, icon, iconBg }: MetricCardProps) {
+function MetricCard({ label, value, subtext }: MetricCardProps) {
   return (
-    <div className="bg-[#111111] border border-[#1e2126] rounded-xl p-5 flex flex-col gap-2 relative overflow-hidden group hover:border-[#2a2d35] transition-colors">
-      {/* Decorative glow */}
-      <div
-        className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-[0.06] blur-2xl pointer-events-none transition-opacity group-hover:opacity-[0.1]"
-        style={{ background: iconBg }}
-      />
-
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-          {label}
-        </span>
-        <div
-          className="w-9 h-9 rounded-lg flex items-center justify-center"
-          style={{ background: `${iconBg}15` }}
-        >
-          {icon}
-        </div>
+    <div className="bg-white border border-amazon-border shadow-sm rounded-md px-3 py-1.5 flex flex-col gap-0.5 relative overflow-hidden transition-colors hover:bg-neutral-50">
+      {/* Label nhỏ, không còn flex với icon */}
+      <div className="text-[11px] font-medium text-amazon-textMuted leading-tight truncate">
+        {label}
       </div>
 
-      <p className="text-2xl font-bold text-white tracking-tight">{value}</p>
+      {/* Value chính, ép leading-none để sát với nhãn */}
+      <div className="text-base font-bold text-amazon-text leading-none ">
+        {value}
+      </div>
 
+      {/* Subtext siêu nhỏ gọn */}
       {subtext && (
-        <p className="text-xs text-gray-500 leading-relaxed">{subtext}</p>
+        <div className="text-[10px] text-amazon-textMuted leading-tight truncate">
+          {subtext}
+        </div>
       )}
     </div>
   );
@@ -103,7 +87,7 @@ export default function CustomerOverviewSection({
     };
   }, [filters]);
 
-  // Metric cards config
+  // Metric cards config - Đã xóa toàn bộ cấu hình Icon
   const cards = useMemo(() => {
     if (!data) return [];
 
@@ -111,84 +95,74 @@ export default function CustomerOverviewSection({
       {
         label: "Total Revenue",
         value: formatVND(data.totalRevenue),
-        icon: <DollarSign className="w-4.5 h-4.5 text-green-500" />,
-        iconBg: "#22c55e",
       },
       {
         label: "AOV",
         value: formatVND(data.averageOrderValue),
-        icon: <Receipt className="w-4.5 h-4.5 text-blue-500" />,
-        iconBg: "#3b82f6",
       },
       {
         label: "Customers",
         value: formatNumber(data.totalCustomers),
         subtext: `New: ${formatNumber(data.newCustomers)}  ·  Returning: ${formatNumber(data.returningCustomers)}`,
-        icon: <Users className="w-4.5 h-4.5 text-purple-500" />,
-        iconBg: "#a855f7",
       },
       {
         label: "Retention",
         value: `${data.repeatRate.toFixed(1)}%`,
-        subtext: `Repeat Customers: ${formatNumber(data.repeatCustomers)}`,
-        icon: <RefreshCw className="w-4.5 h-4.5 text-orange-500" />,
-        iconBg: "#f97316",
+        subtext: `Repeat: ${formatNumber(data.repeatCustomers)}`, // Rút gọn chữ để chống tràn
       },
       {
         label: "Orders",
         value: formatNumber(data.totalOrders),
-        subtext: `Purchase Frequency: ${data.purchaseFrequency}`,
-        icon: <ShoppingCart className="w-4.5 h-4.5 text-yellow-500" />,
-        iconBg: "#eab308",
+        subtext: `Freq: ${data.purchaseFrequency}`, // Rút gọn chữ để chống tràn
       },
     ];
   }, [data]);
 
   return (
     <section>
-      {/* Metric Cards */}
+      {data && !isLoading && (
+        <p className="text-[12px] text-amazon-textMuted text-right">
+          Data from{" "}
+          <span className="text-amazon-text font-medium">
+            {new Date(data.fromUtc).toLocaleDateString("vi-VN")}
+          </span>{" "}
+          to{" "}
+          <span className="text-amazon-text font-medium">
+            {new Date(data.toUtc).toLocaleDateString("vi-VN")}
+          </span>
+        </p>
+      )}
+      {/* Metric Cards Grid - Thu nhỏ gap từ gap-4 xuống gap-2 */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-1">
           {[...Array(5)].map((_, i) => (
             <div
               key={i}
-              className="bg-[#111111] border border-[#1e2126] rounded-xl p-5 animate-pulse"
+              className="bg-white border border-amazon-border shadow-sm rounded-md px-1 py-1.5 flex flex-col gap-1 animate-pulse"
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className="h-3 w-20 bg-[#1e2126] rounded" />
-                <div className="w-9 h-9 bg-[#1e2126] rounded-lg" />
-              </div>
-              <div className="h-7 w-28 bg-[#1e2126] rounded mb-2" />
-              <div className="h-3 w-36 bg-[#1e2126] rounded" />
+              {/* Skeleton gọn gàng hơn, không còn khối vuông icon */}
+              <div className="h-3 w-16 bg-neutral-200 rounded" />
+              <div className="h-4 w-24 bg-neutral-200 rounded" />
+              <div className="h-2 w-32 bg-neutral-100 rounded" />
             </div>
           ))}
         </div>
       ) : data ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2">
           {cards.map((card) => (
             <MetricCard key={card.label} {...card} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 text-gray-500 bg-[#111111] border border-[#1e2126] rounded-xl">
-          <p className="font-medium">No data available.</p>
-          <p className="text-sm mt-1">Try adjusting your date range.</p>
+        <div className="text-center py-6 text-amazon-textMuted bg-white border border-amazon-border shadow-sm rounded-md">
+          <p className="text-sm font-medium">No data available.</p>
         </div>
       )}
 
-      {/* Date Range Footer */}
-      {data && !isLoading && (
-        <p className="text-[11px] text-gray-600 mt-3 text-right">
-          Data from{" "}
-          <span className="text-gray-400">
-            {new Date(data.fromUtc).toLocaleDateString("vi-VN")}
-          </span>{" "}
-          to{" "}
-          <span className="text-gray-400">
-            {new Date(data.toUtc).toLocaleDateString("vi-VN")}
-          </span>
-        </p>
-      )}
+      {/* Date Range Footer - Ép sát lên trên với mt-1.5 và chữ text-[10px] */}
+      
+      
+    
     </section>
   );
 }

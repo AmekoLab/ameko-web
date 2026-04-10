@@ -4,9 +4,9 @@ import { Flame, Hash, Users, TrendingUp } from "lucide-react";
 
 // --- LEFT SIDEBAR ---
 export const LeftSidebar: FC = () => (
-  <div className="sticky top-32 space-y-2">
+  <div className=" top-32 space-y-2">
     <SidebarLink
-      icon={<Flame className="w-5 h-5 text-[#ce2a32]" />}
+      icon={<Flame className="w-5 h-5 text-amazon-btnSecondary" />}
       text="News Feed"
       active
     />
@@ -17,9 +17,9 @@ export const LeftSidebar: FC = () => (
       text="Trending Builds"
     />
 
-    <div className="border-t border-[#2a2d31] my-4"></div>
+    <div className="border-t border-amazon-border my-4"></div>
 
-    <h3 className="text-md font-black uppercase text-gray-400 mb-3 px-3 tracking-widest">
+    <h3 className="text-md font-black uppercase text-amazon-textMuted mb-3 px-3 tracking-widest">
       My Groups
     </h3>
     <SidebarGroup text="Vietnam MechKey" />
@@ -30,10 +30,10 @@ export const LeftSidebar: FC = () => (
 
 // --- RIGHT SIDEBAR ---
 export const RightSidebar: FC = () => (
-  <div className="sticky top-32 space-y-6">
+  <div className=" top-32 space-y-6">
     {/* Trending Tags */}
-    <div className="bg-[#1a1a1a] p-4 rounded-sm shadow-sm border border-[#2a2d31]">
-      <h3 className="text-sm font-black uppercase mb-4 text-white">
+    <div className="bg-white p-4 rounded-sm shadow-sm border border-amazon-border">
+      <h3 className="text-sm font-black uppercase mb-4 text-amazon-text">
         Trending Tags
       </h3>
       <div className="flex flex-wrap gap-2">
@@ -41,7 +41,7 @@ export const RightSidebar: FC = () => (
           (tag) => (
             <span
               key={tag}
-              className="text-md bg-[#111] hover:bg-[#ce2a32] hover:text-white transition-colors px-2 py-1 rounded-md cursor-pointer font-medium text-gray-300"
+              className="text-md bg-amazon-bgSecondary hover:bg-neutral-50 transition-colors border border-amazon-border px-2 py-1 rounded-md cursor-pointer font-medium text-amazon-textMuted hover:text-amazon-text"
             >
               {tag}
             </span>
@@ -51,8 +51,8 @@ export const RightSidebar: FC = () => (
     </div>
 
     {/* Top Builders */}
-    <div className="bg-[#1a1a1a] p-4 rounded-md shadow-sm border border-[#2a2d31]">
-      <h3 className="text-sm font-black uppercase mb-4 text-white">
+    <div className="bg-white p-4 rounded-md shadow-sm border border-amazon-border">
+      <h3 className="text-sm font-black uppercase mb-4 text-amazon-text">
         Top Builders
       </h3>
       <ul className="space-y-4">
@@ -77,8 +77,8 @@ const SidebarLink = ({
   <div
     className={`flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer transition-colors ${
       active
-        ? "bg-[#111] shadow-sm font-bold text-white border-l-4 border-[#ce2a32]"
-        : "hover:bg-[#111] hover:shadow-sm text-gray-300"
+        ? "bg-neutral-50 shadow-sm font-bold text-amazon-text border-l-4 border-amazon-btnSecondary"
+        : "hover:bg-neutral-50 hover:shadow-sm text-amazon-textMuted"
     }`}
   >
     {icon}
@@ -87,9 +87,9 @@ const SidebarLink = ({
 );
 
 const SidebarGroup = ({ text }: { text: string }) => (
-  <div className="flex items-center gap-3 px-3 py-2 rounded-sm cursor-pointer hover:bg-[#111] hover:shadow-sm transition-colors group">
-    <div className="w-8 h-8 rounded-lg bg-[#2a2d31] group-hover:bg-[#3a3d42] transition-colors"></div>
-    <span className="text-sm font-medium text-gray-400 group-hover:text-white">
+  <div className="flex items-center gap-3 px-3 py-2 rounded-sm cursor-pointer hover:bg-neutral-50 hover:shadow-sm transition-colors group">
+    <div className="w-8 h-8 rounded-lg bg-neutral-200 group-hover:bg-neutral-300 transition-colors"></div>
+    <span className="text-sm font-medium text-amazon-textMuted group-hover:text-amazon-text">
       {text}
     </span>
   </div>
@@ -97,13 +97,13 @@ const SidebarGroup = ({ text }: { text: string }) => (
 
 const BuilderRow = ({ name, role }: { name: string; role: string }) => (
   <li className="flex items-center gap-3">
-    <div className="w-8 h-8 rounded-full bg-[#2a2d31]"></div>
+    <div className="w-8 h-8 rounded-full bg-neutral-200"></div>
     <div>
-      <p className="text-md font-bold text-white hover:text-[#ce2a32] cursor-pointer">
+      <p className="text-md font-bold text-amazon-text hover:text-amazon-btnSecondary cursor-pointer">
         {name}
       </p>
-      <p className="text-[10px] uppercase text-gray-400 font-bold">{role}</p>
+      <p className="text-[10px] uppercase text-amazon-textMuted font-bold">{role}</p>
     </div>
-    <button className="ml-auto text-md font-bold text-[#ce2a32]">Follow</button>
+    <button className="ml-auto text-md font-bold text-amazon-link">Follow</button>
   </li>
 );

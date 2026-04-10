@@ -70,8 +70,8 @@ const ImageUpload = ({
 
   const containerClass =
     type === "banner"
-      ? "w-full h-48 md:h-64 rounded-t-2xl bg-gray-100 border-2 border-dashed border-gray-300 relative overflow-hidden group hover:border-gray-400 transition-all"
-      : "w-32 h-32 md:w-40 md:h-40 rounded-full bg-white border-4 border-white shadow-lg relative overflow-hidden group cursor-pointer hover:brightness-95 transition-all";
+      ? "w-full h-48 md:h-64 rounded-t-sm bg-neutral-100 border-b border-amazon-border relative overflow-hidden group hover:brightness-95 transition-all"
+      : "w-32 h-32 md:w-36 md:h-36 rounded-sm bg-white border-4 border-white shadow-md relative overflow-hidden group cursor-pointer hover:brightness-95 transition-all";
 
   return (
     <div className="relative">
@@ -133,12 +133,12 @@ const InputLabel = ({
   error?: string;
   required?: boolean;
 }) => (
-  <div className="flex justify-between mb-1.5 items-end">
-    <label className="text-sm font-bold text-gray-700">
-      {label} {required && <span className="text-[#ce2a32]">*</span>}
+  <div className="flex justify-between mb-0.5 items-center">
+    <label className="text-[13px] font-medium text-amazon-text">
+      {label} {required && <span className="text-red-500">*</span>}
     </label>
     {error && (
-      <span className="text-[#ce2a32] text-xs font-semibold animate-pulse">
+      <span className="text-red-500 text-[11px] font-medium">
         {error}
       </span>
     )}
@@ -272,15 +272,15 @@ export default function ShopProfilePage() {
   const canToggle = currentShop?.status === 1 || currentShop?.status === 2;
 
   return (
-    <div className="py-6 px-2 md:px-0">
-      <div className="max-w-5xl mx-auto">
-        {/* HEADER */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      {/* HEADER */}
+      <div className="bg-amazon-bgSecondary border-b border-amazon-border py-4 px-4 md:px-6 mb-6">
+        <div className="max-w-[1100px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black font-oswald uppercase text-gray-900">
+            <h1 className="text-2xl font-bold text-amazon-text">
               Shop Profile
             </h1>
-            <p className="text-gray-500 text-sm mt-1">
+            <p className="text-amazon-textMuted text-[13px] mt-1">
               Update your shop&apos;s information and settings.
             </p>
           </div>
@@ -288,7 +288,7 @@ export default function ShopProfilePage() {
           <div className="flex flex-wrap items-center gap-3">
             {currentShop && (
               <span
-                className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${
+                className={`px-2.5 py-1 rounded-sm text-[12px] font-medium ${
                   currentShop.status === 1
                     ? "bg-green-100 text-green-700"
                     : currentShop.status === 0
@@ -317,7 +317,7 @@ export default function ShopProfilePage() {
               <button
                 onClick={handleToggleStatus}
                 disabled={isToggling}
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-colors border shadow-sm disabled:opacity-70 ${
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-sm text-[12px] font-medium transition-colors border shadow-sm disabled:opacity-70 ${
                   currentShop.status === 1
                     ? "bg-white border-red-500 text-red-600 hover:bg-red-50" // Đang Active -> Bấm để Deactivate
                     : "bg-green-600 border-green-600 text-white hover:bg-green-700" // Đang Inactive -> Bấm để Reactivate
@@ -335,7 +335,9 @@ export default function ShopProfilePage() {
             )}
           </div>
         </div>
+      </div>
 
+      <div className="max-w-[1100px] mx-auto px-4 md:px-6">
         {/* Admin note (if rejected) */}
         {currentShop?.adminNote && currentShop.status === 3 && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
@@ -346,9 +348,9 @@ export default function ShopProfilePage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* --- SECTION 1: VISUAL IDENTITY --- */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
+          <div className="bg-white rounded-sm shadow-sm border border-amazon-border">
             <div className="relative">
               <ImageUpload
                 name="bannerImage"
@@ -384,7 +386,7 @@ export default function ShopProfilePage() {
                   />
                   <input
                     {...register("shopName")}
-                    className="form-input text-lg font-bold"
+                    className="form-input font-bold"
                     placeholder="Shop Name..."
                   />
                 </div>
@@ -401,10 +403,10 @@ export default function ShopProfilePage() {
           </div>
 
           {/* --- SECTION 2: CONTACT & ADDRESS --- */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
-            <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
-              <User className="text-[#ce2a32]" />
-              <h3 className="text-lg font-bold text-gray-800 uppercase">
+          <div className="bg-white rounded-sm shadow-sm border border-amazon-border p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-6 border-b border-amazon-border pb-4">
+              <User className="text-amazon-btnPrimary w-5 h-5" />
+              <h3 className="text-[16px] font-bold text-amazon-text">
                 Contact Details
               </h3>
             </div>
@@ -450,14 +452,14 @@ export default function ShopProfilePage() {
           </div>
 
           {/* --- SECTION 3: BANKING INFORMATION (Read-only) --- */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 opacity-80">
-            <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
-              <CreditCard className="text-[#ce2a32]" />
-              <h3 className="text-lg font-bold text-gray-800 uppercase">
+          <div className="bg-white rounded-sm shadow-sm border border-amazon-border p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-6 border-b border-amazon-border pb-4">
+              <CreditCard className="text-amazon-btnPrimary w-5 h-5" />
+              <h3 className="text-[16px] font-bold text-amazon-text">
                 Banking Information
               </h3>
-              <span className="ml-auto text-xs font-semibold text-gray-400 uppercase tracking-wide">
-                Locked
+              <span className="ml-auto text-[11px] font-bold text-amazon-textMuted bg-neutral-100 px-2 py-0.5 rounded-sm">
+                LOCKED
               </span>
             </div>
 
@@ -494,29 +496,29 @@ export default function ShopProfilePage() {
 
           {/* --- SHOP STATS (read-only) --- */}
           {currentShop && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
-              <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
-                <Store className="text-[#ce2a32]" />
-                <h3 className="text-lg font-bold text-gray-800 uppercase">
+            <div className="bg-white rounded-sm shadow-sm border border-amazon-border p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-6 border-b border-amazon-border pb-4">
+                <Store className="text-amazon-btnPrimary w-5 h-5" />
+                <h3 className="text-[16px] font-bold text-amazon-text">
                   Shop Statistics
                 </h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <p className="text-sm text-gray-500 mb-1">Rating</p>
-                  <p className="text-2xl font-bold text-gray-800">
+                <div className="bg-neutral-50 border border-amazon-border rounded-sm p-4 text-center">
+                  <p className="text-[13px] font-medium text-amazon-textMuted mb-1">Rating</p>
+                  <p className="text-xl font-bold text-amazon-text">
                     {currentShop.rating?.toFixed(1) || "N/A"}
                   </p>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <p className="text-sm text-gray-500 mb-1">Total Sales</p>
-                  <p className="text-2xl font-bold text-gray-800">
+                <div className="bg-neutral-50 border border-amazon-border rounded-sm p-4 text-center">
+                  <p className="text-[13px] font-medium text-amazon-textMuted mb-1">Total Sales</p>
+                  <p className="text-xl font-bold text-amazon-text">
                     {currentShop.totalSales ?? 0}
                   </p>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <p className="text-sm text-gray-500 mb-1">Total Revenue</p>
-                  <p className="text-2xl font-bold text-gray-800">
+                <div className="bg-neutral-50 border border-amazon-border rounded-sm p-4 text-center">
+                  <p className="text-[13px] font-medium text-amazon-textMuted mb-1">Total Revenue</p>
+                  <p className="text-xl font-bold text-amazon-text">
                     {currentShop.totalRevenue?.toLocaleString() ?? 0}₫
                   </p>
                 </div>
@@ -529,7 +531,7 @@ export default function ShopProfilePage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-black font-oswald uppercase tracking-widest rounded-lg hover:bg-[#ce2a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-70 disabled:cursor-not-allowed w-full md:w-auto"
+              className="px-6 py-2.5 text-[14px] font-medium text-amazon-text bg-amazon-btnPrimary border border-amazon-border rounded-sm hover:brightness-95 transition disabled:opacity-50 flex items-center gap-2 shadow-sm whitespace-nowrap w-full md:w-auto"
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
@@ -549,21 +551,27 @@ export default function ShopProfilePage() {
       <style jsx>{`
         .form-input {
           width: 100%;
-          padding: 0.75rem 1rem;
-          border-radius: 0.5rem;
-          border: 1px solid #e5e7eb;
-          background-color: #f9fafb;
-          font-size: 0.95rem;
+          padding: 0.5rem 0.75rem;
+          border-radius: 0.125rem;
+          border: 1px solid #d5d9d9;
+          background-color: #fff;
+          font-size: 13px;
+          font-weight: 500;
+          color: #0f1111;
           transition: all 0.2s;
           outline: none;
         }
         .form-input:focus {
-          border-color: #ce2a32;
-          background-color: #fff;
-          box-shadow: 0 0 0 4px rgba(206, 42, 50, 0.1);
+          border-color: #e77600;
+          box-shadow: 0 0 0 1px #e77600;
         }
         .form-input::placeholder {
-          color: #9ca3af;
+          color: #565959;
+          font-weight: 400;
+        }
+        .form-input[disabled] {
+          background-color: #f7f7f7;
+          color: #565959;
         }
       `}</style>
     </div>

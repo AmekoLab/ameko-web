@@ -128,8 +128,8 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
   if (!isOpen || !issue) return null;
 
   const inputClass =
-    "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors";
-  const labelClass = "block text-sm font-medium text-gray-700 mb-1.5";
+    "w-full rounded-lg border border-amazon-border px-3 py-2.5 text-sm text-amazon-text placeholder-neutral-400 focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary outline-none transition-colors";
+  const labelClass = "block text-sm font-medium text-amazon-text mb-1.5";
   const errorClass = "text-xs text-red-500 mt-1";
 
   return (
@@ -143,15 +143,15 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
       {/* Modal */}
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white rounded-t-2xl border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-lg font-bold text-gray-900">
+        <div className="sticky top-0 bg-white rounded-t-2xl border-b border-amazon-border px-6 py-4 flex items-center justify-between z-10">
+          <h2 className="text-lg font-bold text-amazon-text">
             Update warranty request
           </h2>
           <button
             onClick={handleClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1 rounded-lg hover:bg-neutral-100 transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-amazon-textMuted" />
           </button>
         </div>
 
@@ -201,27 +201,27 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
                     onClick={() => field.onChange(field.value === 1 ? -1 : 1)}
                     className={`w-full p-4 rounded-lg border-2 text-left transition-colors ${
                       field.value === 1
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
+                        ? "border-amazon-btnPrimary bg-yellow-50"
+                        : "border-amazon-border hover:border-neutral-300"
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                           field.value === 1
-                            ? "border-blue-500"
-                            : "border-gray-300"
+                            ? "border-amazon-btnPrimary"
+                            : "border-amazon-border"
                         }`}
                       >
                         {field.value === 1 && (
-                          <div className="w-2 h-2 rounded-full bg-blue-500" />
+                          <div className="w-2 h-2 rounded-full bg-amazon-btnPrimary" />
                         )}
                       </div>
-                      <span className="text-sm font-semibold text-gray-900">
+                      <span className="text-sm font-semibold text-amazon-text">
                         Return &amp; Refund
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1 ml-7">
+                    <p className="text-xs text-amazon-textMuted mt-1 ml-7">
                       Request to return the physical product to the Shop before
                       receiving a refund.
                     </p>
@@ -233,27 +233,27 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
                     onClick={() => field.onChange(field.value === 2 ? -1 : 2)}
                     className={`w-full p-4 rounded-lg border-2 text-left transition-colors ${
                       field.value === 2
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
+                        ? "border-amazon-btnPrimary bg-yellow-50"
+                        : "border-amazon-border hover:border-neutral-300"
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                           field.value === 2
-                            ? "border-blue-500"
-                            : "border-gray-300"
+                            ? "border-amazon-btnPrimary"
+                            : "border-amazon-border"
                         }`}
                       >
                         {field.value === 2 && (
-                          <div className="w-2 h-2 rounded-full bg-blue-500" />
+                          <div className="w-2 h-2 rounded-full bg-amazon-btnPrimary" />
                         )}
                       </div>
-                      <span className="text-sm font-semibold text-gray-900">
+                      <span className="text-sm font-semibold text-amazon-text">
                         Warranty / Instant Refund
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1 ml-7">
+                    <p className="text-xs text-amazon-textMuted mt-1 ml-7">
                       No return required. Suitable for minor compensation or
                       private agreement.
                     </p>
@@ -303,7 +303,7 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
             <label className={labelClass}>Evidence image</label>
             <div className="relative">
               {previewUrl ? (
-                <div className="relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
+                <div className="relative w-full h-48 rounded-lg overflow-hidden border border-amazon-border">
                   <Image
                     src={previewUrl}
                     alt="Evidence"
@@ -316,33 +316,33 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
                       setPreviewUrl(null);
                       setValue("evidenceUrl", "", { shouldValidate: true });
                     }}
-                    className="absolute top-2 right-2 p-1 bg-white rounded-full shadow hover:bg-gray-100 transition-colors"
+                    className="absolute top-2 right-2 p-1 bg-white rounded-full shadow hover:bg-neutral-100 transition-colors"
                   >
-                    <X className="w-4 h-4 text-gray-600" />
+                    <X className="w-4 h-4 text-amazon-textMuted" />
                   </button>
                 </div>
               ) : (
                 <label
                   className={`flex flex-col items-center justify-center w-full h-40 rounded-lg border-2 border-dashed transition-colors cursor-pointer ${
                     isUploading
-                      ? "border-gray-300 bg-gray-50"
-                      : "border-gray-300 hover:border-blue-400 hover:bg-blue-50/30"
+                      ? "border-amazon-border bg-neutral-50"
+                      : "border-amazon-border hover:border-amazon-btnPrimary hover:bg-yellow-50"
                   }`}
                 >
                   {isUploading ? (
                     <div className="flex flex-col items-center gap-2">
-                      <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-                      <span className="text-sm text-gray-500">
+                      <Loader2 className="w-8 h-8 text-amazon-btnPrimary animate-spin" />
+                      <span className="text-sm text-amazon-textMuted">
                         Uploading...
                       </span>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2">
-                      <ImagePlus className="w-8 h-8 text-gray-400" />
-                      <span className="text-sm text-gray-500">
+                      <ImagePlus className="w-8 h-8 text-neutral-400" />
+                      <span className="text-sm text-amazon-textMuted">
                         Click to upload image
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-amazon-textMuted">
                         PNG, JPG up to 5MB
                       </span>
                     </div>
@@ -368,14 +368,14 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
               type="button"
               onClick={handleClose}
               disabled={isUpdatingWarranty}
-              className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="px-5 py-2.5 text-sm font-medium text-amazon-text bg-white border border-amazon-border rounded-lg hover:bg-neutral-50 transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isUpdatingWarranty || isUploading}
-              className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+              className="px-5 py-2.5 text-sm font-medium text-amazon-text bg-amazon-btnPrimary rounded-lg hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
             >
               {isUpdatingWarranty && (
                 <Loader2 className="w-4 h-4 animate-spin" />

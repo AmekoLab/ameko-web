@@ -100,7 +100,7 @@ export const CommentSection: FC<CommentSectionProps> = ({
   };
 
   return (
-    <div className="border-t border-[#2a2d31] pt-3 mt-3 px-4 pb-4">
+    <div className="border-t border-amazon-border pt-3 mt-3 px-4 pb-4">
       {/* Loading State */}
       {loading ? (
         <div className="flex justify-center py-4">
@@ -174,13 +174,13 @@ export const CommentSection: FC<CommentSectionProps> = ({
             }}
             placeholder="Write a comment..."
             rows={1}
-            className="w-full bg-gray-800 text-white rounded-2xl px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#555] placeholder-gray-400 pr-10 resize-none overflow-y-auto"
+            className="w-full bg-white border border-amazon-border text-amazon-text rounded-2xl px-4 py-2.5 text-sm outline-none focus:ring-1 focus:border-amazon-focus focus:ring-amazon-focus placeholder-gray-400 pr-10 resize-none overflow-y-auto"
             style={{ minHeight: "40px", maxHeight: "120px" }}
           />
           <button
             type="submit"
             disabled={!inputValue.trim() || isPosting}
-            className="absolute right-2 bottom-1.5 text-[#ce2a32] disabled:text-gray-400 p-1"
+            className="absolute right-2 bottom-1.5 text-amazon-link disabled:text-gray-400 p-1"
           >
             {isPosting ? (
               <Loader2 className="w-4 h-4 animate-spin" />

@@ -75,13 +75,13 @@ function ComponentDetailsSection({
   return (
     <div className="pt-16 mb-20">
       {/* Section eyebrow */}
-      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#f5d800] mb-2">
+      <p className="text-[14px] font-black uppercase tracking-[0.3em] text-amazon-link mb-2">
         Breakdown
       </p>
-      <h3 className="text-2xl lg:text-[28px] font-black uppercase text-white mb-2 leading-tight">
+      <h3 className="text-2xl lg:text-[28px] font-black uppercase text-amazon-text mb-2 leading-tight">
         Build Components
       </h3>
-      <p className="text-sm text-gray-400 mb-10">
+      <p className="text-sm text-amazon-textMuted mb-10">
         Every part hand-selected and assembled for the perfect typing
         experience.
       </p>
@@ -89,15 +89,15 @@ function ComponentDetailsSection({
       {Object.entries(grouped).map(([kitName, components]) => (
         <div key={kitName} className="mb-10">
           <div className="flex items-center gap-2 mb-4">
-            <Layers className="w-4 h-4 text-[#f5d800]" />
-            <h4 className="text-sm font-black uppercase tracking-[0.2em] text-gray-300">
+            <Layers className="w-4 h-4 text-amazon-link" />
+            <h4 className="text-sm font-black uppercase tracking-[0.2em] text-amazon-text">
               Base Kit: {kitName}
             </h4>
           </div>
 
-          <div className="border border-white/10 overflow-hidden">
+          <div className="border border-amazon-border overflow-hidden">
             {/* Table header */}
-            <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-[#1e1e1e] text-[10px] font-black uppercase tracking-widest text-gray-500">
+            <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-neutral-100 text-[10px] font-black uppercase tracking-widest text-amazon-textMuted">
               <div className="col-span-1">#</div>
               <div className="col-span-5">Component</div>
               <div className="col-span-3 text-center">Quantity</div>
@@ -107,18 +107,18 @@ function ComponentDetailsSection({
             {components.map((comp, idx) => (
               <div
                 key={comp.id || idx}
-                className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-white/10 last:border-0 items-center hover:bg-white/5 transition-colors"
+                className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-amazon-border last:border-0 items-center hover:bg-neutral-50 transition-colors"
               >
-                <div className="col-span-1 text-xs text-gray-500 font-mono">
+                <div className="col-span-1 text-xs text-amazon-textMuted font-mono">
                   {String(idx + 1).padStart(2, "0")}
                 </div>
                 <div className="col-span-5">
-                  <p className="text-sm font-semibold text-gray-200">
+                  <p className="text-sm font-semibold text-amazon-text">
                     {comp.componentName || comp.componentId}
                   </p>
                 </div>
                 <div className="col-span-3 text-center">
-                  <span className="inline-flex items-center justify-center bg-[#1e1e1e] border border-white/10 px-2 py-0.5 text-xs font-bold text-gray-300">
+                  <span className="inline-flex items-center justify-center bg-white border border-amazon-border px-2 py-0.5 text-xs font-bold text-amazon-text">
                     ×{comp.quantity}
                   </span>
                 </div>
@@ -128,13 +128,13 @@ function ComponentDetailsSection({
                       href={comp.soundUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[10px] font-black text-[#f5d800] hover:underline uppercase tracking-wider"
+                      className="inline-flex items-center gap-1 text-[10px] font-black text-amazon-link hover:underline uppercase tracking-wider"
                     >
                       <Music className="w-3 h-3" />
                       Listen
                     </a>
                   ) : (
-                    <span className="text-gray-600 text-xs">—</span>
+                    <span className="text-amazon-textMuted text-xs">—</span>
                   )}
                 </div>
               </div>
@@ -152,23 +152,23 @@ function ComponentDetailsSection({
 
 function PageSkeleton() {
   return (
-    <div className="bg-[#0d0d0d] min-h-screen pb-16 overflow-x-hidden w-full font-sans animate-pulse">
+    <div className="bg-white min-h-screen pb-16 overflow-x-hidden w-full font-sans animate-pulse">
       {/* Hero strip */}
-      <div className="w-full max-w-[1920px] mx-auto flex flex-col lg:flex-row border-b border-[#2a2d31]">
+      <div className="w-full max-w-[1920px] mx-auto flex flex-col lg:flex-row border-b border-amazon-border">
         {/* Gallery placeholder */}
-        <div className="w-full lg:w-[65%] h-[600px] lg:h-[800px] bg-[radial-gradient(circle_at_center,_#1e2024_0%,_#0d0d0d_100%)]" />
+        <div className="w-full lg:w-[65%] h-[600px] lg:h-[800px] bg-neutral-200" />
         {/* Info placeholder */}
-        <div className="w-full lg:w-[35%] bg-black border-l border-[#2a2d31] p-6 lg:p-12 space-y-5">
-          <div className="h-3 w-16 bg-[#f5d800]/20" />
-          <div className="h-7 w-full bg-white/10" />
-          <div className="h-6 w-3/4 bg-white/10" />
+        <div className="w-full lg:w-[35%] bg-white border-l border-amazon-border p-6 lg:p-12 space-y-5">
+          <div className="h-3 w-16 bg-neutral-200" />
+          <div className="h-7 w-full bg-neutral-200" />
+          <div className="h-6 w-3/4 bg-neutral-200" />
           <div className="space-y-2 mt-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-2.5 w-52 bg-white/10" />
+              <div key={i} className="h-2.5 w-52 bg-neutral-200" />
             ))}
           </div>
-          <div className="h-12 w-40 bg-white/10 mt-4" />
-          <div className="h-[52px] w-full bg-white/10 mt-4" />
+          <div className="h-12 w-40 bg-neutral-200 mt-4" />
+          <div className="h-[52px] w-full bg-neutral-200 mt-4" />
         </div>
       </div>
     </div>
@@ -215,20 +215,20 @@ export default function AssembledProductDetailPage() {
   // --- ERROR ---
   if (error || !assembledProduct) {
     return (
-      <div className="bg-[#0d0d0d] min-h-screen flex items-center justify-center font-sans">
+      <div className="bg-white min-h-screen flex items-center justify-center font-sans">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-white/5 border border-white/10 flex items-center justify-center mx-auto">
-            <XCircle className="w-8 h-8 text-[#f5d800]" />
+          <div className="w-16 h-16 bg-white border border-amazon-border rounded-md shadow-sm flex items-center justify-center mx-auto">
+            <XCircle className="w-8 h-8 text-amazon-link" />
           </div>
-          <h2 className="text-xl font-black uppercase tracking-tight text-white">
+          <h2 className="text-xl font-black uppercase tracking-tight text-amazon-text">
             Product Not Found
           </h2>
-          <p className="text-sm text-gray-500 max-w-sm">
+          <p className="text-sm text-amazon-textMuted max-w-sm">
             {error || "The assembled product you're looking for doesn't exist."}
           </p>
           <Link
             href="/shop/all-products"
-            className="inline-block text-[11px] font-black uppercase tracking-widest text-[#f5d800] hover:underline mt-2"
+            className="inline-block text-[11px] font-black uppercase tracking-widest text-amazon-link hover:underline mt-2"
           >
             ← Back to Shop
           </Link>
@@ -244,7 +244,7 @@ export default function AssembledProductDetailPage() {
   const soundTestUrl = assembledProduct.details?.[0]?.soundUrl?.trim() || null;
 
   return (
-    <div className="bg-[#0d0d0d] min-h-screen pb-16 w-full font-sans overflow-x-clip">
+    <div className="bg-white min-h-screen pb-16 w-full font-sans overflow-x-clip">
 
       {/* ================================================================
           HERO — Full-bleed 60 / 40 split, no max-width cap
@@ -264,7 +264,7 @@ export default function AssembledProductDetailPage() {
         </div>
 
         {/* Product Info — 40% right, black panel */}
-        <div className="w-full lg:w-[45%] bg-black p-6 lg:p-10 xl:p-14 ">
+        <div className="w-full lg:w-[45%] bg-white border-l border-amazon-border p-6 lg:p-10 xl:p-10 ">
           <ProductInfo
             product={product}
             shopId={assembledProduct.shopId}
@@ -292,15 +292,15 @@ export default function AssembledProductDetailPage() {
         {/* Description & Specs */}
         <div className=" pt-16 grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
           <div className="lg:col-span-7">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#f5d800] mb-2">
+            <p className="text-[14px] font-black uppercase tracking-[0.3em] text-amazon-link mb-2">
               Details
             </p>
-            <h3 className="text-2xl lg:text-[28px] font-black uppercase text-white mb-6 leading-tight">
+            <h3 className="text-2xl lg:text-[28px] font-black uppercase text-amazon-text mb-6 leading-tight">
               Product Description
             </h3>
             <div className="relative">
               <div
-                className={`text-[13px] text-gray-100 leading-relaxed space-y-4 overflow-hidden transition-all duration-300 [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-md [&_img]:mx-auto [&_img]:my-6 [&_p]:mb-4 ${
+                className={`text-[13px] text-amazon-text leading-relaxed space-y-4 overflow-hidden transition-all duration-300 [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-md [&_img]:mx-auto [&_img]:my-6 [&_p]:mb-4 ${
                   isDescriptionExpanded ? "" : "max-h-[300px]"
                 }`}
               >
@@ -312,7 +312,7 @@ export default function AssembledProductDetailPage() {
                     <p>
                       Designed for enthusiasts, gamers, and professionals alike,
                       the{" "}
-                      <strong className="text-white font-black">
+                      <strong className="text-amazon-text font-bold">
                         {product.name}
                       </strong>{" "}
                       offers unparalleled customization and performance. With its
@@ -330,14 +330,14 @@ export default function AssembledProductDetailPage() {
               
               {/* Fade out gradient when collapsed */}
               {!isDescriptionExpanded && (
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0d0d0d] to-transparent pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent pointer-events-none" />
               )}
             </div>
             
             {/* Toggle Button */}
             <button
               onClick={() => setIsDescriptionExpanded((prev) => !prev)}
-              className="mt-6 text-[#f5d800] hover:text-[#ffe500] hover:underline text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center gap-1"
+              className="mt-6 text-amazon-link hover:text-amazon-focus hover:underline text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center gap-1"
             >
               {isDescriptionExpanded ? "Show Less" : "Read More"}
               <svg
@@ -350,10 +350,10 @@ export default function AssembledProductDetailPage() {
           </div>
 
           <div className="lg:col-span-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#f5d800] mb-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amazon-link mb-2">
               Specs
             </p>
-            <h3 className="text-2xl lg:text-[28px] font-black uppercase text-white mb-6 leading-tight">
+            <h3 className="text-2xl lg:text-[28px] font-black uppercase text-amazon-text mb-6 leading-tight">
               Technical Specs
             </h3>
             <ProductSpecs specs={product.specs} />

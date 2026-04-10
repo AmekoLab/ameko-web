@@ -120,9 +120,9 @@ export default function EditCategoryModal({
   if (!isOpen || !category) return null;
 
   const inputClass =
-    "text-black w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
-  const labelClass = "block text-sm font-semibold text-gray-700 mb-1";
-  const errorClass = "text-xs text-red-500 mt-1";
+    "w-full px-3 py-2 border border-amazon-border rounded-sm text-sm text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition";
+  const labelClass = "block text-[13px] font-medium text-amazon-text mb-1";
+  const errorClass = "text-[11px] font-medium text-red-500 mt-1";
 
   // Exclude the current category from parent options to prevent self-parenting
   const rootParents = parentOptions.filter(
@@ -131,12 +131,12 @@ export default function EditCategoryModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-sm shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto border border-amazon-border">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-200">
+        <div className="flex items-center justify-between p-5 border-b border-amazon-border">
           <div>
-            <h2 className="text-lg font-bold text-gray-800">Edit Category</h2>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <h2 className="text-lg font-bold text-amazon-text">Edit Category</h2>
+            <p className="text-[12px] text-amazon-textMuted mt-0.5">
               {category.categoryType === "global"
                 ? "Global category"
                 : "Private category"}{" "}
@@ -145,15 +145,15 @@ export default function EditCategoryModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition"
+            className="p-1 rounded-sm hover:bg-neutral-50 transition"
             disabled={updating}
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-amazon-textMuted hover:text-amazon-text" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-5">
           {/* Name */}
           <div>
             <label className={labelClass}>Category Name</label>
@@ -169,7 +169,7 @@ export default function EditCategoryModal({
           <div>
             <label className={labelClass}>
               Parent Category{" "}
-              <span className="font-normal text-gray-400">(optional)</span>
+              <span className="font-normal text-amazon-textMuted">(optional)</span>
             </label>
             <select {...register("parentId")} className={inputClass}>
               <option value="">— None (root category) —</option>
@@ -185,10 +185,10 @@ export default function EditCategoryModal({
           <div>
             <label className={labelClass}>
               Thumbnail Image{" "}
-              <span className="font-normal text-gray-400">(optional)</span>
+              <span className="font-normal text-amazon-textMuted">(optional)</span>
             </label>
             {thumbnailPreview ? (
-              <div className="relative w-full h-36 rounded-lg border border-gray-200 overflow-hidden bg-gray-50">
+              <div className="relative w-full h-36 border border-amazon-border overflow-hidden bg-neutral-50 rounded-sm">
                 <Image
                   src={thumbnailPreview}
                   alt="Thumbnail preview"
@@ -199,19 +199,19 @@ export default function EditCategoryModal({
                 <button
                   type="button"
                   onClick={removeThumbnail}
-                  className="absolute top-2 right-2 p-1 bg-white/80 rounded-full hover:bg-red-100 transition"
+                  className="absolute top-2 right-2 p-1 bg-white border border-amazon-border shadow-sm rounded-sm hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition z-10"
                 >
-                  <X className="w-4 h-4 text-red-500" />
+                  <X className="w-4 h-4 text-amazon-textMuted hover:text-red-500" />
                 </button>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full h-28 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-blue-400 hover:text-blue-500 transition"
+                className="w-full h-28 border border-dashed border-amazon-border rounded-sm flex flex-col items-center justify-center gap-2 text-amazon-textMuted hover:border-amazon-btnPrimary hover:text-amazon-btnPrimary hover:bg-neutral-50 transition"
               >
                 <Upload className="w-5 h-5" />
-                <span className="text-xs font-semibold">Click to upload</span>
+                <span className="text-[12px] font-medium">Click to upload</span>
               </button>
             )}
             <input
@@ -224,37 +224,37 @@ export default function EditCategoryModal({
           </div>
 
           {/* Is Active */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <input
               {...register("isActive")}
               type="checkbox"
               id="editIsActive"
-              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="w-4 h-4 rounded-sm border-amazon-border text-amazon-btnPrimary focus:ring-amazon-btnPrimary focus:ring-1"
             />
             <label
               htmlFor="editIsActive"
-              className="text-sm font-semibold text-gray-700"
+              className="text-[13px] font-medium text-amazon-text mt-[1px]"
             >
-              Active
+              Set as Active
             </label>
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-3 border-t border-gray-100">
+          <div className="flex justify-end gap-3 pt-3 border-t border-amazon-border">
             <button
               type="button"
               onClick={handleClose}
               disabled={updating}
-              className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition disabled:opacity-50"
+              className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={updating}
-              className="px-5 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2 text-[13px] font-medium text-amazon-text bg-amazon-btnPrimary border border-amazon-border rounded-sm hover:brightness-95 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
             >
-              {updating && <Loader2 className="w-4 h-4 animate-spin" />}
+              {updating && <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />}
               {updating ? "Saving..." : "Save Changes"}
             </button>
           </div>

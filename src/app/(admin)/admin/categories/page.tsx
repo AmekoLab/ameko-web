@@ -5,7 +5,6 @@ import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { fetchCategories } from "@/src/store/slices/categoriesSlice";
 import { CategoryItem } from "@/src/types/category.types";
 import {
-  FolderTree,
   ChevronRight,
   ChevronDown,
   Globe,
@@ -25,13 +24,9 @@ export default function AdminCategoriesPage() {
   const { categories, loading } = useAppSelector((state) => state.categories);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(
-    null,
-  );
+  const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deletingCategory, setDeletingCategory] = useState<CategoryItem | null>(
-    null,
-  );
+  const [deletingCategory, setDeletingCategory] = useState<CategoryItem | null>(null);
 
   useEffect(() => {
     // Admin: no shopId → only returns global categories
@@ -57,49 +52,39 @@ export default function AdminCategoriesPage() {
   }, [categories]);
 
   return (
-    <div className="p-8 bg-black min-h-screen">
-      <div className="max-w-6xl mx-auto">
+    <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary min-h-screen">
+      <div className="max-w-[1440px] w-full mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-end mb-6 border-b border-[#1e2126] pb-4">
+        <div className="flex justify-between items-end mb-5 border-b border-amazon-border pb-4">
           <div>
-            <h1 className="text-3xl font-oswald font-black text-white mb-2 uppercase tracking-widest flex items-center gap-3">
-              <FolderTree className="w-8 h-8 text-[#f5d800]" />
+            <h1 className="text-2xl font-bold text-amazon-text mb-1 flex items-center gap-2">
               Category Management
             </h1>
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+            <p className="text-[13px] text-amazon-textMuted font-medium">
               Manage global categories available to all shops on the platform.
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-              Total:{" "}
-              <strong className="text-white">
-                {categories.filter((c) => c.categoryType === "global").length}
-              </strong>{" "}
-              global categories
-            </span>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-5 py-2.5 bg-[#f5d800] text-black text-[11px] font-black uppercase tracking-widest rounded-sm hover:bg-[#ffe500] transition shrink-0 shadow-[0_0_15px_rgba(245,216,0,0.3)]"
-            >
-              <Plus className="w-4 h-4 text-black" />
-              Add Category
-            </button>
-          </div>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center justify-center gap-2 px-5 py-2 bg-amazon-btnPrimary text-amazon-text text-[13px] font-medium rounded-sm border border-amazon-border hover:brightness-95 transition shrink-0 shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Add Category
+          </button>
         </div>
 
-        {/* Main content */}
-        <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
+        {/* Table */}
+        <div className="bg-white rounded-sm border border-amazon-border overflow-hidden shadow-sm">
           {loading ? (
-            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500">
+            <div className="p-12 text-center text-[13px] font-medium text-amazon-textMuted">
               Loading categories...
             </div>
           ) : categoryTree.roots.length === 0 ? (
-            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500">
+            <div className="p-12 text-center text-[13px] font-medium text-amazon-textMuted">
               No categories found.
             </div>
           ) : (
-            <div className="divide-y divide-[#1e2126]">
+            <div className="divide-y divide-amazon-border">
               {categoryTree.roots.map((root) => (
                 <CategoryRow
                   key={root.id}
@@ -178,8 +163,8 @@ function CategoryRow({
   return (
     <div>
       <div
-        className={`flex items-center gap-3 px-5 py-4 hover:bg-[#202030] transition-colors border-b border-[#1e2126] ${
-          depth > 0 ? "bg-[#0f0f0f]" : "bg-[#151515]"
+        className={`flex items-center gap-3 px-5 py-4 hover:bg-neutral-50 transition-colors border-b border-amazon-border ${
+          depth > 0 ? "bg-neutral-50/50" : "bg-white"
         }`}
         style={{ paddingLeft: `${20 + depth * 32}px` }}
       >
@@ -188,7 +173,7 @@ function CategoryRow({
           onClick={() => hasChildren && setExpanded(!expanded)}
           className={`p-1 rounded-sm transition-colors ${
             hasChildren
-              ? "hover:bg-[#202030] text-gray-400 hover:text-white cursor-pointer"
+              ? "hover:bg-neutral-200 text-amazon-textMuted hover:text-amazon-text cursor-pointer"
               : "text-transparent cursor-default"
           }`}
         >
@@ -200,44 +185,44 @@ function CategoryRow({
         </button>
 
         {/* Icon */}
-        <div className="w-8 h-8 rounded-sm shrink-0 border border-[#1e2126] flex items-center justify-center bg-black">
+        <div className="w-8 h-8 rounded-sm shrink-0 border border-amazon-border flex items-center justify-center bg-neutral-50">
           {depth === 0 ? (
-            <Layers className="w-4 h-4 text-gray-400" />
+            <Layers className="w-4 h-4 text-neutral-400" />
           ) : (
-            <Tag className="w-4 h-4 text-gray-400" />
+            <Tag className="w-4 h-4 text-neutral-400" />
           )}
         </div>
 
         {/* Name + Slug */}
         <div className="flex-1 min-w-0">
-          <p className="font-black text-[13px] text-white uppercase tracking-wider truncate">{category.name}</p>
-          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest truncate">{category.slug}</p>
+          <p className="font-medium text-[13px] text-amazon-text truncate">{category.name}</p>
+          <p className="text-[12px] text-amazon-textMuted truncate">{category.slug}</p>
         </div>
 
         {/* Type badge */}
-        <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest bg-[#202030] text-gray-400 border border-[#1e2126] px-2 py-0.5 rounded-sm shrink-0">
+        <span className="flex items-center gap-1 text-[11px] font-medium bg-neutral-100 text-amazon-textMuted border border-amazon-border px-2 py-0.5 rounded-sm shrink-0">
           <Globe className="w-3 h-3" />
           Global
         </span>
 
         {/* Stats */}
-        <div className="flex items-center gap-4 text-[11px] font-black uppercase tracking-widest text-gray-500 shrink-0">
+        <div className="flex items-center gap-4 text-[13px] font-medium text-amazon-textMuted shrink-0">
           <span className="flex items-center gap-1" title="Sub-categories">
-            <Layers className="w-3 h-3" />
+            <Layers className="w-3.5 h-3.5" />
             {category.subCategoryCount}
           </span>
           <span className="flex items-center gap-1" title="Parts">
-            <Package className="w-3 h-3" />
+            <Package className="w-3.5 h-3.5" />
             {category.partCount}
           </span>
         </div>
 
         {/* Active status */}
         <span
-          className={`text-[10px] px-2 py-0.5 rounded-sm font-black uppercase tracking-widest shrink-0 border ${
+          className={`text-[11px] px-2 py-0.5 rounded-sm font-medium shrink-0 border ${
             category.isActive
-              ? "bg-[#202030] text-white border-white/10"
-              : "bg-red-500/10 text-red-500 border-red-500/20"
+              ? "bg-neutral-100 text-amazon-text border-amazon-border"
+              : "bg-red-50 text-red-600 border-red-200"
           }`}
         >
           {category.isActive ? "Active" : "Inactive"}
@@ -246,7 +231,7 @@ function CategoryRow({
         {/* Edit button */}
         <button
           onClick={() => onEdit(category)}
-          className="p-1.5 rounded-sm border border-[#1e2126] bg-black hover:bg-[#202030] hover:border-[#f5d800] text-gray-500 hover:text-[#f5d800] transition shrink-0"
+          className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 hover:border-amazon-btnPrimary text-amazon-textMuted hover:text-amazon-text transition shrink-0"
           title="Edit category"
         >
           <Pencil className="w-3.5 h-3.5" />
@@ -255,7 +240,7 @@ function CategoryRow({
         {/* Delete button */}
         <button
           onClick={() => onDelete(category)}
-          className="p-1.5 rounded-sm border border-[#1e2126] bg-black hover:bg-[#202030] hover:border-red-500 text-gray-500 hover:text-red-500 transition shrink-0"
+          className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-red-50 hover:border-red-500 text-amazon-textMuted hover:text-red-500 transition shrink-0"
           title="Delete category"
         >
           <Trash2 className="w-3.5 h-3.5" />

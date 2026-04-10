@@ -56,82 +56,84 @@ export default function ShopOrderIssuesPage() {
   };
 
   return (
-    <div className="p-6 text-white min-h-screen">
-      <h1 className="uppercase font-bold text-2xl tracking-widest text-white">
-        Order Issues Management
-      </h1>
+    <div className="max-w-[1440px] w-full mx-auto">
+      <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary min-h-screen">
+        <h1 className="font-bold text-2xl text-amazon-text mb-6">
+          Order Issues Management
+        </h1>
 
-      <div className="bg-[#151515] border border-[#1e2126] rounded-sm overflow-hidden mt-6">
-        <div className="w-full overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-[#1a1c20] border-b border-[#1e2126] text-gray-400 uppercase tracking-wider text-xs">
-              <tr>
-                <th className="px-6 py-4 font-semibold">Order ID</th>
-                <th className="px-6 py-4 font-semibold">Customer</th>
-                <th className="px-6 py-4 font-semibold">Amount</th>
-                <th className="px-6 py-4 font-semibold">Reason</th>
-                <th className="px-6 py-4 font-semibold">Date</th>
-                <th className="px-6 py-4 font-semibold text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#1e2126]">
-              {loading ? (
+        <div className="bg-white border border-amazon-border rounded-md shadow-sm overflow-hidden">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap text-amazon-text">
+              <thead className="bg-neutral-50 border-b border-amazon-border text-amazon-text font-medium">
                 <tr>
-                  <td colSpan={6} className="px-6 py-10 text-center text-gray-400">
-                    <div className="flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#f5d800]"></div>
-                    </div>
-                  </td>
+                  <th className="px-6 py-4 font-medium">Order ID</th>
+                  <th className="px-6 py-4 font-medium">Customer</th>
+                  <th className="px-6 py-4 font-medium">Amount</th>
+                  <th className="px-6 py-4 font-medium">Reason</th>
+                  <th className="px-6 py-4 font-medium">Date</th>
+                  <th className="px-6 py-4 font-medium text-center">Actions</th>
                 </tr>
-              ) : issues.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-10 text-center text-gray-400 italic">
-                    No pending order issues found.
-                  </td>
-                </tr>
-              ) : (
-                issues.map((issue) => (
-                  <tr key={issue.id} className="hover:bg-[#1a1c20]/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-[#f5d800]">
-                      {issue.orderId}
-                    </td>
-                    <td className="px-6 py-4 text-gray-200">
-                      {issue.customerName}
-                    </td>
-                    <td className="px-6 py-4 text-gray-200 font-medium">
-                      {formatCurrency(issue.orderTotalAmount)}
-                    </td>
-                    <td className="px-6 py-4 text-gray-300 max-w-[200px] truncate" title={issue.reason}>
-                      {issue.reason}
-                    </td>
-                    <td className="px-6 py-4 text-gray-400">
-                      {formatDate(issue.createdAt)}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => {
-                          setSelectedIssueId(issue.id);
-                          setIsModalOpen(true);
-                        }}
-                        className="p-2 bg-[#2a2d35] hover:bg-[#323640] text-white rounded-sm transition-colors border border-[#3e424d] inline-flex items-center justify-center group"
-                        title="View Details"
-                      >
-                        <Eye className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
-                      </button>
+              </thead>
+              <tbody className="divide-y divide-amazon-border">
+                {loading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-10 text-center text-amazon-textMuted">
+                      <div className="flex justify-center items-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-neutral-400"></div>
+                      </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : issues.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-10 text-center text-amazon-textMuted italic">
+                      No pending order issues found.
+                    </td>
+                  </tr>
+                ) : (
+                  issues.map((issue) => (
+                    <tr key={issue.id} className="hover:bg-neutral-50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-amazon-text">
+                        {issue.orderId}
+                      </td>
+                      <td className="px-6 py-4 text-amazon-text">
+                        {issue.customerName}
+                      </td>
+                      <td className="px-6 py-4 text-amazon-price font-bold">
+                        {formatCurrency(issue.orderTotalAmount)}
+                      </td>
+                      <td className="px-6 py-4 text-amazon-text max-w-[200px] truncate" title={issue.reason}>
+                        {issue.reason}
+                      </td>
+                      <td className="px-6 py-4 text-amazon-text">
+                        {formatDate(issue.createdAt)}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <button
+                          onClick={() => {
+                            setSelectedIssueId(issue.id);
+                            setIsModalOpen(true);
+                          }}
+                          className="p-2 bg-white hover:bg-neutral-50 text-amazon-textMuted hover:text-amazon-text rounded-sm transition-colors border border-amazon-border shadow-sm inline-flex items-center justify-center group"
+                          title="View Details"
+                        >
+                          <Eye className="w-4 h-4 transition-colors" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
-      <OrderIssueDetailModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        issueId={selectedIssueId}
-      />
+        <OrderIssueDetailModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          issueId={selectedIssueId}
+        />
+      </div>
     </div>
   );
 }

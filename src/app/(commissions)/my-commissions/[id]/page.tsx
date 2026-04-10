@@ -34,31 +34,31 @@ const STATUS_STYLES: Record<
   string,
   { bg: string; border: string; text: string; label: string }
 > = {
-  Draft: { bg: "bg-[#202030]", border: "border-[#2a2d35]", text: "text-gray-300", label: "Draft" },
+  Draft: { bg: "bg-neutral-100", border: "border-amazon-border", text: "text-amazon-textMuted", label: "Draft" },
   PendingTarget: {
-    bg: "bg-orange-500/10",
-    border: "border-orange-500/30",
-    text: "text-orange-400",
+    bg: "bg-orange-50",
+    border: "border-orange-200",
+    text: "text-orange-600",
     label: "Waiting for Shop",
   },
-  Quoted: { bg: "bg-purple-500/10", border: "border-purple-500/30", text: "text-purple-400", label: "Quoted" },
-  OpenPool: { bg: "bg-blue-500/10", border: "border-blue-500/30", text: "text-blue-400", label: "Open" },
+  Quoted: { bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-600", label: "Quoted" },
+  OpenPool: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-600", label: "Open" },
   Completed: {
-    bg: "bg-green-500/10",
-    border: "border-green-500/30",
-    text: "text-green-400",
+    bg: "bg-green-50",
+    border: "border-green-200",
+    text: "text-green-600",
     label: "Completed",
   },
   Canceled: {
-    bg: "bg-red-500/10",
-    border: "border-red-500/30",
-    text: "text-red-400",
+    bg: "bg-red-50",
+    border: "border-red-200",
+    text: "text-red-600",
     label: "Canceled",
   },
   TargetRejected: {
-    bg: "bg-red-500/10",
-    border: "border-red-500/30",
-    text: "text-red-400",
+    bg: "bg-red-50",
+    border: "border-red-200",
+    text: "text-red-600",
     label: "Shop rejected",
   },
 };
@@ -68,25 +68,26 @@ const QUOTE_STATUS_STYLES: Record<
   { bg: string; border: string; text: string; label: string }
 > = {
   PendingUserDecision: {
-    bg: "bg-yellow-500/10",
-    border: "border-yellow-500/30",
-    text: "text-yellow-400",
+    bg: "bg-yellow-50",
+    border: "border-yellow-200",
+    text: "text-yellow-700",
     label: "Waiting for your decision",
   },
   Accepted: {
-    bg: "bg-green-500/10",
-    border: "border-green-500/30",
-    text: "text-green-400",
+    bg: "bg-green-50",
+    border: "border-green-200",
+    text: "text-green-600",
     label: "Accepted",
   },
-  Rejected: { bg: "bg-red-500/10", border: "border-red-500/30", text: "text-red-400", label: "Rejected" },
-  Expired: { bg: "bg-[#202030]", border: "border-[#2a2d35]", text: "text-gray-500", label: "Expired" },
+  Rejected: { bg: "bg-red-50", border: "border-red-200", text: "text-red-600", label: "Rejected" },
+  Expired: { bg: "bg-neutral-100", border: "border-amazon-border", text: "text-neutral-500", label: "Expired" },
+  Revoked: { bg: "bg-red-50", border: "border-red-200", text: "text-red-600", label: "Revoked" },
 };
 
 const DEFAULT_STATUS = {
-  bg: "bg-[#202030]",
-  border: "border-[#2a2d35]",
-  text: "text-gray-400",
+  bg: "bg-neutral-100",
+  border: "border-amazon-border",
+  text: "text-amazon-textMuted",
   label: "Unknown",
 };
 
@@ -119,11 +120,11 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
   const isAccepted = quote.status === "Accepted";
 
   return (
-    <div className="bg-[#151515] rounded-sm border border-[#1e2126] hover:border-[#3a3f4a] p-6 shadow-sm hover:shadow-md transition-colors">
+    <div className="bg-white rounded-sm border border-amazon-border hover:shadow-md p-6 shadow-sm transition-shadow">
       {/* Header: Shop info + quote status */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="relative w-10 h-10 rounded-sm overflow-hidden border border-[#2a2d35] bg-[#111111] flex items-center justify-center shrink-0">
+          <div className="relative w-10 h-10 rounded-sm overflow-hidden border border-amazon-border bg-neutral-100 flex items-center justify-center shrink-0">
             {quote.shopAvatar ? (
               <Image
                 src={quote.shopAvatar}
@@ -132,14 +133,14 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
                 className="object-cover"
               />
             ) : (
-              <Store className="w-5 h-5 text-gray-500" />
+              <Store className="w-5 h-5 text-neutral-400" />
             )}
           </div>
           <div>
-            <p className="font-black text-white text-[12px] uppercase tracking-widest">
+            <p className="font-black text-amazon-text text-[12px] uppercase tracking-widest">
               {quote.shopName || "Shop"}
             </p>
-            <p className="text-[10px] uppercase font-bold tracking-widest text-[#f5d800]">Quotation</p>
+            <p className="text-[10px] uppercase font-bold tracking-widest text-amazon-focus">Quotation</p>
           </div>
         </div>
         <span
@@ -152,22 +153,22 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
       {/* Body: Details grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 mb-6">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Quoted Price</p>
-          <p className="text-xl font-black text-[#f5d800]">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mb-1">Quoted Price</p>
+          <p className="text-xl font-black text-amazon-price">
             {formatVND(quote.quotedPrice)}
           </p>
         </div>
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Estimated Time</p>
-          <p className="text-sm font-bold text-white flex items-center gap-1.5">
-            <Clock className="w-4 h-4 text-gray-400" />
+          <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mb-1">Estimated Time</p>
+          <p className="text-sm font-bold text-amazon-text flex items-center gap-1.5">
+            <Clock className="w-4 h-4 text-neutral-400" />
             {quote.estimatedDays} days
           </p>
         </div>
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Deadline</p>
-          <p className="text-sm font-bold text-white flex items-center gap-1.5">
-            <Calendar className="w-4 h-4 text-gray-400" />
+          <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mb-1">Deadline</p>
+          <p className="text-sm font-bold text-amazon-text flex items-center gap-1.5">
+            <Calendar className="w-4 h-4 text-neutral-400" />
             {formatDate(quote.expiredAt)}
           </p>
         </div>
@@ -175,9 +176,9 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
 
       {/* Shop Notes */}
       {quote.shopNotes && (
-        <div className="bg-[#111111] border-l-2 border-[#f5d800] rounded-r-sm px-4 py-4 mb-6">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Message from Shop:</p>
-          <p className="text-[12px] font-medium text-gray-300 italic leading-relaxed">
+        <div className="bg-neutral-50 border-l-2 border-amazon-focus rounded-r-sm px-4 py-4 mb-6">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-1">Message from Shop:</p>
+          <p className="text-[12px] font-medium text-amazon-text italic leading-relaxed">
             {quote.shopNotes}
           </p>
         </div>
@@ -188,7 +189,7 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
         <button
           onClick={() => onAccept(quote.commissionQuoteId)}
           disabled={isAccepting}
-          className="w-full py-3 bg-[#111111] hover:bg-[#1a1c20] text-gray-300 hover:text-[#f5d800] border border-[#2a2d35] hover:border-[#f5d800]/50 font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+          className="w-full py-3 bg-white hover:bg-neutral-50 text-amazon-text border border-amazon-border font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
         >
           {isAccepting ? (
             <>
@@ -202,7 +203,7 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
         </button>
       )}
       {isAccepted && (
-        <div className="w-full py-3 bg-green-500/10 text-green-400 font-black text-[11px] uppercase tracking-widest rounded-sm flex items-center justify-center gap-2 border border-green-500/30">
+        <div className="w-full py-3 bg-green-50 text-green-600 font-black text-[11px] uppercase tracking-widest rounded-sm flex items-center justify-center gap-2 border border-green-200">
           <CheckCircle className="w-4 h-4" /> This quotation was selected
         </div>
       )}
@@ -227,34 +228,34 @@ const ConfirmAcceptModal = ({
   if (!isOpen) return null;
   return (
     <div
-      className="fixed inset-0 bg-black/50 z-[999] flex items-center justify-center p-4 backdrop-blur-sm"
+      className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4 backdrop-blur-sm"
       onClick={onCancel}
     >
       <div
-        className="bg-[#151515] border border-[#1e2126] rounded-sm w-full max-w-sm p-8 shadow-2xl text-center"
+        className="bg-white border border-amazon-border rounded-sm w-full max-w-sm p-8 shadow-2xl text-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="w-14 h-14 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center mx-auto mb-5">
-          <CheckCircle className="w-6 h-6 text-green-400" />
+        <div className="w-14 h-14 rounded-full bg-green-50 border border-green-200 flex items-center justify-center mx-auto mb-5">
+          <CheckCircle className="w-6 h-6 text-green-600" />
         </div>
-        <h3 className="text-[14px] font-black uppercase tracking-wider text-white mb-2">
+        <h3 className="text-[14px] font-black uppercase tracking-wider text-amazon-text mb-2">
           Confirm Accept Quotation
         </h3>
-        <p className="text-[12px] text-gray-400 mb-6">
+        <p className="text-[12px] text-amazon-textMuted mb-6">
           Are you sure you want to accept this price? The order will be created
           immediately after confirmation.
         </p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 bg-[#111111] hover:bg-[#1a1c20] text-gray-300 font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors border border-[#2a2d35]"
+            className="flex-1 py-3 bg-white hover:bg-neutral-50 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors border border-amazon-border"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="flex-1 py-3 bg-[#f5d800] hover:bg-[#e6ca00] text-black font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+            className="flex-1 py-3 bg-amazon-btnPrimary hover:brightness-95 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -331,10 +332,10 @@ export default function CommissionDetailPage() {
   // Full-page loading
   if (loadingDetail || !currentRequest) {
     return (
-      <div className="bg-black min-h-screen flex items-center justify-center">
+      <div className="bg-amazon-bgSecondary min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 text-[#f5d800] animate-spin" />
-          <p className="text-[11px] font-black uppercase tracking-widest text-gray-400">Loading details...</p>
+          <Loader2 className="w-8 h-8 text-neutral-600 animate-spin" />
+          <p className="text-[11px] font-black uppercase tracking-widest text-neutral-500">Loading details...</p>
         </div>
       </div>
     );
@@ -354,7 +355,7 @@ export default function CommissionDetailPage() {
       currentRequest.status === "TargetRejected");
 
   return (
-    <div className="bg-black text-white min-h-screen">
+    <div className="bg-amazon-bgSecondary text-amazon-text min-h-screen">
       <ConfirmAcceptModal
         isOpen={!!confirmQuoteId}
         onConfirm={handleConfirmAccept}
@@ -365,33 +366,33 @@ export default function CommissionDetailPage() {
       {/* Cancel Confirm Modal */}
       {showCancelConfirm && (
         <div
-          className="fixed inset-0 bg-black/50 z-[999] flex items-center justify-center p-4 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4 backdrop-blur-sm"
           onClick={() => setShowCancelConfirm(false)}
         >
           <div
-            className="bg-[#151515] border border-[#1e2126] rounded-sm w-full max-w-sm p-8 shadow-2xl text-center"
+            className="bg-white border border-amazon-border rounded-sm w-full max-w-sm p-8 shadow-2xl text-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-5">
-              <AlertTriangle className="w-6 h-6 text-red-500" />
+            <div className="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto mb-5">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
-            <h3 className="text-[14px] font-black uppercase tracking-wider text-white mb-2">
+            <h3 className="text-[14px] font-black uppercase tracking-wider text-amazon-text mb-2">
               Confirm cancel request
             </h3>
-            <p className="text-[12px] text-gray-400 mb-6">
+            <p className="text-[12px] text-amazon-textMuted mb-6">
                 Are you sure you want to cancel this request? This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCancelConfirm(false)}
-                className="flex-1 py-3 bg-[#111111] hover:bg-[#1a1c20] text-gray-300 font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors border border-[#2a2d35]"
+                className="flex-1 py-3 bg-white hover:bg-neutral-50 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors border border-amazon-border"
               >
               Back
               </button>
               <button
                 onClick={handleCancelRequest}
                 disabled={isCanceling}
-                className="flex-1 py-3 bg-[#ce2a32] hover:bg-red-600 text-white font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+                className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
               >
                 {isCanceling ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -407,33 +408,33 @@ export default function CommissionDetailPage() {
       {/* Publish Confirm Modal */}
       {showPublishConfirm && (
         <div
-          className="fixed inset-0 bg-black/50 z-[999] flex items-center justify-center p-4 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4 backdrop-blur-sm"
           onClick={() => setShowPublishConfirm(false)}
         >
           <div
-            className="bg-[#151515] border border-[#1e2126] rounded-sm w-full max-w-sm p-8 shadow-2xl text-center"
+            className="bg-white border border-amazon-border rounded-sm w-full max-w-sm p-8 shadow-2xl text-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-14 h-14 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mx-auto mb-5">
-              <Globe className="w-6 h-6 text-blue-400" />
+            <div className="w-14 h-14 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto mb-5">
+              <Globe className="w-6 h-6 text-blue-600" />
             </div>
-            <h3 className="text-[14px] font-black uppercase tracking-wider text-white mb-2">
+            <h3 className="text-[14px] font-black uppercase tracking-wider text-amazon-text mb-2">
               Publish to pool
             </h3>
-            <p className="text-[12px] text-gray-400 mb-6">
+            <p className="text-[12px] text-amazon-textMuted mb-6">
               Do you want to publish this request to the public market for other shops to quote? This action will remove the current shop assignment.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowPublishConfirm(false)}
-                className="flex-1 py-3 bg-[#111111] hover:bg-[#1a1c20] text-gray-300 font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors border border-[#2a2d35]"
+                className="flex-1 py-3 bg-white hover:bg-neutral-50 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors border border-amazon-border"
               >
                 Hủy
               </button>
               <button
                 onClick={handlePublishToPool}
                 disabled={isPublishingToPool}
-                className="flex-1 py-3 bg-[#f5d800] hover:bg-[#e6ca00] text-black font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+                className="flex-1 py-3 bg-amazon-btnPrimary hover:brightness-95 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
               >
                 {isPublishingToPool ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -446,11 +447,11 @@ export default function CommissionDetailPage() {
         </div>
       )}
 
-      <div className="max-w-[1280px] mx-auto px-4 py-8 lg:py-12">
+      <div className="max-w-[1280px] mx-auto px-4 py-8 lg:py-8">
         {/* Back link */}
         <Link
           href="/my-commissions"
-          className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-gray-500 hover:text-[#f5d800] transition-colors mb-6"
+          className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-amazon-textMuted hover:text-amazon-focus transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" /> Back to list
         </Link>
@@ -461,9 +462,9 @@ export default function CommissionDetailPage() {
           <div className="lg:col-span-1 space-y-6">
             {/* Canceled Alert */}
             {isCanceled && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-sm p-4 flex items-center gap-3">
+              <div className="bg-red-50 border border-red-200 rounded-sm p-4 flex items-center gap-3">
                 <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
-                <p className="text-[12px] uppercase font-bold tracking-widest text-red-400">
+                <p className="text-[12px] uppercase font-bold tracking-widest text-red-600">
                   This request has been canceled
                 </p>
               </div>
@@ -471,7 +472,7 @@ export default function CommissionDetailPage() {
 
             {/* Reference Image */}
             {currentRequest.referenceImages && (
-              <div className="relative w-full aspect-square rounded-sm overflow-hidden bg-[#0f0f0f] border border-[#1e2126] shadow-sm">
+              <div className="relative w-full aspect-square rounded-sm overflow-hidden bg-neutral-100 border border-amazon-border shadow-sm">
                 <Image
                   src={currentRequest.referenceImages}
                   alt={currentRequest.title}
@@ -484,7 +485,7 @@ export default function CommissionDetailPage() {
             {/* Title + Status */}
             <div>
               <div className="flex items-start gap-3 mb-3">
-                <h1 className="text-2xl font-black text-white uppercase tracking-widest leading-snug flex-1">
+                <h1 className="text-2xl font-black text-amazon-text uppercase tracking-widest leading-snug flex-1">
                   {currentRequest.title}
                 </h1>
                 <span
@@ -494,44 +495,44 @@ export default function CommissionDetailPage() {
                 </span>
               </div>
 
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
                 ID: {currentRequest.commissionRequestId}
               </p>
             </div>
 
             {/* Details Card */}
-            <div className="bg-[#151515] rounded-sm border border-[#1e2126] p-6 space-y-4">
+            <div className="bg-white rounded-sm border border-amazon-border p-6 space-y-4">
               {/* Shop target */}
               {currentRequest.targetedShopId ? (
                 <div className="flex items-center gap-3">
-                  <Store className="w-4 h-4 text-gray-500" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Sent to:</span>
-                  <span className="font-black text-[12px] text-white">
+                  <Store className="w-4 h-4 text-neutral-400" />
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">Sent to:</span>
+                  <span className="font-black text-[12px] text-amazon-text">
                     {currentRequest.targetedShopName || "Shop"}
                   </span>
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
-                  <Store className="w-4 h-4 text-gray-500" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Sent to:</span>
-                  <span className="font-black text-[12px] text-white">Public Market</span>
+                  <Store className="w-4 h-4 text-neutral-400" />
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">Sent to:</span>
+                  <span className="font-black text-[12px] text-amazon-text">Public Market</span>
                 </div>
               )}
 
               {/* Quantity */}
               <div className="flex items-center gap-3">
-                <Hash className="w-4 h-4 text-gray-500" />
-                <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Quantity:</span>
-                <span className="font-black text-[12px] text-white">
+                <Hash className="w-4 h-4 text-neutral-400" />
+                <span className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">Quantity:</span>
+                <span className="font-black text-[12px] text-amazon-text">
                   {currentRequest.quantity}
                 </span>
               </div>
 
               {/* Budget */}
               <div className="flex items-center gap-3">
-                <Banknote className="w-4 h-4 text-gray-500" />
-                <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Budget:</span>
-                <span className="font-black text-[12px] text-[#f5d800]">
+                <Banknote className="w-4 h-4 text-neutral-400" />
+                <span className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">Budget:</span>
+                <span className="font-black text-[12px] text-amazon-price">
                   {formatVND(currentRequest.minBudget)} –{" "}
                   {formatVND(currentRequest.maxBudget)}
                 </span>
@@ -539,20 +540,20 @@ export default function CommissionDetailPage() {
 
               {/* Date */}
               <div className="flex items-center gap-3">
-                <Calendar className="w-4 h-4 text-gray-500" />
-                <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Created date:</span>
-                <span className="font-black text-[12px] text-white">
+                <Calendar className="w-4 h-4 text-neutral-400" />
+                <span className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">Created date:</span>
+                <span className="font-black text-[12px] text-amazon-text">
                   {formatDate(currentRequest.createdAt)}
                 </span>
               </div>
             </div>
 
             {/* Description */}
-            <div className="bg-[#151515] rounded-sm border border-[#1e2126] p-6">
-              <h3 className="text-[11px] font-black uppercase tracking-widest text-[#f5d800] mb-3">
+            <div className="bg-white rounded-sm border border-amazon-border p-6">
+              <h3 className="text-[11px] font-black uppercase tracking-widest text-amazon-focus mb-3">
                 Request Description
               </h3>
-              <p className="text-[13px] text-gray-300 leading-relaxed whitespace-pre-wrap">
+              <p className="text-[13px] text-amazon-text leading-relaxed whitespace-pre-wrap">
                 {currentRequest.description}
               </p>
             </div>
@@ -563,7 +564,7 @@ export default function CommissionDetailPage() {
                 <button
                   onClick={() => setShowPublishConfirm(true)}
                   disabled={isPublishingToPool}
-                  className="flex-1 py-3.5 bg-[#f5d800] hover:bg-[#e6ca00] text-black font-black uppercase text-[11px] tracking-widest rounded-sm shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-1 py-3.5 bg-amazon-btnPrimary hover:brightness-95 text-amazon-text font-black uppercase text-[11px] tracking-widest rounded-sm shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {isPublishingToPool ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -574,7 +575,7 @@ export default function CommissionDetailPage() {
                 </button>
                 <button
                   onClick={() => setIsEditModalOpen(true)}
-                  className="flex-1 py-3.5 bg-[#111111] hover:bg-[#1a1c20] hover:text-[#f5d800] hover:border-[#f5d800]/50 text-gray-300 font-black uppercase text-[11px] tracking-widest rounded-sm transition-colors border border-[#2a2d35]"
+                  className="flex-1 py-3.5 bg-white hover:bg-neutral-50 hover:text-amazon-text text-amazon-textMuted font-black uppercase text-[11px] tracking-widest rounded-sm transition-colors border border-amazon-border"
                 >
                   Edit Request
                 </button>
@@ -622,20 +623,20 @@ export default function CommissionDetailPage() {
 
           {/* ── Right Column: Quotes / Bids (col-span-2) ── */}
           <div className="lg:col-span-2">
-            <h2 className="text-[14px] font-black uppercase tracking-widest text-white mb-6">
+            <h2 className="text-[14px] font-black uppercase tracking-widest text-amazon-text mb-6">
               Quotations from Shop
             </h2>
 
             {currentRequest.quotes.length === 0 ? (
               /* Empty State */
-              <div className="bg-[#151515] rounded-sm border border-dashed border-[#1e2126] flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-16 h-16 rounded-full bg-[#202030] border border-[#2a2d35] flex items-center justify-center mb-5">
-                  <Clock className="w-6 h-6 text-gray-500" />
+              <div className="bg-white rounded-sm border border-dashed border-amazon-border flex flex-col items-center justify-center py-20 text-center">
+                <div className="w-16 h-16 rounded-full bg-neutral-50 border border-amazon-border flex items-center justify-center mb-5">
+                  <Clock className="w-6 h-6 text-neutral-400" />
                 </div>
-                <h3 className="text-[12px] font-black uppercase tracking-widest text-white mb-2">
+                <h3 className="text-[12px] font-black uppercase tracking-widest text-amazon-text mb-2">
                   No quotations yet
                 </h3>
-                <p className="text-[12px] text-gray-400 max-w-xs">
+                <p className="text-[12px] text-amazon-textMuted max-w-xs">
                   Please wait for shop response...
                 </p>
               </div>

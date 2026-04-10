@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, useCallback } from "react";
+import { FC, useEffect, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation"; // Thêm hook này
 import { X, Loader2, Package, Calendar, CreditCard, Keyboard, Pencil } from "lucide-react";
@@ -55,6 +55,24 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
   const [editPhone, setEditPhone] = useState("");
   const [editAddress, setEditAddress] = useState("");
 
+  const [assemblyCompletionMap, setAssemblyCompletionMap] = useState<Record<string, boolean>>({});
+
+  const handleAssemblyReady = useCallback((itemId: string, isReady: boolean) => {
+    setAssemblyCompletionMap(prev => {
+      // Prevent state update if value hasn't changed to break infinite loops
+      if (prev[itemId] === isReady) return prev; 
+      return { ...prev, [itemId]: isReady };
+    });
+  }, []);
+
+  const canShipOrComplete = useMemo(() => {
+    if (!order) return false;
+    const customItems = order.orderItems.filter(item => item.isCustom);
+    if (customItems.length === 0) return true; // No custom items, always ready
+    // Ready ONLY if every custom item has reported true in the map
+    return customItems.every(item => assemblyCompletionMap[item.orderItemId] === true);
+  }, [order, assemblyCompletionMap]);
+
   const fetchOrderDetail = useCallback(async () => {
     if (!orderId) return;
     setLoading(true);
@@ -89,7 +107,13 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
     if (!orderId) return;
     setIsUpdatingStatus(newStatus);
     try {
-      const res = await shopOrderService.updateOrderStatus(orderId, newStatus);
+      let expectedDate = undefined;
+      if (newStatus === 3) {
+        const date = new Date();
+        date.setDate(date.getDate() + 3);
+        expectedDate = date.toISOString();
+      }
+      const res = await shopOrderService.updateOrderStatus(orderId, newStatus, expectedDate);
       if (res.success) {
         toast.success("Order status updated successfully.");
         fetchOrderDetail(); // Refresh the modal data
@@ -175,16 +199,16 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-[#151515] border border-[#1e2126] rounded-sm shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-white border border-amazon-border rounded-sm shadow-xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e2126] bg-[#1a1c20]">
-          <h2 className="text-xl font-oswald font-black uppercase text-white tracking-widest flex items-center gap-2">
-            <Package className="w-5 h-5 text-[#f5d800]" />
+        <div className="flex items-center justify-between px-6 py-4 border-b border-amazon-border bg-neutral-50">
+          <h2 className="text-xl font-bold text-amazon-text flex items-center gap-2">
+            <Package className="w-5 h-5 text-amazon-text" />
             Order Details
           </h2>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-white transition-colors hover:bg-white/10 rounded-sm"
+            className="p-2 text-amazon-textMuted hover:text-amazon-text transition-colors hover:bg-neutral-100 rounded-sm"
           >
             <X className="w-5 h-5" />
           </button>
@@ -194,64 +218,172 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <Loader2 className="w-10 h-10 text-[#f5d800] animate-spin mb-4" />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
+              <Loader2 className="w-10 h-10 text-amazon-link animate-spin mb-4" />
+              <p className="text-[11px] font-medium text-amazon-textMuted">
                 Loading order details...
               </p>
             </div>
           ) : !order ? (
-            <div className="text-center py-20 text-gray-500 text-[11px] font-bold uppercase tracking-widest">
+            <div className="text-center py-20 text-amazon-textMuted text-[11px] font-medium">
               No order data found.
             </div>
           ) : (
-            <div className="space-y-8">
-              {/* Top Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {/* Shipping Info */}
+            <div className="space-y-6">
+              {/* 1. STATUS BANNER (TOP) */}
+              <div className="bg-neutral-50 border border-amazon-border rounded-sm p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                {/* Left: Status & Date */}
                 <div>
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-[#f5d800] mb-3 flex items-center gap-2">
+                  <p className="text-lg font-medium text-amazon-text flex items-center gap-2">
+                    {/* <Package className="w-5 h-5" /> */}
+                    Status: {order.orderStatus}
+                  </p>
+                  <p className="text-xs text-amazon-textMuted mt-1">
+                    Placed on: {formatDate(order.createdAt)}
+                  </p>
+                </div>
+                
+                {/* Right: Action Hub */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* BUYER ACTIONS */}
+                  {isBuyerContext && order.orderStatus === 'Processing' && order.paymentStatus === 'Paid' && !order.hasCancelRequest && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCancelingOrderId(order.orderId);
+                        setIsCancelModalOpen(true);
+                      }}
+                      className="text-xs text-red-500 border border-red-500 border-dashed rounded-sm px-4 py-2 hover:bg-red-50 hover:text-red-600 transition-colors font-medium text-center"
+                    >
+                      Request Cancel
+                    </button>
+                  )}
+                  {isBuyerContext && order.hasCancelRequest && (
+                    <div className="text-xs text-yellow-600 border border-yellow-500/50 bg-yellow-500/10 rounded-sm px-4 py-2 text-center font-medium">
+                      Cancel Request Pending Approval
+                    </div>
+                  )}
+
+                  {/* SHOP ACTIONS */}
+                  {!isBuyerContext && (order.orderStatus === 'Processing' || order.orderStatus === 'Shipped') && (
+                    <>
+                      {order.orderStatus === 'Processing' && (
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateStatus(3)}
+                          disabled={isUpdatingStatus !== null || !canShipOrComplete}
+                          title={!canShipOrComplete ? "Cannot update status until all assembly timelines are completed." : ""}
+                          className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-2 px-4 rounded-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                          {isUpdatingStatus === 3 && <Loader2 className="w-3 h-3 animate-spin" />}
+                          Mark Shipped
+                        </button>
+                      )}
+                      {order.orderStatus === 'Shipped' && (
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateStatus(4)}
+                          disabled={isUpdatingStatus !== null}
+                          className="bg-green-600 hover:bg-green-700 text-white text-xs font-medium py-2 px-4 rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          {isUpdatingStatus === 4 && <Loader2 className="w-3 h-3 animate-spin" />}
+                          Mark Completed
+                        </button>
+                      )}
+                      {order.orderStatus === 'Processing' && !isShopCancelOpen && (
+                        <button
+                          type="button"
+                          onClick={() => setIsShopCancelOpen(true)}
+                          disabled={isUpdatingStatus !== null || isCancellingOrder}
+                          className="text-xs text-red-500 border border-red-500/40 border-dashed rounded-sm px-4 py-2 hover:bg-red-50 hover:text-red-600 transition-colors font-medium text-center disabled:opacity-50"
+                        >
+                          Cancel Order
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* 3. SHOP CANCEL FORM (FULL WIDTH) */}
+              {order.orderStatus === 'Processing' && isShopCancelOpen && !isBuyerContext && (
+                <div className="bg-red-50 border border-red-200 rounded-sm p-4">
+                  <label className="block text-xs font-bold text-red-700 mb-2">Cancellation Reason</label>
+                  <textarea
+                    value={shopCancelReason}
+                    onChange={(e) => setShopCancelReason(e.target.value)}
+                    rows={2}
+                    className="w-full bg-white border border-amazon-border rounded-sm px-3 py-2 text-sm text-amazon-text focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400 placeholder-neutral-400 resize-none mb-3"
+                    placeholder="Why are you cancelling this order?"
+                  />
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => { setIsShopCancelOpen(false); setShopCancelReason(""); }}
+                      disabled={isCancellingOrder}
+                      className="px-4 py-2 rounded-sm text-xs font-medium text-amazon-textMuted hover:bg-neutral-50 bg-white transition-colors border border-amazon-border"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleShopCancelOrder}
+                      disabled={isCancellingOrder || !shopCancelReason.trim()}
+                      className="px-4 py-2 rounded-sm text-xs font-medium text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {isCancellingOrder && <Loader2 className="w-3 h-3 animate-spin" />}
+                      Confirm Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 2. TWO-COLUMN INFO GRID */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {/* Column 1 (Shipping) */}
+                <div className="bg-white border border-amazon-border rounded-sm p-4">
+                  <h3 className="text-xs font-bold text-amazon-text mb-3 flex items-center justify-between uppercase tracking-wider">
                     Shipping Address
                     {isBuyerContext && order.orderStatus === 'Processing' && !isEditingAddress && (
                       <button
                         type="button"
                         onClick={startEditingAddress}
-                        className="ml-auto p-1 text-gray-500 hover:text-[#f5d800] transition-colors rounded-sm hover:bg-white/5"
+                        className="p-1 text-amazon-textMuted hover:text-amazon-text transition-colors rounded-sm hover:bg-neutral-100"
                         title="Edit shipping address"
                       >
-                        <Pencil className="w-3.5 h-3.5" />
+                        <Pencil className="w-4 h-4" />
                       </button>
                     )}
                   </h3>
 
                   {isEditingAddress ? (
-                    <div className="bg-[#1a1c20] p-4 rounded-sm border border-[#f5d800]/30 space-y-3">
+                    <div className="space-y-3">
                       <div>
-                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Name</label>
+                        <label className="block text-xs font-medium text-amazon-textMuted mb-1">Name</label>
                         <input
                           type="text"
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
-                          className="w-full bg-[#111111] border border-[#2a2d35] rounded-sm px-3 py-2 text-[12px] font-bold text-white focus:outline-none focus:border-[#f5d800]/50 placeholder-gray-600"
+                          className="w-full bg-white border border-amazon-border rounded-sm px-3 py-2 text-sm font-medium text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus placeholder-neutral-400"
                           placeholder="Receiver name"
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Phone</label>
+                        <label className="block text-xs font-medium text-amazon-textMuted mb-1">Phone</label>
                         <input
                           type="text"
                           value={editPhone}
                           onChange={(e) => setEditPhone(e.target.value)}
-                          className="w-full bg-[#111111] border border-[#2a2d35] rounded-sm px-3 py-2 text-[12px] font-bold text-white focus:outline-none focus:border-[#f5d800]/50 placeholder-gray-600"
+                          className="w-full bg-white border border-amazon-border rounded-sm px-3 py-2 text-sm font-medium text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus placeholder-neutral-400"
                           placeholder="Phone number"
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Address</label>
+                        <label className="block text-xs font-medium text-amazon-textMuted mb-1">Address</label>
                         <input
                           type="text"
                           value={editAddress}
                           onChange={(e) => setEditAddress(e.target.value)}
-                          className="w-full bg-[#111111] border border-[#2a2d35] rounded-sm px-3 py-2 text-[12px] font-bold text-white focus:outline-none focus:border-[#f5d800]/50 placeholder-gray-600"
+                          className="w-full bg-white border border-amazon-border rounded-sm px-3 py-2 text-sm font-medium text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus placeholder-neutral-400"
                           placeholder="Shipping address"
                         />
                       </div>
@@ -260,7 +392,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                           type="button"
                           onClick={() => setIsEditingAddress(false)}
                           disabled={isSavingAddress}
-                          className="flex-1 py-2 rounded-sm text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-[#111111] hover:bg-[#252830] transition-colors border border-[#2a2d35]"
+                          className="flex-1 py-2 rounded-sm text-xs font-medium text-amazon-textMuted hover:bg-neutral-50 bg-white transition-colors border border-amazon-border"
                         >
                           Cancel
                         </button>
@@ -268,7 +400,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                           type="button"
                           onClick={handleSaveAddress}
                           disabled={isSavingAddress}
-                          className="flex-1 py-2 rounded-sm text-[10px] font-black uppercase tracking-widest text-black bg-[#f5d800] hover:bg-[#e6cc00] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                          className="flex-1 py-2 rounded-sm text-xs font-medium text-amazon-text bg-amazon-btnPrimary hover:brightness-95 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                           {isSavingAddress && <Loader2 className="w-3 h-3 animate-spin" />}
                           Save
@@ -276,133 +408,28 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-[#1a1c20] p-4 rounded-sm border border-[#1e2126]">
-                      <p className="text-[12px] font-bold text-white mb-1 uppercase tracking-wider">{order.receiverName}</p>
-                      <p className="text-[11px] font-bold text-gray-400 mb-2">{order.receiverPhone}</p>
-                      <p className="text-[11px] text-gray-500 leading-relaxed">{order.shippingAddress}</p>
+                    <div>
+                      <p className="text-sm font-medium text-amazon-text mb-1 capitalize">{order.receiverName}</p>
+                      <p className="text-xs font-normal text-amazon-textMuted mb-2">{order.receiverPhone}</p>
+                      <p className="text-sm text-amazon-text leading-relaxed">{order.shippingAddress}</p>
                     </div>
                   )}
                 </div>
 
-                {/* Status Summary */}
-                <div>
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-[#f5d800] mb-3 flex items-center gap-2">
-                    Order Summary
+                {/* Column 2 (Payment & Notes) */}
+                <div className="bg-white border border-amazon-border rounded-sm p-2">
+                  <h3 className="text-xs font-bold text-amazon-text mb-3 uppercase tracking-wider">
+                    Payment & Notes
                   </h3>
-                  <div className="bg-[#1a1c20] p-4 rounded-sm border border-[#1e2126] space-y-3">
+                  <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 flex items-center gap-1.5"><Package className="w-3.5 h-3.5"/> Status</span>
-                      <span className="text-[11px] font-black text-white">{order.orderStatus}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5"/> Payment</span>
-                      <span className="text-[11px] font-black text-white">{order.paymentStatus}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5"/> Date</span>
-                      <span className="text-[11px] font-bold text-gray-400">{formatDate(order.createdAt)}</span>
+                      <span className="text-xs font-medium text-amazon-textMuted flex items-center gap-1.5"><CreditCard className="w-4 h-4"/> Payment</span>
+                      <span className="text-sm font-medium text-amazon-text">{order.paymentStatus}</span>
                     </div>
                     {order.note && (
-                      <div className="pt-2 border-t border-[#1e2126]">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 block mb-1">Note:</span>
-                        <p className="text-[11px] text-gray-400 italic">"{order.note}"</p>
-                      </div>
-                    )}
-                    
-                 
-                    {isBuyerContext && order.orderStatus === 'Processing' && order.paymentStatus === 'Paid' &&  !order.hasCancelRequest && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCancelingOrderId(order.orderId);
-                          setIsCancelModalOpen(true);
-                        }}
-                        className="mt-4 text-[10px] text-red-500 border border-red-500 border-dashed rounded-sm px-4 py-2 hover:bg-red-500 hover:text-white transition-colors uppercase font-bold tracking-widest w-full text-center"
-                      >
-                        Request Cancel
-                      </button>
-                        )}
-                        {isBuyerContext && order.hasCancelRequest && (
-  <div className="mt-4 text-[10px] text-yellow-500 border border-yellow-500/50 bg-yellow-500/10 rounded-sm px-4 py-2 text-center uppercase font-bold tracking-widest w-full">
-    Cancel Request Pending Approval
-  </div>
-)}
-
-                    {/* SHOP ACTIONS: Update Status */}
-                    {!isBuyerContext && (order.orderStatus === 'Processing' || order.orderStatus === 'Shipped') && (
-                      <div className="pt-3 mt-3 border-t border-[#1e2126] flex flex-col gap-2">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 block mb-1">Shop Actions:</span>
-                        <div className="flex gap-2">
-                          
-                          {order.orderStatus === 'Processing' && (
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateStatus(3)}
-                              disabled={isUpdatingStatus !== null}
-                              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold uppercase tracking-widest py-2 rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                            >
-                              {isUpdatingStatus === 3 && <Loader2 className="w-3 h-3 animate-spin" />}
-                              Mark Shipped
-                            </button>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={() => handleUpdateStatus(4)}
-                            disabled={isUpdatingStatus !== null}
-                            className="flex-1 bg-green-600 hover:bg-green-700 text-white text-[10px] font-bold uppercase tracking-widest py-2 rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                          >
-                            {isUpdatingStatus === 4 && <Loader2 className="w-3 h-3 animate-spin" />}
-                            Mark Completed
-                          </button>
-
-                        </div>
-
-                        {/* Shop Cancel Order */}
-                        {order.orderStatus === 'Processing' && (
-                          <div className="pt-2 mt-1">
-                            {!isShopCancelOpen ? (
-                              <button
-                                type="button"
-                                onClick={() => setIsShopCancelOpen(true)}
-                                disabled={isUpdatingStatus !== null || isCancellingOrder}
-                                className="w-full text-[10px] text-red-500 border border-red-500/40 border-dashed rounded-sm px-4 py-2 hover:bg-red-500 hover:text-white transition-colors uppercase font-bold tracking-widest text-center disabled:opacity-50"
-                              >
-                                Cancel Order
-                              </button>
-                            ) : (
-                              <div className="border border-red-500/30 rounded-sm p-3 bg-red-500/5 space-y-2">
-                                <label className="block text-[10px] font-bold uppercase tracking-widest text-red-400 mb-1">Cancellation Reason</label>
-                                <textarea
-                                  value={shopCancelReason}
-                                  onChange={(e) => setShopCancelReason(e.target.value)}
-                                  rows={2}
-                                  className="w-full bg-[#111111] border border-[#2a2d35] rounded-sm px-3 py-2 text-[11px] text-white focus:outline-none focus:border-red-500/50 placeholder-gray-600 resize-none"
-                                  placeholder="Why are you cancelling this order?"
-                                />
-                                <div className="flex gap-2">
-                                  <button
-                                    type="button"
-                                    onClick={() => { setIsShopCancelOpen(false); setShopCancelReason(""); }}
-                                    disabled={isCancellingOrder}
-                                    className="flex-1 py-1.5 rounded-sm text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-[#111111] hover:bg-[#252830] transition-colors border border-[#2a2d35]"
-                                  >
-                                    Back
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={handleShopCancelOrder}
-                                    disabled={isCancellingOrder || !shopCancelReason.trim()}
-                                    className="flex-1 py-1.5 rounded-sm text-[10px] font-black uppercase tracking-widest text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                                  >
-                                    {isCancellingOrder && <Loader2 className="w-3 h-3 animate-spin" />}
-                                    Confirm Cancel
-                                  </button>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
+                      <div className="pt-3 border-t border-amazon-border">
+                        <span className="text-xs font-medium text-amazon-textMuted block mb-1">Customer Note:</span>
+                        <p className="text-sm text-amazon-text italic">"{order.note}"</p>
                       </div>
                     )}
                   </div>
@@ -411,67 +438,80 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
 
               {/* Items List */}
               <div>
-                <h3 className="text-[11px] font-black uppercase tracking-widest text-[#f5d800] mb-3">
+                <h3 className="text-[11px] font-medium text-amazon-text pb-2">
                   Items ({order.orderItems.length})
                 </h3>
-                <div className="border border-[#1e2126] rounded-sm divide-y divide-[#1e2126] bg-[#1a1c20]">
+                <div className="list-container">
                   {order.orderItems.map((item) => (
-                    <div key={item.orderItemId} className="p-4">
-                      <div className="flex items-start gap-4">
-                        <div className="relative w-16 h-16 bg-black border border-[#1e2126] rounded-sm flex-shrink-0 overflow-hidden">
-                          {item.productImage ? (
-                            <Image src={item.productImage} alt={item.productName} fill className="object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Keyboard className="w-6 h-6 text-gray-600" />
+                    <div key={item.orderItemId} className="bg-white border border-amazon-border rounded-md overflow-hidden mb-4 shadow-sm">
+                      <div className={item.isCustom ? "grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-amazon-border" : "p-4 sm:p-5"}>
+                        
+                        {/* Left Column (Item Info & Components) */}
+                        <div className={item.isCustom ? "col-span-12 lg:col-span-6 p-4 sm:p-5 flex flex-col gap-4" : "flex flex-col gap-4"}>
+                          <div className="flex items-start gap-4 sm:gap-6">
+                            <div className="relative w-20 h-20 bg-white flex-shrink-0 overflow-hidden border border-amazon-border rounded-sm">
+                              {item.productImage ? (
+                                <Image src={item.productImage} alt={item.productName} fill className="object-contain p-1" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-neutral-50">
+                                  <Keyboard className="w-6 h-6 text-amazon-textMuted" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-amazon-text pr-4 line-clamp-2">{item.productName}</p>
+                              <div className="flex items-center justify-between mt-2">
+                                <p className="text-xs font-normal text-amazon-textMuted">
+                                  Qty: <span className="text-amazon-link">{item.quantity}</span> × {formatCurrency(item.unitPrice)}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Custom Components Nesting */}
+                          {item.isCustom && item.orderItemComponents && item.orderItemComponents.length > 0 && (
+                            <div className="mt-2 pt-4 border-t border-amazon-border border-dashed">
+                              <p className="text-xs font-medium text-amazon-textMuted mb-3 block">Includes Custom Parts:</p>
+                              <div className="space-y-3">
+                                {item.orderItemComponents.map((part) => (
+                                  <div key={part.partId} className="flex items-center gap-3">
+                                    <div className="relative w-10 h-10 bg-white border border-amazon-border rounded-sm flex-shrink-0 overflow-hidden">
+                                      {part.partImageUrl ? (
+                                        <Image src={part.partImageUrl} alt={part.partName} fill className="object-cover" />
+                                      ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-neutral-50">
+                                          <Package className="w-4 h-4 text-amazon-textMuted" />
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium text-amazon-text truncate">{part.partName}</p>
+                                      <p className="text-xs font-normal text-amazon-textMuted">
+                                        Qty: <span className="text-amazon-link">{part.quantity}</span> × {formatCurrency(part.partPriceSnapshot)}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[12px] font-black uppercase tracking-wider text-white truncate pr-4">{item.productName}</p>
-                          <div className="flex items-center justify-between mt-1">
-                            <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
-                              Qty: <span className="text-[#f5d800]">{item.quantity}</span> × {formatCurrency(item.unitPrice)}
-                            </p>
-                            <p className="text-[13px] font-oswald font-black text-white">{formatCurrency(item.totalPrice)}</p>
+
+                        {/* Right Column (Assembly Timeline) */}
+                        {item.isCustom && (
+                          <div className="col-span-12 lg:col-span-6 p-4 sm:p-5 bg-neutral-50/50">
+                            <h4 className="text-xs font-bold text-amazon-text mb-3 flex items-center gap-2">
+                              <Package className="w-4 h-4" /> Assembly Progress
+                            </h4>
+                            <AssemblyTimeline 
+                              orderItemId={item.orderItemId} 
+                              role={!isBuyerContext ? "shop" : "user"} 
+                              isCancelled={order.orderStatus === 'Cancelled' || order.orderStatus === 'Returned'} 
+                              onReadyChange={handleAssemblyReady}
+                            />
                           </div>
-                        </div>
+                        )}
                       </div>
-
-                      {/* Custom Components Nesting */}
-                      {item.isCustom && item.orderItemComponents && item.orderItemComponents.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-[#1e2126]/50 pl-6 bg-black/20 rounded-sm p-3 border-l-2 border-l-[#f5d800]/50">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-3 block">Includes Custom Parts:</p>
-                          <div className="space-y-3">
-                            {item.orderItemComponents.map((part) => (
-                              <div key={part.partId} className="flex items-center gap-3">
-                                <div className="relative w-10 h-10 bg-black border border-[#1e2126] rounded-sm flex-shrink-0 overflow-hidden">
-                                  {part.partImageUrl ? (
-                                    <Image src={part.partImageUrl} alt={part.partName} fill className="object-cover" />
-                                  ) : (
-                                    <div className="w-full h-full flex items-center justify-center">
-                                      <Package className="w-4 h-4 text-gray-600" />
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-[11px] font-bold uppercase tracking-wider text-gray-300 truncate">{part.partName}</p>
-                                  <p className="text-[10px] font-bold text-gray-500">
-                                    Qty: <span className="text-white">{part.quantity}</span> × {formatCurrency(part.partPriceSnapshot)}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Assembly Timeline */}
-                      {item.isCustom && (
-                        <div className="mt-4">
-                          <AssemblyTimeline orderItemId={item.orderItemId} role={!isBuyerContext ? "shop" : "user"} />
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -482,24 +522,24 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
 
         {/* Footer */}
         {order && !loading && (
-          <div className="px-6 py-4 border-t border-[#1e2126] bg-[#1a1c20] space-y-2">
-            <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest text-gray-400">
+          <div className="px-6 py-4 border-t border-amazon-border bg-neutral-50 space-y-2">
+            <div className="flex justify-between items-center text-[11px] font-medium text-amazon-textMuted">
               <span>Subtotal:</span>
               <span>{formatCurrency(order.subTotal)}</span>
             </div>
-            <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest text-gray-400">
+            <div className="flex justify-between items-center text-[11px] font-medium text-amazon-textMuted">
               <span>Shipping Fee:</span>
               <span>{formatCurrency(order.shippingFee)}</span>
             </div>
             {order.discountAmount > 0 && (
-              <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest text-green-400">
+              <div className="flex justify-between items-center text-[11px] font-medium text-green-600">
                 <span>Discount:</span>
                 <span>-{formatCurrency(order.discountAmount)}</span>
               </div>
             )}
-            <div className="pt-2 border-t border-[#1e2126] flex justify-between items-center">
-              <span className="text-[12px] font-black uppercase tracking-widest text-white">Final Total:</span>
-              <span className="text-xl font-oswald font-black text-[#f5d800]">{formatCurrency(order.totalAmount)}</span>
+            <div className="pt-2 border-t border-amazon-border flex justify-between items-center">
+              <span className="text-[12px] font-medium text-amazon-text">Final Total:</span>
+              <span className="text-xl font-bold text-amazon-price">{formatCurrency(order.totalAmount)}</span>
             </div>
           </div>
         )}

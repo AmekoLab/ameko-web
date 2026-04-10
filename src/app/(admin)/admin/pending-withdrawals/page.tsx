@@ -3,16 +3,6 @@
 import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { fetchPendingWithdrawalTxns } from "@/src/store/slices/adminWalletSlice";
-import {
-  Banknote,
-  Calendar,
-  CheckCircle,
-  ChevronLeft,
-  ChevronRight,
-  Copy,
-  Inbox,
-  XCircle,
-} from "lucide-react";
 import { TransactionItem } from "@/src/services/wallet.service";
 import ApproveWithdrawalModal from "@/src/components/Admin/ApproveWithdrawalModal";
 import RejectWithdrawalModal from "@/src/components/Admin/RejectWithdrawalModal";
@@ -82,147 +72,138 @@ export default function PendingWithdrawalsPage() {
   };
 
   return (
-    <div className="p-8 bg-black min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className="w-full flex flex-col gap-4">
+      <div className="max-w-7xl mx-auto w-full">
         {/* Header */}
-        <div className="flex justify-between items-end mb-6 border-b border-[#1e2126] pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-2">
           <div>
-            <h1 className="text-3xl font-oswald font-black text-white mb-2 uppercase tracking-widest flex items-center gap-3">
-              <Banknote className="w-8 h-8 text-[#f5d800]" />
+            <h1 className="text-2xl font-bold text-amazon-text leading-tight">
               Pending Withdrawal Requests
             </h1>
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+            <p className="text-[11px] text-amazon-textMuted mt-0.5">
               Manage withdrawal requests currently pending from Shops.
             </p>
           </div>
-          <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-            Total: <strong className="text-white">{pendingPagination?.totalCount || 0}</strong>{" "}
+          <span className="text-[10px] text-amazon-textMuted">
+            Total:{" "}
+            <strong className="text-amazon-text mx-1">
+              {pendingPagination?.totalCount || 0}
+            </strong>{" "}
             requests
           </span>
         </div>
 
         {/* TABLE */}
-        <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden">
+        <div className="bg-white rounded-md border border-amazon-border overflow-hidden flex flex-col shadow-sm">
           {loadingPending && pendingWithdrawals.length === 0 ? (
-            <div className="p-12 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500">
+            <div className="p-12 text-center text-[11px] text-amazon-textMuted">
               Loading data...
             </div>
           ) : pendingWithdrawals.length === 0 && !loadingPending ? (
             /* ─── Empty State ─────────────────────────── */
             <div className="p-16 flex flex-col items-center justify-center text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-sm bg-black border border-[#1e2126] mb-4">
-                <Inbox className="h-8 w-8 text-gray-500" />
-              </div>
-              <h3 className="text-base font-black text-white font-oswald uppercase tracking-widest mb-1">
+              <h3 className="text-[13px] font-bold text-amazon-text mb-1">
                 No requests
               </h3>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 max-w-xs">
+              <p className="text-[11px] text-amazon-textMuted max-w-xs">
                 There are currently no withdrawal requests pending.
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-black text-gray-500 text-[10px] uppercase font-black tracking-widest border-b border-[#1e2126]">
-                    <th className="p-4">Date</th>
-                    <th className="p-4">Amount</th>
-                    <th className="p-4">Fee</th>
-                    <th className="p-4">Bank</th>
-                    <th className="p-4 text-center">Actions</th>
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-left border-collapse whitespace-nowrap">
+                <thead className="bg-neutral-50 border-b border-amazon-border">
+                  <tr className="text-left text-[10px] font-medium text-amazon-textMuted">
+                    <th className="px-4 py-2">Date</th>
+                    <th className="px-4 py-2">Amount</th>
+                    <th className="px-4 py-2">Fee</th>
+                    <th className="px-4 py-2">Bank</th>
+                    <th className="px-4 py-2 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#1e2126]">
+                <tbody className="divide-y divide-amazon-border">
                   {pendingWithdrawals.map((tx: TransactionItem) => {
                     const bank = parseBankDetails(tx.description);
                     return (
                       <tr
                         key={tx.id}
-                        className="hover:bg-[#202030] transition-colors"
+                        className="hover:bg-neutral-50 transition-colors"
                       >
                         {/* Date */}
-                        <td className="p-4 text-[10px] font-bold uppercase tracking-widest text-gray-500">
-                          <div className="flex items-center gap-1.5">
-                            <Calendar className="w-3.5 h-3.5" />
-                            {new Date(tx.createdAt).toLocaleDateString(
-                              "en-US",
-                              {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              },
-                            )}
-                          </div>
+                        <td className="px-4 py-3 text-[10px] text-amazon-textMuted">
+                          {new Date(tx.createdAt).toLocaleDateString("en-US", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </td>
 
                         {/* Amount */}
-                        <td className="p-4">
-                          <span className="font-black text-[#f5d800] tracking-wider text-[13px]">
-                            {tx.amount.toLocaleString("en-US")}
+                        <td className="px-4 py-3">
+                          <span className="font-bold text-[11px] text-amazon-text">
+                            {tx.amount.toLocaleString("en-US")}₫
                           </span>
                         </td>
 
                         {/* Fee */}
-                        <td className="p-4">
-                          <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                        <td className="px-4 py-3">
+                          <span className="text-[11px] text-amazon-textMuted">
                             {tx.feeAmount > 0
-                              ? `${tx.feeAmount.toLocaleString("en-US")}`
+                              ? `${tx.feeAmount.toLocaleString("en-US")}₫`
                               : "—"}
                           </span>
                         </td>
 
                         {/* Bank Details */}
-                        <td className="p-4">
+                        <td className="px-4 py-3">
                           {bank ? (
-                            <div className="space-y-1">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                            <div className="space-y-0.5">
+                              <p className="text-[11px] font-medium text-amazon-text">
                                 {bank.bankName}
                               </p>
-                              <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-white">
-                                <span>
-                                  {bank.accountNumber}
-                                </span>
+                              <div className="flex items-center gap-1.5 text-[10px] text-amazon-textMuted">
+                                <span>{bank.accountNumber}</span>
                                 <button
                                   onClick={() => handleCopy(bank.accountNumber)}
-                                  className="p-1 rounded-sm bg-black border border-[#1e2126] hover:bg-[#202030] text-gray-500 hover:text-[#f5d800] hover:border-[#f5d800]/50 transition-colors"
+                                  className="text-blue-600 hover:text-blue-800 transition-colors px-1 border border-transparent hover:border-blue-200 bg-transparent hover:bg-blue-50 rounded"
                                   title="Copy Account Number"
                                 >
-                                  <Copy className="w-3 h-3" />
+                                  Copy
                                 </button>
                               </div>
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                              <p className="text-[10px] text-amazon-textMuted">
                                 {bank.accountName}
                               </p>
                             </div>
                           ) : (
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600 italic">
+                            <span className="text-[10px] text-amazon-textMuted">
                               No information
                             </span>
                           )}
                         </td>
 
                         {/* Actions */}
-                        <td className="p-4">
+                        <td className="px-4 py-3">
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() =>
                                 handleOpenApproveModal(tx.id, tx.amount)
                               }
-                              className="p-1.5 border border-[#1e2126] bg-[#151515] hover:bg-green-500/10 text-gray-500 hover:text-green-500 hover:border-green-500/50 rounded-sm transition shadow-sm"
+                              className="px-2 py-1 bg-green-50 text-green-700 border border-green-200 text-[10px] font-medium rounded hover:bg-green-100 transition-colors"
                               title="Approve"
                             >
-                              <CheckCircle className="w-4 h-4" />
+                              Approve
                             </button>
                             <button
                               onClick={() =>
                                 handleOpenRejectModal(tx.id, tx.amount)
                               }
-                              className="p-1.5 border border-[#1e2126] bg-[#151515] hover:bg-red-500/10 text-gray-500 hover:text-red-500 hover:border-red-500/50 rounded-sm transition shadow-sm"
+                              className="px-2 py-1 bg-red-50 text-red-600 border border-red-200 text-[10px] font-medium rounded hover:bg-red-100 transition-colors"
                               title="Reject"
                             >
-                              <XCircle className="w-4 h-4" />
+                              Reject
                             </button>
                           </div>
                         </td>
@@ -236,22 +217,22 @@ export default function PendingWithdrawalsPage() {
 
           {/* Pagination */}
           {pendingPagination && pendingPagination.totalPages > 1 && (
-            <div className="flex items-center justify-between p-4 border-t border-[#1e2126] bg-black">
-              <p className="text-[10px] uppercase font-bold tracking-widest text-gray-500">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-amazon-border bg-neutral-50/50">
+              <p className="text-[10px] text-amazon-textMuted">
                 Page{" "}
-                <strong className="text-white">
+                <strong className="text-amazon-text mx-0.5">
                   {pendingPagination.currentPage} /{" "}
                   {pendingPagination.totalPages}
                 </strong>{" "}
                 — {pendingPagination.totalCount} requests
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <button
                   onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
                   disabled={!pendingPagination.hasPreviousPage}
-                  className="p-2 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] disabled:opacity-40 disabled:cursor-not-allowed transition text-gray-400 hover:text-white"
+                  className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white text-amazon-text hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  Prev
                 </button>
                 <button
                   onClick={() =>
@@ -260,9 +241,9 @@ export default function PendingWithdrawalsPage() {
                     )
                   }
                   disabled={!pendingPagination.hasNextPage}
-                  className="p-2 rounded-sm border border-[#1e2126] bg-[#151515] hover:bg-[#202030] disabled:opacity-40 disabled:cursor-not-allowed transition text-gray-400 hover:text-white"
+                  className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white text-amazon-text hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  Next
                 </button>
               </div>
             </div>

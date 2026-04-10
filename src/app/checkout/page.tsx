@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, FormEvent, Suspense } from "react";
 import { useAppSelector, useAppDispatch } from "@/src/store/hook";
 import { fetchWalletDetails } from "@/src/store/slices/walletSlice";
+import { fetchProfileThunk } from "@/src/store/slices/authSlice";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -14,6 +15,7 @@ import {
   ChevronUp,
   X,
   Store,
+  User,
 } from "lucide-react";
 import { orderService } from "@/src/services/order.service";
 import { CartData, OrderItem } from "@/src/types/order.types";
@@ -71,38 +73,38 @@ const CheckoutItemRow = ({ item }: { item: OrderItem }) => {
     <div>
       <div className="flex gap-4 items-center">
         {/* Image with Badge */}
-        <div className="relative w-16 h-16 border border-gray-200 rounded-lg bg-white shrink-0">
+        <div className="relative w-16 h-16  rounded-sm bg-white shrink-0">
           {displayImage ? (
             <Image
               src={displayImage}
               alt={item.productName}
               fill
-              className="object-contain p-1 rounded-lg"
+              className="object-contain p-1 rounded-sm"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-gray-300" />
+              <ShoppingBag className="w-6 h-6 text-amazon-textMuted" />
             </div>
           )}
-          <span className="absolute -top-2 -right-2 bg-gray-600 text-white text-[11px] font-medium w-5 h-5 rounded-full flex items-center justify-center z-10 shadow-sm border border-white">
+          <span className="absolute -top-2 -right-2 bg-neutral-200 text-amazon-text text-[11px] font-medium w-5 h-5 rounded-full flex items-center justify-center z-10 shadow-sm border border-amazon-border">
             {item.quantity}
           </span>
         </div>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-sm text-gray-800 truncate capitalize">
+          <h3 className="font-bold text-sm text-amazon-text truncate capitalize uppercase tracking-widest">
             {item.productName}
           </h3>
           {/* {item.shopName && (
-            <p className="text-xs text-gray-500 mt-0.5 truncate">
-              Shop: <span className="font-medium text-gray-700">{item.shopName}</span>
+            <p className="text-xs text-amazon-textMuted mt-0.5 truncate">
+              Shop: <span className="font-medium text-amazon-text">{item.shopName}</span>
             </p>
           )} */}
           {isCustom && (
             <button
               onClick={() => setShowComponents(!showComponents)}
-              className="text-[11px] text-[#ce2a32] hover:underline flex items-center gap-0.5 mt-0.5"
+              className="text-[11px] font-bold text-amazon-link hover:underline flex items-center gap-0.5 mt-0.5 uppercase tracking-wider"
             >
               {showComponents ? "Hide" : "View"} components
               {showComponents ? (
@@ -115,7 +117,7 @@ const CheckoutItemRow = ({ item }: { item: OrderItem }) => {
         </div>
 
         {/* Price */}
-        <p className="font-medium text-sm text-gray-800 tabular-nums shrink-0">
+        <p className="font-bold text-sm text-amazon-price tabular-nums shrink-0 mt-0.5">
           {item.totalPrice.toLocaleString("vi-VN")}₫
         </p>
       </div>
@@ -126,9 +128,9 @@ const CheckoutItemRow = ({ item }: { item: OrderItem }) => {
           {item.orderItemComponents.map((comp) => (
             <div
               key={comp.partId}
-              className="flex items-center gap-2 text-xs text-gray-500"
+              className="flex items-center gap-2 text-xs text-amazon-textMuted"
             >
-              <div className="relative w-6 h-6 shrink-0 rounded overflow-hidden border border-gray-100">
+              <div className="relative w-6 h-6 shrink-0 rounded-sm overflow-hidden border border-amazon-border bg-neutral-50 mb-0.5">
                 {comp.partImageUrl ? (
                   <Image
                     src={comp.partImageUrl}
@@ -138,11 +140,11 @@ const CheckoutItemRow = ({ item }: { item: OrderItem }) => {
                     className="object-contain"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-100" />
+                  <div className="w-full h-full bg-neutral-100" />
                 )}
               </div>
-              <span className="capitalize truncate">{comp.partName}</span>
-              <span className="text-gray-400 ml-auto shrink-0">
+              <span className="capitalize truncate font-medium text-amazon-text">{comp.partName}</span>
+              <span className="text-amazon-textMuted ml-auto shrink-0 font-bold">
                 ×{comp.quantity}
               </span>
             </div>
@@ -167,8 +169,9 @@ function CheckoutContent() {
   const selectedSystemCode = useAppSelector((state) => state.voucher.selectedSystemVoucherCode);
   const selectedShopVoucherCodesMap = useAppSelector((state) => state.voucher.selectedShopVoucherCodes);
 
-  // ── Wallet state ──────────────────────────────────────────────────────
+  // ── Wallet and Auth state ─────────────────────────────────────────────
   const { details: walletDetails } = useAppSelector((state) => state.wallet);
+  const { user } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(fetchWalletDetails());
@@ -177,6 +180,7 @@ function CheckoutContent() {
   const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [activePolicy, setActivePolicy] = useState<"terms" | "privacy" | "returns" | null>(null);
 
@@ -191,36 +195,64 @@ function CheckoutContent() {
 
   // Fetch cart data and pre-fill form if available
   useEffect(() => {
-    const fetchCart = async () => {
+    const fetchCheckoutData = async () => {
       try {
-        const res = await orderService.getCart();
-        if (res.success) {
-          setCart(res.data);
-
-          // Pre-fill form with saved shipping info from cart
-          const cartData = res.data;
-          if (
-            cartData.receiverName ||
-            cartData.receiverPhone ||
-            cartData.shippingAddress
-          ) {
-            setForm((prev) => ({
-              ...prev,
-              receiverName: cartData.receiverName || prev.receiverName,
-              receiverPhone: cartData.receiverPhone || prev.receiverPhone,
-              shippingAddress: cartData.shippingAddress || prev.shippingAddress,
-              note: cartData.note || prev.note,
-            }));
-          }
+        // 1. Fetch Cart
+        const cartRes = await orderService.getCart();
+        let cartData = null;
+        if (cartRes.success) {
+          cartData = cartRes.data;
+          setCart(cartData);
         }
+
+        // 3. Pre-fill form (Cart data takes precedence over Profile data)
+        setForm((prev) => {
+          return {
+            ...prev,
+            receiverName: cartData?.receiverName || prev.receiverName,
+            receiverPhone: cartData?.receiverPhone || prev.receiverPhone,
+            shippingAddress: cartData?.shippingAddress || prev.shippingAddress,
+            note: cartData?.note || prev.note,
+          };
+        });
+
       } catch {
-        // Cart fetch failed — will show empty state
+        // Fetch failed — will show empty state
       } finally {
         setLoading(false);
       }
     };
-    fetchCart();
-  }, []);
+    fetchCheckoutData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
+
+  const handleAutoFill = async () => {
+    if (!user?.id) {
+       toast.error("Please login to use this feature");
+       return;
+    }
+    
+    setIsAutoFilling(true);
+    try {
+      const profileRes = await dispatch(fetchProfileThunk(user.id));
+      if (fetchProfileThunk.fulfilled.match(profileRes)) {
+        const profileData = profileRes.payload;
+        setForm((prev) => ({
+          ...prev,
+          receiverName: `${profileData.firstName || ""} ${profileData.lastName || ""}`.trim() || prev.receiverName,
+          receiverPhone: profileData.phoneNumber || prev.receiverPhone,
+          shippingAddress: profileData.storeAddress || prev.shippingAddress,
+        }));
+        // toast.success("Filled from your profile!");
+      } else {
+        toast.error("Could not fetch profile data.");
+      }
+    } catch {
+      toast.error("An error occurred while fetching profile data.");
+    } finally {
+      setIsAutoFilling(false);
+    }
+  };
 
   // ── Build voucher codes payload (codes stored directly in state) ─────────
   const payloadCodes = useMemo(() => {
@@ -359,8 +391,8 @@ function CheckoutContent() {
   // ─── Loading ─────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className="min-h-screen flex items-center justify-center bg-amazon-bgSecondary text-amazon-text">
+        <Loader2 className="w-8 h-8 animate-spin text-amazon-btnSecondary" />
       </div>
     );
   }
@@ -368,13 +400,13 @@ function CheckoutContent() {
   // ─── Empty Cart ──────────────────────────────────────────
   if (!cart || cart.orderItems.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-4">
-        <ShoppingBag className="w-16 h-16 text-gray-300 mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
-        <p className="text-gray-500 mb-6">Add some products to checkout.</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-amazon-bgSecondary text-center px-4">
+        <ShoppingBag className="w-16 h-16 text-amazon-btnSecondary mb-4 opacity-50" />
+        <h2 className="text-2xl font-black uppercase tracking-widest text-amazon-text mb-2">Your cart is empty</h2>
+        <p className="text-amazon-textMuted mb-6 font-medium">Add some products to checkout.</p>
         <Link
           href="/shop/all-products"
-          className="bg-black text-white px-6 py-3 rounded text-sm font-bold uppercase hover:bg-[#ce2a32] transition-colors"
+          className="bg-amazon-btnPrimary text-amazon-text px-6 py-3 rounded-sm text-sm font-black uppercase tracking-widest hover:brightness-95 transition-colors shadow-sm"
         >
           Return to Shop
         </Link>
@@ -384,15 +416,15 @@ function CheckoutContent() {
   // No selected items found
   if (selectedItems.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-4">
-        <ShoppingBag className="w-16 h-16 text-gray-300 mb-4" />
-        <h2 className="text-2xl font-bold mb-2">No items selected</h2>
-        <p className="text-gray-500 mb-6">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-amazon-bgSecondary text-center px-4">
+        <ShoppingBag className="w-16 h-16 text-amazon-btnSecondary mb-4 opacity-50" />
+        <h2 className="text-2xl font-black  uppercase tracking-widest text-amazon-text mb-2">No items selected</h2>
+        <p className="text-amazon-textMuted mb-6 font-medium">
           Please go back to your cart and select items to checkout.
         </p>
         <Link
           href="/cart"
-          className="bg-black text-white px-6 py-3 rounded text-sm font-bold uppercase hover:bg-[#ce2a32] transition-colors"
+          className="bg-amazon-btnPrimary text-amazon-text px-6 py-3 rounded-sm text-sm font-black uppercase tracking-widest hover:brightness-95 transition-colors shadow-sm"
         >
           Return to Cart
         </Link>
@@ -400,11 +432,11 @@ function CheckoutContent() {
     );
   }
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row font-sans text-[#333]">
+    <div className="min-h-screen flex flex-col lg:flex-row font-sans text-amazon-text bg-amazon-bgSecondary">
       {/* ═══════════════════════════════════════════════════════
           LEFT COLUMN: CHECKOUT FORM
       ═══════════════════════════════════════════════════════ */}
-      <div className="flex-1 lg:flex-[0_0_58%] lg:order-1 order-2 bg-white px-4 md:px-8 lg:px-14 py-8 lg:py-12 border-r border-gray-200">
+      <div className="flex-1 lg:flex-[0_0_58%] lg:order-1 order-2 bg-bgSecondary px-4 md:px-8 lg:px-14 py-8 lg:py-4 border-r border-amazon-border">
         <form
           id="checkout-form"
           onSubmit={handleSubmit}
@@ -412,24 +444,24 @@ function CheckoutContent() {
         >
           {/* Logo */}
           <Link href="/" className="block mb-6">
-            <h1 className="text-2xl font-black font-oswald uppercase tracking-tight">
+            <h1 className="text-2xl font-black uppercase tracking-tight text-amazon-text">
               AMEKO STORE
             </h1>
           </Link>
 {/* 
           <Link
             href="/cart"
-            className="text-[#ce2a32] hover:text-[#a01e25] transition-colors text-sm inline-flex items-center gap-1 mb-8"
+            className="text-amazon-link hover:underline transition-colors text-sm inline-flex items-center gap-1 mb-8 font-bold"
           >
             <ChevronRight className="w-4 h-4 rotate-180" /> Return to cart
           </Link> */}
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-gray-500 mb-6">
-            <Link href="/cart" className="text-[#ce2a32] hover:underline">
+          <nav className="flex items-center gap-2 text-xs text-amazon-textMuted mb-6">
+            <Link href="/cart" className="text-amazon-link hover:underline">
               Cart
             </Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="font-medium text-black">Information</span>
+            <span className="font-black text-amazon-text">Information</span>
             <ChevronRight className="w-3 h-3" />
             <span>Payment</span>
           </nav>
@@ -437,7 +469,23 @@ function CheckoutContent() {
 
           {/* ─── Shipping Information ─────────────────────── */}
           <div className="mb-8">
-            <h2 className="text-lg font-medium mb-4">Shipping Information</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg tracking-tight text-amazon-text">Shipping Information</h2>
+              <button
+                type="button"
+                onClick={handleAutoFill}
+                disabled={isAutoFilling}
+                title="Auto-fill using your profile data"
+                className="flex items-center gap-1.5 text-[11px] font-bold text-amazon-textMuted hover:text-amazon-link transition-colors disabled:opacity-50"
+              >
+                {isAutoFilling ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <User className="w-3.5 h-3.5" />
+                )}
+                AUTO-FILL
+              </button>
+            </div>
 
             <div className="space-y-3">
               {/* Receiver Name */}
@@ -447,14 +495,14 @@ function CheckoutContent() {
                   placeholder="Receiver name *"
                   value={form.receiverName}
                   onChange={handleInputChange("receiverName")}
-                  className={`w-full h-[50px] px-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#ce2a32] text-sm placeholder:text-gray-500 ${
+                  className={`w-full h-[50px] px-3 border rounded-sm focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/30 text-[13px] placeholder:text-amazon-textMuted ${
                     errors.receiverName
                       ? "border-red-400 bg-red-50"
-                      : "border-gray-300"
+                      : "border-amazon-border bg-white"
                   }`}
                 />
                 {errors.receiverName && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p className="text-red-600 text-xs mt-1 font-bold">
                     {errors.receiverName}
                   </p>
                 )}
@@ -467,20 +515,20 @@ function CheckoutContent() {
                   placeholder="Phone number *"
                   value={form.receiverPhone}
                   onChange={handleInputChange("receiverPhone")}
-                  className={`w-full h-[50px] px-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#ce2a32] text-sm placeholder:text-gray-500 ${
+                  className={`w-full h-[50px] px-3 border rounded-sm focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/30 text-[13px]  placeholder:text-amazon-textMuted ${
                     errors.receiverPhone
                       ? "border-red-400 bg-red-50"
-                      : "border-gray-300"
+                      : "border-amazon-border bg-white"
                   }`}
                 />
                 <div
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-help"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-amazon-textMuted cursor-help"
                   title="Phone number needed for shipping"
                 >
                   <HelpCircle className="w-4 h-4" />
                 </div>
                 {errors.receiverPhone && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p className="text-red-600 text-xs mt-1 font-bold">
                     {errors.receiverPhone}
                   </p>
                 )}
@@ -493,14 +541,14 @@ function CheckoutContent() {
                   placeholder="Shipping address *"
                   value={form.shippingAddress}
                   onChange={handleInputChange("shippingAddress")}
-                  className={`w-full h-[50px] px-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#ce2a32] text-sm placeholder:text-gray-500 ${
+                  className={`w-full h-[50px] px-3 border rounded-sm focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/30 text-[13px] placeholder:text-amazon-textMuted ${
                     errors.shippingAddress
                       ? "border-red-400 bg-red-50"
-                      : "border-gray-300"
+                      : "border-amazon-border bg-white"
                   }`}
                 />
                 {errors.shippingAddress && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p className="text-red-600 text-xs mt-1 font-bold">
                     {errors.shippingAddress}
                   </p>
                 )}
@@ -512,20 +560,21 @@ function CheckoutContent() {
                 rows={3}
                 value={form.note}
                 onChange={handleInputChange("note")}
-                className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ce2a32] text-sm placeholder:text-gray-500 resize-none"
+                className="w-full px-3 py-3 border rounded-sm focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/30 text-[13px] placeholder:text-amazon-textMuted border-amazon-border bg-white resize-none"
                 maxLength={500}
               />
             </div>
 
             {/* ─── Payment Method ──────────────────────────── */}
-            <h2 className="text-lg font-medium mb-4 mt-8 pt-8 border-t border-gray-200">Payment Method</h2>
+            {/* ─── Payment Method ──────────────────────────── */}
+            <h2 className="text-lg   text-amazon-text mb-4 mt-8 pt-8 border-t border-amazon-border">Payment Method</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Stripe */}
               <label
-                className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
+                className={`flex items-center gap-3 p-4 border rounded-sm cursor-pointer transition-colors ${
                   paymentMethod === 0
-                    ? "border-[#ce2a32] bg-red-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-amazon-focus ring-1 ring-amazon-focus/30 bg-neutral-50 shadow-sm"
+                    : "border-amazon-border bg-white hover:border-neutral-300"
                 }`}
               >
                 <input
@@ -534,44 +583,20 @@ function CheckoutContent() {
                   value={0}
                   checked={paymentMethod === 0}
                   onChange={() => setPaymentMethod(0)}
-                  className="accent-[#ce2a32]"
+                  className="accent-amazon-btnPrimary w-4 h-4 cursor-pointer"
                 />
                 <div>
-                  <p className="text-sm font-medium text-gray-800">Stripe (Credit Card)</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Pay securely via Stripe</p>
+                  <p className="text-sm font-bold text-amazon-text  ">Stripe (Credit Card)</p>
+                  <p className="text-[11px]  text-amazon-textMuted mt-0.5 ">Pay securely via Stripe</p>
                 </div>
               </label>
 
-              {/* Ameko Wallet */}
+              {/* VN PAY*/}
               <label
-                className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
-                  paymentMethod === 1
-                    ? "border-[#ce2a32] bg-red-50"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value={1}
-                  checked={paymentMethod === 1}
-                  onChange={() => setPaymentMethod(1)}
-                  className="accent-[#ce2a32]"
-                />
-                <div className="ml-3 flex flex-col">
-                  <span className="font-medium text-sm">Ameko Wallet</span>
-                  <span className="text-xs text-gray-500 italic mt-0.5">
-                    Balance: {walletDetails?.balance?.toLocaleString("vi-VN") ?? 0}₫
-                  </span>
-                </div>
-              </label>
-
-              { /* VN PAY*/}
-              <label
-                className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
+                className={`flex items-center gap-3 p-4 border rounded-sm cursor-pointer transition-colors ${
                   paymentMethod === 2
-                    ? "border-[#ce2a32] bg-red-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-amazon-focus ring-1 ring-amazon-focus/30 bg-neutral-50 shadow-sm"
+                    : "border-amazon-border bg-white hover:border-neutral-300"
                 }`}
               >
                 <input
@@ -580,46 +605,69 @@ function CheckoutContent() {
                   value={2}
                   checked={paymentMethod === 2}
                   onChange={() => setPaymentMethod(2)}
-                  className="accent-[#ce2a32]"
+                  className="accent-amazon-btnPrimary w-4 h-4 cursor-pointer"
                 />
-                <div className="ml-3 flex flex-col">
-                  <span className="font-medium text-sm">VN PAY</span>
-                  <span className="text-xs text-gray-500 italic mt-0.5">Pay via VN PAY</span>
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-amazon-text  ">VN PAY</span>
+                  <span className="text-[11px]  text-amazon-textMuted mt-0.5 ">Pay securely via VN PAY</span>
+                </div>
+              </label>
+
+              {/* Ameko Wallet */}
+              <label
+                className={`flex items-center gap-3 p-4 border rounded-sm cursor-pointer transition-colors md:col-span-2 lg:col-span-1 ${
+                  paymentMethod === 1
+                    ? "border-amazon-focus ring-1 ring-amazon-focus/30 bg-neutral-50 shadow-sm"
+                    : "border-amazon-border bg-white hover:border-neutral-300"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value={1}
+                  checked={paymentMethod === 1}
+                  onChange={() => setPaymentMethod(1)}
+                  className="accent-amazon-btnPrimary w-4 h-4 cursor-pointer"
+                />
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-amazon-text  ">Ameko Wallet</span>
+                  <span className="text-[11px]  text-amazon-textMuted italic mt-0.5 ">
+                    Balance: {walletDetails?.balance?.toLocaleString("vi-VN") ?? 0}₫
+                  </span>
                 </div>
               </label>
             </div>
           </div>
 
           {/* ─── Footer Actions ───────────────────────────── */}
-       <div className="mt-10 border-t border-gray-200 pt-6">
-  <p className="text-[11px] md:text-xs text-gray-500 leading-relaxed mb-6 text-justify">
-    By placing your order, you confirm that you have read, understood, and agree to be bound by AMK Collective&apos;s{" "}
-    <button
-      type="button"
-      onClick={() => setActivePolicy("terms")}
-      className="font-bold text-gray-800 hover:text-[#ce2a32] hover:underline transition-colors"
-    >
-      Terms of Use and Sale
-    </button>
-    . You also acknowledge that your personal information will be securely collected and processed in accordance with our{" "}
-    <button
-      type="button"
-      onClick={() => setActivePolicy("privacy")}
-      className="font-bold text-gray-800 hover:text-[#ce2a32] hover:underline transition-colors"
-    >
-      Privacy Policy
-    </button>{" "}
-    to fulfill your order and enhance your shopping experience. All financial transactions are fully encrypted and processed through secure third-party payment gateways; we do not store your full credit card details on our servers. For details regarding cancellations or refunds, please refer to our{" "}
-    <button
-      type="button"
-      onClick={() => setActivePolicy("returns")}
-      className="font-bold text-gray-800 hover:text-[#ce2a32] hover:underline transition-colors"
-    >
-      Return & Refund Policy
-    </button>
-    .
-  </p>
-
+          <div className="mt-10 border-t border-amazon-border pt-6">
+            <p className="text-[11px] md:text-xs text-amazon-textMuted leading-relaxed mb-6 text-justify">
+              By placing your order, you confirm that you have read, understood, and agree to be bound by AMK Collective&apos;s{" "}
+              <button
+                type="button"
+                onClick={() => setActivePolicy("terms")}
+                className="font-bold text-amazon-text hover:text-amazon-link hover:underline transition-colors"
+              >
+                Terms of Use and Sale
+              </button>
+              . You also acknowledge that your personal information will be securely collected and processed in accordance with our{" "}
+              <button
+                type="button"
+                onClick={() => setActivePolicy("privacy")}
+                className="font-bold text-amazon-text hover:text-amazon-link hover:underline transition-colors"
+              >
+                Privacy Policy
+              </button>{" "}
+              to fulfill your order and enhance your shopping experience. All financial transactions are fully encrypted and processed through secure third-party payment gateways; we do not store your full credit card details on our servers. For details regarding cancellations or refunds, please refer to our{" "}
+              <button
+                type="button"
+                onClick={() => setActivePolicy("returns")}
+                className="font-bold text-amazon-text hover:text-amazon-link hover:underline transition-colors"
+              >
+                Return & Refund Policy
+              </button>
+              .
+            </p>
           </div>
         </form>
       </div>
@@ -627,26 +675,26 @@ function CheckoutContent() {
       {/* ═══════════════════════════════════════════════════════
           RIGHT COLUMN: ORDER SUMMARY
       ═══════════════════════════════════════════════════════ */}
-      <div className="flex-1 lg:flex-[0_0_42%] lg:order-2 order-1 bg-[#fafafa] border-l border-gray-200 px-4 md:px-8 lg:px-10 py-8 lg:py-12">
+      <div className="flex-1 lg:flex-[0_0_42%] lg:order-2 order-1 bg-amazon-bgSecondary border-l border-amazon-border px-4 md:px-8 lg:px-10 py-8 lg:py-12">
         {/* Mobile Toggle */}
         <button
           onClick={() => setIsSummaryOpen(!isSummaryOpen)}
-          className="lg:hidden flex w-full items-center justify-between border-b border-gray-200 pb-4 mb-6 bg-[#fafafa]"
+          className="lg:hidden flex w-full items-center justify-between border-b border-amazon-border pb-4 mb-6 bg-amazon-bgSecondary"
         >
-          <div className="flex items-center gap-2 text-[#ce2a32]">
+          <div className="flex items-center gap-2 text-amazon-text">
             <ShoppingBag className="w-4 h-4" />
-            <span className="text-sm font-medium">
+            <span className="text-sm font-bold uppercase tracking-widest text-amazon-text">
               {isSummaryOpen ? "Hide" : "Show"} order summary
             </span>
             <ChevronDown
-              className={`w-3 h-3 transition-transform ${
+              className={`w-3 h-3 text-amazon-textMuted transition-transform ${
                 isSummaryOpen ? "rotate-180" : ""
               }`}
             />
           </div>
-          <span className="font-bold text-lg text-black">
+          <span className="font-bold text-lg text-amazon-price">
             {isCalculatingPreview ? (
-              <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+              <Loader2 className="w-5 h-5 animate-spin text-amazon-textMuted" />
             ) : (
               `${displayTotal.toLocaleString("vi-VN")}₫`
             )}
@@ -661,11 +709,11 @@ function CheckoutContent() {
         >
           {/* Product List — grouped by shop */}
           {Object.entries(groupedItems).map(([shopName, items]) => (
-            <div key={shopName} className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm mb-4">
+            <div key={shopName} className="bg-white rounded-sm  overflow-hidden  mb-4">
               {/* Shop Header */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100 bg-gray-50/80">
-                <Store className="w-4 h-4 text-gray-500 shrink-0" />
-                <span className="font-semibold text-sm text-gray-800 tracking-tight truncate">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-amazon-border bg-neutral-50">
+                <Store className="w-4 h-4 text-amazon-textMuted shrink-0" />
+                <span className="font-black text-sm text-amazon-text uppercase tracking-widest truncate">
                   {shopName}
                 </span>
               </div>
@@ -679,12 +727,12 @@ function CheckoutContent() {
           ))}
 
           {/* Cost Breakdown */}
-          <div className="space-y-3 border-t border-gray-200 pt-6 pb-6 mb-6 text-sm text-gray-600">
+          <div className="space-y-3 border-t border-amazon-border pt-6 pb-6 mb-6 text-sm text-amazon-textMuted font-bold  tracking-wider">
             <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-medium text-black">
+                <span className="font-black text-amazon-text">
                   {isCalculatingPreview ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    <Loader2 className="w-4 h-4 animate-spin text-amazon-textMuted" />
                   ) : (
                     `${(cartPreview?.totalCartSubTotal ?? selectedTotal).toLocaleString("vi-VN")}₫`
                   )}
@@ -692,16 +740,16 @@ function CheckoutContent() {
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span className="italic text-gray-400 text-xs">
+                <span className="italic text-amazon-textMuted text-xs">
                   Pay on delivery
                 </span>
               </div>
               {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (
               <div className="flex justify-between">
                 <span>Discount</span>
-                <span className="font-medium text-green-600">
+                <span className="font-black text-green-600">
                   {isCalculatingPreview ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    <Loader2 className="w-4 h-4 animate-spin text-amazon-textMuted" />
                   ) : (
                     `-${cartPreview!.totalDiscountAmount.toLocaleString("vi-VN")}₫`
                   )}
@@ -711,13 +759,12 @@ function CheckoutContent() {
           </div>
 
           {/* Total */}
-          <div className="flex justify-between items-center border-t border-gray-200 pt-6 mb-6">
-            <span className="text-base font-medium text-gray-800">Total</span>
+          <div className="flex justify-between items-center border-t border-amazon-border pt-6 mb-6">
+            <span className="text-base font-black uppercase tracking-widest text-amazon-text">Total</span>
             <div className="flex items-baseline gap-2">
-              <span className="text-xs text-gray-500 font-medium">VND</span>
-              <span className="text-2xl font-bold text-black tracking-tight">
+              <span className="text-2xl font-bold text-amazon-price tracking-tight">
                 {isCalculatingPreview ? (
-                  <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                  <Loader2 className="w-6 h-6 animate-spin text-amazon-textMuted" />
                 ) : (
                   `${displayTotal.toLocaleString("vi-VN")}₫`
                 )}
@@ -730,7 +777,7 @@ function CheckoutContent() {
             type="submit"
             form="checkout-form"
             disabled={submitting || isCalculatingPreview || cartPreview === null}
-            className="w-full bg-[#1a1a1a] hover:bg-black text-white px-10 py-4 rounded-md font-medium transition-colors text-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full bg-amazon-btnPrimary text-amazon-text hover:brightness-95 px-10 py-4 rounded-sm font-black uppercase  transition-colors text-[15px] shadow-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
           >
             {submitting ? (
               <>
@@ -750,10 +797,10 @@ function CheckoutContent() {
       </div>
 
       {activePolicy && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden max-h-[85vh] animate-in fade-in zoom-in duration-200">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6 transition-opacity">
+          <div className="bg-white rounded-sm shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden max-h-[85vh] animate-in slide-in-from-bottom duration-300 border border-amazon-border">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-amazon-border bg-neutral-50">
+              <h2 className="text-xl font-black uppercase tracking-widest text-amazon-text">
                 {activePolicy === "terms" && "Terms of Use and Sale"}
                 {activePolicy === "privacy" && "Privacy Policy"}
                 {activePolicy === "returns" && "Return & Refund Policy"}
@@ -761,13 +808,13 @@ function CheckoutContent() {
               <button
                 type="button"
                 onClick={() => setActivePolicy(null)}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors focus:outline-none"
+                className="p-2 text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-200 rounded-sm transition-colors focus:outline-none"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             
-            <div className="px-6 py-5 overflow-y-auto flex-1 text-sm text-gray-600 space-y-4">
+            <div className="px-6 py-5 overflow-y-auto flex-1 text-sm text-amazon-textMuted space-y-4">
               {activePolicy === "terms" && (
                 <>
                   <p>Welcome to AMK Collective. By accessing our platform, you agree to these terms.</p>
@@ -791,11 +838,11 @@ function CheckoutContent() {
               )}
             </div>
 
-            <div className="p-4 sm:p-6 border-t border-gray-100 bg-gray-50 mt-auto">
+            <div className="p-4 sm:p-6 border-t border-amazon-border bg-neutral-50 mt-auto">
               <button
                 type="button"
                 onClick={() => setActivePolicy(null)}
-                className="w-full bg-gray-900 hover:bg-black text-white py-2.5 rounded-xl font-medium transition-colors focus:outline-none"
+                className="w-full bg-amazon-btnPrimary text-amazon-text py-2.5 rounded-sm font-black shadow-sm uppercase tracking-widest hover:brightness-95 transition-colors focus:outline-none"
               >
                 I Understand & Close
               </button>

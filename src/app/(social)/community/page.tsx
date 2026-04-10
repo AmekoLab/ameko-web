@@ -5,7 +5,7 @@ import { LeftSidebar, RightSidebar } from "@/src/components/Community/Sidebar";
 // Đây là Server Component mặc định
 export default async function CommunityPage() {
   return (
-    <div className="bg-[#111] min-h-screen pt-6 pb-10">
+    <div className="bg-amazon-bgSecondary min-h-screen pt-6 pb-10">
       <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Cột Trái: Menu */}

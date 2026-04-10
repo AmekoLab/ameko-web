@@ -28,15 +28,15 @@ import UpdateWarrantyModal from "@/src/components/Warranty/UpdateWarrantyModal";
 const PAGE_SIZE = 10;
 
 const STATUS_STYLES: Record<string, string> = {
-  InProgress: "bg-yellow-500/10 border-yellow-500/30 text-yellow-400",
-  AwaitingReturn: "bg-blue-500/10 border-blue-500/30 text-blue-400",
-  ShopAccepted: "bg-teal-500/10 border-teal-500/30 text-teal-400",
-  Rejected: "bg-red-500/10 border-red-500/30 text-red-400",
-  AdminReviewing: "bg-purple-500/10 border-purple-500/30 text-purple-400",
-  Completed: "bg-green-500/10 border-green-500/30 text-green-400",
-  AutoCancelled: "bg-gray-500/10 border-gray-500/30 text-gray-400",
-  Returning: "bg-blue-500/10 border-blue-500/30 text-blue-400",
-  Returned: "bg-blue-500/20 border-blue-500/40 text-blue-300",
+  InProgress: "bg-yellow-50 border-yellow-200 text-yellow-700",
+  AwaitingReturn: "bg-blue-50 border-blue-200 text-blue-700",
+  ShopAccepted: "bg-teal-50 border-teal-200 text-teal-700",
+  Rejected: "bg-red-50 border-red-200 text-red-700",
+  AdminReviewing: "bg-purple-50 border-purple-200 text-purple-700",
+  Completed: "bg-green-50 border-green-200 text-green-700",
+  AutoCancelled: "bg-gray-50 border-gray-200 text-gray-700",
+  Returning: "bg-blue-50 border-blue-200 text-blue-700",
+  Returned: "bg-blue-50 border-blue-200 text-blue-700",
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -60,32 +60,32 @@ const formatDate = (dateStr: string): string => {
 };
 
 const getStatusStyle = (statusName: string): string =>
-  STATUS_STYLES[statusName] || "bg-[#202030] border-[#2a2d35] text-gray-400";
+  STATUS_STYLES[statusName] || "bg-neutral-50 border-amazon-border text-amazon-textMuted";
 
 const getTypeLabel = (typeName: string): string =>
   TYPE_LABELS[typeName] || typeName;
 
 // ─── Loading Skeleton ──────────────────────────────────────
 const WarrantySkeleton: FC = () => (
-  <div className="bg-black min-h-screen">
+  <div className="bg-amazon-bgSecondary min-h-screen">
     <div className="max-w-[900px] mx-auto px-4 md:px-8 py-12 lg:py-20 animate-pulse">
-      <div className="h-10 w-72 bg-[#1e2126] rounded-sm mb-8" />
+      <div className="h-10 w-72 bg-neutral-200 rounded-sm mb-8" />
       <div className="space-y-5">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-[#151515] rounded-sm border border-[#1e2126] p-6">
+          <div key={i} className="bg-white rounded-sm border border-amazon-border p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <div className="h-5 w-44 bg-[#202030] rounded-sm" />
-              <div className="h-6 w-24 bg-[#202030] rounded-sm" />
+              <div className="h-5 w-44 bg-neutral-200 rounded-sm" />
+              <div className="h-6 w-24 bg-neutral-200 rounded-sm" />
             </div>
             <div className="space-y-2 mb-4">
-              <div className="h-4 w-60 bg-[#202030] rounded-sm" />
-              <div className="h-4 w-40 bg-[#202030] rounded-sm" />
-              <div className="h-4 w-36 bg-[#202030] rounded-sm" />
+              <div className="h-4 w-60 bg-neutral-200 rounded-sm" />
+              <div className="h-4 w-40 bg-neutral-200 rounded-sm" />
+              <div className="h-4 w-36 bg-neutral-200 rounded-sm" />
             </div>
-            <div className="h-16 w-full bg-[#111111] rounded-sm mb-4" />
+            <div className="h-16 w-full bg-neutral-200 rounded-sm mb-4" />
             <div className="flex gap-3">
-              <div className="h-10 w-28 bg-[#202030] rounded-sm" />
-              <div className="h-10 w-32 bg-[#202030] rounded-sm" />
+              <div className="h-10 w-28 bg-neutral-200 rounded-sm" />
+              <div className="h-10 w-32 bg-neutral-200 rounded-sm" />
             </div>
           </div>
         ))}
@@ -96,12 +96,12 @@ const WarrantySkeleton: FC = () => (
 
 // ─── Empty State ───────────────────────────────────────────
 const EmptyWarranties: FC = () => (
-  <div className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-[#1e2126] bg-[#151515] rounded-sm">
-    <div className="w-16 h-16 rounded-full bg-[#202030] border border-[#2a2d35] flex items-center justify-center mb-5">
-      <ShieldCheck className="w-8 h-8 text-gray-500" />
+  <div className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-amazon-border bg-white rounded-sm">
+    <div className="w-16 h-16 rounded-full bg-neutral-50 border border-amazon-border flex items-center justify-center mb-5">
+      <ShieldCheck className="w-8 h-8 text-neutral-400" />
     </div>
-    <h2 className="text-[14px] font-black uppercase tracking-widest text-white mb-2">No requests yet</h2>
-    <p className="text-[12px] text-gray-400 max-w-sm">
+    <h2 className="text-[14px] font-black uppercase tracking-widest text-amazon-text mb-2">No requests yet</h2>
+    <p className="text-[12px] text-amazon-textMuted max-w-sm">
       You have not submitted any warranty or return requests. New requests will
       appear here.
     </p>
@@ -130,16 +130,16 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
     request.requiresReturn && request.statusName === "AwaitingReturn";
 
   return (
-    <div className="bg-[#151515] rounded-sm border border-[#1e2126] overflow-hidden transition-shadow hover:shadow-md">
+    <div className="bg-white rounded-sm border border-amazon-border overflow-hidden transition-shadow shadow-sm hover:shadow-md">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#1e2126] bg-[#111111]">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-amazon-border bg-neutral-50">
         <div className="flex items-center gap-2">
           {request.typeName === "ReturnRequest" ? (
             <PackageOpen className="w-4.5 h-4.5 text-orange-500" />
           ) : (
             <ShieldCheck className="w-4.5 h-4.5 text-blue-500" />
           )}
-          <span className="text-[12px] font-black uppercase tracking-widest text-white">
+          <span className="text-[12px] font-black uppercase tracking-widest text-amazon-text">
             {getTypeLabel(request.typeName)}
           </span>
         </div>
@@ -154,8 +154,8 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
       <div className="px-5 py-5 space-y-4">
         {/* Reason + Date */}
         <div>
-          <p className="text-[14px] font-bold text-gray-200">{request.reason}</p>
-          <p className="text-[11px] font-bold tracking-widest uppercase text-gray-500 flex items-center gap-1.5 mt-2">
+          <p className="text-[14px] font-bold text-amazon-text">{request.reason}</p>
+          <p className="text-[11px] font-bold tracking-widest uppercase text-amazon-textMuted flex items-center gap-1.5 mt-2">
             <Calendar className="w-3.5 h-3.5" />
             {formatDate(request.createdAt)}
           </p>
@@ -164,8 +164,8 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
         {/* Refund Amount */}
         {request.refundAmount > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Refund Amount:</span>
-            <span className="text-[14px] font-black tracking-widest text-[#f5d800]">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">Refund Amount:</span>
+            <span className="text-[14px] text-amazon-price font-bold tracking-widest">
               {formatCurrency(request.refundAmount)}
             </span>
           </div>
@@ -173,7 +173,7 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
 
         {/* Evidence */}
         {request.evidenceUrl && (
-          <div className="relative w-full h-40 rounded-sm overflow-hidden border border-[#1e2126] bg-[#0f0f0f]">
+          <div className="relative w-full h-40 rounded-sm overflow-hidden border border-amazon-border bg-neutral-50">
             <Image
               src={request.evidenceUrl}
               alt="Evidence"
@@ -185,13 +185,13 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
 
         {/* Shop Response */}
         {request.shopResponse && (
-          <div className="flex gap-3 p-4 rounded-sm bg-[#111111] border border-[#2a2d35]">
-            <Info className="w-4 h-4 text-gray-500 flex-shrink-0 mt-0.5" />
+          <div className="flex gap-3 p-4 rounded-sm bg-neutral-50 border border-amazon-border">
+            <Info className="w-4 h-4 text-neutral-400 flex-shrink-0 mt-0.5" />
             <div className="min-w-0">
-              <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-1">
+              <p className="text-[11px] font-black uppercase tracking-widest text-amazon-textMuted mb-1">
                 Shop Response
               </p>
-              <p className="text-[13px] text-gray-300 break-words">
+              <p className="text-[13px] text-amazon-text break-words">
                 {request.shopResponse}
               </p>
             </div>
@@ -200,13 +200,13 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
 
         {/* Admin Note */}
         {request.adminNote && (
-          <div className="flex gap-3 p-4 rounded-sm bg-blue-500/10 border border-blue-500/30">
-            <Info className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+          <div className="flex gap-3 p-4 rounded-sm bg-blue-50 border border-blue-200">
+            <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
             <div className="min-w-0">
-              <p className="text-[11px] font-black uppercase tracking-widest text-blue-400 mb-1">
+              <p className="text-[11px] font-black uppercase tracking-widest text-blue-700 mb-1">
                 Admin Note
               </p>
-              <p className="text-[13px] text-blue-300 break-words">
+              <p className="text-[13px] text-blue-800 break-words">
                 {request.adminNote}
               </p>
             </div>
@@ -215,8 +215,8 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
       </div>
 
       {/* Footer */}
-      <div className="flex flex-wrap items-center gap-3 px-5 py-4 border-t border-[#1e2126] bg-[#0f0f0f]">
-        <button className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-gray-300 bg-[#111111] border border-[#2a2d35] px-4 py-2 rounded-sm hover:bg-[#1a1c20] transition-colors shadow-sm">
+      <div className="flex flex-wrap items-center gap-3 px-5 py-4 border-t border-amazon-border bg-neutral-50">
+        <button className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-amazon-textMuted bg-white border border-amazon-border px-4 py-2 rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition-colors shadow-sm">
           <Eye className="w-4 h-4" />
           View Details
         </button>
@@ -225,7 +225,7 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
           <button
             onClick={() => onWithdrawClick(request.id)}
             disabled={isWithdrawing}
-            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-500/10 border border-red-500/30 px-4 py-2 rounded-sm hover:bg-red-500/20 transition-colors disabled:opacity-50 shadow-sm"
+            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-red-700 bg-red-50 border border-red-200 px-4 py-2 rounded-sm hover:bg-red-100 transition-colors disabled:opacity-50 shadow-sm"
           >
             <Undo2 className="w-4 h-4" />
             Withdraw
@@ -235,7 +235,7 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
         {showEdit && (
           <button
             onClick={() => onEditClick(request)}
-            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 border border-blue-500/30 px-4 py-2 rounded-sm hover:bg-blue-500/20 transition-colors shadow-sm"
+            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-blue-700 bg-blue-50 border border-blue-200 px-4 py-2 rounded-sm hover:bg-blue-100 transition-colors shadow-sm"
           >
             <Pencil className="w-4 h-4" />
             Edit
@@ -245,7 +245,7 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
         {showReturnShipping && (
           <button
             onClick={() => onShipClick(request.id)}
-            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-black bg-[#f5d800] px-4 py-2 border border-[#f5d800] rounded-sm hover:bg-[#e6ca00] transition-colors shadow-sm"
+            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-amazon-text bg-amazon-btnPrimary px-4 py-2 border border-amazon-btnPrimary rounded-sm hover:opacity-90 transition-colors shadow-sm"
           >
             <Truck className="w-4 h-4" />
             Send Return Info
@@ -271,18 +271,18 @@ const Pagination: FC<PaginationProps> = ({ current, total, onChange }) => {
       <button
         disabled={current <= 1}
         onClick={() => onChange(current - 1)}
-        className="p-2 rounded-sm border border-[#2a2d35] bg-[#111111] text-gray-400 hover:text-white hover:border-gray-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="p-2 rounded-sm border border-amazon-border bg-white text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronLeft className="w-4 h-4" />
       </button>
-      <span className="text-[12px] font-bold uppercase tracking-widest text-gray-500 px-3">
-        Page <span className="text-white">{current}</span> /{" "}
+      <span className="text-[12px] font-bold uppercase tracking-widest text-amazon-textMuted px-3">
+        Page <span className="text-amazon-text">{current}</span> /{" "}
         {total}
       </span>
       <button
         disabled={current >= total}
         onClick={() => onChange(current + 1)}
-        className="p-2 rounded-sm border border-[#2a2d35] bg-[#111111] text-gray-400 hover:text-white hover:border-gray-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="p-2 rounded-sm border border-amazon-border bg-white text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronRight className="w-4 h-4" />
       </button>
@@ -350,9 +350,9 @@ const MyWarrantiesPage: FC = () => {
   if (loadingWarranties) return <WarrantySkeleton />;
 
   return (
-    <div className="bg-black min-h-screen text-white">
-      <div className="max-w-[900px] mx-auto px-4 md:px-8 py-12 lg:py-20">
-        <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-widest text-white mb-10 pb-4 border-b border-[#1e2126]">
+    <div className="bg-amazon-bgSecondary min-h-screen text-amazon-text">
+      <div className="max-w-[900px] mx-auto px-4 md:px-8 py-12 lg:py-6">
+        <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-widest text-amazon-text mb-10 pb-4 border-b border-amazon-border">
           Warranty & Return Requests
         </h1>
 

@@ -19,8 +19,8 @@ export const shopOrderService = {
     return api.get(`/orders/shop/${orderId}`);
   },
 
-  updateOrderStatus: async (orderId: string, status: number): Promise<ApiResponse<null>> => {
-    return api.put(`/orders/shop/${orderId}/status`, status, {
+  updateOrderStatus: async (orderId: string, status: number, expectedDeliveryDate?: string): Promise<ApiResponse<null>> => {
+    return api.put(`/orders/shop/${orderId}/status`, { status, expectedDeliveryDate }, {
       headers: { 'Content-Type': 'application/json' }
     });
   },

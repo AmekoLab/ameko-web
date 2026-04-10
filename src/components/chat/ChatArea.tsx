@@ -22,7 +22,12 @@ import {
   selectMessagesForConversation,
 } from "@/src/store/slices/chatSlice";
 import { createNegotiationVoucherThunk } from "@/src/store/slices/voucherSlice";
-import { Message, REACTION_EMOJIS, REACTION_LABELS, ReactionType } from "@/src/types/chat.types";
+import {
+  Message,
+  REACTION_EMOJIS,
+  REACTION_LABELS,
+  ReactionType,
+} from "@/src/types/chat.types";
 
 // ─── Helpers ─────────────────────────────────────────────
 
@@ -54,7 +59,7 @@ const ReactionPicker: FC<{
     exit={{ opacity: 0, scale: 0.75, y: 8 }}
     transition={{ type: "spring", stiffness: 450, damping: 26 }}
     className={`absolute bottom-full mb-1.5 z-[300] flex gap-0.5
-      bg-[#1a1b23] border border-[#2a2d3a] rounded-2xl px-1.5 py-1 shadow-2xl shadow-black/60
+      bg-white border border-amazon-border rounded-full px-1.5 py-1 shadow-md
       ${isMine ? "right-0" : "left-0"}
     `}
     onMouseLeave={onClose}
@@ -68,7 +73,7 @@ const ReactionPicker: FC<{
         className={`
           text-[18px] w-8 h-8 flex items-center justify-center
           transition-transform hover:scale-125 active:scale-105 rounded-full
-          ${currentReaction === r ? "bg-[#f5d800]/15 ring-1 ring-[#f5d800]/40" : "hover:bg-white/5"}
+          ${currentReaction === r ? "bg-amazon-btnSecondary ring-1 ring-amazon-focus/40" : "hover:bg-neutral-50"}
         `}
       >
         {REACTION_EMOJIS[r]}
@@ -97,25 +102,30 @@ const MessageBubble: FC<{
 
   return (
     // Outer row: full width, no flex stretch on the bubble
-    <div className={`flex ${isMine ? "flex-row-reverse" : "flex-row"} items-end gap-1.5 group w-full`}>
-
+    <div
+      className={`flex ${isMine ? "flex-row-reverse" : "flex-row"} items-end gap-1.5 group w-full`}
+    >
       {/* Reaction trigger button */}
       <button
         type="button"
         onClick={() => setPickerOpen((p) => !p)}
-        className="opacity-0 group-hover:opacity-100 flex-shrink-0 p-1 rounded-full bg-[#1e2126] hover:bg-[#252830] text-gray-500 hover:text-yellow-400 transition-all duration-150 self-end mb-0.5"
+        className="opacity-0 group-hover:opacity-100 flex-shrink-0 p-1 rounded-full bg-white border border-amazon-border shadow-sm hover:bg-neutral-50 text-amazon-textMuted hover:text-amazon-link transition-all duration-150 self-end mb-0.5"
         title="React"
       >
-        {hasReaction
-          ? <span className="text-xs leading-none">{REACTION_EMOJIS[reaction!]}</span>
-          : <Heart className="w-3 h-3" />
-        }
+        {hasReaction ? (
+          <span className="text-xs leading-none">
+            {REACTION_EMOJIS[reaction!]}
+          </span>
+        ) : (
+          <Heart className="w-3 h-3" />
+        )}
       </button>
 
       {/* Bubble column — max 70% of width, anchors reaction picker */}
       {/* pb-4 only when a reaction badge is present so it has room below */}
-      <div className={`relative flex flex-col ${isMine ? "items-end" : "items-start"} max-w-[70%] ${hasReaction ? "pb-2" : ""}`}>
-
+      <div
+        className={`relative flex flex-col ${isMine ? "items-end" : "items-start"} max-w-[70%] ${hasReaction ? "pb-2" : ""}`}
+      >
         {/* Reaction picker */}
         <AnimatePresence>
           {pickerOpen && (
@@ -134,9 +144,10 @@ const MessageBubble: FC<{
             relative w-full
             ${compact ? "px-3 py-1.5 text-[12px]" : "px-4 py-2.5 text-sm"}
             rounded-2xl leading-relaxed
-            ${isMine
-              ? "bg-[#f5d800] text-black rounded-br-sm font-medium"
-              : "bg-[#1e2030] text-white rounded-bl-sm"
+            ${
+              isMine
+                ? "bg-amazon-btnPrimary text-amazon-text rounded-br-sm border border-amazon-focus/50 shadow-sm font-bold"
+                : "bg-white text-amazon-text rounded-bl-sm border border-amazon-border shadow-sm font-bold"
             }
             break-words whitespace-pre-wrap
           `}
@@ -157,8 +168,8 @@ const MessageBubble: FC<{
               title={`${REACTION_LABELS[reaction!]} — click to change`}
               className={`
                 absolute bottom-0.5 ${isMine ? "right-2" : "left-2"}
-                bg-[#1a1b23] border border-[#2a2d3a] rounded-full px-1.5 py-px
-                shadow-md text-[13px] leading-none cursor-pointer
+                bg-white border border-amazon-border rounded-full px-1.5 py-px
+                shadow-sm text-[13px] leading-none cursor-pointer
                 hover:scale-110 transition-transform z-10
               `}
             >
@@ -168,10 +179,16 @@ const MessageBubble: FC<{
         </AnimatePresence>
 
         {/* Timestamp */}
-        <span className={`text-[9px] text-gray-600 mt-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 ${isMine ? "text-right" : "text-left"}`}>
+        <span
+          className={`text-[9px] text-amazon-textMuted font-bold mt-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 ${isMine ? "text-right" : "text-left"}`}
+        >
           {fmtTime(message.createdAt)}
-          {message.status === "sending" && <span className="ml-1 italic">· Sending</span>}
-          {message.status === "error" && <span className="ml-1 text-red-500 font-bold">· Failed</span>}
+          {message.status === "sending" && (
+            <span className="ml-1 italic">· Sending</span>
+          )}
+          {message.status === "error" && (
+            <span className="ml-1 text-red-500 font-bold">· Failed</span>
+          )}
         </span>
       </div>
     </div>
@@ -184,11 +201,15 @@ MessageBubble.displayName = "MessageBubble";
 
 const EmptyThread: FC<{ compact?: boolean }> = memo(({ compact }) => (
   <div className="flex flex-col items-center justify-center h-full text-center px-6 py-8">
-    <div className={`${compact ? "w-10 h-10" : "w-12 h-12"} rounded-full bg-[#f5d800]/10 border border-[#f5d800]/20 flex items-center justify-center mb-3`}>
-      <Send className={`${compact ? "w-4 h-4" : "w-5 h-5"} text-[#f5d800]/60`} />
+    <div
+      className={`${compact ? "w-10 h-10" : "w-12 h-12"} rounded-full bg-neutral-100 border border-amazon-border shadow-sm flex items-center justify-center mb-3`}
+    >
+      <Send
+        className={`${compact ? "w-4 h-4" : "w-5 h-5"} text-amazon-textMuted`}
+      />
     </div>
-    <p className="text-xs font-semibold text-gray-400">No messages yet</p>
-    <p className="text-[10px] text-gray-600 mt-1">Say hello 👋</p>
+    <p className="text-xs font-bold text-amazon-textMuted">No messages yet</p>
+    <p className="text-[10px] text-amazon-textMuted mt-1 font-bold">Say hello 👋</p>
   </div>
 ));
 EmptyThread.displayName = "EmptyThread";
@@ -204,10 +225,16 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
   const dispatch = useAppDispatch();
 
   const currentUserId = useAppSelector((state) => state.auth.user?.id);
-  const activeConversationId = useAppSelector((state) => state.chat.activeConversationId);
+  const activeConversationId = useAppSelector(
+    (state) => state.chat.activeConversationId,
+  );
   const conversations = useAppSelector((state) => state.chat.conversations);
-  const messages = useAppSelector((state) => selectMessagesForConversation(state, activeConversationId));
-  const activeConversation = conversations.find((c) => c.conversationId === activeConversationId) ?? null;
+  const messages = useAppSelector((state) =>
+    selectMessagesForConversation(state, activeConversationId),
+  );
+  const activeConversation =
+    conversations.find((c) => c.conversationId === activeConversationId) ??
+    null;
 
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -220,7 +247,8 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
 
   // ── Fetch history ────────────────────────────────────
   useEffect(() => {
-    if (activeConversationId) dispatch(fetchMessagesThunk(activeConversationId));
+    if (activeConversationId)
+      dispatch(fetchMessagesThunk(activeConversationId));
   }, [activeConversationId, dispatch]);
 
   // ── Mark as Read ────────────────────────────────────
@@ -232,10 +260,17 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
       if (readTimeoutRef.current) clearTimeout(readTimeoutRef.current);
       readTimeoutRef.current = setTimeout(() => {
         const lastMsg = messages[messages.length - 1];
-        dispatch(markMessagesReadThunk({ conversationId: activeConversationId, upToMessageId: lastMsg.id }));
+        dispatch(
+          markMessagesReadThunk({
+            conversationId: activeConversationId,
+            upToMessageId: lastMsg.id,
+          }),
+        );
       }, 600);
     }
-    return () => { if (readTimeoutRef.current) clearTimeout(readTimeoutRef.current); };
+    return () => {
+      if (readTimeoutRef.current) clearTimeout(readTimeoutRef.current);
+    };
   }, [messages, activeConversationId, unreadCount, dispatch]);
 
   // ── Auto-scroll ──────────────────────────────────────
@@ -262,32 +297,52 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
     isNearBottomRef.current = true;
     setInputValue("");
     // Reset textarea height
-    const ta = document.getElementById("chat-input") as HTMLTextAreaElement | null;
-    if (ta) { ta.style.height = "auto"; }
+    const ta = document.getElementById(
+      "chat-input",
+    ) as HTMLTextAreaElement | null;
+    if (ta) {
+      ta.style.height = "auto";
+    }
     const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
     try {
-      await dispatch(sendMessageThunk({
-        conversationId: activeConversationId,
-        content: text,
-        messageType: 0,
-        tempId,
-        senderId: currentUserId ?? "",
-      })).unwrap();
-    } catch { /* optimistic UI handles error */ }
+      await dispatch(
+        sendMessageThunk({
+          conversationId: activeConversationId,
+          content: text,
+          messageType: 0,
+          tempId,
+          senderId: currentUserId ?? "",
+        }),
+      ).unwrap();
+    } catch {
+      /* optimistic UI handles error */
+    }
   }, [inputValue, activeConversationId, isSending, dispatch, currentUserId]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
     },
     [handleSend],
   );
 
   // ── React ────────────────────────────────────────────
-  const handleReact = useCallback((m: Message, newReaction: number | null) => {
-    if (!activeConversationId) return;
-    dispatch(reactToMessageThunk({ conversationId: activeConversationId, messageId: m.id, reaction: newReaction }));
-  }, [activeConversationId, dispatch]);
+  const handleReact = useCallback(
+    (m: Message, newReaction: number | null) => {
+      if (!activeConversationId) return;
+      dispatch(
+        reactToMessageThunk({
+          conversationId: activeConversationId,
+          messageId: m.id,
+          reaction: newReaction,
+        }),
+      );
+    },
+    [activeConversationId, dispatch],
+  );
 
   // ── Send Voucher Gift ────────────────────────────────
   const handleSendVoucher = useCallback(async () => {
@@ -304,88 +359,118 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
     setIsSendingVoucher(true);
     try {
       // 1. Create the Voucher using otherUserId as targetUserId
-      const voucherRes = await dispatch(createNegotiationVoucherThunk({
-        targetUserId: activeConversation.otherUserId,
-        discountAmount: discount,
-        minOrderValue: minOrder,
-      })).unwrap();
+      const voucherRes = await dispatch(
+        createNegotiationVoucherThunk({
+          targetUserId: activeConversation.otherUserId,
+          discountAmount: discount,
+          minOrderValue: minOrder,
+        }),
+      ).unwrap();
 
       // 2. Send the Chat Message
-      const voucherCode = voucherRes.code || (voucherRes as any).data?.code || "N/A";
+      const voucherCode =
+        voucherRes.code || (voucherRes as any).data?.code || "N/A";
       const messageContent = `🎉 Shop vừa tặng bạn Voucher giảm ${discount.toLocaleString()}₫ (Mã: ${voucherCode}) cho đơn từ ${minOrder.toLocaleString()}₫. Hãy vào giỏ hàng để sử dụng ngay nhé!`;
 
       const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-      await dispatch(sendMessageThunk({
-        conversationId: activeConversationId,
-        content: messageContent,
-        messageType: 0,
-        tempId,
-        senderId: currentUserId,
-      })).unwrap();
+      await dispatch(
+        sendMessageThunk({
+          conversationId: activeConversationId,
+          content: messageContent,
+          messageType: 0,
+          tempId,
+          senderId: currentUserId,
+        }),
+      ).unwrap();
 
       setIsVoucherModalOpen(false);
       setDiscountAmount("");
       setMinOrderValue("");
     } catch (error) {
-      toast.error(typeof error === 'string' ? error : "Lỗi khi tặng voucher");
+      toast.error(typeof error === "string" ? error : "Lỗi khi tặng voucher");
     } finally {
       setIsSendingVoucher(false);
     }
-  }, [activeConversation, activeConversationId, currentUserId, discountAmount, minOrderValue, dispatch]);
+  }, [
+    activeConversation,
+    activeConversationId,
+    currentUserId,
+    discountAmount,
+    minOrderValue,
+    dispatch,
+  ]);
 
   // ── No active conversation ────────────────────────────
   if (!activeConversationId || !activeConversation) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-[#0a0a0a] text-center px-8">
-        <div className="w-12 h-12 rounded-full bg-white/5 border border-[#1e2126] flex items-center justify-center mb-4">
-          <Send className="w-5 h-5 text-gray-600" />
+      <div className="flex flex-col items-center justify-center h-full bg-amazon-bgSecondary text-center px-8">
+        <div className="w-12 h-12 rounded-sm bg-white border border-amazon-border shadow-sm flex items-center justify-center mb-4">
+          <Send className="w-5 h-5 text-amazon-textMuted" />
         </div>
-        <p className="text-sm font-semibold text-gray-300">Select a conversation</p>
-        <p className="text-xs text-gray-600 mt-1">Choose one from the list</p>
+        <p className="text-sm font-black text-amazon-text tracking-tight uppercase">
+          Select a conversation
+        </p>
+        <p className="text-xs text-amazon-textMuted mt-1 font-bold">Choose one from the list</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0a] overflow-hidden">
-
+    <div className="flex flex-col h-full bg-amazon-bgSecondary overflow-hidden">
       {/* ── Header ───────────────────────────────────────── */}
-      <div className={`flex items-center gap-2.5 ${compact ? "px-3 py-2" : "px-4 py-3"} border-b border-[#1e2126] bg-[#111111] shrink-0`}>
+      <div
+        className={`flex items-center gap-2.5 ${compact ? "px-3 py-2" : "px-4 py-3"} border-b border-amazon-border bg-white shadow-sm shrink-0 z-10`}
+      >
         {onBack && (
           <button
             type="button"
-            onClick={() => { onBack(); dispatch(setActiveConversation(null)); }}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors shrink-0"
+            onClick={() => {
+              onBack();
+              dispatch(setActiveConversation(null));
+            }}
+            className="p-1.5 rounded-sm border border-transparent text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 transition-colors shrink-0"
             aria-label="Back"
           >
             <ArrowLeft className={compact ? "w-4 h-4" : "w-5 h-5"} />
           </button>
         )}
 
-        <div className={`${compact ? "w-7 h-7" : "w-9 h-9"} rounded-full bg-[#f5d800]/20 border border-[#f5d800]/30 flex items-center justify-center shrink-0 overflow-hidden`}>
+        <div
+          className={`${compact ? "w-7 h-7" : "w-9 h-9"} rounded-full bg-neutral-100 border border-amazon-border flex items-center justify-center shrink-0 overflow-hidden shadow-sm`}
+        >
           {activeConversation.otherUserAvatarUrl ? (
-            <img src={activeConversation.otherUserAvatarUrl} alt={activeConversation.otherUserName} className="w-full h-full object-cover" />
+            <img
+              src={activeConversation.otherUserAvatarUrl}
+              alt={activeConversation.otherUserName}
+              className="w-full h-full object-cover"
+            />
           ) : (
-            <span className={`text-[#f5d800] ${compact ? "text-[9px]" : "text-xs"} font-bold`}>
+            <span
+              className={`text-amazon-textMuted ${compact ? "text-[9px]" : "text-xs"} font-black`}
+            >
               {activeConversation.otherUserName[0]?.toUpperCase()}
             </span>
           )}
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className={`${compact ? "text-[12px]" : "text-sm"} font-semibold text-white truncate leading-tight`}>
+          <h3
+            className={`${compact ? "text-[12px]" : "text-sm"} font-black uppercase text-amazon-text truncate leading-tight`}
+          >
             {activeConversation.otherUserName}
           </h3>
-          {!compact && <p className="text-[10px] text-gray-500 mt-0.5">Direct message</p>}
+          {!compact && (
+            <p className="text-[10px] text-green-500  mt-0.5">Direct message</p>
+          )}
         </div>
       </div>
 
       {/* ── Message list ─────────────────────────────────── */}
-   
+
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar scrollbar-thumb-[#f5d800] scrollbar-track-transparent"
+        className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar scrollbar-thumb-amazon-textMuted scrollbar-track-transparent"
         style={{ overscrollBehavior: "contain" }}
       >
         <div className="flex flex-col justify-end min-h-full px-3 py-3 gap-1">
@@ -408,18 +493,20 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
       </div>
 
       {/* ── Input area ───────────────────────────────────── */}
-      <div className={`${compact ? "px-2.5 py-2" : "px-3 py-3"} border-t border-[#1e2126] bg-[#111111] shrink-0`}>
+      <div
+        className={`${compact ? "px-2.5 py-2" : "px-3 py-3"} border-t border-amazon-border bg-white shadow-[0_-2px_4px_rgba(0,0,0,0.02)] shrink-0 z-10`}
+      >
         <div className="flex items-end gap-2">
           {/* Gift Voucher Button */}
           <button
             type="button"
             onClick={() => setIsVoucherModalOpen(true)}
             className={`
-              shrink-0 ${compact ? "w-8 h-8" : "w-10 h-10"} rounded-full bg-[#1e2030] text-[#f5d800]
-              flex items-center justify-center transition-all
-              hover:bg-[#252830] active:scale-95 self-end border border-[#2a2d35]
+              shrink-0 ${compact ? "w-8 h-8" : "w-10 h-10"} rounded-full bg-btnPrimary text-amazon-btnPrimary
+              flex items-center justify-center transition-all shadow-sm
+              hover:bg-neutral-50 hover:text-amazon-btnPrimary active:scale-95 self-end border border-amazon-border
             `}
-            title="Tặng deal riêng tư"
+            title="Gift a Voucher"
           >
             <Ticket className={compact ? "w-4 h-4" : "w-5 h-5"} />
           </button>
@@ -434,17 +521,21 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
               e.target.style.height = `${Math.min(e.target.scrollHeight, compact ? 80 : 112)}px`;
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Message…"
+            placeholder="Type a message…"
             disabled={isSending}
             className={`
-              flex-1 resize-none bg-[#1a1a1a] border border-[#2a2d35] rounded-2xl
-              px-3.5 ${compact ? "py-1.5 text-[12px]" : "py-2.5 text-sm"} text-white placeholder-gray-600
-              focus:outline-none focus:border-[#f5d800]/50 focus:ring-1 focus:ring-[#f5d800]/20
+              flex-1 resize-none bg-neutral-50 border border-amazon-border rounded-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]
+              px-3.5 ${compact ? "py-1.5 text-[12px]" : "py-2.5 text-sm"} text-amazon-text placeholder:text-amazon-textMuted font-bold
+              focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/20
               transition-colors leading-relaxed
               disabled:opacity-50 disabled:cursor-not-allowed
               overflow-hidden
             `}
-            style={{ height: compact ? "32px" : "40px", minHeight: compact ? "32px" : "40px", maxHeight: compact ? "80px" : "112px" }}
+            style={{
+              height: compact ? "32px" : "40px",
+              minHeight: compact ? "32px" : "40px",
+              maxHeight: compact ? "80px" : "112px",
+            }}
           />
 
           <button
@@ -452,23 +543,28 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
             onClick={handleSend}
             disabled={!inputValue.trim() || isSending}
             className={`
-              shrink-0 ${compact ? "w-8 h-8" : "w-10 h-10"} rounded-full bg-[#f5d800] text-black
-              flex items-center justify-center transition-all
-              hover:bg-[#e6cc00] active:scale-95
+              shrink-0 ${compact ? "w-8 h-8" : "w-10 h-10"} rounded-full bg-amazon-btnPrimary text-amazon-text
+              flex items-center justify-center transition-all shadow-sm border border-amazon-focus/50
+              hover:brightness-95 active:scale-95
               disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100
               self-end
             `}
             aria-label="Send message"
           >
-            {isSending
-              ? <Loader2 className={compact ? "w-3.5 h-3.5 animate-spin" : "w-4 h-4 animate-spin"} />
-              : <Send className={compact ? "w-3 h-3" : "w-4 h-4"} />
-            }
+            {isSending ? (
+              <Loader2
+                className={
+                  compact ? "w-3.5 h-3.5 animate-spin" : "w-4 h-4 animate-spin"
+                }
+              />
+            ) : (
+              <Send className={compact ? "w-3 h-3" : "w-4 h-4"} />
+            )}
           </button>
         </div>
 
         {!compact && (
-          <p className="text-[10px] text-gray-700 mt-1.5 text-right">
+          <p className="text-[10px] text-amazon-textMuted font-bold mt-1.5 text-right">
             Enter to send · Shift+Enter for new line
           </p>
         )}
@@ -476,36 +572,42 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
       {/* Mini Voucher Modal */}
       <AnimatePresence>
         {isVoucherModalOpen && (
-          <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-xs bg-[#111111] border border-[#f5d800]/20 rounded-xl p-4 shadow-2xl"
+              className="w-full max-w-xs bg-white border border-amazon-border rounded-sm p-4 shadow-2xl"
             >
-              <div className="flex items-center gap-2 mb-4 text-[#f5d800]">
-                <Gift className="w-5 h-5" />
-                <h4 className="font-bold text-sm uppercase tracking-wider">Tặng Deal Riêng</h4>
+              <div className="flex items-center gap-2 mb-4 text-amazon-text">
+                <Gift className="w-5 h-5 text-amazon-btnSecondary" />
+                <h4 className="font-black text-sm uppercase tracking-wider">
+                  Gift a Voucher
+                </h4>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Số tiền giảm (VNĐ)</label>
+                  <label className="block text-[11px] font-black text-amazon-textMuted uppercase tracking-widest mb-1.5">
+                    Discount Amount (VNĐ)
+                  </label>
                   <input
                     type="number"
                     value={discountAmount}
                     onChange={(e) => setDiscountAmount(e.target.value)}
-                    className="w-full bg-[#1a1a1a] border border-[#2a2d35] rounded-lg px-3 py-2 text-sm font-bold text-white focus:outline-none focus:border-[#f5d800]/50"
+                    className="w-full bg-neutral-50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border border-amazon-border rounded-sm px-3 py-2 text-sm font-bold text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/20"
                     placeholder="VD: 50000"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Đơn tối thiểu (VNĐ)</label>
+                  <label className="block text-[11px] font-black text-amazon-textMuted uppercase tracking-widest mb-1.5">
+                    Minimum Order Value (VNĐ)
+                  </label>
                   <input
                     type="number"
                     value={minOrderValue}
                     onChange={(e) => setMinOrderValue(e.target.value)}
-                    className="w-full bg-[#1a1a1a] border border-[#2a2d35] rounded-lg px-3 py-2 text-sm font-bold text-white focus:outline-none focus:border-[#f5d800]/50"
+                    className="w-full bg-neutral-50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border border-amazon-border rounded-sm px-3 py-2 text-sm font-bold text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/20"
                     placeholder="VD: 200000"
                   />
                 </div>
@@ -514,17 +616,19 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
               <div className="flex gap-2 mt-5">
                 <button
                   onClick={() => setIsVoucherModalOpen(false)}
-                  className="flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-[#1a1a1a] hover:bg-[#252830] transition-colors"
+                  className="flex-1 py-2 rounded-sm text-xs font-black uppercase tracking-widest text-amazon-text hover:text-amazon-link bg-white border border-amazon-border hover:bg-neutral-50 shadow-sm transition-colors"
                 >
-                  Hủy
+                  Cancel
                 </button>
                 <button
                   onClick={handleSendVoucher}
                   disabled={isSendingVoucher || !discountAmount}
-                  className="flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-widest text-black bg-[#f5d800] hover:bg-[#e6cc00] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-2 rounded-sm text-xs font-black uppercase tracking-widest text-amazon-text bg-amazon-btnPrimary border border-amazon-focus/50 shadow-sm hover:brightness-95 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {isSendingVoucher && <Loader2 className="w-3 h-3 animate-spin" />}
-                  Gửi Tặng
+                  {isSendingVoucher && (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  )}
+                  Gift
                 </button>
               </div>
             </motion.div>

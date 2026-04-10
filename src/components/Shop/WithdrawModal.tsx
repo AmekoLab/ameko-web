@@ -68,10 +68,10 @@ function PinInput({
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             onPaste={handlePaste}
-            className={`w-11 h-13 text-center text-xl font-bold rounded-lg border-2 outline-none transition-all ${
+            className={`w-11 h-13 text-center text-xl font-bold rounded-sm border outline-none transition-all ${
               error
-                ? "border-red-400 focus:border-red-500"
-                : "border-gray-300 focus:border-black"
+                ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                : "border-amazon-border focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus"
             }`}
           />
         ))}
@@ -188,33 +188,33 @@ export default function WithdrawModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+      <div className="relative bg-white rounded-sm shadow-xl border border-amazon-border w-full max-w-md mx-4 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+        <div className="flex items-center justify-between p-6 border-b border-amazon-border">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black">
-              <Wallet className="h-5 w-5 text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100">
+              <Wallet className="h-5 w-5 text-neutral-600" />
             </div>
-            <h2 className="text-lg font-black uppercase tracking-tight text-black font-oswald">
+            <h2 className="text-lg font-black uppercase tracking-tight text-amazon-text ">
               Withdraw to Bank
             </h2>
           </div>
           <button
             onClick={handleClose}
-            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-sm hover:bg-neutral-100 transition-colors"
           >
-            <X className="h-5 w-5 text-gray-500" />
+            <X className="h-5 w-5 text-amazon-textMuted" />
           </button>
         </div>
 
         {/* Body */}
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
           {/* Available Balance */}
-          <div className="bg-gray-50 rounded-xl p-4 text-center">
-            <p className="text-xs text-gray-500 uppercase tracking-wide font-oswald mb-1">
+          <div className="bg-neutral-50 border border-amazon-border rounded-sm p-4 text-center">
+            <p className="text-xs text-amazon-textMuted uppercase tracking-wide  mb-1">
               Available Balance
             </p>
-            <p className="text-2xl font-black text-[#ce2a32] font-oswald">
+            <p className="text-2xl font-black text-amazon-price ">
               {availableBalance.toLocaleString("en-US")}
               <span className="text-base ml-1">₫</span>
             </p>
@@ -222,24 +222,24 @@ export default function WithdrawModal({
 
           {/* Amount */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-amazon-text mb-2">
               Withdrawal Amount
             </label>
             <div className="relative">
               <input
                 type="number"
                 placeholder="Enter amount"
-                className={`w-full border-2 rounded-lg p-3 pr-20 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                className={`w-full border rounded-sm p-3 pr-20 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
                   errors.amount
-                    ? "border-red-400 focus:border-red-500"
-                    : "border-gray-300 focus:border-black"
+                    ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                    : "border-amazon-border focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus"
                 }`}
                 {...register("amount", { valueAsNumber: true })}
               />
               <button
                 type="button"
                 onClick={fillMax}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-black px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white hover:bg-gray-800 transition-colors font-oswald"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm bg-neutral-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-amazon-text hover:bg-neutral-300 transition-colors  border border-amazon-border"
               >
                 Max
               </button>
@@ -253,7 +253,7 @@ export default function WithdrawModal({
 
           {/* PIN */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
+            <label className="block text-sm font-semibold text-amazon-text mb-3">
               Wallet PIN
             </label>
             <PinInput
@@ -264,14 +264,14 @@ export default function WithdrawModal({
 
             {/* Wrong PIN inline alert */}
             {wrongPinError && (
-              <div className="flex items-start gap-2 mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-start gap-2 mt-3 p-3 bg-red-50 border border-red-200 rounded-sm">
                 <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-red-700">
                   Incorrect PIN.{" "}
                   <button
                     type="button"
                     onClick={handleOpenResetPin}
-                    className="font-bold text-[#ce2a32] hover:underline"
+                    className="font-bold text-red-600 hover:text-red-700 hover:underline"
                   >
                     Reset PIN now
                   </button>
@@ -284,7 +284,7 @@ export default function WithdrawModal({
               <button
                 type="button"
                 onClick={handleOpenResetPin}
-                className="text-xs text-gray-500 hover:text-[#ce2a32] hover:underline transition-colors"
+                className="text-xs text-amazon-link hover:text-amazon-focus hover:underline transition-colors"
               >
                 Forgot PIN?
               </button>
@@ -295,7 +295,7 @@ export default function WithdrawModal({
           <button
             type="submit"
             disabled={withdrawLoading}
-            className="w-full rounded-lg bg-[#ce2a32] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-[#b0242b] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-oswald flex items-center justify-center gap-2"
+            className="w-full rounded-sm bg-amazon-btnPrimary px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-amazon-text transition-all hover:brightness-95 active:scale-[0.98] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed  flex items-center justify-center gap-2"
           >
             {withdrawLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             {withdrawLoading ? "Processing..." : "Confirm Withdrawal"}

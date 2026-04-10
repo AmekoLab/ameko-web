@@ -205,7 +205,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
-        className="bg-[#111] rounded-md shadow-sm  mb-6 overflow-hidden text-white"
+        className="bg-white border border-amazon-border rounded-md shadow-sm mb-6 overflow-hidden text-amazon-text"
       >
         {/* HEADER */}
         <div className="p-4 flex justify-between items-start">
@@ -216,7 +216,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                 href={`/profile/shop/${post.shopId}`}
                 className="group flex gap-3 cursor-pointer"
               >
-                <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-600 transition-opacity group-hover:opacity-80">
+                <div className="relative w-10 h-10 rounded-full overflow-hidden bg-neutral-200 transition-opacity group-hover:opacity-80">
                   <Image
                     src={
                       post.avatarUrl ||
@@ -228,11 +228,11 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-lg text-white group-hover:underline">
+                    <span className="font-bold text-lg text-amazon-text group-hover:underline">
                       {post.username || post.fullName || post.userId}
                     </span>
                     <div title="Verified Shop">
-                      <Store className="w-4 h-4 text-[#f5d800]" />
+                      <Store className="w-4 h-4 text-amazon-btnSecondary" />
                     </div>
                     {post.product?.isAvailable && (
                       <span className="bg-[#ce2a32] text-white text-[9px] px-1.5 py-0.5 rounded-sm font-bold uppercase tracking-wider">
@@ -240,14 +240,14 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-400 font-medium">
+                  <p className="text-sm text-amazon-textMuted font-medium">
                     {formattedDate()}
                   </p>
                 </div>
               </Link>
             ) : (
               <div className="flex gap-3 cursor-default">
-                <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-600">
+                <div className="relative w-10 h-10 rounded-full overflow-hidden bg-neutral-200">
                   <Image
                     src={
                       post.avatarUrl ||
@@ -259,7 +259,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-white">
+                    <span className="font-bold text-sm text-amazon-text">
                       {post.fullName || post.username || post.userId}
                     </span>
                     {post.product?.isAvailable && (
@@ -268,7 +268,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-400 font-medium">
+                  <p className="text-sm text-amazon-textMuted font-medium">
                     {formattedDate()}
                   </p>
                 </div>
@@ -281,7 +281,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
           <div className="relative">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-400 hover:text-black focus:outline-none"
+              className="text-amazon-textMuted hover:text-amazon-text focus:outline-none"
             >
               <MoreHorizontal className="w-5 h-5" />
             </button>
@@ -292,7 +292,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.1 }}
-                  className="absolute right-0 mt-2 w-48 bg-[#1a1a1a] border border-[#2a2d31] rounded-md shadow-xl z-[99]"
+                  className="absolute right-0 mt-2 w-48 bg-white border border-amazon-border rounded-md shadow-xl z-[99]"
                 >
                   {isOwner && (
                     <button
@@ -301,7 +301,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                         setIsEditing(true);
                         setEditTitle(currentPost.title);
                       }}
-                      className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-gray-200 hover:text-white hover:bg-[#111] first:rounded-t-md transition-colors"
+                      className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 first:rounded-t-md transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
                       Edit the post
@@ -313,7 +313,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                       setShowDeleteConfirm(true);
                     }}
                     disabled={isDeleting}
-                    className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-red-500 hover:text-red-400 hover:bg-[#111] last:rounded-b-md transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 last:rounded-b-md transition-colors disabled:opacity-50"
                   >
                     {isDeleting ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -336,20 +336,20 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
               <textarea
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
-                className="w-full bg-[#111] border border-[#2a2d31] rounded-md p-3 text-sm text-white outline-none focus:border-[#f5d800] focus:ring-1 focus:ring-[#f5d800] min-h-[100px] resize-y"
+                className="w-full bg-white border border-amazon-border rounded-md p-3 text-sm text-amazon-text outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus min-h-[100px] resize-y"
                 placeholder="What's on your mind?"
               />
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setIsEditing(false)}
-                  className="px-4 py-1.5 text-xs font-bold uppercase text-gray-400 hover:text-white transition-colors"
+                  className="px-4 py-1.5 text-xs font-bold uppercase text-amazon-textMuted hover:text-amazon-text transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdatePost}
                   disabled={isUpdating || !editTitle.trim()}
-                  className="inline-flex items-center justify-center gap-1.5 bg-[#f5d800] text-black px-4 py-1.5 rounded-sm text-xs font-black uppercase tracking-wider hover:bg-[#ffe500] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex items-center justify-center gap-1.5 bg-amazon-btnPrimary text-amazon-text px-4 py-1.5 rounded-sm text-xs font-black uppercase tracking-wider hover:brightness-95 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isUpdating ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -361,29 +361,29 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
               </div>
             </div>
           ) : (
-            <p className="text-md text-gray-200 leading-relaxed whitespace-pre-line">
+            <p className="text-md text-amazon-text leading-relaxed whitespace-pre-line">
               {currentPost.title}
             </p>
           )}
 
           {post.product && (
-            <div className="mt-3 bg-[#111]  p-2 rounded-sm text-md text-gray-300 space-y-1">
+            <div className="mt-3 bg-amazon-bgSecondary border border-amazon-border p-2 rounded-sm text-md text-amazon-textMuted space-y-1">
               <p>
-                <span className="font-bold text-white">Board:</span>{" "}
+                <span className="font-bold text-amazon-link">Board:</span>{" "}
                 {post.product.name}
               </p>
               <p>
-                <span className="font-bold text-white">Switch:</span>{" "}
+                <span className="font-bold text-amazon-link">Switch:</span>{" "}
                 {post.product.price}
               </p>
               <p>
-                <span className="font-bold text-white">Keycaps:</span>{" "}
+                <span className="font-bold text-amazon-link">Keycaps:</span>{" "}
                 {post.product.quantity}
               </p>
               <div className="pt-2">
                 <Link
                   href={`/shop/assembled-product/${post.product.id}`}
-                  className="inline-flex items-center justify-center bg-[#f5d800] text-black px-3 py-1.5 rounded-sm text-xs font-black uppercase tracking-wider hover:bg-[#ffe500] transition-colors"
+                  className="inline-flex items-center justify-center bg-amazon-btnSecondary text-amazon-text px-3 py-1.5 rounded-sm text-xs font-black uppercase tracking-wider hover:brightness-95 transition-colors"
                 >
                   View Product
                 </Link>
@@ -403,7 +403,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
               <div
                 key={idx}
                 onClick={() => setSelectedImage(img)}
-                className="relative aspect-[4/3] bg-[#111] cursor-zoom-in group overflow-hidden"
+                className="relative aspect-[4/3] bg-neutral-100 cursor-zoom-in group overflow-hidden"
               >
                 <Image
                   src={img}
@@ -419,14 +419,14 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
 
         {/* STATS */}
         <div className="px-4 py-3">
-          <div className="flex justify-between items-center text-md text-gray-500 mb-3 pb-3 border-b border-[#2a2d31]">
+          <div className="flex justify-between items-center text-md text-amazon-textMuted mb-3 pb-3 border-b border-amazon-border">
             <div className="flex items-center gap-1">
               <div className="bg-[#ce2a32] rounded-full p-1">
                 <Heart className="w-3 h-3 text-white" />
               </div>
               <span
                 onClick={handleOpenReactions}
-                className="cursor-pointer hover:underline text-gray-400"
+                className="cursor-pointer hover:underline text-amazon-textMuted"
               >
                 {reactionCount} {reactionCount <= 1 ? "reaction" : "reactions"}
               </span>
@@ -456,7 +456,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute bottom-[115%] left-0 bg-[#111] border border-[#2a2d31] shadow-xl rounded-full px-3 py-2 flex items-center justify-between gap-1 z-50 min-w-max"
+                    className="absolute bottom-[115%] left-0 bg-white border border-amazon-border shadow-xl rounded-full px-3 py-2 flex items-center justify-between gap-1 z-50 min-w-max"
                   >
                     {(
                       Object.entries(REACTION_EMOJIS) as [
@@ -479,10 +479,10 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
 
               <button
                 onClick={(e) => handleReact(e, userReaction || "Like")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-sm hover:bg-[#111] transition-colors text-sm font-bold uppercase tracking-wider ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-sm hover:bg-neutral-50 transition-colors text-sm font-bold uppercase tracking-wider ${
                   userReaction
                     ? REACTION_COLORS[userReaction]
-                    : "text-gray-400 hover:text-white"
+                    : "text-amazon-textMuted hover:text-amazon-text"
                 }`}
               >
                 {userReaction ? (
@@ -503,7 +503,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
 
             <button
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center gap-2 px-4 py-2 rounded-sm hover:bg-[#111] transition-colors text-sm font-bold uppercase tracking-wider text-gray-500 hover:text-white"
+              className="flex items-center gap-2 px-4 py-2 rounded-sm hover:bg-neutral-50 transition-colors text-sm font-bold uppercase tracking-wider text-amazon-textMuted hover:text-amazon-text"
             >
               <MessageCircle className="w-4 h-4" />
               Comment
@@ -511,7 +511,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
 
             <button
               onClick={handleShare}
-              className="flex items-center gap-2 px-4 py-2 rounded-sm hover:bg-[#111] transition-colors text-sm font-bold uppercase tracking-wider text-gray-500 hover:text-white"
+              className="flex items-center gap-2 px-4 py-2 rounded-sm hover:bg-neutral-50 transition-colors text-sm font-bold uppercase tracking-wider text-amazon-textMuted hover:text-amazon-text"
             >
               <Share2 className="w-4 h-4" />
               Share
@@ -531,12 +531,12 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
 
       {isReactionsModalOpen && (
         <div className="fixed inset-0 z-[999] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#1a1a1a] border border-[#2a2d31] rounded-2xl w-full max-w-sm max-h-[70vh] flex flex-col">
-            <div className="flex justify-between items-center p-4 border-b border-[#2a2d31]">
-              <h2 className="text-white font-bold">Reactions</h2>
+          <div className="bg-white border border-amazon-border rounded-2xl w-full max-w-sm max-h-[70vh] flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b border-amazon-border">
+              <h2 className="text-amazon-text font-bold">Reactions</h2>
               <button
                 onClick={() => setIsReactionsModalOpen(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-amazon-textMuted hover:text-amazon-text"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -544,7 +544,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
             <div className="overflow-y-auto p-4 space-y-3">
               {isLoadingReactions ? (
                 <div className="flex justify-center p-4">
-                  <Loader2 className="w-6 h-6 text-[#f5d800] animate-spin" />
+                  <Loader2 className="w-6 h-6 text-amazon-btnSecondary animate-spin" />
                 </div>
               ) : (
                 reactionsList.map((reaction, idx) => (
@@ -558,12 +558,12 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                         className="w-10 h-10 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-[#f5d800]/20 text-[#f5d800] flex items-center justify-center font-bold">
+                      <div className="w-10 h-10 rounded-full bg-amazon-btnPrimary/20 text-amazon-btnSecondary flex items-center justify-center font-bold">
                         {reaction.fullName.charAt(0)}
                       </div>
                     )}
                     <div className="flex flex-col">
-                      <span className="text-white text-sm font-medium">
+                      <span className="text-amazon-text text-sm font-medium">
                         {reaction.username}
                       </span>
                       {/* <span className="text-gray-500 text-xs">
@@ -586,24 +586,24 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="bg-[#1a1a1a] border border-[#2a2d31] rounded-xl p-6 w-full max-w-sm shadow-2xl"
+              className="bg-white border border-amazon-border rounded-xl p-6 w-full max-w-sm shadow-2xl"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                 </div>
-                <h3 className="text-lg font-black uppercase tracking-wide text-white">
+                <h3 className="text-lg font-black uppercase tracking-wide text-amazon-text">
                   Delete Item?
                 </h3>
               </div>
-              <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+              <p className="text-sm text-amazon-textMuted mb-6 leading-relaxed">
                 Are you sure you want to permanently delete this? This action cannot be undone.
               </p>
               <div className="flex items-center justify-end gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={isDeleting}
-                  className="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-bold text-amazon-textMuted hover:text-amazon-text transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>

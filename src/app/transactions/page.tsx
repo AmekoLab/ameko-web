@@ -59,15 +59,15 @@ function formatDate(iso: string) {
 function getStatusColor(status: string) {
   switch (status.toLowerCase()) {
     case "completed":
-      return "text-emerald-400";
+      return "text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-sm border border-emerald-200";
     case "pending":
-      return "text-amber-400";
+      return "text-amber-600 bg-amber-50 px-2 py-0.5 rounded-sm border border-amber-200";
     case "failed":
-      return "text-red-400";
+      return "text-red-600 bg-red-50 px-2 py-0.5 rounded-sm border border-red-200";
     case "cancelled":
-      return "text-zinc-400";
+      return "text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-sm border border-neutral-300";
     default:
-      return "text-zinc-300";
+      return "text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-sm border border-neutral-300";
   }
 }
 
@@ -183,27 +183,27 @@ export default function TransactionsPage() {
 
   // ── Render ──────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-zinc-950 px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-amazon-bgSecondary px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-3xl font-bold text-amazon-text uppercase font-oswald tracking-widest">
             Transaction History
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-amazon-textMuted uppercase font-bold tracking-widest">
             View and filter all your wallet transactions
           </p>
         </div>
 
         {/* ── Filters Card ──────────────────────────────── */}
-        <div className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/70 p-5 backdrop-blur-sm">
+        <div className="mb-6 rounded-sm border border-amazon-border bg-white shadow-sm p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
+            <h2 className="text-[11px] font-black uppercase tracking-widest text-amazon-text">
               Filters
             </h2>
             <button
               onClick={handleClearFilters}
-              className="text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+              className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted transition-colors hover:text-amazon-text"
             >
               Clear all
             </button>
@@ -212,14 +212,14 @@ export default function TransactionsPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Type filter */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+              <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
                 Type
               </label>
               <select
                 id="filter-type"
                 value={filterType}
                 onChange={(e) => setFilterType(Number(e.target.value))}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-[#f5d800] focus:ring-1 focus:ring-[#f5d800]"
+                className="w-full rounded-sm border border-amazon-border bg-white px-3 py-2 text-sm text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary"
               >
                 {TRANSACTION_TYPES.map((t) => (
                   <option key={t.value} value={t.value}>
@@ -231,14 +231,14 @@ export default function TransactionsPage() {
 
             {/* Status filter */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+              <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
                 Status
               </label>
               <select
                 id="filter-status"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(Number(e.target.value))}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-[#f5d800] focus:ring-1 focus:ring-[#f5d800]"
+                className="w-full rounded-sm border border-amazon-border bg-white px-3 py-2 text-sm text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary"
               >
                 {TRANSACTION_STATUSES.map((s) => (
                   <option key={s.value} value={s.value}>
@@ -250,7 +250,7 @@ export default function TransactionsPage() {
 
             {/* From date */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+              <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
                 From Date
               </label>
               <input
@@ -258,13 +258,13 @@ export default function TransactionsPage() {
                 type="date"
                 value={filterFromDate}
                 onChange={(e) => setFilterFromDate(e.target.value)}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-[#f5d800] focus:ring-1 focus:ring-[#f5d800]"
+                className="w-full rounded-sm border border-amazon-border bg-white px-3 py-2 text-sm text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary"
               />
             </div>
 
             {/* To date */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+              <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
                 To Date
               </label>
               <input
@@ -272,7 +272,7 @@ export default function TransactionsPage() {
                 type="date"
                 value={filterToDate}
                 onChange={(e) => setFilterToDate(e.target.value)}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-[#f5d800] focus:ring-1 focus:ring-[#f5d800]"
+                className="w-full rounded-sm border border-amazon-border bg-white px-3 py-2 text-sm text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary"
               />
             </div>
           </div>
@@ -281,11 +281,11 @@ export default function TransactionsPage() {
             <button
               id="btn-apply-filters"
               onClick={handleApplyFilters}
-              className="rounded-lg bg-[#f5d800] px-5 py-2 text-sm font-medium text-black transition-all hover:bg-[#f5d800] active:scale-[0.97]"
+              className="rounded-sm bg-amazon-btnPrimary px-5 py-2 text-[11px] font-black uppercase tracking-widest text-amazon-text transition-all hover:opacity-90 active:scale-[0.97]"
             >
               Apply Filters
             </button>
-            <span className="text-xs text-zinc-500">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
               {totalCount} transaction{totalCount !== 1 ? "s" : ""} found
             </span>
           </div>
@@ -294,16 +294,16 @@ export default function TransactionsPage() {
         {/* ── Sort & Page Size Controls ─────────────────── */}
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <label className="text-xs text-zinc-400">Sort by:</label>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">Sort by:</label>
             <div className="flex gap-1">
               {SORT_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => handleSortChange(opt.value)}
-                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+                  className={`rounded-sm px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all border ${
                     queryParams.sortBy === opt.value
-                      ? "bg-[#f5d800] text-black ring-1 ring-[#f5d800]"
-                      : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+                      ? "bg-amazon-btnPrimary text-amazon-text border-amazon-btnPrimary"
+                      : "text-amazon-textMuted bg-white border-amazon-border hover:bg-neutral-50 hover:text-amazon-text"
                   }`}
                 >
                   {opt.label}
@@ -318,12 +318,12 @@ export default function TransactionsPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <label className="text-xs text-zinc-400">Show:</label>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">Show:</label>
             <select
               id="page-size-select"
               value={queryParams.pageSize}
               onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-              className="rounded-md border border-zinc-700 bg-zinc-800 px-2 py-1 text-xs text-white outline-none focus:border-[#f5d800]"
+              className="rounded-sm border border-amazon-border bg-white px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-amazon-text outline-none focus:border-amazon-btnPrimary"
             >
               {PAGE_SIZE_OPTIONS.map((size) => (
                 <option key={size} value={size}>
@@ -335,22 +335,22 @@ export default function TransactionsPage() {
         </div>
 
         {/* ── Table ─────────────────────────────────────── */}
-        <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/70 backdrop-blur-sm">
+        <div className="overflow-hidden rounded-sm border border-amazon-border bg-white shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[700px]">
               <thead>
-                <tr className="border-b border-zinc-800 text-left text-xs uppercase tracking-wider text-zinc-500">
-                  <th className="px-5 py-3.5 font-medium">Type</th>
-                  <th className="px-5 py-3.5 font-medium">Description</th>
-                  <th className="px-5 py-3.5 font-medium text-right">
+                <tr className="border-b border-amazon-border bg-neutral-50 text-left text-[10px] font-black uppercase tracking-widest text-amazon-textMuted">
+                  <th className="px-5 py-3.5">Type</th>
+                  <th className="px-5 py-3.5">Description</th>
+                  <th className="px-5 py-3.5 text-right">
                     Amount
                   </th>
-                  <th className="px-5 py-3.5 font-medium text-right">Fee</th>
-                  <th className="px-5 py-3.5 font-medium">Status</th>
-                  <th className="px-5 py-3.5 font-medium">Date</th>
+                  <th className="px-5 py-3.5 text-right">Fee</th>
+                  <th className="px-5 py-3.5">Status</th>
+                  <th className="px-5 py-3.5">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/60">
+              <tbody className="divide-y divide-amazon-border">
                 {isLoading ? (
                   // Loading skeleton rows
                   Array.from({ length: queryParams.pageSize || 5 }).map(
@@ -358,7 +358,7 @@ export default function TransactionsPage() {
                       <tr key={`skeleton-${i}`}>
                         {Array.from({ length: 6 }).map((_, j) => (
                           <td key={j} className="px-5 py-4">
-                            <div className="h-4 w-3/4 animate-pulse rounded bg-zinc-800" />
+                            <div className="h-4 w-3/4 animate-pulse rounded bg-neutral-200" />
                           </td>
                         ))}
                       </tr>
@@ -368,7 +368,7 @@ export default function TransactionsPage() {
                   <tr>
                     <td
                       colSpan={6}
-                      className="px-5 py-16 text-center text-sm text-zinc-500"
+                      className="px-5 py-16 text-center text-sm font-bold uppercase tracking-widest text-amazon-textMuted"
                     >
                       No transactions found. Try adjusting your filters.
                     </td>
@@ -377,33 +377,33 @@ export default function TransactionsPage() {
                   transactions.map((tx) => (
                     <tr
                       key={tx.id}
-                      className="transition-colors hover:bg-zinc-800/40"
+                      className="transition-colors hover:bg-neutral-50"
                     >
                       <td className="px-5 py-4">
-                        <span className="flex items-center gap-2 text-sm text-zinc-200">
+                        <span className="flex items-center gap-2 text-[11px] font-bold text-amazon-text">
                           <span>{getTypeIcon(tx.type)}</span>
                           <span className="capitalize">{tx.type}</span>
                         </span>
                       </td>
-                      <td className="max-w-[200px] truncate px-5 py-4 text-sm text-zinc-400">
+                      <td className="max-w-[200px] truncate px-5 py-4 text-[11px] font-medium text-amazon-textMuted">
                         {tx.description || "—"}
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-right text-sm font-medium text-white">
+                      <td className="whitespace-nowrap px-5 py-4 text-right text-sm font-black text-amazon-price">
                         {formatCurrency(tx.amount, tx.currency)}
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-right text-sm text-zinc-400">
+                      <td className="whitespace-nowrap px-5 py-4 text-right text-[11px] font-black text-amazon-textMuted ">
                         {tx.feeAmount > 0
                           ? formatCurrency(tx.feeAmount, tx.currency)
                           : "—"}
                       </td>
                       <td className="px-5 py-4">
                         <span
-                          className={`text-sm font-medium capitalize ${getStatusColor(tx.status)}`}
+                          className={`text-[10px] font-black uppercase tracking-widest ${getStatusColor(tx.status)}`}
                         >
                           {tx.status}
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-sm text-zinc-400">
+                      <td className="whitespace-nowrap px-5 py-4 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
                         {formatDate(tx.createdAt)}
                       </td>
                     </tr>
@@ -417,13 +417,13 @@ export default function TransactionsPage() {
         {/* ── Pagination ──────────────────────────────────  */}
         {data && totalPages > 0 && (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-xs text-zinc-500">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
               Page{" "}
-              <span className="font-medium text-zinc-300">{currentPage}</span>{" "}
+              <span className="font-black text-amazon-text">{currentPage}</span>{" "}
               of{" "}
-              <span className="font-medium text-zinc-300">{totalPages}</span>
+              <span className="font-black text-amazon-text">{totalPages}</span>
               {" · "}
-              <span className="font-medium text-zinc-300">
+              <span className="font-black text-amazon-text">
                 {totalCount}
               </span>{" "}
               total
@@ -435,7 +435,7 @@ export default function TransactionsPage() {
                 id="btn-page-first"
                 disabled={!data.hasPreviousPage}
                 onClick={() => handlePageChange(1)}
-                className="rounded-md px-2.5 py-1.5 text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+                className="rounded-sm px-2.5 py-1.5 text-[11px] font-black uppercase tracking-widest text-amazon-textMuted transition-colors bg-white border border-amazon-border hover:bg-neutral-50 hover:text-amazon-text disabled:cursor-not-allowed disabled:opacity-30"
               >
                 ««
               </button>
@@ -444,7 +444,7 @@ export default function TransactionsPage() {
                 id="btn-page-prev"
                 disabled={!data.hasPreviousPage}
                 onClick={() => handlePageChange(currentPage - 1)}
-                className="rounded-md px-2.5 py-1.5 text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+                className="rounded-sm px-2.5 py-1.5 text-[11px] font-black uppercase tracking-widest text-amazon-textMuted transition-colors bg-white border border-amazon-border hover:bg-neutral-50 hover:text-amazon-text disabled:cursor-not-allowed disabled:opacity-30"
               >
                 ‹ Prev
               </button>
@@ -468,10 +468,10 @@ export default function TransactionsPage() {
                   <button
                     key={page}
                     onClick={() => handlePageChange(page)}
-                    className={`min-w-[32px] rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
+                    className={`min-w-[32px] rounded-sm border px-2.5 py-1.5 text-[11px] font-black uppercase tracking-widest transition-all ${
                       page === currentPage
-                        ? "bg-[#f5d800] text-white shadow-lg shadow-indigo-500/20"
-                        : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                        ? "bg-amazon-btnPrimary text-amazon-text border-amazon-btnPrimary shadow-sm"
+                        : "text-amazon-textMuted bg-white border-amazon-border hover:bg-neutral-50 hover:text-amazon-text"
                     }`}
                   >
                     {page}
@@ -484,7 +484,7 @@ export default function TransactionsPage() {
                 id="btn-page-next"
                 disabled={!data.hasNextPage}
                 onClick={() => handlePageChange(currentPage + 1)}
-                className="rounded-md px-2.5 py-1.5 text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+                className="rounded-sm px-2.5 py-1.5 text-[11px] font-black uppercase tracking-widest text-amazon-textMuted transition-colors bg-white border border-amazon-border hover:bg-neutral-50 hover:text-amazon-text disabled:cursor-not-allowed disabled:opacity-30"
               >
                 Next ›
               </button>
@@ -493,7 +493,7 @@ export default function TransactionsPage() {
                 id="btn-page-last"
                 disabled={!data.hasNextPage}
                 onClick={() => handlePageChange(totalPages)}
-                className="rounded-md px-2.5 py-1.5 text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+                className="rounded-sm px-2.5 py-1.5 text-[11px] font-black uppercase tracking-widest text-amazon-textMuted transition-colors bg-white border border-amazon-border hover:bg-neutral-50 hover:text-amazon-text disabled:cursor-not-allowed disabled:opacity-30"
               >
                 »»
               </button>

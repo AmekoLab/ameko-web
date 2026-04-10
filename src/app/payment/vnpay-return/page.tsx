@@ -17,6 +17,14 @@ function VnPayReturnContent() {
   const [message, setMessage] = useState("Đang xử lý...");
   const [orderId, setOrderId] = useState<string | null>(null);
 
+  // VNPay Extraction
+  const amountStr = searchParams.get("vnp_Amount");
+  const bankCode = searchParams.get("vnp_BankCode");
+  const transactionNo = searchParams.get("vnp_TransactionNo");
+  const orderInfo = searchParams.get("vnp_OrderInfo");
+
+  const amountDisplay = amountStr ? (parseInt(amountStr) / 100).toLocaleString("vi-VN") : "0";
+
   // Prevent StrictMode double-fire
   const hasFetched = useRef(false);
 
@@ -28,7 +36,7 @@ function VnPayReturnContent() {
     // Guard: nothing to verify
     if (!payload.vnp_SecureHash) {
       setStatus("failed");
-      setMessage("Thiếu thông tin xác thực giao dịch.");
+      setMessage("Missing transaction parameters.");
       return;
     }
 
@@ -54,60 +62,99 @@ function VnPayReturnContent() {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] p-4">
-      <div className="bg-[#111111] border border-[#1e2126] rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-amazon-bgSecondary p-4 text-amazon-text font-sans">
+      <Link href="/" className="mb-6">
+        <h1 className="text-2xl font-black uppercase tracking-tight text-amazon-text">
+          AMEKO STORE
+        </h1>
+      </Link>
+      
+      <div className="bg-white border border-amazon-border rounded-md p-6 sm:p-8 max-w-[420px] w-full text-center shadow-sm flex flex-col items-center">
         {/* ── Loading ────────────────────────────────────── */}
         {status === "loading" && (
           <div className="py-8">
-            <Loader2 className="w-16 h-16 animate-spin text-yellow-500 mx-auto mb-6" />
-            <h2 className="text-xl font-semibold text-white mb-2">
+            <Loader2 className="w-12 h-12 animate-spin text-amazon-btnSecondary mx-auto mb-6" />
+            <h2 className="text-lg font-bold text-amazon-text mb-2 tracking-tight">
               Processing payment...
             </h2>
-            <p className="text-sm text-gray-400">
-              Please do not close this page.
+            <p className="text-[13px] text-amazon-textMuted">
+              Please wait while we verify your transaction. Do not refresh this page.
             </p>
           </div>
         )}
 
         {/* ── Success ───────────────────────────────────── */}
         {status === "success" && (
-          <div className="py-4">
-            <CheckCircle className="text-green-500 mx-auto mb-4" size={64} />
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Payment successful!
+          <div className="py-2 w-full">
+            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100">
+               <CheckCircle className="text-green-600 w-8 h-8" />
+            </div>
+            <h2 className="text-xl font-bold text-amazon-text mb-2 tracking-tight">
+              Payment Successful
             </h2>
-            <p className="text-sm text-gray-400 mb-1">{message}</p>
-            {orderId && (
-              <p className="text-xs text-gray-500 break-all">
-                Transaction ID:{" "}
-                <span className="text-gray-300 font-mono">{orderId}</span>
-              </p>
-            )}
+            <p className="text-[13px] text-amazon-textMuted mb-2">{message}</p>
+            
+            <div className="mt-6 mb-6 text-left border border-amazon-border rounded-sm bg-neutral-50 p-4 w-full">
+              <h3 className="text-[11px] font-bold text-amazon-textMuted mb-3 uppercase tracking-wider border-b border-amazon-border pb-2">
+                Transaction Details
+              </h3>
+              <div className="space-y-2.5 text-[13px]">
+                <div className="flex justify-between items-center gap-4">
+                  <span className="text-amazon-textMuted font-medium">Bank</span>
+                  <span className="font-bold text-amazon-text flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 mt-px"></span>
+                    {bankCode || "N/A"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <span className="text-amazon-textMuted font-medium">Amount</span>
+                  <span className="font-bold text-amazon-price text-[14px]">
+                    {amountDisplay}₫
+                  </span>
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <span className="text-amazon-textMuted font-medium">Txn ID</span>
+                  <span className="font-bold font-mono text-[11px] text-amazon-text bg-white px-1.5 py-0.5 rounded border border-amazon-border">
+                    {transactionNo || "N/A"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-start gap-4">
+                  <span className="text-amazon-textMuted font-medium shrink-0 pt-0.5">Info</span>
+                  <span className="font-medium text-amazon-text text-right line-clamp-2 leading-snug">
+                    {orderInfo ? decodeURIComponent(orderInfo.replace(/\+/g, " ")) : "Payment via VNPay"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
             <Link
               href="/orders"
-              className="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-lg mt-6 block w-full font-medium transition-colors"
+              className="bg-amazon-btnPrimary text-amazon-text hover:brightness-95 py-3 px-6 rounded-sm block w-full font-bold uppercase tracking-widest text-[13px] transition-all shadow-sm"
             >
-              View orders
+              View Orders
             </Link>
           </div>
         )}
 
         {/* ── Failed ────────────────────────────────────── */}
         {status === "failed" && (
-          <div className="py-4">
-            <XCircle className="text-red-500 mx-auto mb-4" size={64} />
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Payment failed
+          <div className="py-2 w-full">
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100">
+               <XCircle className="text-red-500 w-8 h-8" />
+            </div>
+            <h2 className="text-xl font-bold text-amazon-text mb-2 tracking-tight">
+              Payment Failed
             </h2>
-            <p className="text-sm text-gray-400">
+            <p className="text-[13px] text-amazon-textMuted mb-6">
               {message ||
-                "Payment failed. Please try again."}
+                "There was an error processing your transaction via VNPay."}
             </p>
+
             <Link
               href="/cart"
-              className="bg-[#2a2d35] hover:bg-[#3a3b3c] text-white py-2 px-6 rounded-lg mt-6 block w-full font-medium transition-colors"
+              className="bg-white border border-amazon-border hover:bg-neutral-50 text-amazon-text py-3 px-6 rounded-sm block w-full font-bold uppercase tracking-widest text-[13px] transition-all shadow-sm"
             >
-              Back to cart
+              Return to Cart
             </Link>
           </div>
         )}
@@ -121,8 +168,8 @@ export default function VnPayReturnPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
-          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+        <div className="min-h-screen flex items-center justify-center bg-amazon-bgSecondary text-amazon-text">
+          <Loader2 className="w-8 h-8 animate-spin text-amazon-textMuted" />
         </div>
       }
     >

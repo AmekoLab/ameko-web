@@ -14,7 +14,11 @@ import Image from "next/image";
 const commissionSchema = z
   .object({
     title: z.string().min(1, "Title cannot be empty"),
-    description: z.string().min(1, "Description cannot be empty"),
+    layout: z.string().min(1, "Please specify a layout"),
+    switchPref: z.string().min(1, "Please specify switch preferences"),
+    keycapPref: z.string().min(1, "Please specify keycap preferences"),
+    casePlatePref: z.string().min(1, "Please specify case & plate preferences"),
+    additionalNotes: z.string().optional(),
     quantity: z.number().min(1, "Minimum quantity is 1"),
     minBudget: z.number().min(0, "Minimum budget must be >= 0"),
     maxBudget: z.number().min(0, "Maximum budget must be >= 0"),
@@ -58,7 +62,11 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
     resolver: zodResolver(commissionSchema),
     defaultValues: {
       title: "",
-      description: "",
+      layout: "",
+      switchPref: "",
+      keycapPref: "",
+      casePlatePref: "",
+      additionalNotes: "",
       quantity: 1,
       minBudget: 0,
       maxBudget: 0,
@@ -86,12 +94,22 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
 
   const onSubmit = async (data: CommissionFormData) => {
     const isDraft = submitType === "draft";
+
+    // Compile the detailed description
+    const compiledDescription = `
+Layout: ${data.layout}
+Switch Preferences: ${data.switchPref}
+Keycap Preferences: ${data.keycapPref}
+Case & Plate: ${data.casePlatePref}
+Additional Notes: ${data.additionalNotes || "None"}
+    `.trim();
+
     try {
       await dispatch(
         createCommissionRequest({
           ...(targetedShopId ? { targetedShopId } : {}),
           title: data.title,
-          description: data.description,
+          description: compiledDescription,
           referenceImages: data.referenceImages,
           minBudget: data.minBudget,
           maxBudget: data.maxBudget,
@@ -128,21 +146,21 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
       onClick={handleClose}
     >
       <div
-        className=" bg-[#151515] border border-[#1e2126] rounded-sm w-full max-w-[520px] shadow-2xl flex flex-col overflow-hidden custom-scrollbar"
+        className=" bg-white border border-amazon-border rounded-sm w-full max-w-[520px] shadow-2xl flex flex-col overflow-hidden custom-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#1e2126]">
-          <h3 className="text-[15px] font-black uppercase text-white tracking-widest">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-amazon-border">
+          <h3 className="text-[15px] font-black uppercase text-amazon-text tracking-widest">
             {targetedShopId
               ? "Send quotation request"
               : "Post request to Public Market"}
           </h3>
           <button
             onClick={handleClose}
-            className="p-1 hover:bg-[#202030] rounded-full transition-colors"
+            className="p-1 hover:bg-neutral-100 rounded-full transition-colors"
           >
-            <X className="w-5 h-5 text-gray-400" />
+            <X className="w-5 h-5 text-amazon-textMuted" />
           </button>
         </div>
 
@@ -153,13 +171,13 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
         >
           {/* Title */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
-              Title <span className="text-[#ce2a32]">*</span>
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
+              Title <span className="text-red-600">*</span>
             </label>
             <input
               {...register("title")}
               placeholder="E.g.: Order custom keyboard"
-              className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors"
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
             />
             {errors.title && (
               <p className="text-xs text-red-500 mt-1">
@@ -168,34 +186,97 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
             )}
           </div>
 
-          {/* Description */}
+          {/* Layout */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
-              Detailed description <span className="text-[#ce2a32]">*</span>
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
+              Layout <span className="text-red-600">*</span>
+            </label>
+            <select
+              {...register("layout")}
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
+            >
+              <option value="">Select layout</option>
+              <option value="60%">60%</option>
+              <option value="65%">65%</option>
+              <option value="75%">75%</option>
+              <option value="TKL (80%)">TKL (80%)</option>
+              <option value="Full-size (100%)">Full-size (100%)</option>
+              <option value="Alice/Arisu">Alice/Arisu</option>
+              <option value="Other">Other</option>
+            </select>
+            {errors.layout && (
+              <p className="text-xs text-red-500 mt-1">{errors.layout.message}</p>
+            )}
+          </div>
+
+          {/* Switch Preferences */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
+              Switch Preferences <span className="text-red-600">*</span>
+            </label>
+            <input
+              {...register("switchPref")}
+              placeholder="e.g., Thocky linear, tactile, silent, etc."
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
+            />
+            {errors.switchPref && (
+              <p className="text-xs text-red-500 mt-1">{errors.switchPref.message}</p>
+            )}
+          </div>
+
+          {/* Keycap Preferences */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
+              Keycap Preferences <span className="text-red-600">*</span>
+            </label>
+            <input
+              {...register("keycapPref")}
+              placeholder="e.g., Cherry profile, PBT material, dark colors"
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
+            />
+            {errors.keycapPref && (
+              <p className="text-xs text-red-500 mt-1">{errors.keycapPref.message}</p>
+            )}
+          </div>
+
+          {/* Case & Plate */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
+              Case & Plate <span className="text-red-600">*</span>
+            </label>
+            <input
+              {...register("casePlatePref")}
+              placeholder="e.g., Aluminum case (black), FR4 plate"
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
+            />
+            {errors.casePlatePref && (
+              <p className="text-xs text-red-500 mt-1">{errors.casePlatePref.message}</p>
+            )}
+          </div>
+
+          {/* Additional Notes */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
+              Additional Notes
             </label>
             <textarea
-              {...register("description")}
-              rows={3}
-              placeholder="Describe your request..."
-              className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors resize-none placeholder-gray-600"
+              {...register("additionalNotes")}
+              rows={2}
+              placeholder="Any other specific requirements?"
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors resize-none placeholder-gray-400"
             />
-            {errors.description && (
-              <p className="text-xs text-red-500 mt-1">
-                {errors.description.message}
-              </p>
-            )}
           </div>
 
           {/* Quantity */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
-              Quantity <span className="text-[#ce2a32]">*</span>
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
+              Quantity <span className="text-red-600">*</span>
             </label>
             <input
               type="number"
               {...register("quantity", { valueAsNumber: true })}
               min={1}
-              className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors"
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
             />
             {errors.quantity && (
               <p className="text-xs text-red-500 mt-1">
@@ -207,7 +288,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
           {/* Budget Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
                 Minimum budget (VND)
               </label>
               <input
@@ -215,7 +296,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
                 {...register("minBudget", { valueAsNumber: true })}
                 min={0}
                 placeholder="500000"
-                className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors"
+                className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
               />
               {errors.minBudget && (
                 <p className="text-xs text-red-500 mt-1">
@@ -224,7 +305,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
               )}
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
                 Maximum budget (VND)
               </label>
               <input
@@ -232,7 +313,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
                 {...register("maxBudget", { valueAsNumber: true })}
                 min={0}
                 placeholder="1000000"
-                className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors"
+                className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
               />
               {errors.maxBudget && (
                 <p className="text-xs text-red-500 mt-1">
@@ -245,7 +326,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
           {/* SLA Response Windows */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
                 Shop response window (hours)
               </label>
               <input
@@ -253,7 +334,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
                 {...register("shopResponseWindowHours", { valueAsNumber: true })}
                 min={24}
                 placeholder="72"
-                className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors"
+                className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
               />
               {errors.shopResponseWindowHours && (
                 <p className="text-xs text-red-500 mt-1">
@@ -262,7 +343,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
               )}
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
                 Customer response window (hours)
               </label>
               <input
@@ -270,7 +351,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
                 {...register("customerResponseWindowHours", { valueAsNumber: true })}
                 min={24}
                 placeholder="72"
-                className="w-full border border-[#1e2126] bg-[#151515] text-white rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#f5d800] focus:border-[#f5d800] transition-colors"
+                className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
               />
               {errors.customerResponseWindowHours && (
                 <p className="text-xs text-red-500 mt-1">
@@ -282,8 +363,8 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
 
           {/* Image Upload */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">
-              Reference image <span className="text-[#ce2a32]">*</span>
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
+              Reference image <span className="text-red-600">*</span>
             </label>
             <input
               ref={fileInputRef}
@@ -294,7 +375,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
             />
 
             {previewUrl ? (
-              <div className="relative w-full h-40 rounded-sm overflow-hidden border border-[#1e2126] bg-[#0f0f0f]">
+              <div className="relative w-full h-40 rounded-sm overflow-hidden border border-amazon-border bg-neutral-100">
                 <Image
                   src={previewUrl}
                   alt="Preview"
@@ -308,7 +389,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
                     setValue("referenceImages", "", { shouldValidate: true });
                     if (fileInputRef.current) fileInputRef.current.value = "";
                   }}
-                  className="absolute top-2 right-2 p-1 bg-black/60 hover:bg-black/80 rounded-full text-white transition-colors"
+                  className="absolute top-2 right-2 p-1 bg-white/80 hover:bg-white rounded-full text-amazon-text transition-colors shadow-sm"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -318,10 +399,10 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
                 type="button"
                 disabled={isUploading}
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full border border-dashed border-gray-600 bg-[#202030] rounded-sm py-8 flex flex-col items-center gap-2 text-gray-400 hover:border-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                className="w-full border border-dashed border-gray-300 bg-neutral-50 rounded-sm py-8 flex flex-col items-center gap-2 text-amazon-textMuted hover:border-amazon-border hover:bg-neutral-100 transition-colors disabled:opacity-50"
               >
                 {isUploading ? (
-                  <Loader2 className="w-8 h-8 animate-spin" />
+                  <Loader2 className="w-s h-8 animate-spin" />
                 ) : (
                   <Upload className="w-8 h-8" />
                 )}
@@ -343,7 +424,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
               type="submit"
               disabled={isBusy}
               onClick={() => setSubmitType("draft")}
-              className="w-full py-4 bg-[#202030] hover:bg-[#2a2a3d] disabled:bg-[#202030]/50 text-white font-black uppercase tracking-widest text-[13px] rounded-sm shadow-md transition-all flex items-center justify-center gap-2 border border-[#1e2126]"
+              className="w-full py-4 bg-white hover:bg-neutral-50 disabled:bg-white/50 text-amazon-text font-black uppercase tracking-widest text-[13px] rounded-sm shadow-sm transition-all flex items-center justify-center gap-2 border border-amazon-border"
             >
               {isSubmitting && submitType === "draft" ? (
                 <>
@@ -357,7 +438,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
               type="submit"
               disabled={isBusy}
               onClick={() => setSubmitType("send")}
-              className="w-full py-4 bg-[#f5d800] hover:bg-[#e6ca00] disabled:bg-[#f5d800]/50 text-black font-black uppercase tracking-widest text-[13px] rounded-sm shadow-md transition-all flex items-center justify-center gap-2"
+              className="w-full py-4 bg-amazon-btnPrimary hover:brightness-95 disabled:bg-amazon-btnPrimary/50 text-amazon-text font-black uppercase tracking-widest text-[13px] rounded-sm shadow-md transition-all flex items-center justify-center gap-2"
             >
               {isSubmitting && submitType === "send" ? (
                 <>

@@ -102,7 +102,7 @@ export default function FeedClient({
           <p className="text-gray-500 mb-2 text-sm">{error}</p>
           <button
             onClick={retry}
-            className="inline-flex items-center gap-2 bg-[#1a1a1a] border border-[#2a2d31] text-white px-4 py-2 rounded-md text-xl font-bold uppercase hover:bg-[#111] transition-colors"
+            className="inline-flex items-center gap-2 bg-white border border-amazon-border text-amazon-text px-4 py-2 rounded-md text-xl font-bold uppercase hover:bg-neutral-50 transition-colors"
           >
             <RefreshCcw className="w-3 h-3" /> Try Again
           </button>

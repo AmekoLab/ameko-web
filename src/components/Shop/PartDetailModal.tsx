@@ -31,18 +31,18 @@ const PART_TYPE_STYLES: Record<
   PartType,
   { label: string; color: string; bg: string }
 > = {
-  kit: { label: "Kit", color: "text-purple-700", bg: "bg-purple-100" },
-  component: { label: "Component", color: "text-blue-700", bg: "bg-blue-100" },
+  kit: { label: "Kit", color: "text-purple-700", bg: "bg-purple-50 border border-purple-200" },
+  component: { label: "Component", color: "text-blue-700", bg: "bg-blue-50 border border-blue-200" },
   accessory: {
     label: "Accessory",
-    color: "text-green-700",
-    bg: "bg-green-100",
+    color: "text-emerald-700",
+    bg: "bg-emerald-50 border border-emerald-200",
   },
 };
 
 const STATUS_MAP: Record<number, { label: string; cls: string }> = {
-  1: { label: "Active", cls: "bg-green-100 text-green-700" },
-  0: { label: "Inactive", cls: "bg-red-100 text-red-700" },
+  1: { label: "Active", cls: "bg-neutral-100 text-amazon-text border border-amazon-border" },
+  0: { label: "Inactive", cls: "bg-red-50 text-red-600 border border-red-200" },
 };
 
 interface PartDetailModalProps {
@@ -66,27 +66,27 @@ export default function PartDetailModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-sm shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto border border-amazon-border">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-200">
-          <h2 className="text-lg font-bold text-gray-800">Part Details</h2>
+        <div className="flex items-center justify-between p-5 border-b border-amazon-border bg-neutral-50 shrink-0">
+          <h2 className="text-lg font-bold text-amazon-text">Part Details</h2>
           <button
             onClick={handleClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition"
+            className="p-1 rounded-sm hover:bg-white border border-transparent hover:border-amazon-border transition shadow-sm"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-amazon-textMuted hover:text-amazon-text" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-5">
+        <div className="p-6">
           {detailLoading ? (
-            <div className="flex items-center justify-center py-16 text-gray-400 gap-2">
+            <div className="flex items-center justify-center py-16 text-amazon-textMuted gap-2">
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span className="text-sm">Loading part details...</span>
+              <span className="text-[13px] font-medium">Loading part details...</span>
             </div>
           ) : !selectedPart ? (
-            <div className="py-16 text-center text-gray-400 text-sm">
+            <div className="py-16 text-center text-amazon-textMuted text-[13px] font-medium">
               Part not found.
             </div>
           ) : (
@@ -95,10 +95,10 @@ export default function PartDetailModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end p-5 border-t border-gray-100">
+        <div className="flex justify-end px-6 py-5 border-t border-amazon-border bg-neutral-50/50 shrink-0">
           <button
             onClick={handleClose}
-            className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+            className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition shadow-sm"
           >
             Close
           </button>
@@ -124,11 +124,11 @@ function PartDetailContent({ part }: { part: PartItem }) {
   return (
     <div className="space-y-6">
       {/* Images + basic info row */}
-      <div className="flex flex-col sm:flex-row gap-5">
+      <div className="flex flex-col sm:flex-row gap-6">
         {/* Images */}
-        <div className="flex gap-3 shrink-0">
+        <div className="flex gap-4 shrink-0">
           {/* Thumbnail */}
-          <div className="w-28 h-28 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center">
+          <div className="w-28 h-28 rounded-sm bg-neutral-50 border border-amazon-border overflow-hidden flex items-center justify-center shadow-sm">
             {part.thumbnailUrl ? (
               <Image
                 src={part.thumbnailUrl}
@@ -139,18 +139,18 @@ function PartDetailContent({ part }: { part: PartItem }) {
                 unoptimized
               />
             ) : (
-              <Package className="w-8 h-8 text-gray-300" />
+              <Package className="w-8 h-8 text-neutral-300" />
             )}
           </div>
           {/* Layer */}
           {part.defaultLayerImageUrl && (
-            <div className="w-28 h-28 rounded-xl bg-gray-50 border border-dashed border-gray-200 overflow-hidden flex items-center justify-center">
+            <div className="w-28 h-28 rounded-sm bg-neutral-50 border border-dashed border-amazon-border overflow-hidden flex items-center justify-center hover:bg-white transition shadow-sm">
               <Image
                 src={part.defaultLayerImageUrl}
                 alt="Layer"
                 width={112}
                 height={112}
-                className="object-contain w-full h-full"
+                className="object-contain w-full h-full p-2"
                 unoptimized
               />
             </div>
@@ -158,28 +158,28 @@ function PartDetailContent({ part }: { part: PartItem }) {
         </div>
 
         {/* Info */}
-        <div className="flex-1 min-w-0 space-y-2">
+        <div className="flex-1 min-w-0 space-y-3">
           <div>
-            <h3 className="text-xl font-bold text-gray-900">{part.name}</h3>
-            <p className="text-xs text-gray-400 mt-0.5">{part.slug}</p>
+            <h3 className="text-[18px] font-bold text-amazon-text truncate">{part.name}</h3>
+            <p className="text-[12px] text-amazon-textMuted mt-1 truncate">{part.slug}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <span
-              className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${typeStyle.bg} ${typeStyle.color}`}
+              className={`text-[11px] font-medium px-2 py-0.5 rounded-sm ${typeStyle.bg} ${typeStyle.color}`}
             >
               {typeStyle.label}
             </span>
             <span
-              className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${statusInfo.cls}`}
+              className={`text-[11px] font-medium px-2 py-0.5 rounded-sm ${statusInfo.cls}`}
             >
               {statusInfo.label}
             </span>
-            <span className="text-xs text-gray-500 capitalize">
+            <span className="text-[12px] font-medium text-amazon-textMuted border border-amazon-border px-2 py-0.5 rounded-sm shadow-sm bg-white">
               {part.categoryName}
             </span>
           </div>
           {part.description && (
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-[13px] text-amazon-textMuted font-normal leading-relaxed mt-2">
               {part.description}
             </p>
           )}
@@ -188,7 +188,7 @@ function PartDetailContent({ part }: { part: PartItem }) {
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard label="Price" value={formatPrice(part.price)} />
+        <StatCard label="Price" value={formatPrice(part.price)} valueColor="text-amazon-price" />
         <StatCard
           label="Stock"
           value={part.stockQuantity.toLocaleString("vi-VN")}
@@ -197,7 +197,7 @@ function PartDetailContent({ part }: { part: PartItem }) {
               ? "text-red-600"
               : part.stockQuantity < 100
                 ? "text-amber-600"
-                : undefined
+                : "text-amazon-text"
           }
         />
         <StatCard label="Shop" value={part.shopName} />
@@ -206,25 +206,25 @@ function PartDetailContent({ part }: { part: PartItem }) {
 
       {/* Recipe (kit) */}
       {(part.recipeSwitchCount > 0 || part.recipeStabilizerCount > 0) && (
-        <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
-          <p className="text-sm font-bold text-purple-800 mb-2">Kit Recipe</p>
-          <div className="flex gap-6">
+        <div className="p-5 bg-purple-50 border border-purple-200 rounded-sm shadow-sm">
+          <p className="text-[13px] font-bold text-purple-800 mb-4">Kit Recipe</p>
+          <div className="flex gap-8">
             {part.recipeSwitchCount > 0 && (
               <div className="text-center">
-                <p className="text-2xl font-black text-purple-700">
+                <p className="text-[24px] font-bold text-purple-700">
                   {part.recipeSwitchCount}
                 </p>
-                <p className="text-xs text-purple-500 font-semibold">
+                <p className="text-[12px] font-medium text-purple-600 mt-1">
                   Switches
                 </p>
               </div>
             )}
             {part.recipeStabilizerCount > 0 && (
               <div className="text-center">
-                <p className="text-2xl font-black text-purple-700">
+                <p className="text-[24px] font-bold text-purple-700">
                   {part.recipeStabilizerCount}
                 </p>
-                <p className="text-xs text-purple-500 font-semibold">
+                <p className="text-[12px] font-medium text-purple-600 mt-1">
                   Stabilizers
                 </p>
               </div>
@@ -235,28 +235,28 @@ function PartDetailContent({ part }: { part: PartItem }) {
 
       {/* Specifications / Workflow */}
       {specs && (
-        <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg space-y-3">
-          <p className="text-sm font-bold text-gray-800">
+        <div className="p-5 bg-neutral-50 border border-amazon-border rounded-sm space-y-4 shadow-sm">
+          <p className="text-[13px] font-bold text-amazon-text">
             Specifications (Workflow)
           </p>
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-amazon-border">
             {specs.workflow.map((step: PartWorkflowStep, idx: number) => (
               <div
                 key={idx}
-                className="flex items-center justify-between py-2 first:pt-0 last:pb-0"
+                className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
               >
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center">
+                <div className="flex items-center gap-4">
+                  <span className="w-7 h-7 rounded-full bg-white border border-amazon-border text-amazon-text text-[12px] font-bold flex items-center justify-center shadow-sm">
                     {idx + 1}
                   </span>
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">
+                    <p className="text-[13px] font-medium text-amazon-text">
                       {step.title}
                     </p>
-                    <p className="text-xs text-gray-400">{step.step}</p>
+                    <p className="text-[11px] text-amazon-textMuted mt-0.5">{step.step}</p>
                   </div>
                 </div>
-                <span className="text-sm font-bold text-gray-700">
+                <span className="text-[13px] font-bold text-amazon-text">
                   x{step.quantity}
                 </span>
               </div>
@@ -266,14 +266,7 @@ function PartDetailContent({ part }: { part: PartItem }) {
       )}
 
       {/* Image URLs */}
-      <div className="space-y-1">
-        {part.thumbnailUrl && (
-          <ImageLink label="Thumbnail URL" url={part.thumbnailUrl} />
-        )}
-        {part.defaultLayerImageUrl && (
-          <ImageLink label="Layer URL" url={part.defaultLayerImageUrl} />
-        )}
-      </div>
+     
     </div>
   );
 }
@@ -291,12 +284,12 @@ function StatCard({
   small?: boolean;
 }) {
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-      <p className="text-xs text-gray-400 font-semibold uppercase mb-0.5">
+    <div className="bg-white border border-amazon-border rounded-sm p-4 shadow-sm flex flex-col justify-center">
+      <p className="text-[11px] text-amazon-textMuted font-medium mb-1">
         {label}
       </p>
       <p
-        className={`font-bold truncate ${small ? "text-xs" : "text-sm"} ${valueColor || "text-gray-900"}`}
+        className={`font-bold truncate ${small ? "text-[12px]" : "text-[14px]"} ${valueColor || "text-amazon-text"}`}
       >
         {value}
       </p>
@@ -306,16 +299,16 @@ function StatCard({
 
 function ImageLink({ label, url }: { label: string; url: string }) {
   return (
-    <div className="flex items-center gap-2 text-xs text-gray-400">
-      <span className="font-semibold shrink-0">{label}:</span>
+    <div className="flex items-center gap-3 text-[12px] text-amazon-textMuted bg-neutral-50 border border-amazon-border p-2 rounded-sm shadow-sm">
+      <span className="font-medium text-amazon-text shrink-0">{label}:</span>
       <a
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="truncate hover:text-blue-500 transition flex items-center gap-1"
+        className="truncate hover:text-amazon-btnPrimary transition flex items-center gap-1"
       >
         {url}
-        <ExternalLink className="w-3 h-3 shrink-0" />
+        <ExternalLink className="w-3 h-3 shrink-0 ml-1" />
       </a>
     </div>
   );

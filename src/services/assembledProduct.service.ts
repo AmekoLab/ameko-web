@@ -25,6 +25,16 @@ export const assembledProductService = {
   },
 
   /**
+   * Get my assembled products (automatically filters by logged-in shop token).
+   * GET /AssembledProduct/my-products
+   */
+  getMyAssembledProducts: async () => {
+    return api.get<unknown, ApiResponse<AssembledProductItem[]>>(
+      `/AssembledProduct/my-products`,
+    );
+  },
+
+  /**
    * Get assembled product detail by ID.
    * GET /AssembledProduct/{id}
    */

@@ -62,20 +62,20 @@ export default function UpdateLogModal({ isOpen, onClose, onSuccess, logToUpdate
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-[#151515] border border-[#1e2126] max-w-md w-full p-6 rounded-sm shadow-2xl relative">
-        <h2 className="text-xl font-oswald font-black text-white uppercase tracking-widest mb-6">
+      <div className="bg-white border border-amazon-border max-w-md w-full p-6 rounded-sm shadow-2xl relative">
+        <h2 className="text-lg font-bold text-amazon-text mb-6">
           Update Assembly Log
         </h2>
 
         <form id="update-log-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Status Dropdown */}
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-widest text-[#f5d800] mb-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
               Status
             </label>
             <select
               {...register("status")}
-              className="bg-[#1a1c20] text-white border border-[#1e2126] w-full p-2 outline-none focus:border-[#f5d800] transition-colors rounded-sm text-sm"
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors"
             >
               <option value="0">Pending (0)</option>
               <option value="1">In Progress (1)</option>
@@ -86,23 +86,23 @@ export default function UpdateLogModal({ isOpen, onClose, onSuccess, logToUpdate
 
           {/* Note */}
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-widest text-[#f5d800] mb-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
               Note
             </label>
             <textarea
               {...register("note")}
               rows={3}
               placeholder="Add your note here..."
-              className="bg-[#1a1c20] text-white border border-[#1e2126] w-full p-2 outline-none focus:border-[#f5d800] transition-colors rounded-sm text-sm"
+              className="w-full border border-amazon-border bg-white text-amazon-text rounded-sm px-3.5 py-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-amazon-focus focus:border-amazon-focus transition-colors resize-none placeholder-gray-400"
             />
           </div>
 
           {/* File Input */}
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-widest text-[#f5d800] mb-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-amazon-textMuted mb-1.5">
               Media File (Optional)
             </label>
-            <label className="block bg-[#1a1c20] text-center text-sm text-gray-400 border border-[#1e2126] border-dashed rounded-sm py-4 cursor-pointer hover:border-[#f5d800] hover:text-[#f5d800] transition-colors">
+            <label className="block bg-neutral-50 text-center text-sm text-amazon-textMuted border border-amazon-border border-dashed rounded-sm py-4 cursor-pointer hover:border-amazon-focus hover:text-amazon-focus transition-colors">
               <span className="font-bold underline">Click to browse</span>
               <input
                 type="file"
@@ -116,20 +116,20 @@ export default function UpdateLogModal({ isOpen, onClose, onSuccess, logToUpdate
               />
             </label>
             {file && (
-              <p className="mt-2 text-xs text-gray-400 italic">
-                Selected: <span className="text-white">{file.name}</span>
+              <p className="mt-2 text-xs text-amazon-textMuted italic">
+                Selected: <span className="text-amazon-text font-medium">{file.name}</span>
               </p>
             )}
           </div>
         </form>
 
         {/* Action Buttons */}
-        <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-[#1e2126]">
+        <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-amazon-border">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white transition-colors"
+            className="px-4 py-2 text-sm font-medium text-amazon-textMuted hover:text-amazon-text transition-colors"
           >
             Cancel
           </button>
@@ -137,7 +137,7 @@ export default function UpdateLogModal({ isOpen, onClose, onSuccess, logToUpdate
             type="submit"
             form="update-log-form"
             disabled={loading}
-            className="flex items-center justify-center px-6 py-2 bg-[#f5d800] text-black font-black uppercase tracking-widest text-[11px] rounded-sm hover:bg-[#ffe500] transition-colors min-w-[100px] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center px-6 py-2 bg-amazon-btnPrimary hover:brightness-95 text-amazon-text font-medium text-sm rounded-sm transition-all shadow-sm min-w-[100px] disabled:opacity-50 disabled:cursor-not-allowed border border-amazon-border"
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Save"}
           </button>

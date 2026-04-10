@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { adminCreateUser } from "@/src/store/slices/adminUsersSlice";
 import { toast } from "react-toastify";
@@ -103,17 +102,17 @@ export default function CreateUserModal({
   const errorClass = "text-xs text-red-500 mt-1";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/40">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-200">
           <h2 className="text-lg font-bold text-gray-800">Create New User</h2>
           <button
             onClick={handleClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition"
+            className="px-2 py-1 text-[11px] font-medium text-gray-500 rounded hover:bg-gray-100 transition"
             disabled={creating}
           >
-            <X className="w-5 h-5 text-gray-500" />
+            Close
           </button>
         </div>
 
@@ -185,13 +184,9 @@ export default function CreateUserModal({
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-gray-400 hover:text-gray-600"
               >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
+                {showPassword ? "Hide" : "Show"}
               </button>
             </div>
             {errors.password && (
@@ -265,9 +260,8 @@ export default function CreateUserModal({
             <button
               type="submit"
               disabled={creating}
-              className="px-5 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2 text-[11px] font-bold text-neutral-50 bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center gap-2"
             >
-              {creating && <Loader2 className="w-4 h-4 animate-spin" />}
               {creating ? "Creating..." : "Create User"}
             </button>
           </div>

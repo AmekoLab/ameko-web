@@ -325,82 +325,21 @@ export default function ShopView() {
     selectedCategories.length > 0 || selectedAvailability.length > 0 || selectedLayout.length > 0;
 
   return (
-    <div className="w-full bg-black text-white min-h-screen">
+    <div className="w-full bg-amazon-bgSecondary text-amazon-text min-h-screen">
 
       {/* ============================================================
           1A. HERO BANNER
       ============================================================ */}
-      <div className="relative w-full bg-[#111111] overflow-hidden flex items-center justify-center py-20 md:py-32 border-b border-[#2a2d31]">
-        {/* Grid SVG background */}
-      <div
-          className="absolute inset-0 w-full h-full pointer-events-none opacity-20"
-          style={{
-            backgroundImage: "url('https://res.cloudinary.com/doezwafgz/image/upload/v1773335563/cherryblossom_ql7b5v.png')",
-            backgroundSize: "cover", // Kéo giãn ảnh lấp đầy toàn màn hình
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
-          aria-hidden="true"
-        />
-        {/* Left decorative image (hidden on mobile) */}
-        <div
-          className="absolute left-0 top-0 bottom-0 w-1/4 hidden md:block pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(to right, transparent 0%, #111111 100%)",
-          }}
-          aria-hidden="true"
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage:
-                "url('https://res.cloudinary.com/doezwafgz/image/upload/v1773335563/cherryblossom_ql7b5v.png')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              opacity: 0.18,
-              filter: "drop-shadow(0 0 60px rgba(0,0,0,0.9))",
-            }}
-          />
-        </div>
-
-        {/* Right decorative image (hidden on mobile) */}
-        <div
-          className="absolute right-0 top-0 bottom-0 w-1/4 hidden md:block pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(to left, transparent 0%, #111111 100%)",
-          }}
-          aria-hidden="true"
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage:
-                "url('https://res.cloudinary.com/doezwafgz/image/upload/v1773335563/cherryblossom_ql7b5v.png')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              opacity: 0.18,
-              filter: "drop-shadow(0 0 60px rgba(0,0,0,0.9)) scaleX(-1)",
-            }}
-          />
-        </div>
-
-        {/* Center Text */}
-        <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
-          <p className="text-[#f5d800] text-[11px] font-black uppercase tracking-[0.35em] mb-5">
-            Keyboards Without Compromise
-          </p>
-          <h1
-            className="text-5xl md:text-7xl  uppercase text-white tracking-[0.08em] leading-tight mb-6"
-           
-          >
-            Gaming Keyboards
-          </h1>
-          <p className="text-gray-400 text-sm md:text-base leading-relaxed max-w-xl mx-auto">
-            Precision-crafted mechanical keyboards built for performance, comfort,
-            and style. Find your perfect match.
-          </p>
+      <div className="w-full bg-amazon-bgSecondary ">
+        <div className="max-w-[1800px] mx-auto px-6 md:px-12 py-2 md:py-4">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-3xl md:text-4xl font-bold text-amazon-text tracking-tight">
+              Ameko Best Sellers
+            </h1>
+            <span className="text-sm md:text-base text-amazon-textMuted font-normal">
+              Our most popular products based on sales. Updated frequently.
+            </span>
+          </div>
         </div>
       </div>
 
@@ -439,17 +378,17 @@ export default function ShopView() {
       <div className="max-w-[1800px] mx-auto px-6 md:px-12 pb-12">
 
         {/* TOOLBAR */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10 pb-4 border-b border-[#2a2d31]">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-2 pb-1 ">
           {/* Mobile Filter Button */}
           <button
             onClick={toggleMobileFilter}
-            className="md:hidden flex items-center gap-2 px-4 py-2 border border-[#2a2d31] text-sm font-bold uppercase text-white hover:border-[#f5d800] hover:text-[#f5d800] transition-colors"
+            className="md:hidden flex items-center gap-2 px-4 py-2 border border-amazon-border bg-white shadow-sm hover:bg-neutral-50 text-sm font-bold uppercase text-amazon-text transition-colors"
             aria-label="Toggle filters"
           >
             <SlidersHorizontal className="w-4 h-4" />
             Filter
             {hasActiveFilters && (
-              <span className="ml-1 px-1.5 py-0.5 bg-[#f5d800] text-black text-xs font-black rounded-none">
+              <span className="ml-1 px-1.5 py-0.5 bg-amazon-btnSecondary text-amazon-text text-xs font-bold rounded-none">
                 {selectedCategories.length + selectedAvailability.length}
               </span>
             )}
@@ -525,11 +464,11 @@ export default function ShopView() {
               /* Loading Skeleton */
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-4 lg:gap-y-10 min-h-[600px] animate-pulse">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="flex flex-col h-full bg-[#1a1d21]">
-                    <div className="h-[280px] bg-[#22262c]" />
+                  <div key={i} className="flex flex-col h-full bg-white border border-amazon-border">
+                    <div className="h-[280px] bg-neutral-200" />
                     <div className="px-4 py-4 space-y-3">
-                      <div className="h-4 w-full bg-[#22262c] rounded-none" />
-                      <div className="h-5 w-24 bg-[#22262c] rounded-none" />
+                      <div className="h-4 w-full bg-neutral-200 rounded-none" />
+                      <div className="h-5 w-24 bg-neutral-200 rounded-none" />
                     </div>
                   </div>
                 ))}
@@ -538,23 +477,22 @@ export default function ShopView() {
               <>
                   {/* Product Grid */}
                   <div className="flex items-center gap-2 ml-auto p-4 justify-end">
-            <span className="text-[11px] text-gray-500 uppercase font-black tracking-[0.2em] hidden md:inline-block">
+            <span className="text-[11px] text-amazon-textMuted uppercase font-bold tracking-[0.2em] hidden md:inline-block">
               Sort by:
             </span>
             <div className="relative">
               <select
                 value={sortBy}
                 onChange={(e) => handleSortChange(e.target.value as SortOption)}
-                className="appearance-none bg-transparent pl-0 pr-8 py-2 text-sm font-bold text-white border-none focus:ring-0 cursor-pointer uppercase tracking-wide"
+                className="appearance-none bg-white pl-0 pr-8 py-2 pl-4 text-sm font-bold text-amazon-text border border-amazon-border focus:ring-0 cursor-pointer uppercase tracking-wide rounded-sm shadow-sm"
                 aria-label="Sort products"
-                style={{ colorScheme: "dark" }}
               >
-                <option value="featured" className="bg-[#111] text-white">Featured</option>
-                <option value="newest" className="bg-[#111] text-white">Date, new to old</option>
-                <option value="price-asc" className="bg-[#111] text-white">Price, low to high</option>
-                <option value="price-desc" className="bg-[#111] text-white">Price, high to low</option>
+                <option value="featured" className="bg-white text-amazon-text">Featured</option>
+                <option value="newest" className="bg-white text-amazon-text">Date, new to old</option>
+                <option value="price-asc" className="bg-white text-amazon-text">Price, low to high</option>
+                <option value="price-desc" className="bg-white text-amazon-text">Price, high to low</option>
               </select>
-              <ArrowUpDown className="w-3 h-3 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500" />
+              <ArrowUpDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-amazon-textMuted" />
             </div>
           </div>
                 <div
@@ -578,7 +516,7 @@ export default function ShopView() {
                   <div className="flex justify-center mt-16 mb-24">
                     <button
                       onClick={handleLoadMore}
-                      className="bg-[#f5d800] text-black font-black uppercase text-sm tracking-[0.12em] px-12 py-4 hover:bg-[#ffe500] transition-colors"
+                      className="bg-white text-amazon-text border border-amazon-border shadow-sm font-bold uppercase text-sm tracking-[0.12em] px-12 py-4 hover:bg-neutral-50 transition-colors"
                     >
                       Load More
                     </button>
@@ -587,17 +525,17 @@ export default function ShopView() {
               </>
             ) : (
               // Empty State
-              <div className="py-20 text-center border border-dashed border-[#2a2d31]">
+              <div className="py-20 text-center border border-dashed border-amazon-border bg-white mt-10">
                 <div className="max-w-md mx-auto">
-                  <p className="text-gray-400 font-medium mb-2">
+                  <p className="text-amazon-text font-bold mb-2">
                     No products match your filters.
                   </p>
-                  <p className="text-gray-600 text-sm mb-6">
+                  <p className="text-amazon-textMuted text-sm mb-6">
                     Try adjusting your filters or clearing them to see all products.
                   </p>
                   <button
                     onClick={handleClearFilters}
-                    className="px-6 py-3 bg-[#f5d800] text-black text-sm font-black uppercase tracking-widest hover:bg-[#ffe500] transition-colors"
+                    className="px-6 py-3 bg-amazon-btnPrimary text-amazon-text text-sm font-bold uppercase tracking-widest hover:brightness-95 transition-all"
                   >
                     Clear all filters
                   </button>
@@ -611,14 +549,14 @@ export default function ShopView() {
       {/* ============================================================
           SEO BLOCK
       ============================================================ */}
-      <div className="w-full bg-[#0a0a0a] border-t border-[#2a2d31] py-24 text-gray-300">
+      <div className="w-full bg-amazon-bgSecondary border-t border-amazon-border py-24 text-amazon-textMuted">
   <div className="max-w-[1200px] mx-auto px-6 md:px-12">
     {/* Chuyển sang grid 2 cột trên màn hình vừa trở lên */}
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-16">
       
       {/* Khối 1: Trải dài cả 2 cột (giống phần "Gaming Keyboards" trong ảnh) */}
       <div className="md:col-span-2">
-        <h2 className="text-2xl font-bold text-white mb-4">
+        <h2 className="text-2xl font-bold text-amazon-text mb-4">
           About Our Keyboards
         </h2>
         <p className="text-sm md:text-base leading-relaxed">
@@ -631,7 +569,7 @@ export default function ShopView() {
 
       {/* Khối 2: Nằm ở cột trái */}
       <div>
-        <h2 className="text-xl font-bold text-white mb-4">
+        <h2 className="text-xl font-bold text-amazon-text mb-4">
           Customization
         </h2>
         <p className="text-sm leading-relaxed">
@@ -644,7 +582,7 @@ export default function ShopView() {
 
       {/* Khối 3: Nằm ở cột phải */}
       <div>
-        <h2 className="text-xl font-bold text-white mb-4">
+        <h2 className="text-xl font-bold text-amazon-text mb-4">
           Warranty & Support
         </h2>
         <p className="text-sm leading-relaxed">
@@ -655,7 +593,7 @@ export default function ShopView() {
       </div>
 
             <div>
-              <h2 className="text-xl font-bold text-white mb-4">  What to look for in a gaming keyboard </h2>
+              <h2 className="text-xl font-bold text-amazon-text mb-4">  What to look for in a gaming keyboard </h2>
               <p>Gaming keyboards come in all shapes, sizes, and feels, so when you’re considering yours, you’ll want to compare:</ p>
               <ul>
                 <li>Switches and typing feel: Rubber dome, mechanical, or optical</li>

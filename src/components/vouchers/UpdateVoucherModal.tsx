@@ -91,35 +91,35 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
     }
   };
 
-  const labelCls = "block text-sm font-semibold text-gray-700 mb-1";
+  const labelCls = "block text-[13px] font-medium text-amazon-text mb-1";
   const inputCls =
-    " text-black w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#ce2a32] focus:ring-1 focus:ring-[#ce2a32] outline-none transition";
-  const errCls = "mt-1 text-xs text-red-500";
+    " text-[13px] text-amazon-text bg-white w-full rounded-sm border border-amazon-border px-3 py-2.5 focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus outline-none transition placeholder-neutral-400";
+  const errCls = "mt-1 text-[11px] text-red-500 font-medium";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-sm bg-white p-6 shadow-xl border border-amazon-border">
         {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl font-black uppercase tracking-tight font-oswald">
+        <div className="flex items-center justify-between mb-3 pb-2 border-b border-amazon-border">
+          <h2 className="text-lg font-bold text-amazon-text">
             Update Voucher
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
+            className="rounded-sm p-1.5 text-amazon-textMuted hover:bg-neutral-50 hover:text-amazon-text transition border border-transparent hover:border-amazon-border"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Readonly info */}
-        <div className="mb-4 rounded-lg bg-gray-50 px-4 py-3 text-sm text-gray-600">
-          <span className="font-bold font-mono">{voucher.code}</span>
-          <span className="mx-2 text-gray-300">|</span>
-          <span>{voucher.type}</span>
-          <span className="mx-2 text-gray-300">|</span>
-          <span>
+        <div className="mb-4 rounded-sm bg-neutral-50 border border-amazon-border px-4 py-3 text-[13px] text-amazon-textMuted flex items-center gap-2">
+          <span className="font-medium font-mono text-amazon-text">{voucher.code}</span>
+          <span className="text-neutral-300">|</span>
+          <span className="font-medium">{voucher.type}</span>
+          <span className="text-neutral-300">|</span>
+          <span className="font-medium">
             {voucher.discountType === "Percentage"
               ? `${voucher.value}%`
               : `${voucher.value.toLocaleString("vi-VN")}đ`}
@@ -140,7 +140,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
             <textarea
               {...register("description")}
               rows={2}
-              className={inputCls}
+              className={`${inputCls} resize-none`}
             />
             {errors.description && (
               <p className={errCls}>{errors.description.message}</p>
@@ -161,7 +161,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
           </div>
 
           {/* Usage Limit + Status + Max Uses Per User row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className={labelCls}>Usage Limit</label>
               <input
@@ -192,17 +192,17 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              className="rounded-sm border border-amazon-border bg-white px-5 py-2.5 text-[13px] font-medium text-amazon-textMuted transition hover:bg-neutral-50 hover:text-amazon-text"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isUpdatingVoucher}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#ce2a32] px-5 py-2 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-[#b0242b] disabled:opacity-50 disabled:cursor-not-allowed font-oswald"
+              className="inline-flex items-center justify-center gap-2 rounded-sm bg-amazon-btnPrimary border border-amazon-border px-6 py-2.5 text-[13px] font-medium text-amazon-text transition hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
               {isUpdatingVoucher && (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin text-amazon-textMuted" />
               )}
               Save Changes
             </button>

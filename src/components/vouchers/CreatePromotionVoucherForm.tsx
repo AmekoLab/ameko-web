@@ -136,23 +136,23 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
   if (!isOpen) return null;
 
   // ── Label + Input helpers ──
-  const labelCls = "block text-sm font-semibold text-gray-700 mb-1";
+  const labelCls = "block text-[13px] font-medium text-amazon-text mb-1";
   const inputCls =
-    " text-black w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#ce2a32] focus:ring-1 focus:ring-[#ce2a32] outline-none transition";
-  const errCls = "mt-1 text-xs text-red-500";
+    " text-[13px] text-amazon-text bg-white w-full rounded-sm border border-amazon-border px-3 py-2.5 focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus outline-none transition placeholder-neutral-400";
+  const errCls = "mt-1 text-[11px] text-red-500 font-medium";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-sm bg-white p-6 shadow-xl border border-amazon-border">
         {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl font-black uppercase tracking-tight font-oswald">
+        <div className="flex items-center justify-between mb-5 pb-4 border-b border-amazon-border">
+          <h2 className="text-lg font-bold text-amazon-text">
             Create Promotion Voucher
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
+            className="rounded-sm p-1.5 text-amazon-textMuted hover:bg-neutral-50 hover:text-amazon-text transition border border-transparent hover:border-amazon-border"
           >
             <X className="h-5 w-5" />
           </button>
@@ -160,7 +160,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* ── Row 1: Code + Name ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className={labelCls}>Voucher Code</label>
               <input
@@ -188,7 +188,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               {...register("description")}
               rows={2}
               placeholder="Brief description about the voucher..."
-              className={inputCls}
+              className={`${inputCls} resize-none`}
             />
             {errors.description && (
               <p className={errCls}>{errors.description.message}</p>
@@ -196,7 +196,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           </div>
 
           {/* ── Row 2: Discount Type + Value ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className={labelCls}>Discount Type</label>
               <select {...register("discountType")} className={inputCls}>
@@ -242,7 +242,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           )}
 
           {/* ── Row 3: Min Order + Usage Limit + Max Uses Per User ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div>
               <label className={labelCls}>Minimum Order (VND)</label>
               <input
@@ -272,7 +272,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               <input
                 type="number"
                 {...register("maxUsesPerUser")}
-                placeholder="Empty = Unlimited"
+                placeholder="Unlimited if empty"
                 className={inputCls}
               />
               {errors.maxUsesPerUser && (
@@ -282,7 +282,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           </div>
 
           {/* ── Row 4: Dates ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className={labelCls}>Start Date</label>
               <input
@@ -308,34 +308,34 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           </div>
 
           {/* ── Stackable Toggle ── */}
-          <div className="flex items-center gap-3 rounded-lg border border-gray-200 px-4 py-3">
+          <div className="flex items-center gap-3 rounded-sm border border-amazon-border px-4 py-3.5 bg-neutral-50/50 mt-2">
             <input
               type="checkbox"
               id="allowStacking"
               {...register("allowStacking")}
-              className="h-4 w-4 rounded border-gray-300 text-[#ce2a32] focus:ring-[#ce2a32]"
+              className="h-4 w-4 rounded-sm border-amazon-border text-amazon-focus focus:ring-amazon-focus transition-colors"
             />
-            <label htmlFor="allowStacking" className="text-sm text-gray-700">
+            <label htmlFor="allowStacking" className="text-[13px] text-amazon-text font-medium cursor-pointer">
               Allow stacking with other vouchers
             </label>
           </div>
 
           {/* ── Actions ── */}
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex justify-end gap-3 pt-6 mt-2 border-t border-amazon-border">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              className="rounded-sm border border-amazon-border bg-white px-5 py-2.5 text-[13px] font-medium text-amazon-textMuted transition hover:bg-neutral-50 hover:text-amazon-text"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isCreatingVoucher}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#ce2a32] px-5 py-2 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-[#b0242b] disabled:opacity-50 disabled:cursor-not-allowed font-oswald"
+              className="inline-flex items-center justify-center gap-2 rounded-sm bg-amazon-btnPrimary border border-amazon-border px-6 py-2.5 text-[13px] font-medium text-amazon-text transition hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
               {isCreatingVoucher && (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin text-amazon-textMuted" />
               )}
               Create Voucher
             </button>

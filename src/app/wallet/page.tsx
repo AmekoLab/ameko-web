@@ -31,19 +31,19 @@ export default function WalletPage() {
   if (!details && !loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="bg-white rounded-2xl shadow-lg p-10 max-w-md w-full text-center border border-gray-100">
+        <div className="bg-white rounded-sm shadow-sm p-10 max-w-md w-full text-center border border-amazon-border">
           {/* Icon */}
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-black">
-            <Wallet className="h-10 w-10 text-white" />
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100">
+            <Wallet className="h-10 w-10 text-neutral-600" />
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl font-black uppercase tracking-tight text-black font-oswald mb-3">
+          <h2 className="text-2xl font-black uppercase tracking-tight text-amazon-text  mb-3">
             Activate your wallet
           </h2>
 
           {/* Description */}
-          <p className="text-gray-500 mb-8 text-sm leading-relaxed">
+          <p className="text-amazon-textMuted mb-8 text-sm leading-relaxed">
             Initialize your wallet to start managing your balance and making
             transactions on the platform.
           </p>
@@ -51,7 +51,7 @@ export default function WalletPage() {
           {/* CTA Button */}
           <button
             onClick={() => dispatch(initializeWallet())}
-            className="w-full rounded-lg bg-[#ce2a32] px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-[#b0242b] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-oswald"
+            className="w-full rounded-sm bg-amazon-btnPrimary px-6 py-3 text-sm font-bold uppercase tracking-wider text-amazon-text transition-all shadow-sm hover:brightness-95 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed  "
           >
             Initialize wallet now
           </button>
@@ -72,7 +72,7 @@ export default function WalletPage() {
   // ─── Wallet Dashboard ─────────────────────────────────
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-black uppercase tracking-tight text-black font-oswald mb-6">
+      <h1 className="text-2xl font-black uppercase tracking-tight text-amazon-text  mb-6">
         My Wallet
       </h1>
 
@@ -87,7 +87,7 @@ export default function WalletPage() {
             </p>
             <Link
               href="/shop/wallet/pin/setup"
-              className="mt-2 inline-block text-sm font-bold uppercase tracking-wide text-[#ce2a32] hover:underline font-oswald"
+              className="mt-2 inline-block text-sm font-bold uppercase tracking-wide text-amazon-link hover:text-amazon-focus hover:underline "
             >
               Set up now →
             </Link>
@@ -95,26 +95,26 @@ export default function WalletPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+      <div className="bg-white rounded-sm shadow-sm p-8 border border-amazon-border">
         <div className="flex items-center gap-4 mb-6">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-black">
-            <Wallet className="h-7 w-7 text-white" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100">
+            <Wallet className="h-7 w-7 text-neutral-600" />
           </div>
           <div>
-            <p className="text-sm text-gray-500 uppercase tracking-wide font-oswald">
+            <p className="text-sm text-amazon-textMuted uppercase tracking-wide ">
               Current Balance
             </p>
-            <p className="text-3xl font-black text-[#ce2a32] font-oswald">
+            <p className="text-3xl font-black text-amazon-price ">
               {details?.balance?.toLocaleString("vi-VN") ?? 0}
 
               <span className="text-lg ml-1">₫</span>
             </p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-amazon-textMuted mt-1">
               Pending balance:{" "}
               <button
                 type="button"
                 onClick={() => setIsHeldOpen(true)}
-                className="font-semibold text-orange-500 hover:underline cursor-pointer"
+                className="font-semibold text-amazon-link hover:text-amazon-focus hover:underline cursor-pointer"
               >
                 {details?.heldBalance?.toLocaleString("vi-VN") ?? 0} ₫
               </button>
@@ -127,7 +127,7 @@ export default function WalletPage() {
           <button
             disabled={hasPin === false}
             onClick={() => setIsWithdrawOpen(true)}
-            className="rounded-lg bg-black px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-gray-900 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed font-oswald"
+            className="rounded-sm bg-amazon-btnPrimary px-6 py-3 text-sm font-bold uppercase tracking-wider text-amazon-text shadow-sm transition-all hover:brightness-95 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed  "
           >
             Withdraw
           </button>
@@ -135,7 +135,7 @@ export default function WalletPage() {
           {hasPin && (
             <button
               onClick={() => setIsChangePinOpen(true)}
-              className="rounded-lg border-2 border-gray-300 px-6 py-3 text-sm font-bold uppercase tracking-wider text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50 active:scale-[0.98] font-oswald"
+              className="rounded-sm border border-amazon-border px-6 py-3 text-sm font-bold uppercase tracking-wider text-amazon-text transition-all hover:bg-neutral-50 active:scale-[0.98] shadow-sm "
             >
               Change PIN
             </button>

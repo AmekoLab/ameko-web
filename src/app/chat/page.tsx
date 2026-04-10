@@ -14,13 +14,13 @@ function ConversationSkeleton() {
   return (
     <div className="flex flex-col gap-1 px-2 py-2 animate-pulse">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-3 px-2 py-2.5 rounded-xl">
-          <div className="w-9 h-9 rounded-full bg-white/8 shrink-0" />
+        <div key={i} className="flex items-center gap-3 px-2 py-2.5 rounded-sm">
+          <div className="w-9 h-9 rounded-full bg-neutral-200 shrink-0" />
           <div className="flex-1 space-y-1.5">
-            <div className="h-2.5 w-32 rounded-full bg-white/8" />
-            <div className="h-2 w-24 rounded-full bg-white/5" />
+            <div className="h-2.5 w-32 rounded-sm bg-neutral-200" />
+            <div className="h-2 w-24 rounded-sm bg-neutral-100" />
           </div>
-          <div className="h-2 w-8 rounded-full bg-white/5 shrink-0" />
+          <div className="h-2 w-8 rounded-sm bg-neutral-100 shrink-0" />
         </div>
       ))}
     </div>
@@ -31,18 +31,18 @@ function ConversationSkeleton() {
 
 function NoConversationSelected() {
   return (
-    <div className="flex flex-col items-center justify-center h-full text-center px-10">
-      <div className="w-16 h-16 rounded-2xl bg-white/5 border border-[#1e2126] flex items-center justify-center mb-5">
-        <MessageSquareDashed className="w-8 h-8 text-gray-600" />
+    <div className="flex flex-col items-center justify-center h-full text-center px-10 bg-amazon-bgSecondary">
+      <div className="w-16 h-16 rounded-sm bg-white border border-amazon-border flex items-center justify-center mb-5 shadow-sm">
+        <MessageSquareDashed className="w-8 h-8 text-amazon-textMuted" />
       </div>
-      <h2 className="text-base font-bold text-gray-200 mb-2">Your Messages</h2>
-      <p className="text-xs text-gray-500 max-w-xs leading-relaxed">
+      <h2 className="text-base font-black text-amazon-text mb-2">Your Messages</h2>
+      <p className="text-xs text-amazon-textMuted max-w-xs leading-relaxed font-bold">
         Select a conversation from the sidebar, or start a new chat from a product page.
       </p>
-      <div className="mt-5 flex items-center gap-2 text-[10px] text-gray-700">
-        <div className="w-8 h-px bg-[#1e2126]" />
+      <div className="mt-5 flex items-center gap-2 text-[10px] text-amazon-textMuted font-bold">
+        <div className="w-8 h-px bg-amazon-border" />
         <span>Messages are end-to-end secured</span>
-        <div className="w-8 h-px bg-[#1e2126]" />
+        <div className="w-8 h-px bg-amazon-border" />
       </div>
     </div>
   );
@@ -58,20 +58,20 @@ function SidebarHeader() {
   const isLoading = useAppSelector((state) => state.chat.isLoadingConversations);
 
   return (
-    <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#1e2126] shrink-0">
+    <div className="flex items-center justify-between px-4 py-3.5 z-10">
       <div className="flex items-center gap-2.5">
-        <Users className="w-4 h-4 text-[#f5d800]" />
-        <h1 className="text-sm font-bold text-white">Messages</h1>
+        <Users className="w-4 h-4 text-amazon-btnSecondary" />
+        <h1 className="text-sm font-black text-amazon-text ">Messages</h1>
         {totalUnread > 0 && (
-          <span className="min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-[#f5d800] text-black text-[10px] font-bold px-1">
+          <span className="min-w-[18px] h-[18px] flex items-center justify-center rounded-sm bg-amazon-btnPrimary text-amazon-text text-[10px] font-black px-1">
             {totalUnread > 99 ? "99+" : totalUnread}
           </span>
         )}
       </div>
       {isLoading ? (
-        <Loader2 className="w-3.5 h-3.5 text-gray-600 animate-spin" />
+        <Loader2 className="w-3.5 h-3.5 text-amazon-textMuted animate-spin" />
       ) : (
-        <span className="text-[10px] text-gray-600">{count} chat{count !== 1 ? "s" : ""}</span>
+        <span className="text-[10px] text-amazon-textMuted font-bold uppercase tracking-widest">{count} chat{count !== 1 ? "s" : ""}</span>
       )}
     </div>
   );
@@ -102,14 +102,14 @@ export default function ChatPage() {
   const showList = mobileView === "list";
 
   return (
-    <div className="h-[100dvh] bg-[#0a0a0a] flex overflow-hidden">
+    <div className="h-[100dvh] bg-amazon-bgSecondary text-amazon-text flex overflow-hidden font-sans">
 
       {/* ── Left sidebar ──────────────────────────────────── */}
       <aside
         className={`
           flex-col
           w-full md:w-72 lg:w-80 xl:w-96 shrink-0
-          border-r border-[#1e2126] bg-[#111111]
+          border-r border-amazon-border bg-white
           md:flex
           ${showList ? "flex" : "hidden"}
         `}

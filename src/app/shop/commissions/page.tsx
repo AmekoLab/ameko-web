@@ -22,21 +22,21 @@ const STATUS_STYLES: Record<
   { bg: string; text: string; label: string }
 > = {
   PendingTarget: {
-    bg: "bg-[#f5d800]/10 border border-[#f5d800]/20",
-    text: "text-[#f5d800]",
+    bg: "bg-amber-50 border border-amber-200",
+    text: "text-amber-700",
     label: "Waiting for response",
   },
-  OpenPool: { bg: "bg-blue-500/10 border border-blue-500/20", text: "text-blue-400", label: "Open" },
+  OpenPool: { bg: "bg-blue-50 border border-blue-200", text: "text-blue-700", label: "Open" },
   Completed: {
-    bg: "bg-green-500/10 border border-green-500/20",
-    text: "text-green-400",
+    bg: "bg-emerald-50 border border-emerald-200",
+    text: "text-emerald-700",
     label: "Completed",
   },
 };
 
 const DEFAULT_STATUS = {
-  bg: "bg-[#202030] border border-[#1e2126]",
-  text: "text-gray-400",
+  bg: "bg-neutral-50 border border-amazon-border",
+  text: "text-amazon-textMuted",
   label: "Unknown",
 };
 
@@ -60,16 +60,16 @@ const formatDateTime = (dateStr: string): string => {
 
 // ─── Skeleton Row ──────────────────────────────────────────
 const RowSkeleton = () => (
-  <div className="bg-[#151515] rounded-sm border border-[#1e2126] p-5 animate-pulse flex gap-4">
-    <div className="w-20 h-20 bg-[#202030] rounded-sm shrink-0" />
+  <div className="bg-white rounded-sm border border-amazon-border p-5 animate-pulse flex gap-4 shadow-sm">
+    <div className="w-20 h-20 bg-neutral-100 rounded-sm shrink-0" />
     <div className="flex-1 space-y-2">
-      <div className="h-5 w-48 bg-[#202030] rounded-sm" />
-      <div className="h-4 w-32 bg-[#202030] rounded-sm" />
-      <div className="h-4 w-40 bg-[#202030] rounded-sm" />
+      <div className="h-5 w-48 bg-neutral-100 rounded-sm" />
+      <div className="h-4 w-32 bg-neutral-100 rounded-sm" />
+      <div className="h-4 w-40 bg-neutral-100 rounded-sm" />
     </div>
     <div className="flex items-center gap-2">
-      <div className="h-9 w-28 bg-[#202030] rounded-sm" />
-      <div className="h-9 w-24 bg-[#202030] rounded-sm" />
+      <div className="h-9 w-28 bg-neutral-100 rounded-sm" />
+      <div className="h-9 w-24 bg-neutral-100 rounded-sm" />
     </div>
   </div>
 );
@@ -130,12 +130,12 @@ export default function ShopTargetedRequestsPage() {
 
       {/* Confirmation Modal for Rejection */}
       {rejectModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4">
-          <div className="bg-white border border-[#1e2126] w-full max-w-sm rounded-sm p-6 shadow-xl">
-            <h2 className="text-xl font-oswald font-black text-black uppercase tracking-widest mb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white border border-amazon-border w-full max-w-sm rounded-sm p-6 shadow-xl">
+            <h2 className="text-lg font-bold text-amazon-text mb-2">
               Confirm Rejection
             </h2>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-black mb-6">
+            <p className="text-[13px] font-medium text-amazon-textMuted mb-6">
               Are you sure you want to reject this commission request? This action cannot be undone.
             </p>
             <div className="flex items-center justify-end gap-3">
@@ -143,7 +143,7 @@ export default function ShopTargetedRequestsPage() {
                 type="button"
                 onClick={() => !isRejecting && setRejectModal({ isOpen: false, requestId: "" })}
                 disabled={isRejecting}
-                className="px-4 py-2 bg-white hover:bg-red-500 hover:text-white border border-[#1e2126] text-black font-bold uppercase tracking-widest text-[11px] rounded-sm transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-white hover:bg-neutral-50 border border-amazon-border text-amazon-textMuted font-medium text-[13px] rounded-sm transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -151,7 +151,7 @@ export default function ShopTargetedRequestsPage() {
                 type="button"
                 onClick={handleConfirmReject}
                 disabled={isRejecting}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-[#1e2126] hover:bg-black hover:text-white text-black font-black uppercase tracking-widest text-[11px] rounded-sm transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 border border-red-600 hover:bg-red-700 text-white font-medium text-[13px] rounded-sm transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isRejecting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 Confirm
@@ -161,9 +161,9 @@ export default function ShopTargetedRequestsPage() {
         </div>
       )}
       {/* Page Header */}
-      <div className="mb-6 border-b border-[#1e2126] pb-4">
-        <h1 className="text-3xl font-oswald font-black text-white uppercase tracking-widest flex items-center gap-3">Targeted Requests</h1>
-        <p className="text-[11px] font-bold text-gray-400 mt-2 uppercase tracking-widest">
+      <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary">
+        <h1 className="text-2xl font-bold text-amazon-text flex items-center gap-3">Targeted Requests</h1>
+        <p className="text-[11px] text-amazon-textMuted mt-1">
           Quotation requests sent by customers to your shop
         </p>
       </div>
@@ -179,14 +179,14 @@ export default function ShopTargetedRequestsPage() {
 
       {/* Empty State */}
       {!loadingTargetedRequests && targetedRequests.length === 0 && (
-        <div className="bg-[#151515] rounded-sm border border-[#1e2126] flex flex-col items-center justify-center py-24 text-center">
-          <div className="w-20 h-20 rounded-full bg-black border border-[#1e2126] flex items-center justify-center mb-5">
-            <Inbox className="w-10 h-10 text-[#f5d800]" />
+        <div className="bg-white rounded-sm border border-amazon-border shadow-sm flex flex-col items-center justify-center py-24 text-center">
+          <div className="w-20 h-20 rounded-full bg-neutral-50 border border-amazon-border flex items-center justify-center mb-5">
+            <Inbox className="w-10 h-10 text-amazon-textMuted opacity-30" />
           </div>
-          <h2 className="text-[13px] font-black uppercase tracking-widest text-white mb-1">
+          <h2 className="text-[14px] font-bold text-amazon-text mb-1">
             There are currently no targeted requests
           </h2>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 max-w-sm">
+          <p className="text-[11px] font-medium text-amazon-textMuted max-w-sm">
             When customers send quotation requests to your shop, they will
             appear here.
           </p>
@@ -202,12 +202,12 @@ export default function ShopTargetedRequestsPage() {
             return (
               <div
                 key={req.commissionRequestId}
-                className="bg-[#151515] rounded-sm border border-[#1e2126] p-5 hover:border-[#f5d800]/50 transition-colors"
+                className="bg-white rounded-sm border border-amazon-border shadow-sm p-5 hover:border-amazon-btnPrimary transition-colors"
               >
                 <div className="flex flex-col lg:flex-row gap-4">
                   {/* Thumbnail */}
                   {req.referenceImages && (
-                    <div className="relative w-full lg:w-24 h-40 lg:h-24 rounded-sm overflow-hidden bg-black border border-[#1e2126] shrink-0">
+                    <div className="relative w-full lg:w-24 h-40 lg:h-24 rounded-sm overflow-hidden bg-neutral-50 border border-amazon-border shrink-0">
                       <Image
                         src={req.referenceImages}
                         alt={req.title}
@@ -222,37 +222,37 @@ export default function ShopTargetedRequestsPage() {
                     {/* Title row */}
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="min-w-0">
-                        <h3 className="font-black text-white text-[15px] uppercase tracking-wider truncate">
+                        <h3 className="font-bold text-amazon-text text-[15px] truncate">
                           {req.title}
                         </h3>
-                        <p className="text-[11px] font-bold text-[#f5d800] uppercase tracking-widest mt-1">
+                        <p className="text-[13px] font-medium text-amazon-text mt-0.5">
                           Qty: {req.quantity}
                         </p>
                       </div>
                       <span
-                        className={`shrink-0 px-2.5 py-0.5 rounded-sm text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${statusStyle.bg} ${statusStyle.text}`}
+                        className={`shrink-0 px-2 py-0.5 rounded-sm text-[12px] font-medium whitespace-nowrap ${statusStyle.bg} ${statusStyle.text}`}
                       >
                         {statusStyle.label}
                       </span>
                     </div>
 
                     {/* Details */}
-                    <div className="flex flex-wrap gap-x-5 gap-y-2 text-[11px] font-bold uppercase tracking-widest text-gray-400 mt-2">
+                    <div className="flex flex-wrap gap-x-5 gap-y-2 text-[13px] font-medium text-amazon-textMuted mt-2">
                       <div className="flex items-center gap-1.5">
-                        <User className="w-3.5 h-3.5 text-gray-500" />
-                        <span className="text-white">
+                        <User className="w-3.5 h-3.5" />
+                        <span className="text-amazon-text">
                           {req.userName || "Customer"}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <Banknote className="w-3.5 h-3.5 text-gray-500" />
-                        <span className="text-[#f5d800]">
+                        <Banknote className="w-3.5 h-3.5" />
+                        <span className="text-amazon-price font-bold">
                           {formatVND(req.minBudget)} –{" "}
                           {formatVND(req.maxBudget)}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-gray-500" />
+                        <Calendar className="w-3.5 h-3.5" />
                         <span>{formatDateTime(req.createdAt)}</span>
                       </div>
                     </div>
@@ -267,13 +267,13 @@ export default function ShopTargetedRequestsPage() {
                           requestId: req.commissionRequestId,
                         })
                       }
-                      className="flex items-center gap-1.5 px-5 py-2.5 bg-[#f5d800] hover:bg-[#ffe500] text-black font-black uppercase tracking-widest text-[11px] rounded-sm transition-colors shadow-[0_0_15px_rgba(245,216,0,0.3)]"
+                      className="flex items-center gap-1.5 px-5 py-2 bg-amazon-btnPrimary border border-amazon-border hover:brightness-95 text-amazon-text font-medium text-[13px] rounded-sm transition-colors shadow-sm"
                     >
                       <FileEdit className="w-4 h-4" /> Quote
                     </button>
                     <button
                       onClick={() => handleRejectClick(req.commissionRequestId)}
-                      className="flex items-center gap-1.5 px-5 py-2.5 bg-transparent hover:bg-red-500/10 text-red-500 font-bold uppercase tracking-widest text-[11px] rounded-sm transition-colors border border-red-500/50"
+                      className="flex items-center gap-1.5 px-5 py-2 bg-white hover:bg-red-50 text-red-500 font-medium text-[13px] rounded-sm transition-colors border border-amazon-border shadow-sm"
                     >
                       <XCircle className="w-4 h-4" /> Reject
                     </button>

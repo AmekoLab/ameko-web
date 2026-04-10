@@ -70,13 +70,13 @@ const ImageUpload = ({
 
   const containerClass =
     type === "banner"
-      ? "w-full h-48 md:h-64 rounded-t-sm bg-black border border-[#1e2126] border-dashed relative overflow-hidden group hover:border-[#f5d800] transition-all"
-      : "w-32 h-32 md:w-40 md:h-40 rounded-full bg-black border-4 border-[#151515] shadow-lg relative overflow-hidden group cursor-pointer hover:border-[#f5d800] transition-all";
+      ? "w-full h-48 md:h-64 rounded-md bg-neutral-50 border border-dashed border-amazon-border relative overflow-hidden group hover:border-amazon-focus transition-all"
+      : "w-32 h-32 md:w-40 md:h-40 rounded-full bg-neutral-50 border-4 border-white shadow-md relative overflow-hidden group cursor-pointer hover:border-amazon-focus transition-all";
 
   return (
     <div className="relative">
       <div
-        className={`${containerClass} ${isDragging ? "border-blue-500 bg-blue-50" : ""} ${error ? "border-red-500" : ""}`}
+        className={`${containerClass} ${isDragging ? "border-amazon-focus bg-blue-50" : ""} ${error ? "border-red-600" : ""}`}
         onDragOver={(e) => {
           e.preventDefault();
           setIsDragging(true);
@@ -98,12 +98,12 @@ const ImageUpload = ({
         {preview ? (
           <Image src={preview} alt="Preview" fill className="object-cover" />
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 z-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-amazon-textMuted z-10">
             <Camera
-              className={`${type === "banner" ? "w-8 h-8" : "w-6 h-6"} mb-2 ${isDragging ? "text-[#f5d800]" : ""}`}
+              className={`${type === "banner" ? "w-8 h-8" : "w-6 h-6"} mb-2 ${isDragging ? "text-amazon-link" : ""}`}
             />
             {type === "banner" && (
-              <span className="text-[11px] font-bold uppercase tracking-widest text-center px-4">
+              <span className="text-sm font-medium text-center px-4">
                 Drag or click to upload banner
               </span>
             )}
@@ -115,7 +115,7 @@ const ImageUpload = ({
         </div>
       </div>
       {error && (
-        <p className="text-red-500 text-xs mt-1 text-center font-bold">
+        <p className="text-red-600 text-xs mt-1 text-center">
           {error}
         </p>
       )}
@@ -133,12 +133,12 @@ const InputLabel = ({
   error?: string;
   required?: boolean;
 }) => (
-  <div className="flex justify-between mb-2 items-end">
-    <label className="text-[11px] font-black uppercase tracking-widest text-gray-400">
-      {label} {required && <span className="text-[#f5d800]">*</span>}
+  <div className="flex justify-between mb-1.5 items-end">
+    <label className="text-sm font-medium text-amazon-text">
+      {label} {required && <span className="text-red-500">*</span>}
     </label>
     {error && (
-      <span className="text-red-500 text-[10px] font-black uppercase tracking-widest animate-pulse">
+      <span className="text-red-600 text-xs font-medium">
         {error}
       </span>
     )}
@@ -237,10 +237,10 @@ export default function ShopProfilePage() {
   // Loading state (Toàn trang)
   if (loading && !currentShop) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-black">
+      <div className="min-h-[60vh] flex items-center justify-center bg-amazon-bgSecondary">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-10 h-10 animate-spin text-[#f5d800]" />
-          <p className="text-gray-500 text-[11px] font-bold uppercase tracking-widest">Loading profile...</p>
+          <Loader2 className="w-10 h-10 animate-spin text-amazon-link" />
+          <p className="text-amazon-textMuted text-sm font-medium">Loading profile...</p>
         </div>
       </div>
     );
@@ -249,13 +249,13 @@ export default function ShopProfilePage() {
   // No shop found
   if (!loading && !currentShop) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-black">
+      <div className="min-h-[60vh] flex items-center justify-center bg-amazon-bgSecondary">
         <div className="text-center">
-          <Store className="w-16 h-16 text-[#f5d800] mx-auto mb-4" />
-          <h2 className="text-[13px] font-black uppercase tracking-widest text-white mb-2">
+          <Store className="w-16 h-16 text-amazon-link mx-auto mb-4" />
+          <h2 className="text-lg font-bold text-amazon-text mb-2">
             No Shop Found
           </h2>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
+          <p className="text-sm font-medium text-amazon-textMuted">
             You haven&apos;t registered a shop yet.
           </p>
         </div>
@@ -264,17 +264,17 @@ export default function ShopProfilePage() {
   }
 
   return (
-    <div className="py-6 px-2 md:px-0 relative">
+    <div className="py-6 px-2 md:px-0 relative bg-amazon-bgSecondary min-h-screen">
       {/* ==================== CUSTOM CONFIRM MODAL ==================== */}
       {isConfirmModalOpen && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm transition-opacity">
-          <div className="bg-[#151515] border border-[#1e2126] rounded-sm w-full max-w-sm p-6 shadow-2xl flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm transition-opacity">
+          <div className="bg-white border border-amazon-border rounded-md w-full max-w-sm p-6 shadow-xl flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
             {/* Icon Trạng Thái */}
             <div
               className={`w-16 h-16 rounded-full flex items-center justify-center mb-5 border ${
                 currentShop?.isActive
-                  ? "bg-red-500/10 text-red-500 border-red-500/20"
-                  : "bg-green-500/10 text-green-500 border-green-500/20"
+                  ? "bg-red-50 text-red-600 border-red-100"
+                  : "bg-green-50 text-green-600 border-green-100"
               }`}
             >
               {currentShop?.isActive ? (
@@ -285,12 +285,12 @@ export default function ShopProfilePage() {
             </div>
 
             {/* Tiêu đề & Nội dung */}
-            <h3 className="text-[15px] font-black uppercase tracking-wider text-white mb-2">
+            <h3 className="text-lg font-bold text-amazon-text mb-2">
               {currentShop?.isActive
                 ? "Close shop temporarily?"
                 : "Reopen shop?"}
             </h3>
-            <p className="text-[11px] font-bold text-gray-400 mb-6 uppercase tracking-widest">
+            <p className="text-sm font-medium text-amazon-textMuted mb-6">
               {currentShop?.isActive
                 ? "Your shop will be hidden. Customers cannot view or purchase products until you reopen."
                 : "Your shop will be visible again. Customers can continue to view and shop as usual."}
@@ -302,7 +302,7 @@ export default function ShopProfilePage() {
                 type="button"
                 onClick={() => setIsConfirmModalOpen(false)}
                 disabled={isToggling}
-                className="flex-1 py-2.5 bg-black border border-[#1e2126] hover:bg-[#202030] text-gray-400 hover:text-white text-[11px] font-black uppercase tracking-widest rounded-sm transition-colors disabled:opacity-70"
+                className="flex-1 py-2.5 bg-white border border-amazon-border hover:bg-neutral-50 text-amazon-text text-sm font-medium rounded-md transition-colors disabled:opacity-70"
               >
                 Cancel
               </button>
@@ -310,7 +310,7 @@ export default function ShopProfilePage() {
                 type="button"
                 onClick={executeToggleStatus}
                 disabled={isToggling}
-                className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-white text-[11px] font-black uppercase tracking-widest rounded-sm transition-colors shadow-sm disabled:opacity-70 ${
+                className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-white text-sm font-medium rounded-md transition-colors shadow-sm disabled:opacity-70 ${
                   currentShop?.isActive
                     ? "bg-red-600 hover:bg-red-700"
                     : "bg-green-600 hover:bg-green-700"
@@ -327,14 +327,14 @@ export default function ShopProfilePage() {
         </div>
       )}
 
-      <div className="max-w-5xl mx-auto">
+      <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary min-h-screen">
         {/* HEADER */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#1e2126] pb-4">
+        <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-amazon-border pb-4">
           <div>
-            <h1 className="text-3xl font-black font-oswald uppercase tracking-widest text-white">
+            <h1 className="text-2xl font-bold text-amazon-text">
               Shop Profile
             </h1>
-            <p className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mt-2">
+            <p className="text-amazon-textMuted text-[11px] font-medium mt-1">
               Update your shop&apos;s information and settings.
             </p>
           </div>
@@ -343,18 +343,18 @@ export default function ShopProfilePage() {
             {/* --- NHÃN TRẠNG THÁI HIỂN THỊ DỰA VÀO isActive --- */}
             {currentShop && (
               <span
-                className={`px-3 py-1.5 rounded-sm text-[10px] font-black uppercase tracking-widest border ${
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold border ${
                   currentShop.status === 1 && currentShop.isActive
-                    ? "bg-[#202030] text-white border-white/10"
+                    ? "bg-green-50 text-green-700 border-green-200"
                     : currentShop.status === 1 && !currentShop.isActive
-                      ? "bg-gray-500/10 text-gray-400 border-gray-500/20" // Trạng thái Inactive
+                      ? "bg-gray-100 text-gray-600 border-gray-200" // Trạng thái Inactive
                       : currentShop.status === 0
-                        ? "bg-[#f5d800]/10 text-[#f5d800] border-[#f5d800]/20"
+                        ? "bg-yellow-50 text-yellow-700 border-yellow-200"
                         : currentShop.status === 3
-                          ? "bg-red-500/10 text-red-500 border-red-500/20"
+                          ? "bg-red-50 text-red-700 border-red-200"
                           : currentShop.status === 4
-                            ? "bg-gray-500/10 text-gray-500 border-gray-500/20"
-                            : "bg-gray-500/10 text-gray-500 border-gray-500/20"
+                            ? "bg-gray-100 text-gray-600 border-gray-200"
+                            : "bg-gray-100 text-gray-600 border-gray-200"
                 }`}
               >
                 {currentShop.status === 1 && currentShop.isActive
@@ -377,16 +377,16 @@ export default function ShopProfilePage() {
               <button
                 type="button"
                 onClick={() => setIsConfirmModalOpen(true)}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-sm text-[10px] font-black uppercase tracking-widest transition-colors border shadow-sm ${
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-colors border shadow-sm ${
                   currentShop.isActive
-                    ? "bg-black border-red-500 text-red-500 hover:bg-red-500/10"
-                    : "bg-[#202030] border-[#1e2126] text-white hover:bg-[#303040] hover:border-white/20"
+                    ? "bg-white border-amazon-border text-red-600 hover:bg-neutral-50"
+                    : "bg-white border-amazon-border text-amazon-text hover:bg-neutral-50"
                 }`}
               >
                 {currentShop.isActive ? (
-                  <PowerOff className="w-3.5 h-3.5" />
+                  <PowerOff className="w-4 h-4" />
                 ) : (
-                  <Power className="w-3.5 h-3.5" />
+                  <Power className="w-4 h-4" />
                 )}
                 {currentShop.isActive ? "Deactivate" : "Reactivate"}
               </button>
@@ -396,17 +396,17 @@ export default function ShopProfilePage() {
 
         {/* Admin note (if rejected) */}
         {currentShop?.adminNote && currentShop.status === 3 && (
-          <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-sm p-4">
-            <p className="text-[11px] font-black uppercase tracking-widest text-red-500 mb-1">
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+            <p className="text-sm font-semibold text-red-700 mb-1">
               Admin Rejection Note:
             </p>
-            <p className="text-[11px] font-bold text-red-400">{currentShop.adminNote}</p>
+            <p className="text-sm font-medium text-red-600">{currentShop.adminNote}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* --- SECTION 1: VISUAL IDENTITY --- */}
-          <div className="bg-[#151515] rounded-sm shadow-sm border border-[#1e2126]">
+          <div className="bg-white rounded-md shadow-sm border border-amazon-border">
             <div className="relative">
               <ImageUpload
                 name="bannerImage"
@@ -442,15 +442,15 @@ export default function ShopProfilePage() {
                   />
                   <input
                     {...register("shopName")}
-                    className="form-input text-[13px] font-black uppercase tracking-wider text-white"
-                    placeholder="SHOP NAME..."
+                    className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-white text-amazon-text placeholder-gray-400 focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus transition-all text-sm font-medium"
+                    placeholder="Enter shop name..."
                   />
                 </div>
                 <div>
                   <InputLabel label="Slogan / Bio" />
                   <input
                     {...register("bio")}
-                    className="form-input text-[13px] font-bold text-white"
+                    className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-white text-amazon-text placeholder-gray-400 focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus transition-all text-sm font-medium"
                     placeholder="Short slogan or description..."
                   />
                 </div>
@@ -459,10 +459,10 @@ export default function ShopProfilePage() {
           </div>
 
           {/* --- SECTION 2: CONTACT & ADDRESS --- */}
-          <div className="bg-[#151515] rounded-sm shadow-sm border border-[#1e2126] p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6 border-b border-[#1e2126] pb-4">
-              <User className="text-[#f5d800] w-5 h-5" />
-              <h3 className="text-[13px] font-black text-white tracking-widest uppercase">
+          <div className="bg-white rounded-md shadow-sm border border-amazon-border p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-6 border-b border-amazon-border pb-4">
+              <User className="text-amazon-link w-5 h-5" />
+              <h3 className="text-lg font-bold text-amazon-text">
                 Contact Details
               </h3>
             </div>
@@ -476,7 +476,7 @@ export default function ShopProfilePage() {
                 />
                 <input
                   {...register("contactEmail")}
-                  className="form-input text-[13px] font-bold text-white tracking-wider"
+                  className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-white text-amazon-text placeholder-gray-400 focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus transition-all text-sm font-medium"
                   placeholder="email@domain.com"
                 />
               </div>
@@ -488,7 +488,7 @@ export default function ShopProfilePage() {
                 />
                 <input
                   {...register("phoneNumber")}
-                  className="form-input text-[13px] font-bold text-white tracking-wider"
+                  className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-white text-amazon-text placeholder-gray-400 focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus transition-all text-sm font-medium"
                   placeholder="09xxx..."
                 />
               </div>
@@ -500,7 +500,7 @@ export default function ShopProfilePage() {
                 />
                 <input
                   {...register("address")}
-                  className="form-input text-[13px] font-bold text-white tracking-wider"
+                  className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-white text-amazon-text placeholder-gray-400 focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus transition-all text-sm font-medium"
                   placeholder="Shop address..."
                 />
               </div>
@@ -508,13 +508,13 @@ export default function ShopProfilePage() {
           </div>
 
           {/* --- SECTION 3: BANKING INFORMATION (Read-only) --- */}
-          <div className="bg-[#151515] rounded-sm shadow-sm border border-[#1e2126] p-6 md:p-8 opacity-80">
-            <div className="flex items-center gap-3 mb-6 border-b border-[#1e2126] pb-4">
-              <CreditCard className="text-[#f5d800] w-5 h-5" />
-              <h3 className="text-[13px] font-black text-white tracking-widest uppercase">
+          <div className="bg-white rounded-md shadow-sm border border-amazon-border p-6 md:p-8 opacity-90">
+            <div className="flex items-center gap-3 mb-6 border-b border-amazon-border pb-4">
+              <CreditCard className="text-amazon-link w-5 h-5" />
+              <h3 className="text-lg font-bold text-amazon-text">
                 Banking Information
               </h3>
-              <span className="ml-auto text-[10px] font-black text-gray-500 uppercase tracking-widest border border-gray-600/30 px-2 py-0.5 rounded-sm">
+              <span className="ml-auto text-xs font-semibold text-amazon-textMuted bg-neutral-100 border border-amazon-border px-2 py-0.5 rounded-md">
                 Locked
               </span>
             </div>
@@ -524,8 +524,8 @@ export default function ShopProfilePage() {
                 <InputLabel label="Bank Name" />
                 <input
                   {...register("bankName")}
-                  className="form-input bg-[#0f0f0f] text-gray-500 cursor-not-allowed border-transparent"
-                  placeholder="BANK NAME"
+                  className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-neutral-100 text-amazon-textMuted cursor-not-allowed transition-all text-sm font-medium"
+                  placeholder="Bank name"
                   disabled
                 />
               </div>
@@ -533,8 +533,8 @@ export default function ShopProfilePage() {
                 <InputLabel label="Account Number" />
                 <input
                   {...register("bankAccountNumber")}
-                  className="form-input font-mono bg-[#0f0f0f] text-gray-500 cursor-not-allowed border-transparent"
-                  placeholder="ACCOUNT NUMBER"
+                  className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-neutral-100 text-amazon-textMuted cursor-not-allowed transition-all font-mono text-sm"
+                  placeholder="Account number"
                   disabled
                 />
               </div>
@@ -542,8 +542,8 @@ export default function ShopProfilePage() {
                 <InputLabel label="Account Holder Name" />
                 <input
                   {...register("bankAccountName")}
-                  className="form-input uppercase bg-[#0f0f0f] text-gray-500 cursor-not-allowed border-transparent"
-                  placeholder="ACCOUNT HOLDER NAME"
+                  className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-neutral-100 text-amazon-textMuted cursor-not-allowed transition-all text-sm font-medium"
+                  placeholder="Account holder name"
                   disabled
                 />
               </div>
@@ -552,29 +552,29 @@ export default function ShopProfilePage() {
 
           {/* --- SHOP STATS (read-only) --- */}
           {currentShop && (
-            <div className="bg-[#151515] rounded-sm shadow-sm border border-[#1e2126] p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6 border-b border-[#1e2126] pb-4">
-                <Store className="text-[#f5d800] w-5 h-5" />
-                <h3 className="text-[13px] font-black text-white tracking-widest uppercase">
+            <div className="bg-white rounded-md shadow-sm border border-amazon-border p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-6 border-b border-amazon-border pb-4">
+                <Store className="text-amazon-link w-5 h-5" />
+                <h3 className="text-lg font-bold text-amazon-text">
                   Shop Statistics
                 </h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div className="bg-black border border-[#1e2126] rounded-sm p-5 text-center">
-                  <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">Rating</p>
-                  <p className="text-2xl font-black text-white">
+                <div className="bg-neutral-50 border border-amazon-border rounded-md p-5 text-center">
+                  <p className="text-sm font-medium text-amazon-textMuted mb-2">Rating</p>
+                  <p className="text-2xl font-bold text-amazon-text">
                     {currentShop.rating?.toFixed(1) || "N/A"}
                   </p>
                 </div>
-                <div className="bg-black border border-[#1e2126] rounded-sm p-5 text-center">
-                  <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">Total Sales</p>
-                  <p className="text-2xl font-black text-[#f5d800]">
+                <div className="bg-neutral-50 border border-amazon-border rounded-md p-5 text-center">
+                  <p className="text-sm font-medium text-amazon-textMuted mb-2">Total Sales</p>
+                  <p className="text-2xl font-bold text-amazon-text">
                     {currentShop.totalSales ?? 0}
                   </p>
                 </div>
-                <div className="bg-black border border-[#1e2126] rounded-sm p-5 text-center">
-                  <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">Total Revenue</p>
-                  <p className="text-2xl font-black text-green-400">
+                <div className="bg-neutral-50 border border-amazon-border rounded-md p-5 text-center">
+                  <p className="text-sm font-medium text-amazon-textMuted mb-2">Total Revenue</p>
+                  <p className="text-2xl font-bold text-green-600">
                     {currentShop.totalRevenue?.toLocaleString() ?? 0}₫
                   </p>
                 </div>
@@ -587,41 +587,22 @@ export default function ShopProfilePage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="group relative inline-flex items-center justify-center px-8 py-4 text-[13px] font-black text-black transition-all duration-200 bg-[#f5d800] uppercase tracking-widest rounded-sm hover:bg-[#ffe500] focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed w-full md:w-auto shadow-[0_0_15px_rgba(245,216,0,0.3)] disabled:shadow-none"
+              className="group relative inline-flex items-center justify-center px-8 py-3 bg-amazon-btnPrimary text-amazon-text font-medium hover:brightness-95 rounded-md shadow-sm transition-all duration-200 focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed w-full md:w-auto"
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  SAVING...
+                  Saving...
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  SAVE CHANGES <Save className="w-4 h-4" />
+                  Save Changes <Save className="w-4 h-4" />
                 </span>
               )}
             </button>
           </div>
         </form>
       </div>
-
-      <style jsx>{`
-        .form-input {
-          width: 100%;
-          padding: 0.75rem 1rem;
-          border-radius: 2px;
-          border: 1px solid #1e2126;
-          background-color: black;
-          transition: all 0.2s;
-          outline: none;
-        }
-        .form-input:focus:not(:disabled) {
-          border-color: #f5d800;
-          box-shadow: 0 0 0 1px rgba(245, 216, 0, 0.3);
-        }
-        .form-input::placeholder {
-          color: #4b5563;
-        }
-      `}</style>
     </div>
   );
 }

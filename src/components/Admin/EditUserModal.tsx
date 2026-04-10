@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, Loader2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { adminUpdateUser } from "@/src/store/slices/adminUsersSlice";
 import { toast } from "react-toastify";
@@ -129,7 +128,7 @@ export default function EditUserModal({
   const errorClass = "text-xs text-red-500 mt-1";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/40">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-200">
@@ -139,10 +138,10 @@ export default function EditUserModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition"
+            className="px-2 py-1 text-[11px] font-medium text-gray-500 rounded hover:bg-gray-100 transition"
             disabled={updating}
           >
-            <X className="w-5 h-5 text-gray-500" />
+            Close
           </button>
         </div>
 
@@ -295,9 +294,8 @@ export default function EditUserModal({
             <button
               type="submit"
               disabled={updating}
-              className="px-5 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2 text-[11px] font-bold text-neutral-50 bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center gap-2"
             >
-              {updating && <Loader2 className="w-4 h-4 animate-spin" />}
               {updating ? "Saving..." : "Save Changes"}
             </button>
           </div>

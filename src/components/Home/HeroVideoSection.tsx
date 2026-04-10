@@ -51,7 +51,7 @@ export const HeroVideoSection: FC<HeroVideoProps> = ({
   }, []);
 
   return (
-    <section className="relative w-full h-[60vh] min-h-[500px] lg:min-h-[500px] overflow-hidden bg-black">
+    <section className="relative w-full h-[60vh] min-h-[500px] lg:min-h-[500px] overflow-hidden bg-amazon-header">
       {/* ── BACKGROUND VIDEO ──────────────────────────────────────────── */}
       <video
         ref={videoRef}
@@ -78,7 +78,7 @@ export const HeroVideoSection: FC<HeroVideoProps> = ({
         </p>
         <Link
           href={ctaHref}
-          className="bg-[#f5d800] text-black px-8 py-3 text-xs font-black uppercase tracking-widest hover:bg-white transition-colors duration-300"
+          className="bg-amazon-btnPrimary text-amazon-text px-8 py-3 text-xs font-black uppercase tracking-widest hover:brightness-95 transition-all duration-300 rounded-md shadow-sm"
         >
           {ctaText}
         </Link>
@@ -86,7 +86,7 @@ export const HeroVideoSection: FC<HeroVideoProps> = ({
 
       {/* ── SCROLL INDICATOR (Bottom Center) ──────────────────────────── */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
-        <ArrowDown className="w-6 h-6 text-[#f5d800] animate-bounce" />
+        <ArrowDown className="w-6 h-6 text-amazon-btnPrimary animate-bounce" />
       </div>
 
       {/* ── PLAY / PAUSE TOGGLE (Bottom Right) ────────────────────────── */}

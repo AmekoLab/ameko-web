@@ -47,16 +47,16 @@ export default function DeleteCategoryModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4">
+      <div className="bg-white rounded-sm shadow-xl w-full max-w-md mx-4">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-200">
-          <h2 className="text-lg font-bold text-gray-800">Delete Category</h2>
+        <div className="flex items-center justify-between p-5 border-b border-amazon-border">
+          <h2 className="text-lg font-bold text-amazon-text">Delete Category</h2>
           <button
             onClick={handleClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition"
+            className="p-1 rounded-sm hover:bg-neutral-50 transition"
             disabled={deleting}
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-amazon-textMuted" />
           </button>
         </div>
 
@@ -64,13 +64,13 @@ export default function DeleteCategoryModal({
         <div className="p-5 space-y-4">
           {canDelete ? (
             <>
-              <div className="flex items-start gap-3 p-4 bg-red-50 rounded-lg border border-red-200">
+              <div className="flex items-start gap-3 p-4 bg-red-50 rounded-sm border border-red-200">
                 <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                 <div className="text-sm text-red-700">
-                  <p className="font-semibold mb-1">
+                  <p className="font-bold mb-1 text-[13px]">
                     Are you sure you want to delete this category?
                   </p>
-                  <p className="text-red-600">
+                  <p className="text-red-600 text-xs">
                     This action will soft-delete{" "}
                     <strong>&quot;{category.name}&quot;</strong> (
                     {category.categoryType}). This cannot be easily undone.
@@ -79,17 +79,17 @@ export default function DeleteCategoryModal({
               </div>
 
               {/* Category info summary */}
-              <div className="bg-gray-50 rounded-lg p-3 text-sm space-y-1">
+              <div className="bg-neutral-50 border border-amazon-border rounded-sm p-3 text-[13px] font-medium space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Name</span>
-                  <span className="font-semibold text-gray-800">
+                  <span className="text-amazon-textMuted">Name</span>
+                  <span className="font-medium text-amazon-text">
                     {category.name}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Type</span>
+                  <span className="text-amazon-textMuted">Type</span>
                   <span
-                    className={`font-semibold uppercase text-xs ${
+                    className={`font-medium text-[12px] ${
                       category.categoryType === "global"
                         ? "text-blue-600"
                         : "text-amber-600"
@@ -99,19 +99,19 @@ export default function DeleteCategoryModal({
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Slug</span>
-                  <span className="text-gray-600">{category.slug}</span>
+                  <span className="text-amazon-textMuted">Slug</span>
+                  <span className="text-amazon-text">{category.slug}</span>
                 </div>
               </div>
             </>
           ) : (
-            <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-lg border border-amber-200">
+            <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-sm border border-amber-200">
               <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
               <div className="text-sm text-amber-700">
-                <p className="font-semibold mb-1">
-                  Cannot delete &quot;{category.name}&quot;
+                <p className="font-bold mb-1 text-[13px]">
+                  Cannot delete "{category.name}"
                 </p>
-                <ul className="list-disc list-inside text-amber-600 space-y-0.5">
+                <ul className="list-disc list-inside text-amber-600 space-y-0.5 text-[12px] font-medium">
                   {category.subCategoryCount > 0 && (
                     <li>
                       Has {category.subCategoryCount} sub-categor
@@ -125,7 +125,7 @@ export default function DeleteCategoryModal({
                     </li>
                   )}
                 </ul>
-                <p className="mt-2 text-xs text-amber-500">
+                <p className="mt-2 text-[11px] font-medium text-amber-600">
                   Remove all sub-categories and parts before deleting.
                 </p>
               </div>
@@ -134,12 +134,12 @@ export default function DeleteCategoryModal({
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 p-5 border-t border-gray-100">
+        <div className="flex justify-end gap-3 p-5 border-t border-amazon-border bg-neutral-50/50">
           <button
             type="button"
             onClick={handleClose}
             disabled={deleting}
-            className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition disabled:opacity-50"
+            className="px-4 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50"
           >
             Cancel
           </button>
@@ -148,7 +148,7 @@ export default function DeleteCategoryModal({
               type="button"
               onClick={handleDelete}
               disabled={deleting}
-              className="px-5 py-2 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 transition disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2 text-[13px] font-medium text-white bg-red-600 border border-red-600 rounded-sm hover:bg-red-700 hover:border-red-700 transition disabled:opacity-50 flex items-center gap-2"
             >
               {deleting && <Loader2 className="w-4 h-4 animate-spin" />}
               {deleting ? "Deleting..." : "Delete"}

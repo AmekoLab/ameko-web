@@ -72,7 +72,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
   return (
     <>
       <div className="flex gap-2 mb-3 last:mb-0 group">
-        <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 bg-[#2a2d31] mt-1">
+        <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 bg-neutral-200 mt-1">
           <Image
             src={
               comment.avatarUrl ||
@@ -85,9 +85,9 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
         </div>
 
         <div className="flex flex-col flex-grow">
-          <div className="bg-[#111] rounded-2xl px-3 py-2 relative">
+          <div className="bg-amazon-bgSecondary text-amazon-text rounded-2xl px-3 py-2 relative">
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-md font-bold text-white">
+              <span className="text-md font-bold text-amazon-text">
                 {comment.username || comment.fullName}
               </span>
             </div>
@@ -102,7 +102,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
                     if (e.key === "Enter") handleUpdate();
                     if (e.key === "Escape") setIsEditing(false);
                   }}
-                  className="w-full bg-[#1a1a1a] text-sm text-white rounded-md px-2 py-1 outline-none focus:ring-1 focus:ring-[#555]"
+                  className="w-full bg-white border border-amazon-border text-sm text-amazon-text rounded-md px-2 py-1 outline-none focus:ring-1 focus:ring-amazon-focus"
                   autoFocus
                 />
                 <div className="flex items-center gap-2 text-[10px]">
@@ -115,7 +115,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
                   <button 
                     onClick={handleUpdate}
                     disabled={isUpdating}
-                    className="text-[#f5d800] hover:underline font-bold flex items-center gap-1"
+                    className="text-amazon-btnSecondary hover:underline font-bold flex items-center gap-1"
                   >
                     {isUpdating && <Loader2 className="w-3 h-3 animate-spin"/>}
                     Save
@@ -123,7 +123,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-gray-300 leading-snug">
+              <p className="text-sm text-amazon-text leading-snug">
                 {comment.content}
               </p>
             )}
@@ -159,7 +159,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
             <div className="flex items-center gap-1 font-normal">
               <span>{new Date(comment.createdAt).toLocaleString()}</span>
               {comment.isEdited && (
-                <span className="text-gray-600 italic">(edited)</span>
+                <span className="text-amazon-textMuted italic">(edited)</span>
               )}
             </div>
           </div>
@@ -174,18 +174,18 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="bg-[#1a1a1a] border border-[#2a2d31] rounded-xl p-6 w-full max-w-sm shadow-2xl"
+              className="bg-white border border-amazon-border rounded-xl p-6 w-full max-w-sm shadow-2xl"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                 </div>
-                <h3 className="text-lg font-black uppercase tracking-wide text-white">
+                <h3 className="text-lg font-black uppercase tracking-wide text-amazon-text">
                   Delete Comment?
                 </h3>
               </div>
               
-              <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+              <p className="text-sm text-amazon-textMuted mb-6 leading-relaxed">
                 Are you sure you want to delete this comment? This action cannot be undone.
               </p>
               
@@ -200,7 +200,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
                 <button
                   onClick={executeDelete}
                   disabled={isDeleting}
-                  className="px-4 py-2 text-sm font-bold uppercase tracking-wider bg-[#ce2a32] hover:bg-red-600 text-white rounded-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-bold uppercase tracking-wider bg-red-600 hover:bg-red-700 text-white rounded-sm transition-colors flex items-center gap-2 disabled:opacity-50"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete

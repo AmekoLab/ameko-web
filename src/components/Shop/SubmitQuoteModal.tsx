@@ -78,31 +78,31 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 z-[999] flex items-center justify-center p-4 backdrop-blur-sm"
+      className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
       onClick={handleClose}
     >
       <div
-        className="bg-white rounded-xl w-full max-w-[480px] shadow-2xl flex flex-col overflow-hidden"
+        className="bg-white rounded-sm border border-amazon-border w-full max-w-[480px] shadow-xl flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
-          <h3 className="text-base font-semibold text-gray-900">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-amazon-border">
+          <h3 className="text-lg font-bold text-amazon-text">
             Submit Quote
           </h3>
           <button
             onClick={handleClose}
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1 hover:bg-neutral-50 rounded-sm transition-colors text-amazon-textMuted hover:text-amazon-text"
           >
-            <X className="w-5 h-5 text-gray-600" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
           {/* Quoted Price */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-[13px] font-medium text-amazon-text mb-1">
               Quoted Price <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -111,14 +111,14 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
                 {...register("quotedPrice", { valueAsNumber: true })}
                 min={0}
                 placeholder="1000000"
-                className=" text-black w-full border border-gray-300 rounded-lg px-3 py-2 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 pr-14 border border-amazon-border rounded-sm text-[13px] font-medium text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition placeholder:text-neutral-400"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-neutral-400 font-medium">
                 VND
               </span>
             </div>
             {errors.quotedPrice && (
-              <p className="text-xs text-red-500 mt-1">
+              <p className="text-[11px] font-medium text-red-500 mt-1">
                 {errors.quotedPrice.message}
               </p>
             )}
@@ -126,7 +126,7 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
 
           {/* Estimated Days */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-[13px] font-medium text-amazon-text mb-1">
               Estimated Days <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -135,14 +135,14 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
                 {...register("estimatedDays", { valueAsNumber: true })}
                 min={1}
                 placeholder="7"
-                className=" text-black w-full border border-gray-300 rounded-lg px-3 py-2 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 pr-14 border border-amazon-border rounded-sm text-[13px] font-medium text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition placeholder:text-neutral-400"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-neutral-400 font-medium">
                 Days
               </span>
             </div>
             {errors.estimatedDays && (
-              <p className="text-xs text-red-500 mt-1">
+              <p className="text-[11px] font-medium text-red-500 mt-1">
                 {errors.estimatedDays.message}
               </p>
             )}
@@ -150,35 +150,35 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
 
           {/* Shop Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-[13px] font-medium text-amazon-text mb-1">
               Notes for Customer <span className="text-red-500">*</span>
             </label>
             <textarea
               {...register("shopNotes")}
               rows={4}
               placeholder="Describe quote details, time, materials..."
-              className=" text-black w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-amazon-border rounded-sm text-[13px] font-medium text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition placeholder:text-neutral-400 resize-none"
             />
             {errors.shopNotes && (
-              <p className="text-xs text-red-500 mt-1">
+              <p className="text-[11px] font-medium text-red-500 mt-1">
                 {errors.shopNotes.message}
               </p>
             )}
           </div>
 
           {/* Footer */}
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex justify-end gap-3 pt-5 border-t border-amazon-border mt-6">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm rounded-lg transition-colors"
+              className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmittingQuote}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2 text-[13px] font-medium text-amazon-text bg-amazon-btnPrimary border border-amazon-border rounded-sm hover:brightness-95 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
             >
               {isSubmittingQuote ? (
                 <>

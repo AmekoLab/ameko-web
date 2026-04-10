@@ -8,10 +8,10 @@ import { Settings, MousePointer2, Layers } from "lucide-react";
 
 export const BuilderCTA: FC = () => {
   return (
-    <section className="relative bg-black text-white py-24 overflow-hidden">
+    <section className="relative bg-amazon-bg text-amazon-text py-24 overflow-hidden">
       {/* Background Pattern  */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute right-0 top-0 w-[500px] h-[500px] bg-[#ce2a32] rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute right-0 top-0 w-[500px] h-[500px] bg-amazon-btnPrimary rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2"></div>
       </div>
 
       <div className="max-w-[1920px] mx-auto px-4 lg:px-8 relative z-10">
@@ -23,16 +23,16 @@ export const BuilderCTA: FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <span className="text-[#ce2a32] font-bold tracking-widest uppercase text-sm mb-2 block">
+              <span className="text-amazon-btnSecondary font-bold tracking-widest uppercase text-sm mb-2 block">
                 The Core Experience
               </span>
-              <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-[0.9] mb-6">
+              <h2 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter leading-[0.9] mb-6 text-amazon-text">
                 Build Your <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amazon-text to-amazon-textMuted">
                   Own Legacy
                 </span>
               </h2>
-              <p className="text-gray-400 text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-amazon-textMuted text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed">
                 Do not just settle for pre-built keyboards. With our
                 state-of-the-art <strong>Ameko 3D Builder</strong>, you have the
                 power to create a keyboard that reflects your unique style and
@@ -43,24 +43,24 @@ export const BuilderCTA: FC = () => {
             </motion.div>
 
             {/* Features Icon */}
-            <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-8">
+            <div className="grid grid-cols-3 gap-4 border-t border-amazon-border pt-8">
               <div className="flex flex-col items-center lg:items-start gap-2">
-                <Layers className="w-8 h-8 text-[#ce2a32]" />
-                <span className="text-xs font-bold uppercase text-gray-300">
+                <Layers className="w-8 h-8 text-amazon-btnSecondary" />
+                <span className="text-xs font-bold uppercase text-amazon-textMuted">
                   Multi-Layer <br />
                   Customization
                 </span>
               </div>
               <div className="flex flex-col items-center lg:items-start gap-2">
-                <MousePointer2 className="w-8 h-8 text-[#ce2a32]" />
-                <span className="text-xs font-bold uppercase text-gray-300">
+                <MousePointer2 className="w-8 h-8 text-amazon-btnSecondary" />
+                <span className="text-xs font-bold uppercase text-amazon-textMuted">
                   Drag & Drop <br />
                   Interface
                 </span>
               </div>
               <div className="flex flex-col items-center lg:items-start gap-2">
-                <Settings className="w-8 h-8 text-[#ce2a32]" />
-                <span className="text-xs font-bold uppercase text-gray-300">
+                <Settings className="w-8 h-8 text-amazon-btnSecondary" />
+                <span className="text-xs font-bold uppercase text-amazon-textMuted">
                   Real-time <br />
                   3D Preview
                 </span>
@@ -71,7 +71,7 @@ export const BuilderCTA: FC = () => {
             <div className="pt-4">
               <Link
                 href="/builder"
-                className="inline-flex items-center justify-center bg-[#ce2a32] text-white px-10 py-4 text-sm font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300 clip-path-slant"
+                className="inline-flex items-center justify-center bg-amazon-btnPrimary text-amazon-text px-10 py-4 text-sm font-bold uppercase tracking-widest hover:brightness-95 transition-all duration-300 rounded-md shadow-sm"
               >
                 Start Building Now
               </Link>
@@ -94,11 +94,11 @@ export const BuilderCTA: FC = () => {
               />
 
               {/* Floating Badge */}
-              <div className="absolute top-10 right-10 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-sm text-center">
-                <span className="block text-3xl font-black text-white">
+              <div className="absolute top-10 right-10 bg-white backdrop-blur-md border border-amazon-border p-4 rounded-sm text-center shadow-sm">
+                <span className="block text-3xl font-bold text-amazon-text">
                   100+
                 </span>
-                <span className="text-[10px] uppercase font-bold text-gray-300">
+                <span className="text-[10px] uppercase font-bold text-amazon-textMuted">
                   Parts Available
                 </span>
               </div>

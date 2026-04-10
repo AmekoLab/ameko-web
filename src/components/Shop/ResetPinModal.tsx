@@ -73,10 +73,10 @@ function PinInput({
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             onPaste={handlePaste}
-            className={`w-11 h-13 text-center text-xl font-bold rounded-lg border-2 outline-none transition-all ${
+            className={`w-11 h-13 text-center text-xl font-bold rounded-sm border outline-none transition-all ${
               error
-                ? "border-red-400 focus:border-red-500"
-                : "border-gray-300 focus:border-black"
+                ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                : "border-amazon-border focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus"
             }`}
           />
         ))}
@@ -210,22 +210,22 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+      <div className="relative bg-white rounded-sm shadow-xl border border-amazon-border w-full max-w-md mx-4 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+        <div className="flex items-center justify-between p-6 border-b border-amazon-border">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black">
-              <Key className="h-5 w-5 text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100">
+              <Key className="h-5 w-5 text-neutral-600" />
             </div>
-            <h2 className="text-lg font-black uppercase tracking-tight text-black font-oswald">
+            <h2 className="text-lg font-black uppercase tracking-tight text-amazon-text ">
               Reset PIN
             </h2>
           </div>
           <button
             onClick={handleClose}
-            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-sm hover:bg-neutral-100 transition-colors"
           >
-            <X className="h-5 w-5 text-gray-500" />
+            <X className="h-5 w-5 text-amazon-textMuted" />
           </button>
         </div>
 
@@ -235,13 +235,13 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
           {step === 1 && (
             <div className="space-y-6">
               <div className="flex flex-col items-center text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 mb-4">
-                  <Mail className="h-8 w-8 text-blue-500" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-50 border border-amazon-border mb-4">
+                  <Mail className="h-8 w-8 text-neutral-400" />
                 </div>
-                <h3 className="text-base font-bold text-gray-800 mb-2">
+                <h3 className="text-base font-bold text-amazon-text mb-2">
                   Verify via Email
                 </h3>
-                <p className="text-sm text-gray-500 leading-relaxed">
+                <p className="text-sm text-amazon-textMuted leading-relaxed">
                   We will send a 6-digit OTP code to your registered email.
                 </p>
               </div>
@@ -250,7 +250,7 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
                 type="button"
                 onClick={handleRequestOtp}
                 disabled={isRequestingOtp}
-                className="w-full rounded-lg bg-[#ce2a32] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-[#b0242b] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-oswald flex items-center justify-center gap-2"
+                className="w-full rounded-sm bg-amazon-btnPrimary px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-amazon-text transition-all hover:brightness-95 active:scale-[0.98] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed  flex items-center justify-center gap-2"
               >
                 {isRequestingOtp && (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -265,9 +265,9 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* OTP */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <label className="block text-sm font-semibold text-amazon-text mb-3">
                   <div className="flex items-center gap-1.5">
-                    <Mail className="w-4 h-4 text-gray-500" />
+                    <Mail className="w-4 h-4 text-neutral-400" />
                     OTP Code
                   </div>
                 </label>
@@ -280,16 +280,16 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
                 {/* Resend OTP */}
                 <div className="flex justify-center mt-3">
                   {cooldown > 0 ? (
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-amazon-textMuted">
                       Resend code in{" "}
-                      <strong className="text-gray-600">{cooldown}s</strong>
+                      <strong className="text-amazon-text">{cooldown}s</strong>
                     </span>
                   ) : (
                     <button
                       type="button"
                       onClick={handleResendOtp}
                       disabled={isRequestingOtp}
-                      className="flex items-center gap-1 text-xs font-medium text-[#ce2a32] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-1 text-xs font-medium text-amazon-link hover:text-amazon-focus hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <RefreshCw className="w-3 h-3" />
                       {isRequestingOtp ? "Sending..." : "Resend code"}
@@ -300,9 +300,9 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
 
               {/* New PIN */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <label className="block text-sm font-semibold text-amazon-text mb-3">
                   <div className="flex items-center gap-1.5">
-                    <Lock className="w-4 h-4 text-gray-500" />
+                    <Lock className="w-4 h-4 text-neutral-400" />
                     New PIN
                   </div>
                 </label>
@@ -316,9 +316,9 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
 
               {/* Confirm PIN */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <label className="block text-sm font-semibold text-amazon-text mb-3">
                   <div className="flex items-center gap-1.5">
-                    <Lock className="w-4 h-4 text-gray-500" />
+                    <Lock className="w-4 h-4 text-neutral-400" />
                     Confirm New PIN
                   </div>
                 </label>
@@ -334,7 +334,7 @@ export default function ResetPinModal({ isOpen, onClose }: ResetPinModalProps) {
               <button
                 type="submit"
                 disabled={isResettingPin}
-                className="w-full rounded-lg bg-[#ce2a32] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-[#b0242b] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-oswald flex items-center justify-center gap-2"
+                className="w-full rounded-sm bg-amazon-btnPrimary px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-amazon-text transition-all hover:brightness-95 active:scale-[0.98] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed   flex items-center justify-center gap-2"
               >
                 {isResettingPin && <Loader2 className="h-4 w-4 animate-spin" />}
                 {isResettingPin ? "Processing..." : "Reset PIN"}
