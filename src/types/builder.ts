@@ -81,3 +81,15 @@ export interface SelectComponentPayload {
   selectedPartId: string;
   stepName: string;
 }
+
+// --- Payload for POST /Builder/session/{id}/add-addon ---
+export interface AddBuilderAddonItem {
+  componentId: string;
+  quantity: number;
+  positionNote: string;
+}
+
+export interface AddBuilderAddonPayload {
+  sessionId: string;
+  items: AddBuilderAddonItem[];
+}

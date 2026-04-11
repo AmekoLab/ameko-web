@@ -20,8 +20,12 @@ import {
   setActiveStep,
   optimisticSelect,
   optimisticRemove,
+  fetchAvailableAddons,
+  addBuilderAddon,
+  removeBuilderAddon,
 } from "@/src/store/slices/builderSlice";
 import { BuilderProduct, SelectedPart } from "@/src/types/builder";
+import KeymapOverlay from "@/src/components/Builder/KeymapOverlay";
 import { PartItem } from "@/src/types/part.types";
 import { orderService } from "@/src/services/order.service";
 import { toast } from "react-toastify";
@@ -285,6 +289,7 @@ function BuilderContent() {
   const router = useRouter();
   const [addingToCart, setAddingToCart] = useState(false);
   const [viewMode, setViewMode] = useState<"top" | "side" | "angled">("top");
+  const [isCustomizeMode, setIsCustomizeMode] = useState(false);
 
   const {
     loadingKits,
@@ -296,6 +301,8 @@ function BuilderContent() {
     currentStepName,
     currentProducts,
     stepProducts,
+    availableAddons,
+    loadingAddons,
   } = useAppSelector((state) => state.builder);
 
   const shopId = searchParams.get("shopId");
@@ -425,6 +432,39 @@ function BuilderContent() {
   const handleLogoClick = useCallback(() => {
     window.location.href = "/";
   }, []);
+
+  // ─── Addon Handlers ───────────────────────────────────────────────────────
+  const handleFetchAddons = useCallback(() => {
+    if (!session?.id) return;
+    dispatch(fetchAvailableAddons(session.id));
+  }, [dispatch, session]);
+
+  const handleAddonSelected = useCallback(
+    (position: string, partId: string) => {
+      if (!session) return;
+      dispatch(
+        addBuilderAddon({
+          sessionId: session.id,
+          items: [
+            {
+              componentId: partId,
+              quantity: 1,
+              positionNote: position,
+            },
+          ],
+        }),
+      );
+    },
+    [dispatch, session],
+  );
+
+  const handleAddonRemoved = useCallback(
+    (componentId: string) => {
+      if (!session) return;
+      dispatch(removeBuilderAddon({ sessionId: session.id, componentId }));
+    },
+    [dispatch, session],
+  );
 
   // Navigation items for progress bar (+ virtual Summary step)
   const navItems = useMemo(() => {
@@ -641,17 +681,33 @@ function BuilderContent() {
             }}
           />
           
-          {/* Keyboard layers */}
-          <div className="relative z-10 w-full h-full flex items-center justify-center">
-            <Visualizer selection={session.selection} viewMode={viewMode} />
+          {/* Keyboard layers + Keymap Overlay */}
+          <div className="relative z-50 w-full h-full flex items-center justify-center">
+            <div className="relative w-full max-w-5xl aspect-[16/9] flex items-center justify-center">
+              <Visualizer selection={session.selection} viewMode={viewMode} />
+              {viewMode === "top" && session.selection["keycap"] && isCustomizeMode && (
+                <KeymapOverlay
+                  onAddonSelected={handleAddonSelected}
+                  onAddonRemoved={handleAddonRemoved}
+                  selectedAddons={session.selection}
+                  availableAddons={availableAddons}
+                  isLoadingAddons={loadingAddons}
+                  fetchAddons={handleFetchAddons}
+                  isProcessing={processing}
+                />
+              )}
+            </div>
           </div>
 
           {/* View toggle — bottom-left */}
-          <div className="absolute bottom-6 left-6 z-20 flex gap-2">
+          <div className="absolute bottom-6 left-6 z-[60] flex gap-2">
             {(["top", "side", "angled"] as const).map((mode) => (
               <button
                 key={mode}
-                onClick={() => setViewMode(mode)}
+                onClick={() => {
+                  setViewMode(mode);
+                  if (mode !== "top") setIsCustomizeMode(false);
+                }}
                 className={`
                   px-4 py-2 font-black shadow-sm uppercase text-[10px] tracking-widest transition-all rounded-sm border
                   ${viewMode === mode
@@ -663,6 +719,25 @@ function BuilderContent() {
                 {mode} View
               </button>
             ))}
+
+            {/* Customize toggle — only in top view with keycap selected */}
+            {viewMode === "top" && session.selection["keycap"] && (
+              <button
+                onClick={() => setIsCustomizeMode((prev) => !prev)}
+                className={`
+                  px-4 py-2 font-black shadow-sm uppercase text-[10px] tracking-widest transition-all rounded-sm border flex items-center gap-1.5
+                  ${isCustomizeMode
+                    ? "bg-orange-400 text-white border-orange-500 shadow-md"
+                    : "bg-white text-amazon-textMuted hover:text-amazon-text border-amazon-border hover:bg-neutral-50"
+                  }
+                `}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                Customize
+              </button>
+            )}
           </div>
         </div>
 

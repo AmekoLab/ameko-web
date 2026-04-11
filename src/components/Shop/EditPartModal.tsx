@@ -77,6 +77,9 @@ export default function EditPartModal({
   const [layerPreview, setLayerPreview] = useState<string | null>(null);
   const layerInputRef = useRef<HTMLInputElement>(null);
 
+  // Addon eligible toggle
+  const [isAddonEligible, setIsAddonEligible] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -121,6 +124,7 @@ export default function EditPartModal({
       setThumbnailPreview(part.thumbnailUrl || null);
       setLayerFile(null);
       setLayerPreview(part.defaultLayerImageUrl || null);
+      setIsAddonEligible(part.isAddonEligible ?? false);
     }
   }, [part, categories, reset]);
 
@@ -155,6 +159,7 @@ export default function EditPartModal({
           specifications,
           thumbnailImage: thumbnailFile,
           layerImage: layerFile,
+          isAddonEligible,
         }),
       ).unwrap();
       toast.success("Part updated successfully!");
@@ -360,6 +365,20 @@ export default function EditPartModal({
               </p>
             </div>
           )}
+
+          {/* Addon Eligible */}
+          <div className="flex items-center gap-3 p-4 bg-orange-50 border border-orange-200 rounded-sm">
+            <input
+              type="checkbox"
+              id="edit-isAddonEligible"
+              checked={isAddonEligible}
+              onChange={(e) => setIsAddonEligible(e.target.checked)}
+              className="w-4 h-4 accent-orange-500 rounded-sm border-amazon-border cursor-pointer"
+            />
+            <label htmlFor="edit-isAddonEligible" className="text-[13px] font-medium text-amazon-text cursor-pointer select-none">
+              Is Addon Eligible
+            </label>
+          </div>
 
           {/* Images: Thumbnail + Layer */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

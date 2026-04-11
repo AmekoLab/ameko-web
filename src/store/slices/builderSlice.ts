@@ -4,6 +4,7 @@ import {
   BuilderSession,
   BuilderProduct,
   BuilderPayload,
+  AddBuilderAddonPayload,
 } from "@/src/types/builder";
 import { PartItem } from "@/src/types/part.types";
 
@@ -89,6 +90,57 @@ export const removeBuilderComponent = createAsyncThunk(
   },
 );
 
+/** Fetch available addons */
+export const fetchAvailableAddons = createAsyncThunk(
+  "builder/fetchAvailableAddons",
+  async (sessionId: string, { rejectWithValue }) => {
+    try {
+      const data = await builderService.getAvailableAddons(sessionId);
+      return data;
+    } catch (error: unknown) {
+      return rejectWithValue("Failed to load addons");
+    }
+  },
+);
+
+/** Add addon(s) to session */
+export const addBuilderAddon = createAsyncThunk(
+  "builder/addAddon",
+  async (payload: AddBuilderAddonPayload, { rejectWithValue }) => {
+    try {
+      const responsePayload = await builderService.addAddon(payload);
+      return responsePayload;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to add customization",
+      );
+    }
+  },
+);
+
+/** Remove addon from session */
+export const removeBuilderAddon = createAsyncThunk(
+  "builder/removeAddon",
+  async (
+    { sessionId, componentId }: { sessionId: string; componentId: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      const responsePayload = await builderService.removeAddon(
+        sessionId,
+        componentId,
+      );
+      return responsePayload;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to remove customization",
+      );
+    }
+  },
+);
+
 // ============================================================
 // State Shape
 // ============================================================
@@ -108,6 +160,10 @@ interface BuilderState {
   currentStepName: string | null;
   currentProducts: BuilderProduct[];
   stepProducts: Record<string, BuilderProduct[]>;
+
+  // Addons
+  availableAddons: BuilderProduct[];
+  loadingAddons: boolean;
 }
 
 const initialState: BuilderState = {
@@ -120,6 +176,8 @@ const initialState: BuilderState = {
   currentStepName: null,
   currentProducts: [],
   stepProducts: {},
+  availableAddons: [],
+  loadingAddons: false,
 };
 
 // ============================================================
@@ -259,6 +317,46 @@ const builderSlice = createSlice({
         applyBuilderPayload(state, action.payload);
       })
       .addCase(removeBuilderComponent.rejected, (state, action) => {
+        state.processing = false;
+        state.error = action.payload as string;
+      })
+
+      // --- FETCH ADDONS ---
+      .addCase(fetchAvailableAddons.pending, (state) => {
+        state.loadingAddons = true;
+      })
+      .addCase(fetchAvailableAddons.fulfilled, (state, action) => {
+        state.loadingAddons = false;
+        state.availableAddons = action.payload;
+      })
+      .addCase(fetchAvailableAddons.rejected, (state) => {
+        state.loadingAddons = false;
+      })
+
+      // --- ADD ADDON ---
+      .addCase(addBuilderAddon.pending, (state) => {
+        state.processing = true;
+        state.error = null;
+      })
+      .addCase(addBuilderAddon.fulfilled, (state, action) => {
+        state.processing = false;
+        applyBuilderPayload(state, action.payload);
+      })
+      .addCase(addBuilderAddon.rejected, (state, action) => {
+        state.processing = false;
+        state.error = action.payload as string;
+      })
+
+      // --- REMOVE ADDON ---
+      .addCase(removeBuilderAddon.pending, (state) => {
+        state.processing = true;
+        state.error = null;
+      })
+      .addCase(removeBuilderAddon.fulfilled, (state, action) => {
+        state.processing = false;
+        applyBuilderPayload(state, action.payload);
+      })
+      .addCase(removeBuilderAddon.rejected, (state, action) => {
         state.processing = false;
         state.error = action.payload as string;
       });
