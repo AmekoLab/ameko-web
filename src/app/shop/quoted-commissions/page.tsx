@@ -59,6 +59,14 @@ const STATUS_MAP: Record<
     label: "Revoked",
     bg: "bg-red-50 border border-red-200",
     text: "text-red-700",
+    icon:
+      <XCircle className="w-3.5 h-3.5" />,
+   
+  },
+  Rejected: {
+    label: "Rejected",
+    bg: "bg-red-50 border border-red-200",
+    text: "text-red-700",
     icon: <XCircle className="w-3.5 h-3.5" />,
   },
 };

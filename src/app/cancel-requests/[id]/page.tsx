@@ -108,7 +108,7 @@ export default function CancelRequestDetailPage() {
           <span className="text-sm font-semibold uppercase tracking-wider">Back</span>
         </button>
 
-        <h1 className="font-oswald uppercase tracking-widest text-2xl text-amazon-text mt-4 mb-6">
+        <h1 className="text-2xl text-amazon-text mt-4 mb-6">
           Cancel Request Details
         </h1>
 

@@ -31,6 +31,7 @@ export interface WarrantyRequest {
   isSystemValid: boolean;
   createdAt: string;
   updatedAt: string;
+  aiAnalysisResult?: string;
 }
 
 export interface PaginatedWarrantyResponse {
