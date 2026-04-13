@@ -94,6 +94,7 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
   isProcessing,
 }) => {
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  const [showInstruction, setShowInstruction] = useState(true);
   const modalRef = useRef<HTMLDivElement>(null);
 
 
@@ -109,6 +110,7 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
   const handleKeyClick = useCallback(
     (kid: string) => {
       setActiveKey(kid);
+      setShowInstruction(false);
       // Lazy-load addons on first open
       if (availableAddons.length === 0 && !isLoadingAddons) {
         fetchAddons();
@@ -156,6 +158,27 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
                    text-[7.5px] tracking-[0.7px] 
                    [&>button]:px-[0.5%] [&>button]:py-[0%]"
       >
+        {/* ── ONBOARDING COACHMARK ── */}
+        {showInstruction && (
+          <div className="absolute top-[8%] left-1/2 -translate-x-1/2 z-[100] animate-bounce pointer-events-none flex flex-col items-center drop-shadow-2xl">
+            <div className="bg-neutral-900/90 backdrop-blur-md px-6 py-3.5 rounded-full border border-orange-500/50 flex items-center gap-4 shadow-[0_10px_30px_rgba(249,115,22,0.3)]">
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-500 text-white shrink-0">
+                <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg>
+              </div>
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.15em] text-orange-400 mb-0.5">
+                  Start customizing
+                </p>
+                <p className="text-[12px] font-medium text-white/90">
+                  Click on any key on the model to select an Artisan Keycap!
+                </p>
+              </div>
+            </div>
+            {/* Line pointing down to the keyboard */}
+            <div className="w-0.5 h-10 bg-gradient-to-b from-orange-500/80 to-transparent mt-1 rounded-full"></div>
+          </div>
+        )}
+
         <div className="w-full h-full flex flex-col gap-[2%]">
           {KEYBOARD_ROWS.map((row, rowIdx) => (
             <div 
