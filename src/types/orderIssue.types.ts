@@ -10,7 +10,21 @@ export interface OrderIssue {
   description: string;
   shopResponse: string | null;
   createdAt: string;
+  aiAnalysisResult?: string;
 }
+
+export interface AiAnalysisParsed {
+  Category: string;
+  Sentiment: string;
+  Summary: string;
+  Recommendation: string;
+  ConfidenceScore: string | number;
+}
+
+export type AiAnalysisStatus =
+  | { status: "EMPTY" }
+  | { status: "FAILED"; message: string }
+  | { status: "SUCCESS"; data: AiAnalysisParsed };
 
 export interface PaginatedOrderIssues {
   items: OrderIssue[];

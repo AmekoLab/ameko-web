@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAppDispatch } from "@/src/store/hook";
+import { logoutUser } from "@/src/store/action/authActions";
 import {
   LayoutDashboard,
   Package,
@@ -19,6 +21,7 @@ import {
   CheckSquare,
   BarChart,
   Home,
+  LogOut,
   LucideIcon,
 } from "lucide-react";
 
@@ -31,6 +34,13 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
     {},
   );
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    router.push("/login");
+  };
 
   // 1. Define menus
   const commonMenu: MenuGroup[] = [
@@ -174,7 +184,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
 
   return (
     <aside
-      className={`bg-white border-r border-amazon-border h-full flex flex-col transition-all duration-300 ease-in-out flex-shrink-0 z-40 ${
+      className={`bg-amazon-headerLight border-r border-amazon-border h-full flex flex-col transition-all duration-300 ease-in-out flex-shrink-0 z-40 ${
         isCollapsed ? "w-20" : "w-64"
       }`}
     >
@@ -196,7 +206,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
                   className={`w-12 h-12 mx-auto rounded-sm flex items-center justify-center cursor-pointer transition-colors ${
                     isGroupActive
                       ? "bg-neutral-50 text-amazon-focus border border-amazon-border shadow-sm"
-                      : "text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50"
+                      : "text-white hover:text-amazon-text hover:bg-neutral-50"
                   }`}
                   onClick={() => {
                     setIsCollapsed(false);
@@ -215,8 +225,8 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
                   onClick={() => toggleGroup(group.groupName)}
                   className={`flex items-center justify-between p-3 rounded-sm transition-colors text-sm ${
                     isGroupActive && !isExpanded
-                      ? "text-amazon-text font-bold"
-                      : "text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 font-medium"
+                      ? "text-white font-bold"
+                      : "text-white hover:text-amazon-text hover:bg-neutral-50 font-medium"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -249,7 +259,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
                         className={`flex items-center p-3 pl-10 rounded-r-sm transition-colors text-[13px] border-l-2 ${
                           active
                             ? "bg-neutral-50 text-amazon-text font-bold border-amazon-btnSecondary"
-                            : "text-amazon-textMuted hover:bg-neutral-50 hover:text-amazon-text font-medium border-transparent"
+                            : "text-white hover:bg-neutral-50 hover:text-amazon-text font-medium border-transparent"
                         }`}
                       >
                         {item.name}
@@ -263,22 +273,39 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
         })}
       </div>
 
-      {/* Footer Toggle */}
-      <div className="border-t border-amazon-border p-4 flex justify-center items-center bg-white">
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="w-full flex items-center justify-center p-2 rounded-sm text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 transition-colors"
-          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-        >
-          {isCollapsed ? (
-            <ChevronRight className="w-5 h-5" />
-          ) : (
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <ChevronLeft className="w-4 h-4" />
-              Collapse Sidebar
-            </div>
-          )}
-        </button>
+      {/* Footer: Logout + Collapse Toggle */}
+      <div className="border-t border-amazon-border bg-amazon-headerLight">
+        {/* Logout Button */}
+        <div className="px-4 pt-3 pb-1">
+          <button
+            onClick={handleLogout}
+            className={`w-full flex items-center gap-2.5 rounded-sm transition-colors text-red-300 hover:bg-red-500/10 hover:text-red-400 ${
+              isCollapsed ? "justify-center p-2" : "px-3 py-2 text-sm font-medium"
+            }`}
+            title="Logout"
+          >
+            <LogOut className="w-4.5 h-4.5" />
+            {!isCollapsed && <span>Logout</span>}
+          </button>
+        </div>
+
+        {/* Collapse Toggle */}
+        <div className="px-4 pb-3 pt-1 flex justify-center items-center">
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="w-full flex items-center justify-center p-2 rounded-sm text-white hover:text-amazon-text hover:bg-neutral-50 transition-colors"
+            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            {isCollapsed ? (
+              <ChevronRight className="w-5 h-5" />
+            ) : (
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <ChevronLeft className="w-4 h-4" />
+                Collapse Sidebar
+              </div>
+            )}
+          </button>
+        </div>
       </div>
     </aside>
   );

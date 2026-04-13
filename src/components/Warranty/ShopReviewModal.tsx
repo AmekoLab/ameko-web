@@ -1,17 +1,47 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import Image from "next/image";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, Loader2, CheckCircle2, XCircle, Calendar } from "lucide-react";
+import { X, Loader2, CheckCircle2, XCircle, Calendar, Sparkles, AlertCircle } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { submitShopWarrantyReview } from "@/src/store/slices/shopWarrantySlice";
 import { WarrantyRequest } from "@/src/services/warranty.service";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 import WarrantyTimeline from "@/src/components/Warranty/WarrantyTimeline";
+import { AiAnalysisStatus } from "@/src/types/orderIssue.types";
+
+// ─── SAFE AI ANALYSIS PARSER ────────────────────────────────────────────────
+function parseAiAnalysis(rawString?: string | null): AiAnalysisStatus {
+  if (!rawString || rawString.trim() === "") {
+    return { status: "EMPTY" };
+  }
+
+  if (rawString.trim() === "AI processing failed.") {
+    return { status: "FAILED", message: "AI processing failed." };
+  }
+
+  try {
+    const parsed = JSON.parse(rawString);
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      "Category" in parsed &&
+      "Sentiment" in parsed &&
+      "Summary" in parsed &&
+      "Recommendation" in parsed &&
+      "ConfidenceScore" in parsed
+    ) {
+      return { status: "SUCCESS", data: parsed };
+    }
+    return { status: "FAILED", message: "AI response format is unrecognized." };
+  } catch {
+    return { status: "FAILED", message: "Could not parse AI analysis data." };
+  }
+}
 
 // ─── Zod Schema ────────────────────────────────────────────
 const shopReviewSchema = z.object({
@@ -55,6 +85,9 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const { isReviewingWarranty } = useAppSelector((state) => state.shopWarranty);
+
+  // Memoized AI analysis — avoids re-parsing JSON on every form keystroke
+  const aiAnalysis = useMemo(() => parseAiAnalysis(issue?.aiAnalysisResult), [issue?.aiAnalysisResult]);
 
   const {
     register,
@@ -187,6 +220,77 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
           {/* Expected Action */}
           <p className="text-xs text-amazon-textMuted italic">{issue.expectedAction}</p>
         </div>
+
+        {/* ── AI ANALYSIS SECTION ── */}
+        {aiAnalysis.status !== "EMPTY" && (
+          <div className="mx-6 my-5 border border-amazon-border rounded-sm overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-amazon-border">
+              <Sparkles className="w-4 h-4 text-violet-500" />
+              <span className="text-[18px] font-bold text-violet-700 tracking-wide">Ameko Assistant</span>
+              <div className="flex items-center gap-2 pt-1">
+                <span className="text-[10px] text-amazon-textMuted">(Ameko Assistant is AI and can make mistakes.)</span>
+              </div>
+            </div>
+
+            {aiAnalysis.status === "FAILED" ? (
+              /* ─── FAILED STATE ─── */
+              <div className="px-4 py-3 bg-red-50/60 flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-xs font-semibold text-red-600">Analysis Unavailable</p>
+                  <p className="text-[11px] text-red-500/80 mt-0.5">{aiAnalysis.message}</p>
+                </div>
+              </div>
+            ) : (
+              /* ─── SUCCESS STATE ─── */
+              <div className="px-4 py-3 space-y-3 bg-white">
+                {/* Row 1: Category & Sentiment side-by-side */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <span className="text-amazon-textMuted text-[10px] block mb-0.5 font-medium">Category</span>
+                    <span className="text-amazon-text text-xs font-semibold">{aiAnalysis.data.Category}</span>
+                  </div>
+                  <div>
+                    <span className="text-amazon-textMuted text-[10px] block mb-0.5 font-medium">Sentiment</span>
+                    <span className="text-amazon-text text-xs font-semibold">{aiAnalysis.data.Sentiment}</span>
+                  </div>
+                </div>
+
+                {/* Row 2: Summary */}
+                <div>
+                  <span className="text-amazon-textMuted text-[10px] block mb-0.5 font-medium">Summary</span>
+                  <p className="text-amazon-text text-xs leading-relaxed bg-neutral-50 border border-amazon-border rounded-sm p-2.5">
+                    {aiAnalysis.data.Summary}
+                  </p>
+                </div>
+
+                {/* Row 3: Recommendation & Confidence */}
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-amazon-textMuted text-[10px] font-medium">Recommendation:</span>
+                    <span
+                      className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                        aiAnalysis.data.Recommendation.toLowerCase().includes("approve")
+                          ? "bg-green-100 text-green-700 border border-green-200"
+                          : aiAnalysis.data.Recommendation.toLowerCase().includes("reject")
+                            ? "bg-red-100 text-red-700 border border-red-200"
+                            : "bg-amber-100 text-amber-700 border border-amber-200"
+                      }`}
+                    >
+                      {aiAnalysis.data.Recommendation}
+                    </span>
+                  </div>
+                  <span className="text-[12px] text-amazon-text font-medium">
+                    Confidence: {typeof aiAnalysis.data.ConfidenceScore === "number"
+                      ? `${(aiAnalysis.data.ConfidenceScore * 100).toFixed(0)}%`
+                      : aiAnalysis.data.ConfidenceScore}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Timeline Section */}
         <div className="px-6 py-5 border-b border-amazon-border">

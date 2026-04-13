@@ -20,6 +20,7 @@ export interface PartItem {
   shopId: string;
   shopName: string;
   categoryName: string;
+  isAddonEligible: boolean;
 }
 
 export interface PartListData {
@@ -64,6 +65,7 @@ export interface CreatePartPayload {
   recipeStabilizerCount?: number;
   thumbnailImage?: File | null;
   layerImage?: File | null;
+  isAddonEligible?: boolean;
 }
 
 export interface CreatePartResponse {
@@ -97,4 +99,5 @@ export interface UpdatePartPayload {
   recipeStabilizerCount?: number;
   thumbnailImage?: File | null;
   layerImage?: File | null;
+  isAddonEligible?: boolean;
 }

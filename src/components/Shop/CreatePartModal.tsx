@@ -78,6 +78,9 @@ export default function CreatePartModal({
   const [layerPreview, setLayerPreview] = useState<string | null>(null);
   const layerInputRef = useRef<HTMLInputElement>(null);
 
+  // Addon eligible toggle
+  const [isAddonEligible, setIsAddonEligible] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -128,6 +131,7 @@ export default function CreatePartModal({
           specifications,
           thumbnailImage: thumbnailFile,
           layerImage: layerFile,
+          isAddonEligible,
         }),
       ).unwrap();
       toast.success("Part created successfully!");
@@ -146,6 +150,7 @@ export default function CreatePartModal({
     setThumbnailPreview(null);
     setLayerFile(null);
     setLayerPreview(null);
+    setIsAddonEligible(false);
   };
 
   const handleClose = () => {
@@ -355,6 +360,20 @@ export default function CreatePartModal({
               </p>
             </div>
           )}
+
+          {/* Addon Eligible */}
+          <div className="flex items-center gap-3 p-4 bg-orange-50 border border-orange-200 rounded-sm">
+            <input
+              type="checkbox"
+              id="create-isAddonEligible"
+              checked={isAddonEligible}
+              onChange={(e) => setIsAddonEligible(e.target.checked)}
+              className="w-4 h-4 accent-orange-500 rounded-sm border-amazon-border cursor-pointer"
+            />
+            <label htmlFor="create-isAddonEligible" className="text-[13px] font-medium text-amazon-text cursor-pointer select-none">
+              Is Addon Eligible
+            </label>
+          </div>
 
           {/* Images: Thumbnail + Layer */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -234,7 +234,7 @@ function PartDetailContent({ part }: { part: PartItem }) {
       )}
 
       {/* Specifications / Workflow */}
-      {specs && (
+      {specs && specs.workflow && (
         <div className="p-5 bg-neutral-50 border border-amazon-border rounded-sm space-y-4 shadow-sm">
           <p className="text-[13px] font-bold text-amazon-text">
             Specifications (Workflow)

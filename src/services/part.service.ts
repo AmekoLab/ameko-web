@@ -55,6 +55,9 @@ export const partService = {
     if (payload.layerImage) {
       formData.append("LayerImage", payload.layerImage);
     }
+    if (payload.isAddonEligible != null) {
+      formData.append("IsAddonEligible", String(payload.isAddonEligible));
+    }
     return api.post<any, ApiResponse<CreatePartResponse>>(`/parts`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -110,6 +113,9 @@ export const partService = {
       formData.append("LayerImage", payload.layerImage);
     } else {
       formData.append("LayerImage", "");
+    }
+    if (payload.isAddonEligible != null) {
+      formData.append("IsAddonEligible", String(payload.isAddonEligible));
     }
 
     return api.put<any, ApiResponse<null>>(`/parts/${payload.id}`, formData, {
