@@ -20,11 +20,11 @@ function fmtVND(n: number): string {
 function fmtDiscount(v: Voucher): string {
   if (v.discountType === "Percentage") {
     const cap = v.maxDiscountAmount
-      ? ` (tối đa ${fmtVND(v.maxDiscountAmount)})`
+      ? ` (max ${fmtVND(v.maxDiscountAmount)})`
       : "";
-    return `Giảm ${v.value}%${cap}`;
+    return `Discount ${v.value}%${cap}`;
   }
-  return `Giảm ${fmtVND(v.value)}`;
+  return `Discount ${fmtVND(v.value)}`;
 }
 
 function fmtDate(iso: string): string {
@@ -117,13 +117,13 @@ const VoucherCard: FC<VoucherCardProps> = ({
           {voucher.targetUserId && (
             <div className="inline-flex items-center gap-1 mt-1.5 px-1.5 py-0.5 bg-red-50 text-red-600 border border-red-100 rounded text-[10px] font-medium">
               <Gift className="w-3 h-3" />
-              Tặng riêng cho bạn
+              Voucher For You
             </div>
           )}
 
           {/* Code */}
           <p className="text-xs text-gray-500 mt-1 line-clamp-1">
-            Mã: <span className="font-medium text-gray-700">{voucher.description || voucher.name}</span>
+            Code: <span className="font-medium text-gray-700">{voucher.description || voucher.name}</span>
           </p>
 
           {/* Min order */}
@@ -154,7 +154,7 @@ const VoucherCard: FC<VoucherCardProps> = ({
             )}
             <div className="flex items-center gap-1 text-[11px] text-gray-500">
               <Clock className="w-3 h-3 shrink-0" />
-              <span>HSD: {fmtDate(voucher.endDate)}</span>
+              <span>End date: {fmtDate(voucher.endDate)}</span>
             </div>
           </div>
 
@@ -180,13 +180,13 @@ const VoucherCard: FC<VoucherCardProps> = ({
             {isFullyClaimed ? (
               <div className="flex items-center gap-1 text-[11px] text-gray-500">
                 <AlertCircle className="w-3 h-3 shrink-0" />
-                <span>Voucher đã được sử dụng hết</span>
+                <span>Voucher has been used up</span>
               </div>
             ) : (
               <div className="flex items-center gap-1 text-[11px] text-red-500 font-medium">
                 <AlertCircle className="w-3 h-3 shrink-0" />
                 <span>
-                  Mua thêm {fmtVND(remainingAmount)} để sử dụng
+                  Buy more {fmtVND(remainingAmount)} to use
                 </span>
               </div>
             )}
@@ -354,7 +354,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
           <div>
             <h3 className="font-semibold text-lg text-gray-800">{title}</h3>
             <p className="text-xs text-gray-500 mt-0.5">
-              Có thể chọn {eligibleCount} voucher
+              Can choose {eligibleCount} voucher
             </p>
           </div>
           <button
@@ -379,7 +379,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                 setCodeError(null);
               }}
               onKeyDown={(e) => e.key === "Enter" && handleApplyCode()}
-              placeholder="Nhập mã voucher"
+              placeholder="Enter voucher code"
               className="flex-1 bg-transparent px-3 py-2.5 text-sm outline-none text-gray-800 placeholder:text-gray-400 uppercase"
             />
             <button
@@ -392,7 +392,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                   : "text-gray-400 cursor-not-allowed"
               }`}
             >
-              Áp dụng
+              Apply
             </button>
           </div>
           {codeError && (
@@ -415,7 +415,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
               {targetedVouchers.length > 0 && (
                 <div>
                   <h4 className="text-sm font-semibold text-gray-800 mb-3 px-1">
-                    Voucher Dành Riêng Cho Bạn
+                    Voucher For You
                   </h4>
                   <div className="space-y-3">
                     {targetedVouchers.map((v) => {
@@ -444,7 +444,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
               {generalVouchers.length > 0 && (
                 <div>
                   <h4 className="text-sm font-semibold text-gray-800 mb-3 px-1">
-                    Voucher Cửa Hàng
+                    Voucher Ameko
                   </h4>
                   <div className="space-y-3">
                     {generalVouchers.map((v) => {
@@ -477,8 +477,8 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-gray-700">
               {localSelectedCodes.size > 0
-                ? `Đã chọn ${localSelectedCodes.size} mã`
-                : "Chưa chọn mã nào"}
+                ? `Selected ${localSelectedCodes.size} voucher`
+                : "No voucher selected"}
             </span>
             {localSelectedCodes.size > 0 && (
               <button
@@ -486,7 +486,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                 onClick={() => setLocalSelectedCodes(new Set())}
                 className="text-xs font-medium text-gray-500 hover:text-red-500 transition-colors"
               >
-                Bỏ chọn
+                Deselect
               </button>
             )}
           </div>
@@ -494,7 +494,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
             onClick={handleConfirm}
             className="w-full py-3 text-sm font-bold text-white rounded-lg transition-colors bg-amazon-btnPrimary hover:brightness-95 flex items-center justify-center shadow-sm"
           >
-            Đồng ý
+            Confirm
           </button>
         </div>
       </div>

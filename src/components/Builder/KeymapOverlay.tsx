@@ -64,6 +64,15 @@ const KEYBOARD_ROWS: KeyDef[][] = [
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 
+const formatKeycapPosition = (rawName: string) => {
+  return rawName.replace(
+    /\(Position:\s*R(\d+)-([^-]+)-\d+\)/g,
+    (_, rowNum, keyName) => {
+      return `(Position: ${keyName} - Row ${rowNum})`;
+    }
+  );
+};
+
 /** Generate a unique key ID from row + column index + label */
 function keyId(rowIdx: number, colIdx: number, label: string): string {
   return `R${rowIdx}-${label}-${colIdx}`;
@@ -235,7 +244,7 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
                   Customize Key
                 </p>
                 <h3 className="text-lg font-black text-amazon-text uppercase tracking-tight">
-                  {activeKey.split("-")[1]}
+                  {`${activeKey.split("-")[1]} - Row ${activeKey.split("-")[0].replace("R", "")}`}
                 </h3>
               </div>
               <button
@@ -265,7 +274,9 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-black text-amazon-text truncate">{activeAddon[1].name}</p>
+                    <p className="text-xs font-black text-amazon-text truncate">
+                      {formatKeycapPosition(activeAddon[1].name)}
+                    </p>
                     <p className="text-[11px] text-amazon-price font-bold">
                       +{activeAddon[1].price.toLocaleString()}₫
                     </p>

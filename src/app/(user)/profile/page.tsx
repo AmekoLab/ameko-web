@@ -15,6 +15,9 @@ import {
   AlertCircle,
   Eye,
   Ban,
+  Pencil,
+  LogOut,
+  KeyRound,
 } from "lucide-react";
 import Link from "next/link";
 import { ShopStatus } from "@/src/types/shop.types";
@@ -52,13 +55,13 @@ export default function ProfilePage() {
   if (!isInitialized || !user) {
     return (
       <div className="max-w-4xl mx-auto mt-8 p-6 animate-pulse">
-        <div className="h-8 bg-[#1e2126] rounded-sm w-1/4 mb-6"></div>
-        <div className="bg-[#151515] border border-[#1e2126] rounded-sm p-6 flex items-center gap-6">
-          <div className="w-32 h-32 bg-[#1e2126] rounded-full"></div>
+        <div className="h-8 bg-neutral-200 rounded w-1/4 mb-6"></div>
+        <div className="bg-white border border-neutral-100 shadow-sm rounded-xl p-8 flex items-center gap-6">
+          <div className="w-32 h-32 bg-neutral-200 rounded-full"></div>
           <div className="flex-1 space-y-3">
-            <div className="h-6 bg-[#1e2126] rounded-sm w-1/3"></div>
-            <div className="h-4 bg-[#1e2126] rounded-sm w-1/2"></div>
-            <div className="h-4 bg-[#1e2126] rounded-sm w-1/4"></div>
+            <div className="h-6 bg-neutral-200 rounded w-1/3"></div>
+            <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
+            <div className="h-4 bg-neutral-200 rounded w-1/4"></div>
           </div>
         </div>
       </div>
@@ -84,18 +87,21 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto mt-8 px-4 pb-12">
-      <h1 className="text-3xl font-black uppercase tracking-tight mb-8 font-oswald text-white">
+      <h1 className="text-2xl font-bold mb-6 text-neutral-900">
         My Profile
       </h1>
 
-      <div className="bg-[#151515] shadow-2xl rounded-sm overflow-hidden border border-[#1e2126] relative">
+      <div className="bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.08)] rounded-xl overflow-hidden border border-neutral-100 relative">
         {/* Header Background */}
-        <div className="h-32 bg-[#1a1c20] border-b border-[#1e2126]"></div>
+        <div className="h-32 bg-neutral-100 border-b border-neutral-200 relative overflow-hidden">
+           {/* Abstract pattern for banner */}
+           <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-200/60 via-neutral-100/10 to-transparent"></div>
+        </div>
 
-        <div className="px-8 pb-8">
-          <div className="relative flex justify-between items-end -mt-12 mb-6">
+        <div className="px-6 sm:px-10 pb-10">
+          <div className="relative flex justify-between items-end -mt-14 mb-8">
             {/* Avatar */}
-            <div className="relative w-32 h-32 rounded-full border-4 border-[#151515] shadow-md bg-[#1e2126] overflow-hidden">
+            <div className="relative w-[120px] h-[120px] rounded-full border-4 border-white shadow-md bg-white overflow-hidden shrink-0">
               <img
                 src={avatarSrc}
                 alt="avatar"
@@ -111,35 +117,22 @@ export default function ProfilePage() {
             {/* Edit Button */}
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="bg-[#1a1c20] border border-[#2a2d35] text-gray-300 px-4 py-2 hover:border-[#f5d800]/50 hover:text-[#f5d800] rounded-sm transition shadow-sm font-medium text-[11px] uppercase tracking-widest flex items-center gap-2"
+              className="bg-white border border-neutral-200 text-neutral-600 px-4 py-2 hover:bg-neutral-50 hover:text-neutral-900 rounded-lg transition-colors shadow-sm font-medium text-sm flex items-center gap-2 mb-2"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                />
-              </svg>
+              <Pencil className="w-4 h-4" />
               Edit Profile
             </button>
           </div>
 
           {/* User Info */}
-          <div>
-            <h2 className="text-2xl font-bold text-white">{fullName}</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="px-2 py-0.5 bg-[#1e2126] text-gray-400 text-[10px] font-black uppercase tracking-widest rounded-sm border border-[#2a2d35]">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-neutral-900">{fullName}</h2>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="px-2.5 py-0.5 bg-neutral-100 text-neutral-600 text-xs font-semibold rounded-md border border-neutral-200 flex items-center gap-1">
                 {user.role}
               </span>
               <span
-                className={`px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-sm border ${user.emailConfirmed ? "bg-green-500/10 text-green-400 border-green-500/30" : "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"}`}
+                className={`px-2.5 py-0.5 text-xs font-semibold rounded-md border ${user.emailConfirmed ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}
               >
                 {user.emailConfirmed ? "Verified" : "Unverified"}
               </span>
@@ -147,71 +140,69 @@ export default function ProfilePage() {
           </div>
 
           {user.role !== "Admin" && (
-            <div className="mt-8">
+            <div className="mt-8 mb-8">
               {/* TRƯỜNG HỢP 1: PENDING */}
               {currentShop &&
                 currentShop.status === ShopStatus.PendingApproval && (
-                  <div className="bg-[#1a1c20] border border-[#2a2d35] rounded-sm p-6 flex flex-col sm:flex-row items-center gap-4 animate-in fade-in">
-                    <div className="w-12 h-12 bg-yellow-500/10 text-yellow-500 rounded-full flex items-center justify-center shrink-0">
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 flex flex-col sm:flex-row items-center gap-4 animate-in fade-in">
+                    <div className="w-12 h-12 bg-white text-amber-600 rounded-full flex items-center justify-center shrink-0 shadow-sm border border-amber-100">
                       <Clock className="w-6 h-6 animate-pulse" />
                     </div>
-                    <div className="text-center sm:text-left">
-                      <h3 className="font-bold text-[14px] uppercase tracking-wider text-white">
-                        The application is being reviewed
+                    <div className="text-center sm:text-left flex-1">
+                      <h3 className="font-semibold text-sm text-neutral-900">
+                        Application in Review
                       </h3>
-                      <p className="text-[12px] text-gray-400">
-                        Please wait for the review process to complete. This
-                        usually takes 24 hours.
+                      <p className="text-sm text-neutral-600 mt-1">
+                        Please wait for the review process to complete. This usually takes 24-48 hours.
                       </p>
                     </div>
                     <button
                       onClick={() => setIsApplicationModalOpen(true)}
-                      className="px-4 py-2 text-gray-400 font-bold hover:text-[#f5d800] hover:bg-[#111111] text-[11px] uppercase tracking-widest rounded-sm transition-colors flex items-center gap-2 whitespace-nowrap border border-transparent hover:border-[#2a2d35]"
+                      className="px-4 py-2 bg-white text-neutral-700 font-medium hover:bg-neutral-50 text-sm rounded-lg border border-neutral-200 transition-colors flex items-center gap-2 whitespace-nowrap shadow-sm"
                     >
-                      <Eye className="w-4 h-4" /> View Application
+                      <Eye className="w-4 h-4 text-neutral-400" /> View Application
                     </button>
                   </div>
                 )}
 
               {/* TRƯỜNG HỢP 2: CHƯA CÓ SHOP */}
               {!currentShop && (
-                <div className="bg-[#1a1c20] border border-[#2a2d35] rounded-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-4 group hover:border-[#f5d800]/50 transition-all shadow-sm">
+                <div className="bg-gradient-to-r from-neutral-50 to-white border border-neutral-200 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-5 transition-shadow hover:shadow-md">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-[#111111] border border-[#2a2d35] rounded-full flex items-center justify-center text-gray-400 group-hover:bg-[#f5d800]/10 group-hover:text-[#f5d800] group-hover:border-[#f5d800]/50 transition-colors shadow-sm shrink-0">
-                      <Store className="w-6 h-6" />
+                    <div className="w-14 h-14 bg-white border border-neutral-100 shadow-sm rounded-full flex items-center justify-center text-neutral-400 shrink-0">
+                      <Store className="w-6 h-6 text-emerald-600" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-[14px] uppercase tracking-wider text-white group-hover:text-[#f5d800] transition-colors">
-                        Bạn muốn bán hàng trên Ameko?
+                      <h3 className="font-semibold text-base text-neutral-900">
+                        Want to start selling on Ameko?
                       </h3>
-                      <p className="text-[12px] text-gray-400">
-                        Nâng cấp tài khoản để mở Shop và bắt đầu kinh doanh ngay
-                        hôm nay.
+                      <p className="text-sm text-neutral-500 mt-1">
+                        Upgrade your account to a seller to reach millions of custom keyboard enthusiasts.
                       </p>
                     </div>
                   </div>
 
                   <Link
                     href="/shop/register"
-                    className="px-5 py-2.5 bg-[#f5d800] text-black text-[11px] font-black uppercase tracking-widest rounded-sm hover:bg-[#e6cc00] transition-colors flex items-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
+                    className="px-6 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap active:scale-[0.98]"
                   >
-                    Đăng ký Shop <ArrowRight className="w-4 h-4" />
+                    Open a Shop <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               )}
 
               {/* TRƯỜNG HỢP 2B: REJECTED → CẬP NHẬT LẠI HỒ SƠ */}
               {currentShop && currentShop.status === ShopStatus.Rejected && (
-                <div className="bg-[#1a1c20] border border-red-500/30 rounded-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-4 group hover:border-red-500/50 transition-all shadow-sm">
+                <div className="bg-red-50 border border-red-200 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-5 transition-all">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center shrink-0">
-                      <AlertCircle className="w-6 h-6 text-red-500" />
+                    <div className="w-12 h-12 bg-white rounded-full border border-red-100 flex items-center justify-center shadow-sm shrink-0">
+                      <AlertCircle className="w-6 h-6 text-red-600" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-[14px] uppercase tracking-wider text-white">
-                        Your application was rejected
+                      <h3 className="font-semibold text-sm text-neutral-900">
+                        Application Rejected
                       </h3>
-                      <p className="text-[12px] text-gray-400">
+                      <p className="text-sm text-red-600 mt-1 font-medium">
                         {currentShop.adminNote
                           ? `Reason: ${currentShop.adminNote}`
                           : "Please review your information and resubmit."}
@@ -219,18 +210,18 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <button
                       onClick={() => setIsApplicationModalOpen(true)}
-                      className="px-4 py-2.5 bg-[#111111] border border-[#2a2d35] text-gray-300 text-[11px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#252830] hover:text-white transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap"
+                      className="px-4 py-2.5 bg-white border border-neutral-200 text-neutral-700 text-sm font-medium rounded-lg hover:bg-neutral-50 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap"
                     >
-                      <Eye className="w-4 h-4" /> View Application
+                      <Eye className="w-4 h-4 text-neutral-400" /> View Original
                     </button>
                     <button
                       onClick={() => setIsUpdateShopModalOpen(true)}
-                      className="px-5 py-2.5 bg-[#f5d800] text-black text-[11px] font-black uppercase tracking-widest rounded-sm hover:bg-[#e6cc00] transition-colors flex items-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
+                      className="px-5 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap active:scale-[0.98]"
                     >
-                      Update & Resubmit <ArrowRight className="w-4 h-4" />
+                      Resubmit <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -238,48 +229,47 @@ export default function ProfilePage() {
 
               {/* TRƯỜNG HỢP 3: ACTIVE */}
               {currentShop && currentShop.status === ShopStatus.Active && (
-                <div className="bg-[#1a1c20] border border-blue-500/30 rounded-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center shrink-0">
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-5 transition-all">
+                   <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 bg-white border border-blue-100 shadow-sm rounded-full flex items-center justify-center text-blue-600 shrink-0">
                       <ShoppingBag className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-[14px] uppercase tracking-wider text-white">
-                        Manage Your Shop Dashboard
+                      <h3 className="font-semibold text-base text-neutral-900">
+                        Manage Your Store
                       </h3>
-                      <p className="text-[12px] text-gray-400">
-                        Access your shop's dashboard to manage products, orders,
-                        and view analytics.
+                      <p className="text-sm text-neutral-600 mt-1">
+                        Access your merchant dashboard to manage products, view analytics, and fulfill orders.
                       </p>
                     </div>
                   </div>
                   <Link
                     href="/shop/dashboard"
-                    className="px-5 py-2.5 bg-blue-600 text-white text-[11px] font-black uppercase tracking-widest rounded-sm hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
+                    className="px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap active:scale-[0.98]"
                   >
-                    Vào Dashboard <ArrowRight className="w-4 h-4" />
+                    Go to Dashboard <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               )}
 
               {/* TRƯỜNG HỢP 4: BANNED */}
               {currentShop && currentShop.status === ShopStatus.Banned && (
-                <div className="bg-[#1a1c20] border border-red-500/30 rounded-sm p-6 flex flex-col sm:flex-row items-center gap-4 shadow-sm">
-                  <div className="w-12 h-12 bg-red-500/10 text-red-400 rounded-full flex items-center justify-center shrink-0">
+                <div className="bg-white border border-red-200 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-5 shadow-sm relative overflow-hidden">
+                   <div className="absolute top-0 left-0 w-1 h-full bg-red-600"></div>
+                  <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center shrink-0">
                     <Ban className="w-6 h-6" />
                   </div>
-                  <div className="text-center sm:text-left">
-                    <h3 className="font-bold text-[14px] uppercase tracking-wider text-white">
-                      Your shop has been banned
+                  <div className="text-center sm:text-left flex-1">
+                    <h3 className="font-semibold text-sm text-neutral-900">
+                      Store Banned
                     </h3>
-                    <p className="text-[12px] text-red-400">
-                      Your shop has been suspended due to a policy violation.
-                      Please contact support for more information.
+                    <p className="text-sm text-red-600 font-medium mt-1">
+                      Your shop has been suspended due to policy violations. Contact support for details.
                     </p>
                   </div>
                   <button
                     onClick={() => setIsApplicationModalOpen(true)}
-                    className="px-4 py-2 text-red-400 font-bold hover:text-red-300 hover:bg-red-500/10 border border-transparent hover:border-red-500/30 text-[11px] uppercase tracking-widest rounded-sm transition-colors flex items-center gap-2 whitespace-nowrap"
+                    className="px-4 py-2 bg-red-50 text-red-700 font-medium hover:bg-red-100 border border-red-100 text-sm rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap shadow-sm"
                   >
                     <Eye className="w-4 h-4" /> View Details
                   </button>
@@ -289,28 +279,28 @@ export default function ProfilePage() {
           )}
           {/* ============================================================== */}
 
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Contact Info */}
-            <div className="p-6 bg-[#1a1c20] rounded-sm border border-[#1e2126]">
-              <h3 className="font-black text-[#f5d800] mb-5 uppercase text-[11px] tracking-widest flex items-center gap-2">
+            <div className="p-6 sm:p-8 bg-neutral-50 rounded-xl border border-neutral-100">
+              <h3 className="font-semibold text-neutral-900 mb-6 text-sm flex items-center gap-2 border-b border-neutral-200 pb-3">
                 Contact Information
               </h3>
-              <div className="space-y-4 text-sm">
-                <div className="flex justify-between border-b border-[#1e2126] pb-3">
-                  <span className="text-gray-500 text-[11px] uppercase tracking-widest font-bold">Email</span>
-                  <span className="font-bold text-white break-all text-[12px]">
+              <div className="space-y-4 text-sm mt-4">
+                <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-neutral-100">
+                  <span className="text-neutral-500 font-medium">Email</span>
+                  <span className="font-medium text-neutral-800 break-all text-right ml-4">
                     {user.email}
                   </span>
                 </div>
-                <div className="flex justify-between border-b border-[#1e2126] pb-3">
-                  <span className="text-gray-500 text-[11px] uppercase tracking-widest font-bold">Phone</span>
-                  <span className="font-bold text-white text-[12px]">
-                    {user.phoneNumber || "Not updated"}
+                <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-neutral-100">
+                  <span className="text-neutral-500 font-medium">Phone</span>
+                  <span className="font-medium text-neutral-800">
+                    {user.phoneNumber || "Not provided"}
                   </span>
                 </div>
-                <div className="flex justify-between pt-1">
-                  <span className="text-gray-500 text-[11px] uppercase tracking-widest font-bold">Username</span>
-                  <span className="font-bold text-white text-[12px]">
+                <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-neutral-100">
+                  <span className="text-neutral-500 font-medium">Username</span>
+                  <span className="font-medium text-neutral-800">
                     @{user.username}
                   </span>
                 </div>
@@ -318,23 +308,22 @@ export default function ProfilePage() {
             </div>
 
             {/* Store Details (CHỈ HIỆN NẾU KHÔNG PHẢI ADMIN) */}
-            {/* Vì Admin không có shop nên phần này sẽ trống rỗng, ẩn luôn cho đẹp */}
             {user.role !== "Admin" && (
-              <div className="p-6 bg-[#1a1c20] rounded-sm border border-[#1e2126]">
-                <h3 className="font-black text-[#f5d800] mb-5 uppercase text-[11px] tracking-widest">
-                  Store Details
+              <div className="p-6 sm:p-8 bg-neutral-50 rounded-xl border border-neutral-100">
+                <h3 className="font-semibold text-neutral-900 mb-6 text-sm flex items-center gap-2 border-b border-neutral-200 pb-3">
+                  Store Abstract
                 </h3>
-                <div className="space-y-4 text-sm">
-                  <div className="flex justify-between border-b border-[#1e2126] pb-3">
-                    <span className="text-gray-500 text-[11px] uppercase tracking-widest font-bold">Address</span>
-                    <span className="font-bold text-white text-[12px] text-right max-w-[60%] truncate">
+                <div className="space-y-4 text-sm mt-4">
+                  <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-neutral-100">
+                    <span className="text-neutral-500 font-medium">Address</span>
+                    <span className="font-medium text-neutral-800 text-right max-w-[60%] truncate ml-4">
                       {user.storeAddress || "No address provided"}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-2 pt-1">
-                    <span className="text-gray-500 text-[11px] uppercase tracking-widest font-bold">Description</span>
-                    <p className="font-medium text-gray-300 italic text-[12px] leading-relaxed">
-                      "{user.storeDescription || "No description available."}"
+                  <div className="flex flex-col gap-2 bg-white p-3 rounded-lg border border-neutral-100">
+                    <span className="text-neutral-500 font-medium">Bio</span>
+                    <p className="font-medium text-neutral-700 leading-relaxed text-[13px]">
+                      {user.storeDescription ? `"${user.storeDescription}"` : "No description available."}
                     </p>
                   </div>
                 </div>
@@ -343,45 +332,19 @@ export default function ProfilePage() {
           </div>
 
           {/* Logout & Change Password */}
-          <div className="mt-8 pt-6 border-t border-[#1e2126] flex flex-wrap justify-end gap-3">
+          <div className="mt-10 pt-6 border-t border-neutral-100 flex flex-wrap justify-end gap-3">
             <button
               onClick={() => setIsPasswordModalOpen(true)}
-              className="text-gray-400 font-bold hover:text-white hover:bg-[#1a1c20] border border-transparent hover:border-[#2a2d35] px-4 py-2 rounded-sm transition flex items-center gap-2 text-[11px] uppercase tracking-widest"
+              className="text-neutral-600 font-medium hover:text-neutral-900 hover:bg-neutral-50 bg-white border border-neutral-200 px-5 py-2.5 rounded-lg transition-colors flex items-center gap-2 text-sm shadow-sm"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
+              <KeyRound className="w-4 h-4 text-neutral-400" />
               Change Password
             </button>
             <button
               onClick={handleLogout}
-              className="text-red-500 font-bold hover:bg-red-500/10 px-4 py-2 rounded-sm transition flex items-center gap-2 text-[11px] uppercase tracking-widest border border-red-500/30 hover:border-red-500/50"
+              className="text-red-600 font-medium hover:bg-red-50 px-5 py-2.5 rounded-lg transition-colors flex items-center gap-2 text-sm border border-red-200 bg-white shadow-sm"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
+              <LogOut className="w-4 h-4 text-red-500" />
               Sign Out
             </button>
           </div>

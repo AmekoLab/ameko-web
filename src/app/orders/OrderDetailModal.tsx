@@ -234,12 +234,17 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                 {/* Left: Status & Date */}
                 <div>
                   <p className="text-lg font-medium text-amazon-text flex items-center gap-2">
-                    {/* <Package className="w-5 h-5" /> */}
                     Status: {order.orderStatus}
                   </p>
                   <p className="text-xs text-amazon-textMuted mt-1">
                     Placed on: {formatDate(order.createdAt)}
                   </p>
+                  {/* Hiển thị Expected Delivery Date nếu có */}
+                  {order.expectedDeliveryDate && (
+                    <p className="text-xs text-amazon-link font-medium mt-1">
+                      Expected Delivery: {formatDate(order.expectedDeliveryDate)}
+                    </p>
+                  )}
                 </div>
                 
                 {/* Right: Action Hub */}
@@ -462,7 +467,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                               <p className="text-sm font-medium text-amazon-text pr-4 line-clamp-2">{item.productName}</p>
                               <div className="flex items-center justify-between mt-2">
                                 <p className="text-xs font-normal text-amazon-textMuted">
-                                  Qty: <span className="text-amazon-link">{item.quantity}</span> × {formatCurrency(item.unitPrice)}
+                                  Qty: <span className="text-amazon-link">{item.quantity}</span> × <span className="text-amazon-price">{formatCurrency(item.unitPrice)}</span>
                                 </p>
                               </div>
                             </div>
@@ -537,6 +542,12 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({ orderId, isOpen, onClose 
                 <span>-{formatCurrency(order.discountAmount)}</span>
               </div>
             )}
+            {order.systemDiscountAmount && order.systemDiscountAmount > 0 ? (
+              <div className="flex justify-between items-center text-[11px] font-medium text-green-600">
+                <span>System Voucher:</span>
+                <span>-{formatCurrency(order.systemDiscountAmount)}</span>
+              </div>
+            ) : null}
             <div className="pt-2 border-t border-amazon-border flex justify-between items-center">
               <span className="text-[12px] font-medium text-amazon-text">Final Total:</span>
               <span className="text-xl font-bold text-amazon-price">{formatCurrency(order.totalAmount)}</span>

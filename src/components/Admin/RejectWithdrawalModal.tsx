@@ -69,7 +69,7 @@ export default function RejectWithdrawalModal({
       const url = await uploadImage(file);
       setUploadedUrl(url);
     } catch {
-      toast.error("Tải ảnh lên thất bại. Vui lòng thử lại.");
+      toast.error("Upload image failed. Please try again.");
       setImageFile(null);
       setImagePreview(null);
     } finally {

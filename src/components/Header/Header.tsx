@@ -123,14 +123,33 @@ export const Header: FC = () => {
     }
   };
 
-  /* ─── Category links for sub-navbar ─── */
   const CATEGORY_LINKS = [
-    { label: "Điện thoại", href: "/shop/all-products?category=phone" },
-    { label: "Laptop", href: "/shop/all-products?category=laptop" },
-    { label: "Phụ kiện", href: "/shop/all-products?category=accessories" },
-    { label: "Bàn phím", href: "/shop/all-products?category=keyboard" },
-    { label: "Tai nghe", href: "/shop/all-products?category=headphone" },
+    { label: "Warranty", href: "/my-warranty-requests", show: user?.role !== "Admin" },
+    { label: "Cancel Order", href: "/cancel-requests", show: user?.role !== "Admin" },
+    // { label: "Shop Dashboard", href: "/shop/dashboard", show: user?.role === "Admin" },
+    { label: "Transactions", href: "/transactions", show: user?.role !== "Admin" },
+    { label: "Wallet", href: "/wallet", show: user?.role !== "Admin" },
+    // { label: "Bàn phím", href: "/shop/all-products?category=keyboard" },
+    // { label: "Tai nghe", href: "/shop/all-products?category=headphone" },
+      {
+                      href: "/my-commissions",
+                      label: "Custom Requests",
+                      show: user?.role !== "Admin",
+                    },
+                    {
+                      href: "/my-payments",
+                      label: "Payment History",
+                      show: user?.role !== "Admin",
+                    },
   ];
+
+  const displayName = (() => {
+    if (!user) return "";
+    if (user.role === "Shop") {
+      return currentShop?.shopName || user?.firstName || user?.username;
+    }
+    return user?.firstName || user?.username;
+  })();
 
   return (
     <header
@@ -171,11 +190,11 @@ export const Header: FC = () => {
           </form>
 
           {/* ── RIGHT: Actions ── */}
-          <div className="flex items-center gap-1 ml-auto flex-shrink-0">
+          <div className="relative flex items-center gap-1 ml-auto flex-shrink min-w-0" ref={dropdownRef}>
             {/* Country selector */}
-            <div className="hidden md:block mr-1">
+            {/* <div className="hidden md:block mr-1">
               <CountrySelector />
-            </div>
+            </div> */}
 
             {/* Account & Lists (stacked) */}
             <div className="relative" ref={dropdownRef}>
@@ -187,9 +206,9 @@ export const Header: FC = () => {
                 }
                 className="hidden md:flex flex-col items-start px-3 py-1 text-white hover:outline hover:outline-1 hover:outline-white rounded-sm transition-all cursor-pointer"
               >
-                <span className="text-xs font-sans leading-tight whitespace-nowrap">
+                <span className="text-md font-sans leading-tight whitespace-nowrap max-w-[150px] truncate inline-block align-bottom">
                   {isAuthenticated && user
-                    ? `Hi, ${user.username || user.firstName}`
+                    ? `Hi, ${displayName}`
                     : "Hi, Sign in"}
                 </span>
                 <span className="text-sm font-bold font-sans leading-tight whitespace-nowrap">
@@ -199,7 +218,7 @@ export const Header: FC = () => {
 
               {/* Dropdown */}
               {userDropdownOpen && isAuthenticated && user && (
-                <div className="absolute right-0 mt-1 w-56 bg-white border border-amazon-border shadow-xl py-1 z-50 rounded-md font-sans">
+                <div className="absolute left-0 top-full mt-1 w-56 bg-white border border-amazon-border shadow-xl py-1 z-50 rounded-md font-sans">
                   <div className="px-4 py-2.5 border-b border-amazon-border mb-1">
                     <p className="text-amazon-text font-bold truncate text-sm leading-tight">
                       {user.email}
@@ -210,7 +229,7 @@ export const Header: FC = () => {
                   </div>
                   {[
                     { href: "/profile", label: "Account Settings", show: true },
-                    { href: "/orders", label: "My Orders", show: true },
+                    // { href: "/orders", label: "My Orders", show: user.role !== "Admin" },
                     {
                       href: "/admin/dashboard",
                       label: "Admin Dashboard",
@@ -232,36 +251,36 @@ export const Header: FC = () => {
                         user.role !== "Admin" &&
                         user.role !== "User",
                     },
-                    {
-                      href: "/wallet",
-                      label: "My Wallet",
-                      show: user.role !== "Admin",
-                    },
-                    {
-                      href: "/my-commissions",
-                      label: "Custom Requests",
-                      show: user.role !== "Admin",
-                    },
-                    {
-                      href: "/my-payments",
-                      label: "Payment History",
-                      show: user.role !== "Admin",
-                    },
-                    {
-                      href: "/my-warranty-requests",
-                      label: "Warranty Requests",
-                      show: user.role !== "Admin",
-                    },
-                    {
-                      href: "/cancel-requests",
-                      label: "Cancel Requests",
-                      show: user.role !== "Admin",
-                    },
-                    {
-                      href: "/transactions",
-                      label: "Transactions",
-                      show: user.role !== "Admin",
-                    },
+                    // {
+                    //   href: "/wallet",
+                    //   label: "My Wallet",
+                    //   show: user.role !== "Admin",
+                    // },
+                    // {
+                    //   href: "/my-commissions",
+                    //   label: "Custom Requests",
+                    //   show: user.role !== "Admin",
+                    // },
+                    // {
+                    //   href: "/my-payments",
+                    //   label: "Payment History",
+                    //   show: user.role !== "Admin",
+                    // },
+                    // {
+                    //   href: "/my-warranty-requests",
+                    //   label: "Warranty Requests",
+                    //   show: user.role !== "Admin",
+                    // },
+                    // {
+                    //   href: "/cancel-requests",
+                    //   label: "Cancel Requests",
+                    //   show: user.role !== "Admin",
+                    // },
+                    // {
+                    //   href: "/transactions",
+                    //   label: "Transactions",
+                    //   show: user.role !== "Admin",
+                    // },
                   ]
                     .filter((item) => item.show)
                     .map((item) => (
@@ -331,16 +350,16 @@ export const Header: FC = () => {
           ROW 2 — SUB NAVBAR (bg-amazon-headerLight)
           [☰ Tất cả]  [Nav links]  [Category links]
       ═══════════════════════════════════════════ */}
-      <div className="bg-amazon-headerLight hidden md:block">
-        <div className="w-full max-w-7xl mx-auto flex items-center gap-1 px-4 py-1">
+      <div className="bg-amazon-headerLight hidden md:block overflow-hidden">
+        <div className="w-full max-w-7xl mx-auto flex flex-wrap items-center gap-x-1 gap-y-1.5 px-4 py-1.5">
           {/* ☰ Tất cả */}
-          <Link
+          {/* <Link
             href="/shop/all-products"
             className="flex items-center gap-1.5 text-white font-bold text-sm px-2 py-1 hover:outline hover:outline-1 hover:outline-white rounded-sm transition-all mr-2"
           >
             <HamburgerSmall />
             <span>Tất cả</span>
-          </Link>
+          </Link> */}
 
           {/* Divider */}
           <span className="text-white/30 text-xs select-none mr-2">|</span>
@@ -350,7 +369,7 @@ export const Header: FC = () => {
             <Link
               key={item.label}
               href={item.href}
-              className="text-white font-normal text-sm px-2 py-1 hover:underline hover:text-white rounded-sm transition-all whitespace-nowrap"
+              className="text-white font-normal text-xs tracking-tight px-2 py-1 hover:underline hover:text-white rounded-sm transition-all whitespace-nowrap"
             >
               {item.label}
             </Link>
@@ -360,11 +379,11 @@ export const Header: FC = () => {
           <span className="text-white/30 text-xs select-none mx-1">|</span>
 
           {/* Category links */}
-          {CATEGORY_LINKS.map((cat) => (
+          {CATEGORY_LINKS.filter(cat => cat.show).map((cat) => (
             <Link
               key={cat.label}
               href={cat.href}
-              className="text-white font-normal text-sm px-2 py-1 hover:underline hover:text-white rounded-sm transition-all whitespace-nowrap"
+              className="text-white font-normal text-xs tracking-tight px-2 py-1 hover:underline hover:text-white rounded-sm transition-all whitespace-nowrap"
             >
               {cat.label}
             </Link>
@@ -417,7 +436,7 @@ export const Header: FC = () => {
 
               <div className="border-t border-white/10 my-2" />
 
-              {CATEGORY_LINKS.map((cat) => (
+              {CATEGORY_LINKS.filter(cat => cat.show).map((cat) => (
                 <Link
                   key={cat.label}
                   href={cat.href}
@@ -434,7 +453,7 @@ export const Header: FC = () => {
               {isAuthenticated && user ? (
                 <>
                   <div className="px-3 py-2 text-white">
-                    <p className="text-sm font-bold">{user.firstName || user.username}</p>
+                    <p className="text-sm font-bold truncate pr-4">{displayName}</p>
                     <p className="text-xs text-white/60">{user.email}</p>
                   </div>
                   <Link

@@ -27,6 +27,7 @@ import {
 import { BuilderProduct, SelectedPart } from "@/src/types/builder";
 import KeymapOverlay from "@/src/components/Builder/KeymapOverlay";
 import { PartItem } from "@/src/types/part.types";
+import { partService } from "@/src/services/part.service";
 import { orderService } from "@/src/services/order.service";
 import { toast } from "react-toastify";
 import { Logo } from "@/src/components/Header/Logo";
@@ -42,6 +43,15 @@ const getZIndex = (categorySlug?: string) => {
     keycap: 50,
   };
   return map[categorySlug] || 5;
+};
+
+const formatKeycapPosition = (rawName: string) => {
+  return rawName.replace(
+    /\(Position:\s*R(\d+)-([^-]+)-\d+\)/g,
+    (_, rowNum, keyName) => {
+      return `(Position: ${keyName} - Row ${rowNum})`;
+    }
+  );
 };
 
 const LAYER_ORDER = ["case", "pcb", "plate", "switch", "keycap"];
@@ -170,18 +180,22 @@ const ProductItem = memo(
   ({
     product,
     isSelected,
+    isOutOfStock,
     onClick,
     onHover,
   }: {
     product: BuilderProduct;
     isSelected: boolean;
+    isOutOfStock: boolean;
     onClick: (p: BuilderProduct) => void;
     onHover?: (p: BuilderProduct) => void;
   }) => (
     <div
-      onClick={() => onClick(product)}
-      onMouseEnter={() => onHover?.(product)}
-      className="group cursor-pointer flex flex-col items-center gap-2.5 select-none"
+      onClick={() => !isOutOfStock && onClick(product)}
+      onMouseEnter={() => !isOutOfStock && onHover?.(product)}
+      className={`group flex flex-col items-center gap-2.5 select-none transition-all ${
+        isOutOfStock ? "opacity-40 cursor-not-allowed grayscale" : "cursor-pointer"
+      }`}
     >
       {/* Circle */}
       <div
@@ -214,11 +228,15 @@ const ProductItem = memo(
         >
           {product.name}
         </p>
-        <p className="text-[11px] text-amazon-price font-bold mt-0.5">
-          {product.price > 0
-            ? `+${product.price.toLocaleString()}₫`
-            : "Included"}
-        </p>
+        {isOutOfStock ? (
+          <p className="text-[11px] text-red-500 font-black mt-0.5 uppercase tracking-widest">Out of stock</p>
+        ) : (
+          <p className="text-[11px] text-amazon-price font-bold mt-0.5">
+            {product.price > 0
+              ? `+${product.price.toLocaleString()}₫`
+              : "Included"}
+          </p>
+        )}
       </div>
     </div>
   ),
@@ -292,6 +310,7 @@ function BuilderContent() {
   const [isCustomizeMode, setIsCustomizeMode] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
+  const [stockMap, setStockMap] = useState<Record<string, number>>({});
 
 
   const {
@@ -344,6 +363,23 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
       });
     }
   }, [currentStepName, workflowSteps, stepProducts]);
+
+  // Inventory Stock Validation
+  useEffect(() => {
+    if (currentProducts.length === 0) return;
+    const ids = currentProducts.map((p) => p.partId);
+    const fetchStock = async () => {
+      try {
+        const res = await partService.checkStock({ productIds: ids });
+        if (res.success && res.data) {
+          setStockMap(res.data);
+        }
+      } catch (error) {
+        console.error("Stock check failed:", error);
+      }
+    };
+    fetchStock();
+  }, [currentProducts]);
 
   // ─── Post-Task Upsell Sequence ────────────────────────────────────────────
  useEffect(() => {
@@ -518,6 +554,12 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
       handleAddToCart();
       return;
     }
+
+    if (!session.selection[currentStepName || ""]) {
+      toast.warning("Please select a component before proceeding.");
+      return;
+    }
+
     const idx = workflowSteps.indexOf(currentStepName || "");
     if (idx >= 0 && idx < workflowSteps.length - 1) {
       dispatch(setActiveStep(workflowSteps[idx + 1]));
@@ -806,7 +848,9 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                         <div className="text-[9px] text-amazon-textMuted uppercase font-bold tracking-[0.2em]">
                           {stepName}
                         </div>
-                        <h4 className="text-amazon-text font-black tracking-wide text-[13px] truncate">{part.name}</h4>
+                        <h4 className="text-amazon-text font-black tracking-wide text-[13px] truncate">
+                          {formatKeycapPosition(part.name)}
+                        </h4>
                         <div className="text-amazon-price text-[11px] font-bold">
                           <span className="text-amazon-textMuted mr-1">×{part.quantity} —</span>
                           {part.price > 0
@@ -950,18 +994,22 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                   key={currentStepName}
                   className="grid grid-cols-3 gap-x-4 gap-y-7 animate-fadeIn"
                 >
-                  {currentProducts.map((product) => (
-                    <ProductItem
-                      key={product.optionId}
-                      product={product}
-                      isSelected={
-                        session.selection[currentStepName || ""]?.id ===
-                        product.partId
-                      }
-                      onClick={handleSelectComponent}
-                      onHover={handleProductHover}
-                    />
-                  ))}
+                  {currentProducts.map((product) => {
+                    const isOutOfStock = stockMap[product.partId] !== undefined && stockMap[product.partId] <= 0;
+                    return (
+                      <ProductItem
+                        key={product.optionId}
+                        product={product}
+                        isSelected={
+                          session.selection[currentStepName || ""]?.id ===
+                          product.partId
+                        }
+                        isOutOfStock={isOutOfStock}
+                        onClick={handleSelectComponent}
+                        onHover={handleProductHover}
+                      />
+                    );
+                  })}
                 </div>
               </div>
 
@@ -989,7 +1037,7 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                   </button>
                   <button
                     onClick={handleNextStep}
-                    disabled={processing}
+                    disabled={processing || !session.selection[currentStepName || ""]}
                     className="flex-1 py-3 bg-amazon-btnPrimary text-amazon-text font-black rounded-sm shadow-sm uppercase tracking-widest text-[11px] hover:brightness-95 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {processing ? (

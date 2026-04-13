@@ -120,7 +120,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
       onSuccess();
     } catch (err: unknown) {
       const error = err as string;
-      toast.error(error || "Xử lý yêu cầu thất bại");
+      toast.error(error || "Failed to process warranty request");
     }
   };
 
@@ -198,7 +198,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
             <div className="relative w-full h-48 rounded-sm overflow-hidden borderbg-white">
               <Image
                 src={issue.evidenceUrl}
-                alt="Minh chứng từ khách hàng"
+                alt="Evidence from customer"
                 fill
                 className="object-contain"
               />

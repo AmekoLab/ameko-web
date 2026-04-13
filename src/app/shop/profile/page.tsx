@@ -70,13 +70,13 @@ const ImageUpload = ({
 
   const containerClass =
     type === "banner"
-      ? "w-full h-48 md:h-64 rounded-md bg-neutral-50 border border-dashed border-amazon-border relative overflow-hidden group hover:border-amazon-focus transition-all"
-      : "w-32 h-32 md:w-40 md:h-40 rounded-full bg-neutral-50 border-4 border-white shadow-md relative overflow-hidden group cursor-pointer hover:border-amazon-focus transition-all";
+      ? "w-full h-48 md:h-64 bg-neutral-100 border border-dashed border-neutral-300 relative overflow-hidden group hover:border-neutral-400 transition-all rounded-t-xl"
+      : "w-32 h-32 md:w-36 md:h-36 rounded-full bg-neutral-100 border-4 border-white shadow-md relative overflow-hidden group cursor-pointer hover:border-neutral-200 transition-all";
 
   return (
     <div className="relative">
       <div
-        className={`${containerClass} ${isDragging ? "border-amazon-focus bg-blue-50" : ""} ${error ? "border-red-600" : ""}`}
+        className={`${containerClass} ${isDragging ? "border-neutral-500 bg-neutral-200" : ""} ${error ? "border-red-400" : ""}`}
         onDragOver={(e) => {
           e.preventDefault();
           setIsDragging(true);
@@ -98,9 +98,9 @@ const ImageUpload = ({
         {preview ? (
           <Image src={preview} alt="Preview" fill className="object-cover" />
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-amazon-textMuted z-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-neutral-400 z-10">
             <Camera
-              className={`${type === "banner" ? "w-8 h-8" : "w-6 h-6"} mb-2 ${isDragging ? "text-amazon-link" : ""}`}
+              className={`${type === "banner" ? "w-8 h-8" : "w-6 h-6"} mb-2 ${isDragging ? "text-neutral-500" : ""}`}
             />
             {type === "banner" && (
               <span className="text-sm font-medium text-center px-4">
@@ -110,12 +110,12 @@ const ImageUpload = ({
           </div>
         )}
 
-        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
           <UploadCloud className="text-white w-8 h-8" />
         </div>
       </div>
       {error && (
-        <p className="text-red-600 text-xs mt-1 text-center">
+        <p className="text-red-500 text-xs mt-1 absolute -bottom-5 left-0 w-full text-center font-medium">
           {error}
         </p>
       )}
@@ -134,11 +134,11 @@ const InputLabel = ({
   required?: boolean;
 }) => (
   <div className="flex justify-between mb-1.5 items-end">
-    <label className="text-sm font-medium text-amazon-text">
+    <label className="text-sm font-medium text-neutral-700">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     {error && (
-      <span className="text-red-600 text-xs font-medium">
+      <span className="text-red-500 text-xs font-medium">
         {error}
       </span>
     )}
@@ -237,10 +237,10 @@ export default function ShopProfilePage() {
   // Loading state (Toàn trang)
   if (loading && !currentShop) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-amazon-bgSecondary">
+      <div className="min-h-[60vh] flex items-center justify-center bg-neutral-50">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-10 h-10 animate-spin text-amazon-link" />
-          <p className="text-amazon-textMuted text-sm font-medium">Loading profile...</p>
+          <Loader2 className="w-10 h-10 animate-spin text-neutral-400" />
+          <p className="text-neutral-500 text-sm font-medium">Loading profile...</p>
         </div>
       </div>
     );
@@ -249,13 +249,13 @@ export default function ShopProfilePage() {
   // No shop found
   if (!loading && !currentShop) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-amazon-bgSecondary">
+      <div className="min-h-[60vh] flex items-center justify-center bg-neutral-50">
         <div className="text-center">
-          <Store className="w-16 h-16 text-amazon-link mx-auto mb-4" />
-          <h2 className="text-lg font-bold text-amazon-text mb-2">
+          <Store className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-neutral-800 mb-2">
             No Shop Found
           </h2>
-          <p className="text-sm font-medium text-amazon-textMuted">
+          <p className="text-sm text-neutral-500">
             You haven&apos;t registered a shop yet.
           </p>
         </div>
@@ -264,11 +264,11 @@ export default function ShopProfilePage() {
   }
 
   return (
-    <div className="py-6 px-2 md:px-0 relative bg-amazon-bgSecondary min-h-screen">
+    <div className="py-8 px-4 md:px-8 lg:px-12 relative bg-neutral-50 min-h-[calc(100vh-4rem)]">
       {/* ==================== CUSTOM CONFIRM MODAL ==================== */}
       {isConfirmModalOpen && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm transition-opacity">
-          <div className="bg-white border border-amazon-border rounded-md w-full max-w-sm p-6 shadow-xl flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px] transition-opacity">
+          <div className="bg-white border border-neutral-200 rounded-xl w-full max-w-sm p-8 shadow-2xl flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
             {/* Icon Trạng Thái */}
             <div
               className={`w-16 h-16 rounded-full flex items-center justify-center mb-5 border ${
@@ -285,12 +285,12 @@ export default function ShopProfilePage() {
             </div>
 
             {/* Tiêu đề & Nội dung */}
-            <h3 className="text-lg font-bold text-amazon-text mb-2">
+            <h3 className="text-lg font-semibold text-neutral-900 mb-2">
               {currentShop?.isActive
                 ? "Close shop temporarily?"
                 : "Reopen shop?"}
             </h3>
-            <p className="text-sm font-medium text-amazon-textMuted mb-6">
+            <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
               {currentShop?.isActive
                 ? "Your shop will be hidden. Customers cannot view or purchase products until you reopen."
                 : "Your shop will be visible again. Customers can continue to view and shop as usual."}
@@ -302,7 +302,7 @@ export default function ShopProfilePage() {
                 type="button"
                 onClick={() => setIsConfirmModalOpen(false)}
                 disabled={isToggling}
-                className="flex-1 py-2.5 bg-white border border-amazon-border hover:bg-neutral-50 text-amazon-text text-sm font-medium rounded-md transition-colors disabled:opacity-70"
+                className="flex-1 py-2.5 bg-white border border-neutral-300 hover:bg-neutral-50 text-neutral-700 text-sm font-medium rounded-lg transition-colors disabled:opacity-70"
               >
                 Cancel
               </button>
@@ -310,7 +310,7 @@ export default function ShopProfilePage() {
                 type="button"
                 onClick={executeToggleStatus}
                 disabled={isToggling}
-                className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-white text-sm font-medium rounded-md transition-colors shadow-sm disabled:opacity-70 ${
+                className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-white text-sm font-medium rounded-lg transition-colors shadow-sm disabled:opacity-70 ${
                   currentShop?.isActive
                     ? "bg-red-600 hover:bg-red-700"
                     : "bg-green-600 hover:bg-green-700"
@@ -327,15 +327,15 @@ export default function ShopProfilePage() {
         </div>
       )}
 
-      <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary min-h-screen">
+      <div className="max-w-[800px] mx-auto w-full">
         {/* HEADER */}
-        <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-amazon-border pb-4">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-amazon-text">
+            <h1 className="text-2xl font-bold text-neutral-900">
               Shop Profile
             </h1>
-            <p className="text-amazon-textMuted text-[11px] font-medium mt-1">
-              Update your shop&apos;s information and settings.
+            <p className="text-neutral-500 text-sm mt-1">
+              Update your shop&apos;s identity and contact details
             </p>
           </div>
 
@@ -347,14 +347,14 @@ export default function ShopProfilePage() {
                   currentShop.status === 1 && currentShop.isActive
                     ? "bg-green-50 text-green-700 border-green-200"
                     : currentShop.status === 1 && !currentShop.isActive
-                      ? "bg-gray-100 text-gray-600 border-gray-200" // Trạng thái Inactive
+                      ? "bg-neutral-100 text-neutral-600 border-neutral-200" // Trạng thái Inactive
                       : currentShop.status === 0
-                        ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                        ? "bg-amber-50 text-amber-700 border-amber-200"
                         : currentShop.status === 3
                           ? "bg-red-50 text-red-700 border-red-200"
                           : currentShop.status === 4
-                            ? "bg-gray-100 text-gray-600 border-gray-200"
-                            : "bg-gray-100 text-gray-600 border-gray-200"
+                            ? "bg-neutral-100 text-neutral-600 border-neutral-200"
+                            : "bg-neutral-100 text-neutral-600 border-neutral-200"
                 }`}
               >
                 {currentShop.status === 1 && currentShop.isActive
@@ -377,10 +377,10 @@ export default function ShopProfilePage() {
               <button
                 type="button"
                 onClick={() => setIsConfirmModalOpen(true)}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-colors border shadow-sm ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border shadow-sm ${
                   currentShop.isActive
-                    ? "bg-white border-amazon-border text-red-600 hover:bg-neutral-50"
-                    : "bg-white border-amazon-border text-amazon-text hover:bg-neutral-50"
+                    ? "bg-white border-neutral-200 text-red-600 hover:bg-red-50 hover:border-red-200"
+                    : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-50"
                 }`}
               >
                 {currentShop.isActive ? (
@@ -388,7 +388,7 @@ export default function ShopProfilePage() {
                 ) : (
                   <Power className="w-4 h-4" />
                 )}
-                {currentShop.isActive ? "Deactivate" : "Reactivate"}
+                {currentShop.isActive ? "Deactivate Store" : "Reactivate Store"}
               </button>
             )}
           </div>
@@ -396,17 +396,17 @@ export default function ShopProfilePage() {
 
         {/* Admin note (if rejected) */}
         {currentShop?.adminNote && currentShop.status === 3 && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
-            <p className="text-sm font-semibold text-red-700 mb-1">
-              Admin Rejection Note:
-            </p>
-            <p className="text-sm font-medium text-red-600">{currentShop.adminNote}</p>
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-5">
+            <div className="flex items-start gap-3 text-red-700">
+              <div className="font-semibold text-sm">Review Note:</div>
+              <p className="text-sm flex-1">{currentShop.adminNote}</p>
+            </div>
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* --- SECTION 1: VISUAL IDENTITY --- */}
-          <div className="bg-white rounded-md shadow-sm border border-amazon-border">
+          <div className="bg-white rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-neutral-100 mb-6">
             <div className="relative">
               <ImageUpload
                 name="bannerImage"
@@ -431,8 +431,8 @@ export default function ShopProfilePage() {
               </div>
             </div>
 
-            {/* Spacer for Logo */}
-            <div className="pt-20 px-6 md:px-10 pb-8">
+            {/* Spacer for Logo and Input Fields */}
+            <div className="pt-24 px-6 md:px-10 pb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <InputLabel
@@ -442,16 +442,16 @@ export default function ShopProfilePage() {
                   />
                   <input
                     {...register("shopName")}
-                    className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-white text-amazon-text placeholder-gray-400 focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus transition-all text-sm font-medium"
-                    placeholder="Enter shop name..."
+                    className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-all text-sm"
+                    placeholder="Enter your brand name"
                   />
                 </div>
                 <div>
                   <InputLabel label="Slogan / Bio" />
                   <input
                     {...register("bio")}
-                    className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-white text-amazon-text placeholder-gray-400 focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus transition-all text-sm font-medium"
-                    placeholder="Short slogan or description..."
+                    className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-all text-sm"
+                    placeholder="A short description of your shop"
                   />
                 </div>
               </div>
@@ -459,16 +459,18 @@ export default function ShopProfilePage() {
           </div>
 
           {/* --- SECTION 2: CONTACT & ADDRESS --- */}
-          <div className="bg-white rounded-md shadow-sm border border-amazon-border p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6 border-b border-amazon-border pb-4">
-              <User className="text-amazon-link w-5 h-5" />
-              <h3 className="text-lg font-bold text-amazon-text">
+          <div className="bg-white rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-neutral-100 p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                <User className="text-blue-600 w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-900">
                 Contact Details
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
                 <InputLabel
                   label="Contact Email"
                   error={errors.contactEmail?.message}
@@ -476,11 +478,11 @@ export default function ShopProfilePage() {
                 />
                 <input
                   {...register("contactEmail")}
-                  className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-white text-amazon-text placeholder-gray-400 focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus transition-all text-sm font-medium"
-                  placeholder="email@domain.com"
+                  className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-all text-sm"
+                  placeholder="contact@domain.com"
                 />
               </div>
-              <div className="md:col-span-1">
+              <div>
                 <InputLabel
                   label="Phone Number"
                   error={errors.phoneNumber?.message}
@@ -488,34 +490,36 @@ export default function ShopProfilePage() {
                 />
                 <input
                   {...register("phoneNumber")}
-                  className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-white text-amazon-text placeholder-gray-400 focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus transition-all text-sm font-medium"
+                  className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-all text-sm"
                   placeholder="09xxx..."
                 />
               </div>
-              <div className="md:col-span-3">
+              <div className="md:col-span-2">
                 <InputLabel
-                  label="Address"
+                  label="Full Address"
                   error={errors.address?.message}
                   required
                 />
                 <input
                   {...register("address")}
-                  className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-white text-amazon-text placeholder-gray-400 focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus transition-all text-sm font-medium"
-                  placeholder="Shop address..."
+                  className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-all text-sm"
+                  placeholder="Street, Ward, District, City"
                 />
               </div>
             </div>
           </div>
 
           {/* --- SECTION 3: BANKING INFORMATION (Read-only) --- */}
-          <div className="bg-white rounded-md shadow-sm border border-amazon-border p-6 md:p-8 opacity-90">
-            <div className="flex items-center gap-3 mb-6 border-b border-amazon-border pb-4">
-              <CreditCard className="text-amazon-link w-5 h-5" />
-              <h3 className="text-lg font-bold text-amazon-text">
-                Banking Information
+          <div className="bg-white rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-neutral-100 p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                <CreditCard className="text-emerald-600 w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-900 flex-1">
+                Banking Details
               </h3>
-              <span className="ml-auto text-xs font-semibold text-amazon-textMuted bg-neutral-100 border border-amazon-border px-2 py-0.5 rounded-md">
-                Locked
+              <span className="text-[11px] font-medium text-neutral-500 bg-neutral-100 px-2.5 py-1 rounded-md">
+                Read Only
               </span>
             </div>
 
@@ -524,8 +528,7 @@ export default function ShopProfilePage() {
                 <InputLabel label="Bank Name" />
                 <input
                   {...register("bankName")}
-                  className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-neutral-100 text-amazon-textMuted cursor-not-allowed transition-all text-sm font-medium"
-                  placeholder="Bank name"
+                  className="w-full px-4 py-2.5 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-500 transition-all text-sm"
                   disabled
                 />
               </div>
@@ -533,8 +536,7 @@ export default function ShopProfilePage() {
                 <InputLabel label="Account Number" />
                 <input
                   {...register("bankAccountNumber")}
-                  className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-neutral-100 text-amazon-textMuted cursor-not-allowed transition-all font-mono text-sm"
-                  placeholder="Account number"
+                  className="w-full px-4 py-2.5 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-500 transition-all font-mono text-sm"
                   disabled
                 />
               </div>
@@ -542,8 +544,7 @@ export default function ShopProfilePage() {
                 <InputLabel label="Account Holder Name" />
                 <input
                   {...register("bankAccountName")}
-                  className="w-full px-4 py-2.5 rounded-md border border-amazon-border bg-neutral-100 text-amazon-textMuted cursor-not-allowed transition-all text-sm font-medium"
-                  placeholder="Account holder name"
+                  className="w-full px-4 py-2.5 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-500 transition-all text-sm"
                   disabled
                 />
               </div>
@@ -552,28 +553,30 @@ export default function ShopProfilePage() {
 
           {/* --- SHOP STATS (read-only) --- */}
           {currentShop && (
-            <div className="bg-white rounded-md shadow-sm border border-amazon-border p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6 border-b border-amazon-border pb-4">
-                <Store className="text-amazon-link w-5 h-5" />
-                <h3 className="text-lg font-bold text-amazon-text">
+            <div className="bg-white rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-neutral-100 p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-lg bg-violet-50 flex items-center justify-center">
+                  <Store className="text-violet-600 w-5 h-5" />
+                </div>
+                <h3 className="text-lg font-semibold text-neutral-900">
                   Shop Statistics
                 </h3>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div className="bg-neutral-50 border border-amazon-border rounded-md p-5 text-center">
-                  <p className="text-sm font-medium text-amazon-textMuted mb-2">Rating</p>
-                  <p className="text-2xl font-bold text-amazon-text">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-neutral-50 rounded-xl p-5 border border-neutral-100 flex flex-col justify-center items-center">
+                  <p className="text-sm text-neutral-500 mb-1">Rating</p>
+                  <p className="text-2xl font-bold text-neutral-900">
                     {currentShop.rating?.toFixed(1) || "N/A"}
                   </p>
                 </div>
-                <div className="bg-neutral-50 border border-amazon-border rounded-md p-5 text-center">
-                  <p className="text-sm font-medium text-amazon-textMuted mb-2">Total Sales</p>
-                  <p className="text-2xl font-bold text-amazon-text">
+                <div className="bg-neutral-50 rounded-xl p-5 border border-neutral-100 flex flex-col justify-center items-center">
+                  <p className="text-sm text-neutral-500 mb-1">Total Orders</p>
+                  <p className="text-2xl font-bold text-neutral-900">
                     {currentShop.totalSales ?? 0}
                   </p>
                 </div>
-                <div className="bg-neutral-50 border border-amazon-border rounded-md p-5 text-center">
-                  <p className="text-sm font-medium text-amazon-textMuted mb-2">Total Revenue</p>
+                <div className="bg-neutral-50 rounded-xl p-5 border border-neutral-100 flex flex-col justify-center items-center">
+                  <p className="text-sm text-neutral-500 mb-1">Total Revenue</p>
                   <p className="text-2xl font-bold text-green-600">
                     {currentShop.totalRevenue?.toLocaleString() ?? 0}₫
                   </p>
@@ -587,17 +590,18 @@ export default function ShopProfilePage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="group relative inline-flex items-center justify-center px-8 py-3 bg-amazon-btnPrimary text-amazon-text font-medium hover:brightness-95 rounded-md shadow-sm transition-all duration-200 focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed w-full md:w-auto"
+              className="bg-neutral-900 text-white px-8 py-3 rounded-lg text-sm font-semibold hover:bg-neutral-800 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed w-full md:w-auto shadow-sm active:scale-[0.98]"
             >
               {isSubmitting ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Saving...
-                </span>
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Saving Changes...
+                </>
               ) : (
-                <span className="flex items-center gap-2">
-                  Save Changes <Save className="w-4 h-4" />
-                </span>
+                <>
+                  <Save className="w-4 h-4" />
+                  Save Changes
+                </>
               )}
             </button>
           </div>

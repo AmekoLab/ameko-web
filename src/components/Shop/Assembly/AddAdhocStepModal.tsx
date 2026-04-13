@@ -61,6 +61,9 @@ export default function AddAdhocStepModal({
   }, [isOpen, nextOrder, reset]);
 
   useEffect(() => {
+    // Chỉ gọi API khi Modal THỰC SỰ được mở ra
+    if (!isOpen) return;
+
     const fetchOptionalTemplates = async () => {
       try {
         const res = await assemblyService.getShopTemplates();
@@ -73,7 +76,7 @@ export default function AddAdhocStepModal({
       }
     };
     fetchOptionalTemplates();
-  }, []);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

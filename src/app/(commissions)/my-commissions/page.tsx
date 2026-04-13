@@ -17,8 +17,9 @@ import {
   Hash,
   Banknote,
   Inbox,
-  Quote,
   PlusCircle,
+  Loader2,
+  ChevronRight,
 } from "lucide-react";
 
 // ─── Constants ─────────────────────────────────────────────
@@ -26,7 +27,7 @@ const STATUS_STYLES: Record<
   string,
   { bg: string; border: string; text: string; label: string }
 > = {
-  Draft: { bg: "bg-neutral-100", border: "border-amazon-border", text: "text-amazon-textMuted", label: "Draft" },
+  Draft: { bg: "bg-neutral-100", border: "border-neutral-200", text: "text-neutral-600", label: "Draft" },
   PendingTarget: {
     bg: "bg-orange-50",
     border: "border-orange-200",
@@ -52,12 +53,18 @@ const STATUS_STYLES: Record<
     text: "text-purple-600",
     label: "Quoted",
   },
+  RejectedByShop: {
+    bg: "bg-red-50",
+    border: "border-red-200",
+    text: "text-red-600",
+    label: "Shop rejected",
+  },
 };
 
 const DEFAULT_STATUS = {
   bg: "bg-neutral-100",
-  border: "border-amazon-border",
-  text: "text-amazon-textMuted",
+  border: "border-neutral-200",
+  text: "text-neutral-600",
   label: "Unknown",
 };
 
@@ -79,17 +86,17 @@ const formatDate = (dateStr: string): string => {
 
 // ─── Skeleton ──────────────────────────────────────────────
 const CardSkeleton = () => (
-  <div className="bg-white rounded-sm border border-amazon-border overflow-hidden animate-pulse">
-    <div className="h-48 bg-neutral-200 border-b border-amazon-border" />
-    <div className="p-5 space-y-3">
+  <div className="bg-white rounded-xl border border-neutral-100 overflow-hidden animate-pulse shadow-sm">
+    <div className="h-48 bg-neutral-100 border-b border-neutral-100" />
+    <div className="p-5 space-y-4">
       <div className="flex justify-between">
-        <div className="h-5 w-40 bg-neutral-200 rounded-sm" />
-        <div className="h-5 w-20 bg-neutral-200 rounded-sm" />
+        <div className="h-5 w-40 bg-neutral-100 rounded-md" />
+        <div className="h-5 w-20 bg-neutral-100 rounded-md" />
       </div>
-      <div className="h-4 w-32 bg-neutral-200 rounded-sm" />
-      <div className="h-4 w-48 bg-neutral-200 rounded-sm" />
-      <div className="h-4 w-24 bg-neutral-200 rounded-sm" />
-      <div className="h-10 w-full bg-neutral-200 rounded-sm mt-4" />
+      <div className="h-4 w-32 bg-neutral-100 rounded-md" />
+      <div className="h-4 w-48 bg-neutral-100 rounded-md" />
+      <div className="h-4 w-24 bg-neutral-100 rounded-md" />
+      <div className="h-11 w-full bg-neutral-100 rounded-lg mt-5" />
     </div>
   </div>
 );
@@ -107,28 +114,33 @@ export default function MyCommissionsPage() {
   }, [dispatch]);
 
   return (
-    <div className="bg-amazon-bgSecondary text-amazon-text min-h-screen">
-      <div className="max-w-[1280px] mx-auto px-4 py-8 lg:py-12">
+    <div className="bg-neutral-50 text-neutral-900 min-h-[calc(100vh-4rem)] font-sans">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-amazon-border pb-5">
-          <div className="flex items-center gap-3">
-            <FileText className="w-8 h-8 text-neutral-600" />
-            <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-widest text-amazon-text">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-neutral-900 tracking-tight flex items-center gap-3">
+              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                <FileText className="w-6 h-6" />
+              </div>
               My Requests
             </h1>
+            <p className="text-neutral-500 mt-2 text-sm max-w-xl leading-relaxed">
+              Manage your custom keyboard build requests, track their status, and review merchant quotations.
+            </p>
           </div>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center justify-center gap-2 bg-amazon-btnPrimary hover:brightness-95 text-amazon-text px-5 py-3 rounded-sm transition font-black text-[12px] uppercase tracking-widest shadow-sm shrink-0"
+            className="bg-neutral-900 text-white font-medium text-sm rounded-xl px-6 py-3 hover:bg-neutral-800 transition-all shadow-sm flex items-center gap-2 shrink-0 active:scale-[0.98] w-full sm:w-auto justify-center"
           >
             <PlusCircle className="w-4 h-4" />
-            Create new
+            Create Request
           </button>
         </div>
 
         {/* Loading */}
         {loadingMyRequests && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <CardSkeleton key={i} />
             ))}
@@ -137,29 +149,29 @@ export default function MyCommissionsPage() {
 
         {/* Empty State */}
         {!loadingMyRequests && myRequests.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-amazon-border bg-white rounded-sm mx-4 lg:mx-0">
-            <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-5 border border-amazon-border">
+          <div className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-neutral-200 bg-white rounded-2xl shadow-sm mt-4">
+            <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-5 border border-neutral-100">
               <Inbox className="w-8 h-8 text-neutral-400" />
             </div>
-            <h2 className="text-lg font-black uppercase tracking-widest text-amazon-text mb-2">
+            <h2 className="text-lg font-semibold text-neutral-900 mb-2">
               No requests found
             </h2>
-            <p className="text-[13px] font-bold text-amazon-textMuted max-w-sm mb-6">
-              Create your first request to receive quotations from Shops.
+            <p className="text-sm text-neutral-500 max-w-md mb-6 leading-relaxed">
+              You haven't made any custom keyboard build requests yet. Create your first request to receive quotations from verified builders.
             </p>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center justify-center gap-2 bg-white border border-amazon-border hover:bg-neutral-50 text-amazon-text px-5 py-2.5 rounded-sm transition font-black text-[11px] uppercase tracking-widest"
+              className="bg-white border border-neutral-200 hover:bg-neutral-50 text-neutral-800 px-6 py-2.5 rounded-xl font-medium transition-all shadow-sm flex items-center gap-2 active:scale-[0.98]"
             >
-              <PlusCircle className="w-4 h-4" />
-              Create new request
+              <PlusCircle className="w-4 h-4 text-neutral-400" />
+              Create New Request
             </button>
           </div>
         )}
 
         {/* Cards Grid */}
         {!loadingMyRequests && myRequests.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {myRequests.map((req) => {
               const statusStyle = STATUS_STYLES[req.status] || DEFAULT_STATUS;
               const isDraft = req.status === "Draft";
@@ -167,11 +179,11 @@ export default function MyCommissionsPage() {
               return (
                 <div
                   key={req.commissionRequestId}
-                  className="bg-white border border-amazon-border hover:shadow-md rounded-sm overflow-hidden shadow-sm transition-shadow flex flex-col"
+                  className="bg-white border border-neutral-100 hover:border-neutral-300 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col group/card"
                 >
                   {/* Thumbnail */}
                   {req.referenceImages && (
-                    <div className="relative h-48 w-full bg-neutral-100 border-b border-amazon-border">
+                    <div className="relative h-48 w-full bg-neutral-50 border-b border-neutral-100">
                       <Image
                         src={req.referenceImages}
                         alt={req.title}
@@ -184,43 +196,43 @@ export default function MyCommissionsPage() {
                   {/* Content */}
                   <div className="p-5 flex flex-col flex-1">
                     {/* Title + Badge */}
-                    <div className="flex items-start justify-between gap-3 mb-4">
-                      <h3 className="font-black text-amazon-text text-[14px] uppercase tracking-wider line-clamp-2 leading-snug">
+                    <div className="flex items-start justify-between gap-4 mb-5">
+                      <h3 className="font-semibold text-neutral-900 text-base line-clamp-2 leading-snug group-hover/card:text-blue-600 transition-colors">
                         {req.title}
                       </h3>
                       <span
-                        className={`shrink-0 px-2.5 py-1 box-border rounded-sm border text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}
+                        className={`shrink-0 px-2.5 py-1 box-border rounded-md border text-xs font-semibold whitespace-nowrap ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}
                       >
                         {statusStyle.label}
                       </span>
                     </div>
 
                     {/* Details */}
-                    <div className="space-y-2.5 text-[12px] font-bold text-amazon-textMuted flex-1">
+                    <div className="space-y-3 text-sm font-medium text-neutral-500 flex-1">
                       {/* Shop target */}
-                      <div className="flex items-center gap-2">
-                        <Store className="w-3.5 h-3.5 text-neutral-400" />
+                      <div className="flex items-center gap-2.5">
+                        <Store className="w-4 h-4 text-neutral-400" />
                         {req.targetedShopId ? (
                           <span>
                             Target:{" "}
-                            <span className="text-amazon-text">
+                            <span className="text-neutral-900">
                               {req.targetedShopName || "Shop"}
                             </span>
                           </span>
                         ) : (
                           <span>
                             Target:{" "}
-                            <span className="text-amazon-text">Public Market</span>
+                            <span className="text-neutral-900">Public Market</span>
                           </span>
                         )}
                       </div>
 
                       {/* Budget */}
-                      <div className="flex items-center gap-2">
-                        <Banknote className="w-3.5 h-3.5 text-neutral-400" />
+                      <div className="flex items-center gap-2.5">
+                        <Banknote className="w-4 h-4 text-neutral-400" />
                         <span>
                           Budget:{" "}
-                          <span className="text-amazon-price font-black">
+                          <span className="text-green-600 font-semibold">
                             {formatVND(req.minBudget)} -{" "}
                             {formatVND(req.maxBudget)}
                           </span>
@@ -228,23 +240,23 @@ export default function MyCommissionsPage() {
                       </div>
 
                       {/* Quantity */}
-                      <div className="flex items-center gap-2">
-                        <Hash className="w-3.5 h-3.5 text-neutral-400" />
+                      <div className="flex items-center gap-2.5">
+                        <Hash className="w-4 h-4 text-neutral-400" />
                         <span>
-                          Qty: <span className="text-amazon-text">{req.quantity}</span>
+                          Quantity: <span className="text-neutral-900">{req.quantity}</span>
                         </span>
                       </div>
 
                       {/* Date */}
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-3.5 h-3.5 text-neutral-400" />
+                      <div className="flex items-center gap-2.5">
+                        <Calendar className="w-4 h-4 text-neutral-400" />
                         <span>{formatDate(req.createdAt)}</span>
                       </div>
                     </div>
 
                     {/* Footer */}
                     {isDraft ? (
-                      <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-amazon-border">
+                      <div className="grid grid-cols-2 gap-3 mt-6 pt-5 border-t border-neutral-100">
                         <button
                           onClick={async () => {
                             try {
@@ -259,24 +271,28 @@ export default function MyCommissionsPage() {
                             }
                           }}
                           disabled={isPublishingToPool}
-                          className="w-full py-2.5 bg-amazon-btnPrimary hover:brightness-95 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors flex items-center justify-center disabled:opacity-50 shadow-sm"
+                          className="w-full py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white font-medium text-sm rounded-lg transition-colors flex items-center justify-center disabled:opacity-50 shadow-sm active:scale-[0.98]"
                         >
-                          Publish
+                          {isPublishingToPool ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            "Publish"
+                          )}
                         </button>
                         <Link
                           href={`/my-commissions/${req.commissionRequestId}`}
-                          className="w-full py-2.5 bg-white border border-amazon-border hover:bg-neutral-50 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors flex items-center justify-center text-center shadow-sm"
+                          className="w-full py-2.5 bg-white border border-neutral-200 hover:bg-neutral-50 text-neutral-700 font-medium text-sm rounded-lg transition-colors flex items-center justify-center text-center shadow-sm active:scale-[0.98]"
                         >
                           View / Edit
                         </Link>
                       </div>
                     ) : (
-                      <div className="mt-5 pt-4 border-t border-amazon-border">
+                      <div className="mt-6 pt-5 border-t border-neutral-100">
                         <Link
                           href={`/my-commissions/${req.commissionRequestId}`}
-                          className="block w-full py-2.5 bg-white border border-amazon-border hover:bg-neutral-50 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-shadow text-center shadow-sm hover:shadow-md"
+                          className="w-full py-2.5 bg-white border border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300 text-neutral-700 font-medium text-sm rounded-lg transition-all text-center flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]"
                         >
-                          View Details
+                          View Details <ChevronRight className="w-4 h-4 text-neutral-400" />
                         </Link>
                       </div>
                     )}

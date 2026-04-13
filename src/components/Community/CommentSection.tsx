@@ -93,7 +93,7 @@ export const CommentSection: FC<CommentSectionProps> = ({
     } catch (error) {
       console.error("Failed to post comment");
       setInputValue(content);
-      toast.error("Gửi bình luận thất bại");
+      toast.error("Post comment failed");
     } finally {
       setIsPosting(false);
     }

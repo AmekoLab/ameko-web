@@ -71,8 +71,8 @@ export default function DashboardPage() {
       sub: null,
     },
     {
-      id: "gmv",
-      label: "GMV",
+      id: "gross-merchandise-value",
+      label: "Gross Merchandise Value",
       value: formatVND(data.grossMerchandiseValue),
       sub: null,
     },

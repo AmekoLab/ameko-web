@@ -112,12 +112,12 @@ function VnPayReturnContent() {
                     {amountDisplay}₫
                   </span>
                 </div>
-                <div className="flex justify-between items-center gap-4">
+                {/* <div className="flex justify-between items-center gap-4">
                   <span className="text-amazon-textMuted font-medium">Txn ID</span>
                   <span className="font-bold font-mono text-[11px] text-amazon-text bg-white px-1.5 py-0.5 rounded border border-amazon-border">
                     {transactionNo || "N/A"}
                   </span>
-                </div>
+                </div> */}
                 <div className="flex justify-between items-start gap-4">
                   <span className="text-amazon-textMuted font-medium shrink-0 pt-0.5">Info</span>
                   <span className="font-medium text-amazon-text text-right line-clamp-2 leading-snug">

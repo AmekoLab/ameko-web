@@ -239,7 +239,7 @@ export const CreatePost: FC = () => {
             onClick={() => setIsModalOpen(true)}
             className="flex-1 text-left bg-neutral-100 hover:bg-neutral-200 rounded-full px-4 py-2.5 text-sm text-amazon-textMuted transition-colors cursor-pointer"
           >
-            {userName} ơi, bạn đang nghĩ gì thế?
+            {userName} What are you thinking?
           </button>
         </div>
 

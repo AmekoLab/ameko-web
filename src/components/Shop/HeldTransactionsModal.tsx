@@ -74,7 +74,7 @@ export default function HeldTransactionsModal({
               <Clock className="h-5 w-5 text-neutral-600" />
             </div>
             <h2 className="text-lg font-black uppercase tracking-tight text-amazon-text ">
-              Số dư đang chờ xử lý
+              Balance pending
             </h2>
           </div>
           <button

@@ -21,6 +21,7 @@ interface CommissionState {
   isSubmittingQuote: boolean;
   isRevokingQuote: boolean;
   isAcceptingQuote: boolean;
+  isRejectingQuote: boolean;
   isCanceling: boolean;
   isPublishingToPool: boolean;
   isUpdatingRequest: boolean;
@@ -42,6 +43,7 @@ const initialState: CommissionState = {
   isSubmittingQuote: false,
   isRevokingQuote: false,
   isAcceptingQuote: false,
+  isRejectingQuote: false,
   isCanceling: false,
   isPublishingToPool: false,
   isUpdatingRequest: false,
@@ -59,10 +61,10 @@ export const createCommissionRequest = createAsyncThunk(
       if (response.success) {
         return response.data;
       }
-      return rejectWithValue(response.message || "Tạo yêu cầu thất bại");
+      return rejectWithValue(response.message || "Failed to create commission request");
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Lỗi khi gửi yêu cầu báo giá";
+        error instanceof Error ? error.message : "Failed to create commission request";
       return rejectWithValue(message);
     }
   },
@@ -76,12 +78,12 @@ export const fetchMyRequests = createAsyncThunk(
       if (response.success) {
         return response.data;
       }
-      return rejectWithValue(response.message || "Lấy danh sách thất bại");
+      return rejectWithValue(response.message || "Failed to fetch my requests");
     } catch (error: unknown) {
       const message =
         error instanceof Error
           ? error.message
-          : "Lỗi khi lấy danh sách yêu cầu";
+          : "Failed to fetch my requests";
       return rejectWithValue(message);
     }
   },
@@ -95,10 +97,10 @@ export const fetchCommissionDetail = createAsyncThunk(
       if (response.success) {
         return response.data;
       }
-      return rejectWithValue(response.message || "Lấy chi tiết thất bại");
+      return rejectWithValue(response.message || "Failed to fetch commission detail");
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Lỗi khi lấy chi tiết yêu cầu";
+        error instanceof Error ? error.message : "Failed to fetch commission detail";
       return rejectWithValue(message);
     }
   },
@@ -112,12 +114,12 @@ export const fetchShopTargetedRequests = createAsyncThunk(
       if (response.success) {
         return response.data;
       }
-      return rejectWithValue(response.message || "Lấy danh sách thất bại");
+      return rejectWithValue(response.message || "Failed to fetch targeted requests");
     } catch (error: unknown) {
       const message =
         error instanceof Error
           ? error.message
-          : "Lỗi khi lấy danh sách yêu cầu chỉ định";
+          : "Failed to fetch targeted requests";
       return rejectWithValue(message);
     }
   },
@@ -131,12 +133,12 @@ export const fetchPoolRequests = createAsyncThunk(
       if (response.success) {
         return response.data;
       }
-      return rejectWithValue(response.message || "Lấy danh sách thất bại");
+      return rejectWithValue(response.message || "Failed to fetch pool requests");
     } catch (error: unknown) {
       const message =
         error instanceof Error
           ? error.message
-          : "Lỗi khi lấy danh sách chợ chung";
+          : "Failed to fetch pool requests";
       return rejectWithValue(message);
     }
   },
@@ -151,11 +153,11 @@ export const fetchShopQuotes = createAsyncThunk(
         return response.data;
       }
       return rejectWithValue(
-        response.message || "Lấy danh sách báo giá thất bại",
+        response.message || "Failed to fetch shop quotes",
       );
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Lỗi khi lấy lịch sử báo giá";
+        error instanceof Error ? error.message : "Failed to fetch shop quotes";
       return rejectWithValue(message);
     }
   },
@@ -170,13 +172,13 @@ export const submitCommissionQuote = createAsyncThunk(
     try {
       const response = await commissionService.submitQuote(requestId, payload);
       if (response.success) {
-        toast.success("Gửi báo giá thành công!");
+        toast.success("Send quote successfully!");
         return response.data;
       }
-      return rejectWithValue(response.message || "Gửi báo giá thất bại");
+      return rejectWithValue(response.message || "Send quote failed");
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Lỗi khi gửi báo giá";
+        error instanceof Error ? error.message : "Send quote failed";
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -189,14 +191,14 @@ export const revokeCommissionQuote = createAsyncThunk(
     try {
       const response = await commissionService.revokeQuote(quoteId);
       if (response.success) {
-        toast.success("Đã thu hồi báo giá thành công.");
+        toast.success("Revoke quote successfully!");
         dispatch(fetchShopQuotes());
         return;
       }
-      return rejectWithValue(response.message || "Thu hồi báo giá thất bại");
+      return rejectWithValue(response.message || "Revoke quote failed");
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Lỗi khi thu hồi báo giá";
+        error instanceof Error ? error.message : "Revoke quote failed";
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -210,14 +212,14 @@ export const cancelCommission = createAsyncThunk(
       const response =
         await commissionService.cancelCommissionRequest(requestId);
       if (response.success) {
-        toast.success("Yêu cầu đã được hủy thành công!");
+        toast.success("Cancel commission request successfully!");
         dispatch(fetchCommissionDetail(requestId));
         return;
       }
-      return rejectWithValue(response.message || "Hủy yêu cầu thất bại");
+      return rejectWithValue(response.message || "Cancel commission request failed");
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Lỗi khi hủy yêu cầu";
+        error instanceof Error ? error.message : "Cancel commission request failed";
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -230,14 +232,14 @@ export const publishCommissionToPool = createAsyncThunk(
     try {
       const response = await commissionService.publishToPool(requestId);
       if (response.success) {
-        toast.success("Đã đăng yêu cầu lên Chợ chung thành công!");
+        toast.success("Publish to pool successfully!");
         dispatch(fetchCommissionDetail(requestId));
         return;
       }
-      return rejectWithValue(response.message || "Đăng lên Chợ chung thất bại");
+      return rejectWithValue(response.message || "Publish to pool failed");
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Lỗi khi đăng lên Chợ chung";
+        error instanceof Error ? error.message : "Publish to pool failed";
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -252,10 +254,33 @@ export const acceptCommissionQuote = createAsyncThunk(
       if (response.success) {
         return { orderId: response.orderId };
       }
-      return rejectWithValue(response.message || "Chấp nhận báo giá thất bại");
+      return rejectWithValue(response.message || "Accept quote failed");
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Lỗi khi chấp nhận báo giá";
+        error instanceof Error ? error.message : "Accept quote failed";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  },
+);
+
+export const rejectCommissionQuote = createAsyncThunk(
+  "commission/rejectQuote",
+  async (
+    { quoteId, requestId }: { quoteId: string; requestId: string },
+    { rejectWithValue, dispatch },
+  ) => {
+    try {
+      const response = await commissionService.rejectQuote(quoteId);
+      if (response.success) {
+        toast.success("Reject quote successfully!");
+        dispatch(fetchCommissionDetail(requestId));
+        return;
+      }
+      return rejectWithValue(response.message || "Reject quote failed");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Reject quote failed";
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -268,14 +293,14 @@ export const rejectCommissionRequest = createAsyncThunk(
     try {
       const response = await commissionService.rejectCommissionRequest(requestId);
       if (response.success) {
-        toast.success("Đã từ chối yêu cầu thành công!");
+        toast.success("Reject commission request successfully!");
         dispatch(fetchCommissionDetail(requestId));
         return;
       }
-      return rejectWithValue(response.message || "Từ chối yêu cầu thất bại");
+      return rejectWithValue(response.message || "Reject commission request failed");
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Lỗi khi từ chối yêu cầu";
+        error instanceof Error ? error.message : "Reject commission request failed";
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -291,14 +316,14 @@ export const updateCommissionRequestThunk = createAsyncThunk(
     try {
       const response = await commissionService.updateCommission(id, payload);
       if (response.success) {
-        toast.success("Cập nhật yêu cầu thành công!");
+        toast.success("Update commission request successfully!");
         dispatch(fetchCommissionDetail(id));
         return;
       }
-      return rejectWithValue(response.message || "Cập nhật thất bại");
+      return rejectWithValue(response.message || "Update commission request failed");
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Lỗi khi cập nhật yêu cầu";
+        error instanceof Error ? error.message : "Update commission request failed";
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -397,6 +422,16 @@ const commissionSlice = createSlice({
       })
       .addCase(acceptCommissionQuote.rejected, (state) => {
         state.isAcceptingQuote = false;
+      })
+      // --- Reject Quote ---
+      .addCase(rejectCommissionQuote.pending, (state) => {
+        state.isRejectingQuote = true;
+      })
+      .addCase(rejectCommissionQuote.fulfilled, (state) => {
+        state.isRejectingQuote = false;
+      })
+      .addCase(rejectCommissionQuote.rejected, (state) => {
+        state.isRejectingQuote = false;
       })
       // --- Cancel Commission ---
       .addCase(cancelCommission.pending, (state) => {

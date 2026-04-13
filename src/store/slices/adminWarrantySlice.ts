@@ -43,10 +43,10 @@ export const fetchAllWarrantyRequests = createAsyncThunk(
       if (res.success) {
         return res.data;
       }
-      return rejectWithValue(res.message || "Không thể tải danh sách yêu cầu");
+      return rejectWithValue(res.message || "Failed to fetch warranty requests");
     } catch (error: unknown) {
       const err = error as { message?: string };
-      return rejectWithValue(err.message || "Không thể tải danh sách yêu cầu");
+      return rejectWithValue(err.message || "Failed to fetch warranty requests");
     }
   },
 );
@@ -57,14 +57,14 @@ export const processAdminWarrantyDecision = createAsyncThunk(
     try {
       const res = await warrantyService.submitAdminDecision(payload);
       if (res.success) {
-        toast.success("Đã lưu phán quyết của Admin thành công!");
+        toast.success("Admin decision saved successfully!");
         return res.data;
       }
-      return rejectWithValue(res.message || "Xử lý phán quyết thất bại");
+      return rejectWithValue(res.message || "Admin decision failed");
     } catch (error: unknown) {
       const err = error as { message?: string };
-      toast.error(err.message || "Xử lý phán quyết thất bại");
-      return rejectWithValue(err.message || "Xử lý phán quyết thất bại");
+      toast.error(err.message || "Admin decision failed");
+      return rejectWithValue(err.message || "Admin decision failed");
     }
   },
 );

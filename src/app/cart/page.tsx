@@ -57,38 +57,38 @@ const ROUTES = {
 
 // ─── Loading Skeleton ──────────────────────────────────────
 const CartSkeleton: FC = () => (
-  <div className="min-h-screen bg-amazon-bgSecondary">
-    <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 lg:py-12 animate-pulse">
-      <div className="h-8 w-48 bg-neutral-200 rounded-sm mb-8" />
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex-1 space-y-4">
+  <div className="min-h-screen bg-neutral-50">
+    <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-10 lg:py-14 animate-pulse">
+      <div className="h-8 w-48 bg-neutral-200 rounded-lg mb-10" />
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex-1 space-y-5">
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="bg-white rounded-sm border border-amazon-border p-4 space-y-4 shadow-sm"
+              className="bg-white rounded-xl border border-neutral-200/80 p-5 space-y-4"
             >
               <div className="flex gap-3">
-                <div className="w-5 h-5 bg-neutral-200 rounded-sm" />
-                <div className="w-5 h-5 bg-neutral-200 rounded-sm" />
-                <div className="h-5 w-32 bg-neutral-200 rounded-sm" />
+                <div className="w-5 h-5 bg-neutral-200 rounded" />
+                <div className="w-5 h-5 bg-neutral-200 rounded" />
+                <div className="h-5 w-32 bg-neutral-200 rounded" />
               </div>
-              <div className="flex gap-3 items-center">
-                <div className="w-5 h-5 bg-neutral-200 rounded-sm" />
-                <div className="w-20 h-20 bg-neutral-200 rounded-sm" />
+              <div className="flex gap-4 items-center">
+                <div className="w-5 h-5 bg-neutral-200 rounded" />
+                <div className="w-20 h-20 bg-neutral-100 rounded-lg" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 w-3/4 bg-neutral-200 rounded-sm" />
-                  <div className="h-4 w-1/2 bg-neutral-200 rounded-sm" />
+                  <div className="h-4 w-3/4 bg-neutral-200 rounded" />
+                  <div className="h-4 w-1/2 bg-neutral-200 rounded" />
                 </div>
-                <div className="h-4 w-20 bg-neutral-200 rounded-sm" />
+                <div className="h-4 w-20 bg-neutral-200 rounded" />
               </div>
             </div>
           ))}
         </div>
         <div className="w-full lg:w-[380px] shrink-0">
-          <div className="bg-white border border-amazon-border rounded-sm p-6 space-y-4 shadow-sm">
-            <div className="h-6 w-40 bg-neutral-200 rounded-sm" />
-            <div className="h-10 w-full bg-neutral-200 rounded-sm" />
-            <div className="h-12 w-full bg-neutral-200 rounded-sm" />
+          <div className="bg-white border border-neutral-200/80 rounded-xl p-6 space-y-4">
+            <div className="h-6 w-40 bg-neutral-200 rounded" />
+            <div className="h-10 w-full bg-neutral-200 rounded-lg" />
+            <div className="h-12 w-full bg-neutral-200 rounded-lg" />
           </div>
         </div>
       </div>
@@ -99,17 +99,19 @@ const CartSkeleton: FC = () => (
 // ─── Empty Cart ────────────────────────────────────────────
 const EmptyCart: FC = () => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
-    <ShoppingBag className="w-16 h-16 text-neutral-300 mb-6" />
-    <h1 className="text-3xl font-black text-amazon-text mb-4 uppercase tracking-widest">
-      Shopping Cart is Empty
+    <div className="w-20 h-20 rounded-full bg-neutral-100 flex items-center justify-center mb-6">
+      <ShoppingBag className="w-9 h-9 text-neutral-400" />
+    </div>
+    <h1 className="text-2xl font-semibold text-neutral-800 mb-3">
+      Your cart is empty
     </h1>
-    <p className="text-amazon-textMuted mb-8 max-w-md font-medium text-sm">
+    <p className="text-neutral-500 mb-8 max-w-md text-sm leading-relaxed">
       Looks like you haven&apos;t added anything yet. Browse our collection to
       find your perfect custom build.
     </p>
     <Link
       href={ROUTES.SHOP}
-      className="bg-amazon-btnPrimary text-amazon-text px-8 py-3 text-sm font-black uppercase tracking-widest hover:brightness-95 transition-colors duration-200 rounded-sm shadow-md"
+      className="bg-neutral-900 text-white px-8 py-3 text-sm font-medium hover:bg-neutral-800 transition-colors duration-200 rounded-lg"
     >
       Continue Shopping
     </Link>
@@ -118,19 +120,19 @@ const EmptyCart: FC = () => (
 
 // ─── Component Row (inside accordion) ──────────────────────
 const ComponentRow: FC<{ component: OrderItemComponent }> = ({ component }) => (
-  <div className="flex items-center gap-3 py-3 pl-4 border-l border-amazon-border">
+  <div className="flex items-center gap-3 py-2.5 px-3">
     {/* Part image */}
-    <div className="relative w-12 h-12 bg-neutral-100 shrink-0 border border-amazon-border rounded-sm overflow-hidden">
+    <div className="relative w-10 h-10 bg-white shrink-0 border border-neutral-200 rounded-lg overflow-hidden">
       {component.partImageUrl ? (
         <Image
           src={component.partImageUrl}
           alt={component.partName}
           fill
-          sizes="48px"
+          sizes="40px"
           className="object-contain p-1"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center text-gray-400 text-[10px] font-bold uppercase tracking-widest">
+        <div className="w-full h-full flex items-center justify-center text-neutral-400 text-[9px] font-medium">
           N/A
         </div>
       )}
@@ -138,14 +140,14 @@ const ComponentRow: FC<{ component: OrderItemComponent }> = ({ component }) => (
 
     {/* Part info */}
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-bold text-amazon-text truncate uppercase tracking-wide">
+      <p className="text-sm text-neutral-800 truncate">
         {component.partName}
       </p>
-      <p className="text-[11px] font-bold text-amazon-textMuted uppercase tracking-widest">Qty: {component.quantity}</p>
+      <p className="text-xs text-neutral-400">Qty: {component.quantity}</p>
     </div>
 
     {/* Part price */}
-    <span className="text-[13px] font-bold text-amazon-textMuted tabular-nums shrink-0">
+    <span className="text-sm text-neutral-500 tabular-nums shrink-0">
       {component.partPriceSnapshot > 0
         ? `${component.partPriceSnapshot.toLocaleString()}₫`
         : "Included"}
@@ -184,25 +186,25 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
   return (
     <div
-      className={` last:border-b-0 transition-colors ${
-        selected ? "bg-bgSecondary" : "hover:bg-bgSecondary"
+      className={`border-t border-neutral-100 last:border-b-0 transition-colors ${
+        selected ? "bg-amber-50/40" : "hover:bg-neutral-50/60"
       }`}
     >
       {/* Main row */}
-      <div className="flex items-center p-4 gap-3">
+      <div className="flex items-center p-4 gap-4">
         {/* Checkbox */}
         <div className="shrink-0 self-center">
           <input
             type="checkbox"
             checked={selected}
             onChange={() => onToggleSelect(item.orderItemId)}
-            className="w-4 h-4 accent-amazon-btnPrimary cursor-pointer"
+            className="w-[18px] h-[18px] accent-neutral-900 cursor-pointer rounded"
             aria-label={`Select ${item.productName}`}
           />
         </div>
 
         {/* Image */}
-        <div className="relative w-20 h-20 shrink-0 overflow-hidden bg-bgSecondary">
+        <div className="relative w-20 h-20 shrink-0 overflow-hidden bg-neutral-50 rounded-lg border border-neutral-100">
           {displayImage ? (
             <Image
               src={displayImage}
@@ -213,52 +215,52 @@ const CartItemCard: FC<CartItemCardProps> = ({
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-gray-400" />
+              <ShoppingBag className="w-6 h-6 text-neutral-300" />
             </div>
           )}
         </div>
 
         {/* Product Details */}
         <div className="flex-1 min-w-0 pr-2">
-          <p className="text-[13px] font-black text-amazon-text line-clamp-2 uppercase tracking-wider leading-snug">
+          <p className="text-sm font-medium text-neutral-800 line-clamp-2 leading-snug">
             {item.productName}
           </p>
           {isCustom && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted hover:text-amazon-link transition-colors mt-1.5 w-fit"
+              className="flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-700 transition-colors mt-1.5 w-fit"
             >
               {expanded ? (
                 <>
-                  Hide components <ChevronUp className="w-3 h-3" />
+                  Hide components <ChevronUp className="w-3.5 h-3.5" />
                 </>
               ) : (
                 <>
                   View {item.orderItemComponents.length} components{" "}
-                  <ChevronDown className="w-3 h-3" />
+                  <ChevronDown className="w-3.5 h-3.5" />
                 </>
               )}
             </button>
           )}
           {/* Mobile: price, qty, action */}
-          <div className="md:hidden flex items-center gap-3 mt-2">
-            <span className="text-sm font-bold text-amazon-price">
+          <div className="md:hidden flex items-center gap-3 mt-2.5">
+            <span className="text-sm font-semibold text-neutral-900">
               {item.totalPrice.toLocaleString()}₫
             </span>
-            <div className="flex items-center border border-amazon-border bg-white rounded-sm ml-auto">
+            <div className="flex items-center border border-neutral-200 bg-white rounded-lg ml-auto">
               <button
                 onClick={() =>
                   onUpdateQuantity(item.orderItemId, item.quantity - 1)
                 }
                 disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
-                className="w-7 h-7 flex items-center justify-center text-amazon-textMuted hover:text-amazon-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                className="w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-neutral-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label="Decrease quantity"
               >
-                <Minus className="w-3 h-3" />
+                <Minus className="w-3.5 h-3.5" />
               </button>
-              <span className="w-8 h-7 flex items-center justify-center text-xs font-bold text-amazon-text border-x border-amazon-border tabular-nums">
+              <span className="w-9 h-8 flex items-center justify-center text-sm text-neutral-800 border-x border-neutral-200 tabular-nums">
                 {updatingQuantity ? (
-                  <Loader2 className="w-3 h-3 animate-spin text-amazon-textMuted" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-neutral-400" />
                 ) : (
                   item.quantity
                 )}
@@ -268,16 +270,16 @@ const CartItemCard: FC<CartItemCardProps> = ({
                   onUpdateQuantity(item.orderItemId, item.quantity + 1)
                 }
                 disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
-                className="w-7 h-7 flex items-center justify-center text-amazon-textMuted hover:text-amazon-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                className="w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-neutral-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label="Increase quantity"
               >
-                <Plus className="w-3 h-3" />
+                <Plus className="w-3.5 h-3.5" />
               </button>
             </div>
             <button
               onClick={() => onRemove(item.orderItemId)}
               disabled={removing}
-              className="text-amazon-textMuted hover:text-red-600 transition-colors disabled:opacity-40"
+              className="text-neutral-400 hover:text-red-500 transition-colors disabled:opacity-40"
               aria-label={`Remove ${item.productName}`}
             >
               {removing ? (
@@ -291,27 +293,27 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
         {/* Desktop: Unit Price */}
         <div className="hidden md:flex w-28 justify-center shrink-0">
-          <span className="text-[13px] font-bold text-amazon-textMuted uppercase tracking-widest">
+          <span className="text-sm text-neutral-500 tabular-nums">
             {item.unitPrice.toLocaleString()}₫
           </span>
         </div>
 
         {/* Desktop: Quantity */}
         <div className="hidden md:flex w-32 justify-center shrink-0">
-          <div className="flex items-center border border-amazon-border bg-white rounded-sm">
+          <div className="flex items-center border border-neutral-200 bg-white rounded-lg">
             <button
               onClick={() =>
                 onUpdateQuantity(item.orderItemId, item.quantity - 1)
               }
               disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
-              className="w-8 h-8 flex items-center justify-center text-amazon-textMuted hover:text-amazon-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-neutral-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Decrease quantity"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
-            <span className="w-10 h-8 flex items-center justify-center text-[13px] font-bold text-amazon-text border-x border-amazon-border tabular-nums">
+            <span className="w-10 h-9 flex items-center justify-center text-sm text-neutral-800 border-x border-neutral-200 tabular-nums">
               {updatingQuantity ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-amazon-textMuted" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-neutral-400" />
               ) : (
                 item.quantity
               )}
@@ -321,7 +323,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
                 onUpdateQuantity(item.orderItemId, item.quantity + 1)
               }
               disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
-              className="w-8 h-8 flex items-center justify-center text-amazon-textMuted hover:text-amazon-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-neutral-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Increase quantity"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -330,8 +332,8 @@ const CartItemCard: FC<CartItemCardProps> = ({
         </div>
 
         {/* Desktop: Total Price */}
-        <div className="hidden md:flex w-28 justify-center shrink-0">
-          <span className="text-[14px] font-black text-amazon-price uppercase tracking-widest">
+        <div className="hidden md:flex w-28 justify-end shrink-0">
+          <span className="text-sm font-semibold text-neutral-900 tabular-nums">
             {item.totalPrice.toLocaleString()}₫
           </span>
         </div>
@@ -341,7 +343,7 @@ const CartItemCard: FC<CartItemCardProps> = ({
           <button
             onClick={() => onRemove(item.orderItemId)}
             disabled={removing}
-            className="p-1.5 text-amazon-textMuted hover:text-red-600 transition-colors disabled:opacity-40"
+            className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-40"
             aria-label={`Remove ${item.productName}`}
           >
             {removing ? (
@@ -355,13 +357,15 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
       {/* Accordion: Component list for custom builds */}
       {isCustom && expanded && (
-        <div className="mx-4 mb-4 ml-[7.5rem] bg-neutral-50 border border-amazon-border rounded-sm p-3">
-          <p className="text-[10px] font-black text-amazon-textMuted uppercase tracking-widest mb-2 px-4">
+        <div className="mx-4 mb-4 ml-[7.5rem] bg-neutral-50 border border-neutral-200/80 rounded-lg overflow-hidden">
+          <p className="text-xs font-medium text-neutral-500 px-3 pt-3 pb-1">
             Build Components
           </p>
-          {item.orderItemComponents.map((comp) => (
-            <ComponentRow key={comp.partId} component={comp} />
-          ))}
+          <div className="divide-y divide-neutral-100">
+            {item.orderItemComponents.map((comp, index) => (
+              <ComponentRow key={`${comp.partId}-${index}`} component={comp} />
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -421,40 +425,42 @@ const OrderSummary: FC<OrderSummaryProps> = ({
 
   return (
     <div className="w-full lg:w-[380px] shrink-0">
-      <div className="bg-white shadow-sm border border-amazon-border rounded-sm p-6 sticky top-28">
-        <h3 className=" font-black text-amazon-text text-lg uppercase tracking-widest mb-4 border-b border-amazon-border pb-2">
+      <div className="bg-white border border-neutral-200/80 rounded-xl p-6 sticky top-28">
+        <h3 className="text-lg font-semibold text-neutral-900 mb-5">
           Order Summary
         </h3>
 
         {/* Ameko Platform Voucher */}
-        <div className="mb-3 p-3 rounded-sm border border-amazon-border bg-neutral-50 transition-colors hover:border-amazon-focus/50">
+        <div className="mb-4 p-3.5 rounded-lg border border-neutral-200 bg-neutral-50/80 transition-all hover:border-neutral-300 hover:shadow-sm">
           <button
             type="button"
             onClick={onOpenSystemVoucher}
             className="w-full flex items-center justify-between cursor-pointer group"
           >
-            <div className="flex items-center gap-2">
-              <Ticket className="w-5 h-5 text-amazon-btnSecondary" />
-              <span className="font-bold text-[13px] text-amazon-text uppercase tracking-wider">Ameko Voucher</span>
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                <Ticket className="w-4 h-4 text-amber-600" />
+              </div>
+              <span className="font-medium text-sm text-neutral-800">Ameko Voucher</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               {selectedSystemCode ? (
-                <span className="text-[11px] font-bold text-amazon-btnSecondary uppercase tracking-widest">
-                  Selected 1
+                <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                  1 selected
                 </span>
               ) : availableSystemVouchersCount > 0 ? (
-                <span className="text-[11px] font-bold text-amazon-btnSecondary uppercase tracking-widest">
-                  Available ({availableSystemVouchersCount})
+                <span className="text-xs text-neutral-500">
+                  {availableSystemVouchersCount} available
                 </span>
               ) : (
-                <span className="text-[11px] font-bold text-amazon-textMuted uppercase tracking-widest">Select</span>
+                <span className="text-xs text-neutral-400">Select</span>
               )}
-              <ChevronRight className="w-4 h-4 text-amazon-textMuted group-hover:text-amazon-text transition-colors" />
+              <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
             </div>
           </button>
           {/* System voucher error */}
           {cartPreview?.systemVoucherError && (
-            <p className="text-red-500 text-[10px] uppercase font-bold tracking-wider mt-1.5 px-1">
+            <p className="text-red-500 text-xs mt-2 px-1">
               {cartPreview.systemVoucherError}
             </p>
           )}
@@ -462,89 +468,92 @@ const OrderSummary: FC<OrderSummaryProps> = ({
 
         {/* Applied System Voucher Breakdown */}
         {selectedSystemVoucher && (
-          <div className="mb-4 space-y-1.5 py-2 border-t border-amazon-border">
-            <p className="text-[10px] font-black text-amazon-textMuted uppercase tracking-widest mb-1 px-1">
-              Platform Vouchers
+          <div className="mb-4 py-3 border-t border-neutral-100">
+            <p className="text-xs font-medium text-neutral-500 mb-2">
+              Platform Voucher
             </p>
 
-            <div className="flex items-center justify-between text-[11px] font-bold">
-              <div className="flex items-center gap-1.5 pt-1">
-                <Ticket className="w-3 h-3 text-amazon-btnSecondary" />
-                <span className="text-amazon-text uppercase tracking-wider">
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2">
+                <Ticket className="w-3.5 h-3.5 text-amber-500" />
+                <span className="text-neutral-700 font-mono text-xs">
                   {selectedSystemVoucher.code}
                 </span>
-                <span className="text-amazon-textMuted uppercase tracking-wider">(System)</span>
+                <span className="text-xs text-neutral-400">(System)</span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 {systemDiscountAmount > 0 && (
-                  <span className="text-green-600">
+                  <span className="text-green-600 text-sm font-medium">
                     -{formatCurrency(systemDiscountAmount)}
                   </span>
                 )}
                 <button
                   type="button"
                   onClick={() => dispatch(setSelectedSystemVoucher(null))}
-                  className="p-1 text-amazon-textMuted hover:text-red-600 transition-colors"
+                  className="p-1 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded transition-all"
                   aria-label="Remove system voucher"
                 >
-                  <X className="w-3 h-3" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Selected items info */}
-        <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
-          <span>Selected items</span>
-          <span className="text-amazon-text">
-            {selectedItemIds.size} item{selectedItemIds.size !== 1 ? "s" : ""}
-          </span>
-        </div>
-
-        {/* Subtotal */}
-        <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
-          <span>Subtotal</span>
-          <span className="text-amazon-text">
-            {isCalculatingPreview ? (
-              <Loader2 className="w-4 h-4 animate-spin inline" />
-            ) : (
-              formatCurrency(cartPreview?.totalCartSubTotal || 0)
-            )}
-          </span>
-        </div>
-
-        {/* Shipping — Pay on Delivery (excluded from Stripe total) */}
-        {/* <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
-          <span>Shipping</span>
-          <span className="italic text-amazon-textMuted normal-case text-xs">Pay on delivery</span>
-        </div> */}
-
-        {/* Split Discounts for transparency */}
-        {totalShopDiscount > 0 && (
-          <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
-            <span>Shop Discount</span>
-            <span className="text-green-600">
-              -{formatCurrency(totalShopDiscount)}
+        {/* Price breakdown */}
+        <div className="space-y-3 pt-2">
+          {/* Selected items info */}
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-neutral-500">Selected items</span>
+            <span className="text-neutral-800">
+              {selectedItemIds.size} item{selectedItemIds.size !== 1 ? "s" : ""}
             </span>
           </div>
-        )}
-        
-        {systemDiscountAmount > 0 && (
-          <div className="flex justify-between items-center mb-2 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
-            <span>Platform Discount</span>
-            <span className="text-green-600">
-              -{formatCurrency(systemDiscountAmount)}
+
+          {/* Subtotal */}
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-neutral-500">Subtotal</span>
+            <span className="text-neutral-800">
+              {isCalculatingPreview ? (
+                <Loader2 className="w-4 h-4 animate-spin inline" />
+              ) : (
+                formatCurrency(cartPreview?.totalCartSubTotal || 0)
+              )}
             </span>
           </div>
-        )}
+
+          {/* Shipping — Pay on Delivery (excluded from Stripe total) */}
+          {/* <div className="flex justify-between items-center text-sm">
+            <span className="text-neutral-500">Shipping</span>
+            <span className="italic text-neutral-400 text-xs">Pay on delivery</span>
+          </div> */}
+
+          {/* Split Discounts for transparency */}
+          {totalShopDiscount > 0 && (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-neutral-500">Shop discount</span>
+              <span className="text-green-600 font-medium">
+                -{formatCurrency(totalShopDiscount)}
+              </span>
+            </div>
+          )}
+          
+          {systemDiscountAmount > 0 && (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-neutral-500">Platform discount</span>
+              <span className="text-green-600 font-medium">
+                -{formatCurrency(systemDiscountAmount)}
+              </span>
+            </div>
+          )}
+        </div>
 
         {/* Total = Subtotal - Discount (shipping is COD, excluded from Stripe) */}
-        <div className="flex justify-between items-end mb-2 mt-4 pt-3 border-t border-amazon-border">
-          <span className="text-[13px] font-black text-amazon-text uppercase tracking-widest">
+        <div className="flex justify-between items-end mt-5 pt-4 border-t border-neutral-200">
+          <span className="text-sm font-medium text-neutral-600">
             Estimated Total
           </span>
-          <span className="text-xl font-black text-amazon-price">
+          <span className="text-xl font-bold text-neutral-900 tabular-nums">
             {isCalculatingPreview ? (
               <Loader2 className="w-5 h-5 animate-spin inline" />
             ) : (
@@ -555,7 +564,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
           </span>
         </div>
 
-        <p className="text-[10px] text-amazon-textMuted mb-6 text-right">
+        <p className="text-xs text-neutral-400 mt-1.5 mb-6 text-right">
           Taxes and shipping calculated at checkout
         </p>
 
@@ -564,10 +573,10 @@ const OrderSummary: FC<OrderSummaryProps> = ({
           <button
             onClick={onCheckout}
             disabled={!hasSelection || isCalculatingPreview}
-            className={`w-full py-4 text-[13px] font-black uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 ${
+            className={`w-full py-3.5 text-sm font-semibold rounded-lg transition-all duration-200 ${
               hasSelection && !isCalculatingPreview
-                ? "bg-amazon-btnPrimary text-amazon-text hover:brightness-95 shadow-md"
-                : "bg-neutral-200 text-amazon-textMuted cursor-not-allowed border border-amazon-border"
+                ? "bg-neutral-900 text-white hover:bg-neutral-800 shadow-sm active:scale-[0.98]"
+                : "bg-neutral-100 text-neutral-400 cursor-not-allowed border border-neutral-200"
             }`}
           >
             {isCalculatingPreview ? (
@@ -575,9 +584,9 @@ const OrderSummary: FC<OrderSummaryProps> = ({
                 <Loader2 className="w-4 h-4 animate-spin" /> Processing...
               </span>
             ) : hasSelection ? (
-              `Checkout Now (${selectedItemIds.size})`
+              `Checkout (${selectedItemIds.size})`
             ) : (
-              "Select Items"
+              "Select items to checkout"
             )}
           </button>
         </div>
@@ -909,7 +918,7 @@ export default function CartPage() {
         <p className="text-red-500 mb-4">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="bg-amazon-btnPrimary text-amazon-text shadow-sm px-6 py-2 text-sm font-bold uppercase hover:brightness-95 transition-colors"
+          className="bg-neutral-900 text-white px-6 py-2.5 text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors"
         >
           Try Again
         </button>
@@ -924,26 +933,31 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
 
   // Main cart content
   return (
-    <div className="min-h-screen bg-amazon-bgSecondary text-amazon-text">
-      <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 lg:py-4">
+    <div className="min-h-screen bg-neutral-50 text-neutral-800">
+      <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 lg:py-10">
         {/* Header */}
-        <header className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl md:text-3xl  font-black uppercase tracking-widest text-amazon-text">
-            Shopping Cart
-          </h1>
-          {/* <Link
+        <header className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-semibold text-neutral-900">
+              Shopping Cart
+            </h1>
+            <p className="text-sm text-neutral-400 mt-1">
+              {cart.orderItems.length} item{cart.orderItems.length !== 1 ? "s" : ""} in your cart
+            </p>
+          </div>
+          <Link
             href={ROUTES.SHOP}
-            className="hidden md:flex items-center gap-2 text-sm  tracking-widest text-amazon-textMuted hover:text-amazon-text transition-colors"
+            className="hidden md:flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-800 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Continue Shopping
-          </Link> */}
+          </Link>
         </header>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Product List */}
-          <div className="flex-1 space-y-4">
+          <div className="flex-1 space-y-5">
             {/* Column Header (Desktop) */}
-            <div className="hidden md:flex items-center bg-white border border-amazon-border shadow-sm rounded-sm px-4 py-3 text-[11px] font-black text-amazon-textMuted uppercase tracking-widest">
+            <div className="hidden md:flex items-center bg-white border border-neutral-200/80 rounded-xl px-4 py-3 text-xs font-medium text-neutral-500">
               <div className="flex items-center gap-3 shrink-0">
                 <input
                   type="checkbox"
@@ -952,19 +966,19 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
                     cart.orderItems.length > 0
                   }
                   onChange={handleToggleSelectAll}
-                  className="w-4 h-4 accent-amazon-btnPrimary cursor-pointer"
+                  className="w-[18px] h-[18px] accent-neutral-900 cursor-pointer rounded"
                   aria-label="Select all items"
                 />
               </div>
               <span className="flex-1 ml-3">Product</span>
               <span className="w-28 text-center">Price</span>
               <span className="w-32 text-center">Quantity</span>
-              <span className="w-28 text-center">Total</span>
-              <span className="w-10 text-center">Action</span>
+              <span className="w-28 text-right">Total</span>
+              <span className="w-10 text-center" />
             </div>
 
             {/* Mobile: Select All */}
-            <div className="md:hidden flex items-center gap-2 bg-white border border-amazon-border shadow-sm rounded-sm px-4 py-3">
+            <div className="md:hidden flex items-center gap-3 bg-white border border-neutral-200/80 rounded-xl px-4 py-3">
               <input
                 type="checkbox"
                 checked={
@@ -972,10 +986,10 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
                   cart.orderItems.length > 0
                 }
                 onChange={handleToggleSelectAll}
-                className="w-4 h-4 accent-amazon-btnPrimary cursor-pointer"
+                className="w-[18px] h-[18px] accent-neutral-900 cursor-pointer rounded"
                 aria-label="Select all items"
               />
-              <span className="text-[11px] font-black text-amazon-text uppercase tracking-widest">
+              <span className="text-sm text-neutral-700">
                 Select All ({cart.orderItems.length})
               </span>
             </div>
@@ -993,22 +1007,22 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
               return (
                 <div
                   key={shopId}
-                  className="bg-white  rounded-sm overflow-hidden"
+                  className="bg-white rounded-xl border border-neutral-200/80 overflow-hidden"
                 >
                   {/* Shop Header */}
-                  <div className="flex items-center p-4 ">
+                  <div className="flex items-center px-4 py-3.5 border-b border-neutral-100">
                     <input
                       type="checkbox"
                       checked={allShopSelected}
                       onChange={() => handleToggleShopSelect(shopId)}
-                      className="w-4 h-4 accent-amazon-btnPrimary cursor-pointer shrink-0"
+                      className="w-[18px] h-[18px] accent-neutral-900 cursor-pointer shrink-0 rounded"
                       aria-label={`Select all from ${shopName}`}
                     />
-                    <Store className="w-[18px] h-[18px] text-amazon-textMuted ml-3" />
-                    <span className="text-[13px] font-black text-amazon-text ml-2 truncate uppercase tracking-widest">
+                    <Store className="w-4 h-4 text-neutral-400 ml-3" />
+                    <span className="text-sm font-medium text-neutral-800 ml-2 truncate">
                       {shopName}
                     </span>
-                    <ChevronRight className="w-4 h-4 text-amazon-textMuted ml-1 shrink-0" />
+                    <ChevronRight className="w-4 h-4 text-neutral-400 ml-1 shrink-0" />
                   </div>
 
                   {/* Product Rows */}
@@ -1026,22 +1040,22 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
                   ))}
 
                   {/* Shop Voucher Footer */}
-                  <div className="p-4 flex flex-col gap-3 bg-white">
+                  <div className="px-4 py-3.5 flex flex-col gap-3 border-t border-neutral-100 bg-neutral-50/50">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-[12px] font-bold text-amazon-textMuted uppercase tracking-widest">
-                        <Ticket className="w-4 h-4 text-amazon-btnSecondary" />
+                      <div className="flex items-center gap-2 text-sm text-neutral-600">
+                        <Ticket className="w-4 h-4 text-amber-500" />
                         <span>Shop Voucher</span>
                       </div>
                       {vouchers.length > 0 ? (
                         <button
                           type="button"
                           onClick={() => handleOpenShopVoucherModal(shopId, shopName)}
-                          className="text-[12px] text-amazon-btnSecondary hover:brightness-95 hover:underline tracking-widest transition-colors"
+                          className="text-sm text-amber-600 hover:text-amber-700 hover:underline transition-colors"
                         >
                           Select or enter code ({vouchers.length} available)
                         </button>
                       ) : (
-                        <span className="text-[12px] text-amazon-textMuted tracking-widest">
+                        <span className="text-sm text-neutral-400">
                           Select or enter code
                         </span>
                       )}
@@ -1055,36 +1069,36 @@ if (!cart || !cart?.orderItems || cart?.orderItems?.length === 0) {
                       if (appliedVouchers.length === 0) return null;
 
                       return (
-                        <div className="p-3 bg-neutral-50 border border-amazon-border border-dashed rounded-sm mt-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Tag className="w-3.5 h-3.5 text-amazon-focus" />
-                            <span className="text-[11px] font-black text-amazon-text uppercase tracking-widest">
+                        <div className="p-3.5 bg-white border border-neutral-200 border-dashed rounded-lg">
+                          <div className="flex items-center gap-2 mb-2.5">
+                            <Tag className="w-3.5 h-3.5 text-green-600" />
+                            <span className="text-xs font-medium text-neutral-700">
                               Applied Shop Discounts
                             </span>
                           </div>
-                          <div className="space-y-1.5">
+                          <div className="space-y-2">
                             {appliedVouchers.map((voucher: AppliedVoucherBreakdown, idx: number) => (
-                              <div key={idx} className="flex justify-between items-center text-[12px]">
-                                <span className="text-amazon-textMuted flex items-center gap-1.5 font-bold uppercase tracking-widest">
-                                  Code: <span className="font-black text-amazon-text">{voucher.voucherCode}</span>
+                              <div key={idx} className="flex justify-between items-center text-sm">
+                                <span className="text-neutral-500 flex items-center gap-1.5">
+                                  <span className="font-mono text-xs text-neutral-700">{voucher.voucherCode}</span>
                                   {voucher.discountType === "FixedAmount" && (
-                                    <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-sm font-black tracking-widest">FIXED</span>
+                                    <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-medium">Fixed</span>
                                   )}
                                   {voucher.discountType === "Percentage" && (
-                                    <span className="text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-sm font-black tracking-widest">% OFF</span>
+                                    <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded font-medium">% Off</span>
                                   )}
                                 </span>
-                                <span className="font-black text-green-600">
-                                  - {voucher.discountAmount.toLocaleString()}₫
+                                <span className="font-medium text-green-600">
+                                  -{voucher.discountAmount.toLocaleString()}₫
                                 </span>
                               </div>
                             ))}
                           </div>
                           {appliedVouchers.length > 1 && (
-                            <div className="flex justify-between items-center text-[11px] mt-2 pt-2 border-t border-amazon-border">
-                              <span className="font-bold text-amazon-text uppercase tracking-widest">Total Shop Discount:</span>
-                              <span className="font-black text-green-600 text-[13px]">
-                                - {(shopPreview?.shopDiscountAmount || 0).toLocaleString()}₫
+                            <div className="flex justify-between items-center text-sm mt-2.5 pt-2.5 border-t border-neutral-100">
+                              <span className="text-neutral-600">Total shop discount</span>
+                              <span className="font-semibold text-green-600">
+                                -{(shopPreview?.shopDiscountAmount || 0).toLocaleString()}₫
                               </span>
                             </div>
                           )}

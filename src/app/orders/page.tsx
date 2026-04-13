@@ -34,7 +34,7 @@ const PAYMENT_STATUS_STYLES: Record<string, string> = {
   Paid: "bg-green-50 text-green-700 border border-green-200",
   Released: "bg-teal-50 text-teal-700 border border-teal-200",
   Failed: "bg-red-50 text-red-700 border border-red-200",
-  Refunded: "bg-gray-50 text-gray-700 border border-gray-200",
+  Refunded: "bg-neutral-100 text-neutral-700 border border-neutral-200",
 };
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -55,34 +55,34 @@ const formatDate = (dateStr: string): string => {
 const getStatusBadge = (
   status: string,
   styles: Record<string, string>,
-): string => styles[status] || "bg-gray-50 text-gray-700 border border-gray-200";
+): string => styles[status] || "bg-neutral-50 text-neutral-700 border border-neutral-200";
 
 // ─── Loading Skeleton ──────────────────────────────────────
 const OrdersSkeleton: FC = () => (
-  <div className="max-w-[1000px] mx-auto px-4 md:px-8 py-12 lg:py-20 animate-pulse">
-    <div className="h-10 w-56 bg-neutral-200 rounded-sm mb-8" />
+  <div className="max-w-5xl mx-auto px-4 md:px-8 py-12 lg:py-16 animate-pulse">
+    <div className="h-10 w-64 bg-neutral-200 rounded-xl mb-10" />
     <div className="space-y-6">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-white overflow-hidden">
-          <div className="flex items-center justify-between p-5 ">
+        <div key={i} className="bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm">
+          <div className="flex items-center justify-between p-5 border-b border-neutral-50">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-neutral-200 rounded-full" />
-              <div className="h-5 w-32 bg-neutral-200 rounded-sm" />
+              <div className="w-10 h-10 bg-neutral-100 rounded-full" />
+              <div className="h-5 w-32 bg-neutral-100 rounded-md" />
             </div>
-            <div className="h-6 w-20 bg-neutral-200 rounded-sm" />
+            <div className="h-6 w-20 bg-neutral-100 rounded-md" />
           </div>
           <div className="p-5">
-            <div className="flex gap-3">
-              <div className="w-16 h-16 bg-neutral-200 rounded-sm" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 w-40 bg-neutral-200 rounded-sm" />
-                <div className="h-3 w-24 bg-neutral-200 rounded-sm" />
+            <div className="flex gap-4">
+              <div className="w-20 h-20 bg-neutral-100 rounded-xl" />
+              <div className="flex-1 space-y-3 py-1">
+                <div className="h-4 w-48 bg-neutral-100 rounded-md" />
+                <div className="h-3 w-24 bg-neutral-100 rounded-md" />
               </div>
             </div>
           </div>
-          <div className="flex justify-between p-5 border-t border-amazon-border bg-neutral-50">
-            <div className="h-4 w-28 bg-neutral-200 rounded-sm" />
-            <div className="h-5 w-32 bg-neutral-200 rounded-sm" />
+          <div className="flex justify-between items-center p-5 border-t border-neutral-50 bg-neutral-50/50">
+            <div className="h-4 w-28 bg-neutral-200 rounded-md" />
+            <div className="h-8 w-32 bg-neutral-200 rounded-xl" />
           </div>
         </div>
       ))}
@@ -92,18 +92,20 @@ const OrdersSkeleton: FC = () => (
 
 // ─── Empty State ───────────────────────────────────────────
 const EmptyOrders: FC = () => (
-  <div className="flex flex-col items-center justify-center py-24 text-center">
-    <Package className="w-20 h-20 text-neutral-300 mb-6" strokeWidth={1} />
-    <h2 className="text-2xl font-black text-amazon-text mb-2 font-oswald uppercase tracking-widest">
+  <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-2xl border border-dashed border-neutral-200 shadow-sm">
+    <div className="w-20 h-20 rounded-full bg-neutral-50 flex items-center justify-center mb-6">
+        <Package className="w-10 h-10 text-neutral-300" strokeWidth={1.5} />
+    </div>
+    <h2 className="text-xl font-bold text-neutral-900 mb-2">
       No Orders Yet
     </h2>
-    <p className="text-amazon-textMuted text-[11px] font-bold uppercase tracking-widest leading-relaxed mb-8 max-w-sm">
-      You haven&apos;t placed any orders yet. Start exploring our collection of
-      mechanical keyboards and parts!
+    <p className="text-neutral-500 text-sm leading-relaxed mb-8 max-w-sm">
+      You haven't placed any orders yet. Start exploring our collection of
+      custom mechanical keyboards and parts.
     </p>
     <Link
       href="/shop/all-products"
-      className="inline-flex items-center gap-2 bg-amazon-btnPrimary text-amazon-text px-6 py-3 rounded-sm font-black uppercase tracking-widest hover:brightness-95 transition-colors shadow-sm"
+      className="inline-flex items-center justify-center gap-2 bg-neutral-900 text-white px-6 py-3 rounded-xl font-medium hover:bg-neutral-800 transition-colors shadow-sm active:scale-[0.98]"
     >
       <ShoppingBag className="w-5 h-5" />
       Browse Products
@@ -117,32 +119,41 @@ interface OrderItemRowProps {
 }
 
 const OrderItemRow: FC<OrderItemRowProps> = ({ item }) => (
-  <div className="flex items-center gap-8 py-3 border-b border-amazon-border last:border-b-0">
-    <div className="relative w-24 h-24 rounded-sm overflow-hidden bg-white ">
+  <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 py-4 border-b border-neutral-100 last:border-b-0 group">
+    <div className="relative w-24 h-24 sm:w-20 sm:h-20 shrink-0 rounded-xl overflow-hidden bg-neutral-50 border border-neutral-100">
       {item.productImage ? (
         <Image
           src={item.productImage}
           alt={item.productName}
           fill
-          className="object-cover"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-neutral-50">
-          <Keyboard className="w-6 h-6 text-amazon-textMuted" />
+        <div className="w-full h-full flex items-center justify-center">
+          <Keyboard className="w-6 h-6 text-neutral-300" />
         </div>
       )}
     </div>
-    <div className="flex-1 min-w-0">
-      <p className="text-[12px] font-black uppercase tracking-wider text-amazon-text truncate">
+    <div className="flex-1 min-w-0 flex flex-col justify-center">
+      <p className="text-sm font-semibold text-neutral-900 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
         {item.productName}
       </p>
-      <p className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted mt-1">
-        {item.quantity} × <span className="text-amazon-link">{formatCurrency(item.unitPrice)}</span>
+      <div className="flex items-center gap-2 mt-2">
+         <p className="text-xs font-medium text-neutral-500 bg-neutral-100 px-2.5 py-1 rounded-md">
+            Qty: {item.quantity}
+         </p>
+         <span className="text-neutral-300">•</span>
+         <p className="text-xs font-medium text-amazon-price">
+            {formatCurrency(item.unitPrice)} ea
+         </p>
+      </div>
+    </div>
+    <div className="sm:text-right mt-2 sm:mt-0 flex flex-row sm:flex-col items-center sm:items-end justify-between">
+      <span className="text-xs font-medium text-neutral-400 sm:hidden">Total:</span>
+      <p className="text-base font-bold text-amazon-price whitespace-nowrap">
+        {formatCurrency(item.totalPrice)}
       </p>
     </div>
-    <p className="text-[13px] font-oswald font-black tracking-wider text-amazon-text whitespace-nowrap">
-      {formatCurrency(item.totalPrice)}
-    </p>
   </div>
 );
 
@@ -181,12 +192,12 @@ const OrderCard: FC<OrderCardProps> = ({ order, onViewDetails }) => {
   };
 
   return (
-    <div className="bg-white rounded-sm border border-amazon-border ">
+    <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-4 ">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 py-4 border-b border-neutral-50 bg-white">
+        <div className="flex items-center gap-3.5">
           {order.shopAvatar ? (
-            <div className="relative w-9 h-9 rounded-full overflow-hidden border border-amazon-border">
+            <div className="relative w-10 h-10 rounded-full overflow-hidden border border-neutral-100 bg-neutral-50 shrink-0">
               <Image
                 src={order.shopAvatar}
                 alt={order.shopName}
@@ -195,27 +206,27 @@ const OrderCard: FC<OrderCardProps> = ({ order, onViewDetails }) => {
               />
             </div>
           ) : (
-            <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center ">
-              <Store className="w-4 h-4 text-amazon-textMuted" />
+            <div className="w-10 h-10 rounded-full bg-neutral-50 flex items-center justify-center border border-neutral-100 shrink-0">
+              <Store className="w-4 h-4 text-neutral-400" />
             </div>
           )}
           <div>
-            <p className="text-[12px] font-black uppercase tracking-wider text-amazon-text">{order.shopName}</p>
-            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mt-0.5">
-              <Calendar className="w-3.5 h-3.5" />
+            <p className="text-sm font-bold text-neutral-900">{order.shopName}</p>
+            <div className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 mt-0.5">
+              <Calendar className="w-3.5 h-3.5 text-neutral-400" />
               {formatDate(order.createdAt)}
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span
-            className={`inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-black uppercase tracking-widest ${getStatusBadge(order.orderStatus, ORDER_STATUS_STYLES)}`}
+            className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold ${getStatusBadge(order.orderStatus, ORDER_STATUS_STYLES)}`}
           >
-            {order.orderStatus}
+             {order.orderStatus}
           </span>
           <span
-            className={`inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-black uppercase tracking-widest ${getStatusBadge(order.paymentStatus, PAYMENT_STATUS_STYLES)}`}
+            className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold ${getStatusBadge(order.paymentStatus, PAYMENT_STATUS_STYLES)}`}
           >
             {order.paymentStatus}
           </span>
@@ -223,7 +234,7 @@ const OrderCard: FC<OrderCardProps> = ({ order, onViewDetails }) => {
       </div>
 
       {/* Order Items */}
-      <div className="px-5 py-2">
+      <div className="px-6 py-2 flex-grow bg-white">
         {visibleItems.map((item) => (
           <OrderItemRow key={item.orderItemId} item={item} />
         ))}
@@ -231,18 +242,17 @@ const OrderCard: FC<OrderCardProps> = ({ order, onViewDetails }) => {
         {hasMore && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-amazon-link hover:underline transition-colors py-3 w-full justify-center"
+            className="flex items-center justify-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50/50 hover:bg-blue-50 rounded-xl transition-colors py-3 mt-4 w-full"
           >
             {expanded ? (
               <>
-                <ChevronUp className="w-3.5 h-3.5" />
+                <ChevronUp className="w-4 h-4" />
                 Show less
               </>
             ) : (
               <>
-                <ChevronDown className="w-3.5 h-3.5" />
-                {order.orderItems.length - 2} more item
-                {order.orderItems.length - 2 > 1 ? "s" : ""}
+                <ChevronDown className="w-4 h-4" />
+                Show {order.orderItems.length - 2} more item{order.orderItems.length - 2 > 1 ? "s" : ""}
               </>
             )}
           </button>
@@ -250,33 +260,47 @@ const OrderCard: FC<OrderCardProps> = ({ order, onViewDetails }) => {
       </div>
 
       {/* Footer */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-4 bg-neutral-50 rounded-b-sm border-t border-amazon-border">
-        <div className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
-          {order.orderItems.length} item
-          {order.orderItems.length !== 1 ? "s" : ""}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 px-6 py-4 bg-neutral-50/50 border-t border-neutral-100 mt-auto">
+        <div className="text-sm font-medium text-neutral-500 flex items-center gap-2">
+           <span className="bg-white px-2.5 py-1 border border-neutral-200 rounded-lg text-neutral-700">
+              {order.orderItems.length} item{order.orderItems.length !== 1 ? "s" : ""}
+           </span>
           {order.shippingFee > 0 && (
-            <span className="ml-2">
-              · Shipping: {formatCurrency(order.shippingFee)}
+            <span className="flex items-center gap-2">
+               <span className="text-neutral-300">•</span>
+               <span>Shipping: <span className="text-neutral-900">{formatCurrency(order.shippingFee)}</span></span>
             </span>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          <p className="text-lg font-oswald font-black text-amazon-price tracking-wider">
-            {formatCurrency(order.totalAmount)}
-          </p>
-          {/* Pay Now button: only for Pending orders with Pending payment */}
-          {order.orderStatus === "Pending" &&
-            order.paymentStatus === "Pending" && (
-              <button
-                onClick={handleRepay}
-                disabled={paying}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-sm font-black uppercase tracking-widest text-[11px] bg-amazon-btnPrimary text-amazon-text hover:brightness-95 shadow-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed ml-2"
+        
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between w-full md:w-auto mt-2 md:mt-0">
+           <div className="flex items-center gap-3">
+              <span className="text-xs font-medium text-neutral-500 uppercase tracking-widest sm:hidden">Order Total</span>
+              <p className="text-xl font-bold text-amazon-price">
+                 {formatCurrency(order.totalAmount)}
+              </p>
+           </div>
+           
+           <div className="flex items-center gap-2 w-full sm:w-auto">
+             {/* Pay Now button: only for Pending orders with Pending payment */}
+             {order.orderStatus === "Pending" &&
+               order.paymentStatus === "Pending" && (
+                 <button
+                   onClick={handleRepay}
+                   disabled={paying}
+                   className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98]"
+                 >
+                   {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                   Pay Now
+                 </button>
+               )}
+             <button 
+               onClick={() => onViewDetails(order.orderId)} 
+               className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm border border-neutral-200 text-neutral-700 bg-white hover:bg-neutral-50 transition-all shadow-sm active:scale-[0.98]"
               >
-                {paying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
-                Pay Now
+                 View Details
               </button>
-            )}
-          <button onClick={() => onViewDetails(order.orderId)} className="inline-flex items-center gap-2 px-4 py-2 rounded-sm font-black uppercase tracking-widest text-[11px] border border-amazon-border text-amazon-text bg-white hover:bg-neutral-50 transition-colors ml-2 shadow-sm">View Details</button>
+           </div>
         </div>
       </div>
     </div>
@@ -341,29 +365,34 @@ export default function MyOrdersPage() {
   if (loading) return <OrdersSkeleton />;
 
   return (
-    <div className="min-h-screen bg-amazon-bgSecondary text-amazon-text">
-      <div className="max-w-[1000px] mx-auto px-4 md:px-8 py-12 lg:py-6">
+    <div className="min-h-[calc(100vh-4rem)] bg-neutral-50 text-neutral-900 font-sans">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         {/* Back + Title */}
-        <div className="flex items-center gap-4 mb-8">
-          <Link
-            href="/"
-            className="p-2.5 rounded-sm bg-white border border-amazon-border text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 hover:border-amazon-text transition-all flex-shrink-0 shadow-sm"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <div>
-            <h1 className="text-3xl font-black text-amazon-text font-oswald tracking-widest uppercase">
-              My Orders
-            </h1>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted mt-1">
-              {orders.length} order{orders.length !== 1 ? "s" : ""} placed
-            </p>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+          <div className="flex items-center gap-4">
+             <Link
+               href="/"
+               className="p-2.5 rounded-xl bg-white border border-neutral-200 text-neutral-400 hover:text-neutral-800 hover:bg-neutral-50 transition-all shadow-sm group"
+             >
+               <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
+             </Link>
+             <div>
+               <h1 className="text-3xl font-bold text-neutral-900 tracking-tight flex items-center gap-3">
+                 <div className="p-2 bg-blue-50 text-blue-600 rounded-lg hidden sm:block">
+                   <ShoppingBag className="w-6 h-6" />
+                 </div>
+                 Order History
+               </h1>
+               <p className="text-neutral-500 mt-1 text-sm font-medium">
+                 {orders.length} total order{orders.length !== 1 ? "s" : ""} placed
+               </p>
+             </div>
           </div>
         </div>
 
         {/* Filter Tabs */}
         {orders.length > 0 && (
-          <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-2.5 mb-8 overflow-x-auto pb-3 custom-scrollbar">
             {STATUS_FILTERS.map((f) => {
               const count =
                 f.value === "all"
@@ -374,19 +403,19 @@ export default function MyOrdersPage() {
                 <button
                   key={f.value}
                   onClick={() => setActiveFilter(f.value)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-sm text-[11px] font-black uppercase tracking-widest whitespace-nowrap transition-all border-b-2 ${
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
                     activeFilter === f.value
-                      ? "bg-amazon-bg text-amazon-focus border-amazon-focus font-bold"
-                      : "bg-white text-amazon-textMuted border-transparent hover:text-amazon-text"
+                      ? "bg-neutral-900 text-white shadow-md"
+                      : "bg-white text-neutral-500 border border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-800"
                   }`}
                 >
                   {f.label}
                   {count > 0 && (
                     <span
-                      className={`text-[9px] px-1.5 py-0.5 rounded-full font-black ${
+                      className={`text-xs px-2 py-0.5 rounded-md font-bold ${
                         activeFilter === f.value
-                          ? "bg-neutral-100 text-amazon-text"
-                          : "bg-neutral-100 text-amazon-text"
+                          ? "bg-white/20 text-white"
+                          : "bg-neutral-100 text-neutral-600"
                       }`}
                     >
                       {count}
@@ -400,11 +429,11 @@ export default function MyOrdersPage() {
 
         {/* Error State */}
         {error && !loading && (
-          <div className="bg-red-50 border border-red-200 rounded-sm p-4 mb-6">
-            <p className="text-red-700 text-[11px] font-bold uppercase tracking-widest">{error}</p>
+          <div className="bg-red-50 border border-red-100 rounded-2xl p-6 mb-8 flex flex-col items-center justify-center text-center">
+            <p className="text-red-700 text-sm font-semibold mb-3">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="text-red-600 text-[11px] font-black uppercase tracking-widest mt-2 hover:underline inline-flex items-center gap-1"
+              className="bg-white border border-red-200 text-red-600 px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-red-50 transition-colors shadow-sm"
             >
               Try again
             </button>
@@ -414,32 +443,32 @@ export default function MyOrdersPage() {
         {/* Order List */}
         {filteredOrders.length === 0 && !error ? (
           activeFilter !== "all" ? (
-            <div className="text-center py-16 border border-amazon-border bg-white rounded-sm shadow-sm">
-              <Package
-                className="w-16 h-16 text-neutral-300 mx-auto mb-4"
-                strokeWidth={1}
-              />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
-                No{" "}
-                <span className="font-black text-amazon-text">{activeFilter}</span>{" "}
-                orders found
+            <div className="text-center py-24 border border-dashed border-neutral-200 bg-white rounded-2xl shadow-sm">
+              <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mx-auto mb-5 border border-neutral-100">
+                 <Package className="w-8 h-8 text-neutral-400" strokeWidth={1.5} />
+              </div>
+              <p className="text-lg font-semibold text-neutral-900 mb-2">
+                No {activeFilter.toLowerCase()} orders
+              </p>
+              <p className="text-sm text-neutral-500 mb-6">
+                 You don't have any orders matching this status filter.
               </p>
               <button
                 onClick={() => setActiveFilter("all")}
-                className="text-amazon-link text-[10px] font-black uppercase tracking-widest mt-4 hover:underline"
+                className="text-white bg-neutral-900 hover:bg-neutral-800 px-5 py-2.5 rounded-xl font-medium text-sm transition-all shadow-sm active:scale-[0.98]"
               >
-                View all orders
+                View All Orders
               </button>
             </div>
           ) : (
             <EmptyOrders />
           )
         ) : (
-          <div className="space-y-6">
-            {filteredOrders.map((order) => (
-              <OrderCard key={order.orderId} order={order} onViewDetails={(id) => setSelectedOrderId(id)} />
-            ))}
-          </div>
+           <div className="space-y-6">
+             {filteredOrders.map((order) => (
+               <OrderCard key={order.orderId} order={order} onViewDetails={(id) => setSelectedOrderId(id)} />
+             ))}
+           </div>
         )}
       </div>
       <OrderDetailModal isOpen={!!selectedOrderId} orderId={selectedOrderId} onClose={() => setSelectedOrderId(null)} />

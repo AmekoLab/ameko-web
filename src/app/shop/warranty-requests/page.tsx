@@ -10,6 +10,8 @@ import {
   User,
   CheckCircle,
   FileText,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
@@ -258,6 +260,63 @@ const Pagination: FC<PaginationProps> = ({ current, total, onChange }) => {
   );
 };
 
+// ─── Confirm Receipt Modal ─────────────────────────────────
+interface ConfirmReceiptModalProps {
+  isOpen: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+  isLoading: boolean;
+}
+
+const ConfirmReceiptModal = ({
+  isOpen,
+  onConfirm,
+  onCancel,
+  isLoading,
+}: ConfirmReceiptModalProps) => {
+  if (!isOpen) return null;
+  return (
+    <div
+      className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4 backdrop-blur-[2px]"
+      onClick={onCancel}
+    >
+      <div
+        className="bg-white border border-neutral-100 rounded-2xl w-full max-w-sm p-8 shadow-2xl text-center animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-14 h-14 rounded-full bg-green-50 border border-green-100 flex items-center justify-center mx-auto mb-5">
+          <CheckCircle className="w-6 h-6 text-green-600" />
+        </div>
+        <h3 className="text-lg font-bold text-neutral-900 mb-2">
+         Confirm receipt
+        </h3>
+        <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
+          Are you sure you have received the returned item in good condition? This action will close the order and cannot be undone.
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            className="flex-1 py-3 bg-white hover:bg-neutral-50 text-neutral-700 font-semibold text-sm rounded-xl transition-colors border border-neutral-200"
+          >
+            Hủy
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              "Confirm"
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─── Main Page ─────────────────────────────────────────────
 const ShopWarrantyDashboard: FC = () => {
   const dispatch = useAppDispatch();
@@ -272,6 +331,7 @@ const ShopWarrantyDashboard: FC = () => {
   const [selectedIssue, setSelectedIssue] = useState<WarrantyRequest | null>(
     null,
   );
+  const [receiptConfirmId, setReceiptConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(fetchShopWarrantyRequests({ page: 1, pageSize: PAGE_SIZE }));
@@ -293,21 +353,20 @@ const ShopWarrantyDashboard: FC = () => {
     dispatch(fetchShopWarrantyRequests({ page: 1, pageSize: PAGE_SIZE }));
   }, [dispatch]);
 
-  const handleConfirmReceive = useCallback(
-    async (issueId: string) => {
-      const isConfirmed = window.confirm(
-        "Bạn có chắc chắn đã nhận được hàng hoàn trả nguyên vẹn? Hành động này sẽ chốt đơn và không thể hoàn tác.",
-      );
-      if (!isConfirmed) return;
-      try {
-        await dispatch(confirmShopReceipt(issueId)).unwrap();
-        dispatch(fetchShopWarrantyRequests({ page: 1, pageSize: PAGE_SIZE }));
-      } catch {
-        // error toast handled by thunk
-      }
-    },
-    [dispatch],
-  );
+  const handleConfirmReceiveClick = useCallback((issueId: string) => {
+    setReceiptConfirmId(issueId);
+  }, []);
+
+  const handleExecuteConfirmReceive = useCallback(async () => {
+    if (!receiptConfirmId) return;
+    try {
+      await dispatch(confirmShopReceipt(receiptConfirmId)).unwrap();
+      dispatch(fetchShopWarrantyRequests({ page: 1, pageSize: PAGE_SIZE }));
+      setReceiptConfirmId(null);
+    } catch {
+      // error toast handled by thunk
+    }
+  }, [dispatch, receiptConfirmId]);
 
   if (loadingShopWarranties) return <TableSkeleton />;
 
@@ -349,8 +408,8 @@ const ShopWarrantyDashboard: FC = () => {
                       key={req.id}
                       request={req}
                       onReviewClick={handleReviewClick}
-                      onConfirmReceive={handleConfirmReceive}
-                      isConfirmingReceipt={isConfirmingReceipt}
+                      onConfirmReceive={handleConfirmReceiveClick}
+                      isConfirmingReceipt={isConfirmingReceipt && receiptConfirmId === req.id}
                     />
                   ))}
                 </tbody>
@@ -371,6 +430,13 @@ const ShopWarrantyDashboard: FC = () => {
           onClose={() => setReviewModalOpen(false)}
           issue={selectedIssue}
           onSuccess={handleReviewSuccess}
+        />
+        
+        <ConfirmReceiptModal
+          isOpen={!!receiptConfirmId}
+          onConfirm={handleExecuteConfirmReceive}
+          onCancel={() => setReceiptConfirmId(null)}
+          isLoading={isConfirmingReceipt}
         />
       </div>
     </div>

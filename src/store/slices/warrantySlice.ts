@@ -47,10 +47,10 @@ export const submitWarrantyRequest = createAsyncThunk(
         payload,
       );
       if (res.success) {
-        toast.success("Yêu cầu bảo hành đã được gửi thành công!");
+        toast.success("Warranty request submitted successfully!");
         return res.data;
       }
-      return rejectWithValue(res.message || "Gửi yêu cầu thất bại");
+      return rejectWithValue(res.message || "Submit warranty request failed");
     } catch (error: unknown) {
       const err = error as {
         message?: string;
@@ -71,14 +71,14 @@ export const submitWarrantyReturnShipment = createAsyncThunk(
     try {
       const res = await warrantyService.submitReturnShipment(payload);
       if (res.success) {
-        toast.success("Đã gửi thông tin trả hàng thành công!");
+        toast.success("Return shipment submitted successfully!");
         return res.data;
       }
-      return rejectWithValue(res.message || "Gửi thông tin thất bại");
+      return rejectWithValue(res.message || "Return shipment submitted failed");
     } catch (error: unknown) {
       const err = error as { message?: string };
-      toast.error(err.message || "Gửi thông tin thất bại");
-      return rejectWithValue(err.message || "Gửi thông tin thất bại");
+      toast.error(err.message || "Return shipment submitted failed");
+      return rejectWithValue(err.message || "Return shipment submitted failed");
     }
   },
 );
@@ -94,10 +94,10 @@ export const fetchMyWarrantyRequests = createAsyncThunk(
       if (res.success) {
         return res.data;
       }
-      return rejectWithValue(res.message || "Không thể tải danh sách yêu cầu");
+      return rejectWithValue(res.message || "Failed to fetch warranty requests");
     } catch (error: unknown) {
       const err = error as { message?: string };
-      return rejectWithValue(err.message || "Không thể tải danh sách yêu cầu");
+      return rejectWithValue(err.message || "Failed to fetch warranty requests");
     }
   },
 );
@@ -111,10 +111,10 @@ export const updateWarranty = createAsyncThunk(
     try {
       const res = await warrantyService.updateWarrantyRequest(issueId, payload);
       if (res.success) {
-        toast.success("Cập nhật yêu cầu thành công!");
+        toast.success("Update warranty request successfully!");
         return res.data;
       }
-      return rejectWithValue(res.message || "Cập nhật yêu cầu thất bại");
+      return rejectWithValue(res.message || "Update warranty request failed");
     } catch (error: unknown) {
       const err = error as {
         message?: string;
@@ -123,7 +123,7 @@ export const updateWarranty = createAsyncThunk(
       const msg =
         err.response?.data?.message ||
         err.message ||
-        "Có lỗi xảy ra khi cập nhật yêu cầu.";
+        "Update warranty request failed";
       return rejectWithValue(msg);
     }
   },
@@ -135,14 +135,14 @@ export const withdrawWarranty = createAsyncThunk(
     try {
       const res = await warrantyService.withdrawWarrantyRequest(issueId);
       if (res.success) {
-        toast.success("Đã rút lại yêu cầu khiếu nại thành công.");
+        toast.success("Withdraw warranty request successfully!");
         return res.data;
       }
-      return rejectWithValue(res.message || "Rút lại yêu cầu thất bại");
+      return rejectWithValue(res.message || "Withdraw warranty request failed");
     } catch (error: unknown) {
       const err = error as { message?: string };
-      toast.error(err.message || "Rút lại yêu cầu thất bại");
-      return rejectWithValue(err.message || "Rút lại yêu cầu thất bại");
+      toast.error(err.message || "Withdraw warranty request failed");
+      return rejectWithValue(err.message || "Withdraw warranty request failed");
     }
   },
 );

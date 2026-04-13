@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useAppDispatch } from "@/src/store/hook";
+import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { logoutUser } from "@/src/store/action/authActions";
 import {
   LayoutDashboard,
@@ -36,6 +36,17 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state: any) => state.auth);
+  const { currentShop } = useAppSelector((state: any) => state.shop);
+
+  const displayName = (() => {
+    if (!user) return "";
+    if (user.role === "Admin") return "Admin!";
+    if (user.role === "Shop") {
+      return currentShop?.shopName || user?.shopName || user?.firstName || user?.username;
+    }
+    return user?.firstName || user?.username;
+  })();
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
@@ -188,6 +199,27 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
         isCollapsed ? "w-20" : "w-64"
       }`}
     >
+      {/* User Profile Block */}
+      <div className="border-b border-amazon-border p-4">
+        {isCollapsed ? (
+          <div className="w-8 h-8 rounded-full bg-amazon-btnSecondary text-amazon-text flex items-center justify-center font-bold text-sm mx-auto shadow-sm">
+            {displayName ? displayName.charAt(0).toUpperCase() : "A"}
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-amazon-btnSecondary text-amazon-text flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+              {displayName ? displayName.charAt(0).toUpperCase() : "A"}
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-white text-sm font-bold truncate">Hi, {displayName}</span>
+              <span className="text-white/60 text-[11px] font-medium uppercase tracking-wider truncate">
+                {user?.role || role}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Menu Area */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar p-4 flex flex-col gap-2">
         {menu.map((group) => {

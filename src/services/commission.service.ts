@@ -49,6 +49,12 @@ export const commissionService = {
     return api.post(`../Commissions/quotes/${quoteId}/accept`);
   },
 
+  rejectQuote: (
+    quoteId: string,
+  ): Promise<{ success: boolean; message: string }> => {
+    return api.post(`../Commissions/quotes/${quoteId}/reject`);
+  },
+
   rejectCommissionRequest: (
     requestId: string,
   ): Promise<{ success: boolean; message: string }> => {
