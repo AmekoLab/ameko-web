@@ -82,7 +82,7 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
       onSuccess();
     } catch (err: unknown) {
       const error = err as string;
-      toast.error(error || "Xử lý phán quyết thất bại");
+      toast.error(error || "Handle admin decision failed");
     }
   };
 

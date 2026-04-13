@@ -19,7 +19,7 @@ function mapMethodName(method: number): string {
     case 1:
       return "Banking";
     case 2:
-      return "E-Wallet/ZaloPay";
+      return "E-Wallet  ";
     default:
       return "Unknown";
   }

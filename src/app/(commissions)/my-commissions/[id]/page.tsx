@@ -9,6 +9,7 @@ import { AppDispatch, RootState } from "@/src/store/index";
 import {
   fetchCommissionDetail,
   acceptCommissionQuote,
+  rejectCommissionQuote,
   cancelCommission,
   publishCommissionToPool,
 } from "@/src/store/slices/commissionSlice";
@@ -27,6 +28,8 @@ import {
   XCircle,
   AlertTriangle,
   Globe,
+  Info,
+  FileText
 } from "lucide-react";
 
 // ─── Constants ─────────────────────────────────────────────
@@ -34,7 +37,7 @@ const STATUS_STYLES: Record<
   string,
   { bg: string; border: string; text: string; label: string }
 > = {
-  Draft: { bg: "bg-neutral-100", border: "border-amazon-border", text: "text-amazon-textMuted", label: "Draft" },
+  Draft: { bg: "bg-neutral-100", border: "border-neutral-200", text: "text-neutral-600", label: "Draft" },
   PendingTarget: {
     bg: "bg-orange-50",
     border: "border-orange-200",
@@ -61,6 +64,12 @@ const STATUS_STYLES: Record<
     text: "text-red-600",
     label: "Shop rejected",
   },
+  RejectedByShop: {
+    bg: "bg-red-50",
+    border: "border-red-200",
+    text: "text-red-600",
+    label: "Shop rejected",
+  },
 };
 
 const QUOTE_STATUS_STYLES: Record<
@@ -80,14 +89,14 @@ const QUOTE_STATUS_STYLES: Record<
     label: "Accepted",
   },
   Rejected: { bg: "bg-red-50", border: "border-red-200", text: "text-red-600", label: "Rejected" },
-  Expired: { bg: "bg-neutral-100", border: "border-amazon-border", text: "text-neutral-500", label: "Expired" },
+  Expired: { bg: "bg-neutral-100", border: "border-neutral-200", text: "text-neutral-500", label: "Expired" },
   Revoked: { bg: "bg-red-50", border: "border-red-200", text: "text-red-600", label: "Revoked" },
 };
 
 const DEFAULT_STATUS = {
   bg: "bg-neutral-100",
-  border: "border-amazon-border",
-  text: "text-amazon-textMuted",
+  border: "border-neutral-200",
+  text: "text-neutral-600",
   label: "Unknown",
 };
 
@@ -111,20 +120,22 @@ const formatDate = (dateStr: string): string => {
 interface QuoteCardProps {
   quote: CommissionQuote;
   isAccepting: boolean;
+  isRejecting: boolean;
   onAccept: (quoteId: string) => void;
+  onReject: (quoteId: string) => void;
 }
 
-const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
+const QuoteCard = ({ quote, isAccepting, isRejecting, onAccept, onReject }: QuoteCardProps) => {
   const qStatus = QUOTE_STATUS_STYLES[quote.status] || DEFAULT_STATUS;
   const isPending = quote.status === "PendingUserDecision";
   const isAccepted = quote.status === "Accepted";
 
   return (
-    <div className="bg-white rounded-sm border border-amazon-border hover:shadow-md p-6 shadow-sm transition-shadow">
+    <div className="bg-white rounded-xl border border-neutral-100 hover:shadow-md p-6 shadow-sm transition-all group/quote">
       {/* Header: Shop info + quote status */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
-          <div className="relative w-10 h-10 rounded-sm overflow-hidden border border-amazon-border bg-neutral-100 flex items-center justify-center shrink-0">
+          <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-neutral-100 bg-neutral-50 flex items-center justify-center shrink-0">
             {quote.shopAvatar ? (
               <Image
                 src={quote.shopAvatar}
@@ -133,42 +144,44 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
                 className="object-cover"
               />
             ) : (
-              <Store className="w-5 h-5 text-neutral-400" />
+              <Store className="w-6 h-6 text-neutral-300" />
             )}
           </div>
           <div>
-            <p className="font-black text-amazon-text text-[12px] uppercase tracking-widest">
+            <p className="font-semibold text-neutral-900 group-hover/quote:text-blue-600 transition-colors">
               {quote.shopName || "Shop"}
             </p>
-            <p className="text-[10px] uppercase font-bold tracking-widest text-amazon-focus">Quotation</p>
+            <p className="text-xs font-medium text-neutral-500">Quotation Offer</p>
           </div>
         </div>
         <span
-          className={`px-2.5 py-1 box-border rounded-sm border text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${qStatus.bg} ${qStatus.text} ${qStatus.border}`}
+          className={`px-3 py-1.5 box-border rounded-md border text-xs font-semibold whitespace-nowrap ${qStatus.bg} ${qStatus.text} ${qStatus.border}`}
         >
           {qStatus.label}
         </span>
       </div>
 
       {/* Body: Details grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5 bg-neutral-50 p-4 rounded-xl border border-neutral-100 relative overflow-hidden">
+         {/* Slight gradient flourish for pricing element */}
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-400 opacity-50 rounded-l-xl"></div>
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mb-1">Quoted Price</p>
-          <p className="text-xl font-black text-amazon-price">
+          <p className="text-xs font-medium text-neutral-500 mb-1">Quoted Price</p>
+          <p className="text-xl font-bold text-green-600">
             {formatVND(quote.quotedPrice)}
           </p>
         </div>
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mb-1">Estimated Time</p>
-          <p className="text-sm font-bold text-amazon-text flex items-center gap-1.5">
-            <Clock className="w-4 h-4 text-neutral-400" />
+          <p className="text-xs font-medium text-neutral-500 mb-1">Estimated Time</p>
+          <p className="text-sm font-semibold text-neutral-900 flex items-center gap-1.5">
+            <Clock className="w-4 h-4 text-blue-500" />
             {quote.estimatedDays} days
           </p>
         </div>
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted mb-1">Deadline</p>
-          <p className="text-sm font-bold text-amazon-text flex items-center gap-1.5">
-            <Calendar className="w-4 h-4 text-neutral-400" />
+          <p className="text-xs font-medium text-neutral-500 mb-1">Deadline</p>
+          <p className="text-sm font-semibold text-neutral-900 flex items-center gap-1.5">
+            <Calendar className="w-4 h-4 text-orange-400" />
             {formatDate(quote.expiredAt)}
           </p>
         </div>
@@ -176,9 +189,11 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
 
       {/* Shop Notes */}
       {quote.shopNotes && (
-        <div className="bg-neutral-50 border-l-2 border-amazon-focus rounded-r-sm px-4 py-4 mb-6">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-1">Message from Shop:</p>
-          <p className="text-[12px] font-medium text-amazon-text italic leading-relaxed">
+        <div className="mb-6 space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400 flex items-center gap-1.5">
+            <FileText className="w-3.5 h-3.5" /> Message from Shop
+          </p>
+          <p className="text-sm text-neutral-700 leading-relaxed bg-white border border-neutral-100 p-4 rounded-xl shadow-inner italic">
             {quote.shopNotes}
           </p>
         </div>
@@ -186,25 +201,42 @@ const QuoteCard = ({ quote, isAccepting, onAccept }: QuoteCardProps) => {
 
       {/* Footer: Action */}
       {isPending && (
-        <button
-          onClick={() => onAccept(quote.commissionQuoteId)}
-          disabled={isAccepting}
-          className="w-full py-3 bg-white hover:bg-neutral-50 text-amazon-text border border-amazon-border font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-        >
-          {isAccepting ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" /> Processing...
-            </>
-          ) : (
-            <>
-              <CheckCircle className="w-4 h-4" /> Accept quotation
-            </>
-          )}
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => onReject(quote.commissionQuoteId)}
+            disabled={isAccepting || isRejecting}
+            className="flex-1 py-3 bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-semibold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
+          >
+            {isRejecting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Rejecting...
+              </>
+            ) : (
+              <>
+                <XCircle className="w-4 h-4" /> Reject
+              </>
+            )}
+          </button>
+          <button
+            onClick={() => onAccept(quote.commissionQuoteId)}
+            disabled={isAccepting || isRejecting}
+            className="flex-1 py-3 bg-neutral-900 hover:bg-neutral-800 text-white font-semibold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
+          >
+            {isAccepting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Processing...
+              </>
+            ) : (
+              <>
+                <CheckCircle className="w-4 h-4" /> Accept Quotation
+              </>
+            )}
+          </button>
+        </div>
       )}
       {isAccepted && (
-        <div className="w-full py-3 bg-green-50 text-green-600 font-black text-[11px] uppercase tracking-widest rounded-sm flex items-center justify-center gap-2 border border-green-200">
-          <CheckCircle className="w-4 h-4" /> This quotation was selected
+        <div className="w-full py-3 bg-emerald-50 text-emerald-600 font-semibold text-sm rounded-xl flex items-center justify-center gap-2 border border-emerald-100">
+          <CheckCircle className="w-5 h-5" /> You accepted this quotation
         </div>
       )}
     </div>
@@ -228,34 +260,84 @@ const ConfirmAcceptModal = ({
   if (!isOpen) return null;
   return (
     <div
-      className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4 backdrop-blur-sm"
+      className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4 backdrop-blur-[2px]"
       onClick={onCancel}
     >
       <div
-        className="bg-white border border-amazon-border rounded-sm w-full max-w-sm p-8 shadow-2xl text-center"
+        className="bg-white border border-neutral-100 rounded-2xl w-full max-w-sm p-8 shadow-2xl text-center animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="w-14 h-14 rounded-full bg-green-50 border border-green-200 flex items-center justify-center mx-auto mb-5">
+        <div className="w-14 h-14 rounded-full bg-green-50 border border-green-100 flex items-center justify-center mx-auto mb-5">
           <CheckCircle className="w-6 h-6 text-green-600" />
         </div>
-        <h3 className="text-[14px] font-black uppercase tracking-wider text-amazon-text mb-2">
-          Confirm Accept Quotation
+        <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+          Accept Quotation
         </h3>
-        <p className="text-[12px] text-amazon-textMuted mb-6">
-          Are you sure you want to accept this price? The order will be created
+        <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
+          Are you sure you want to accept this price? Your order will be created
           immediately after confirmation.
         </p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 bg-white hover:bg-neutral-50 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors border border-amazon-border"
+            className="flex-1 py-3 bg-white hover:bg-neutral-50 text-neutral-700 font-medium text-sm rounded-xl transition-colors border border-neutral-200"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="flex-1 py-3 bg-amazon-btnPrimary hover:brightness-95 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+            className="flex-1 py-3 bg-neutral-900 hover:bg-neutral-800 text-white font-medium text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              "Confirm"
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Confirm Reject Modal ─────────────────────────────────────────
+const ConfirmRejectModal = ({
+  isOpen,
+  onConfirm,
+  onCancel,
+  isLoading,
+}: ConfirmModalProps) => {
+  if (!isOpen) return null;
+  return (
+    <div
+      className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4 backdrop-blur-[2px]"
+      onClick={onCancel}
+    >
+      <div
+        className="bg-white border border-neutral-100 rounded-2xl w-full max-w-sm p-8 shadow-2xl text-center animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-14 h-14 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-5">
+          <AlertTriangle className="w-6 h-6 text-red-600" />
+        </div>
+        <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+          Reject Quotation
+        </h3>
+        <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
+          Are you sure you want to reject this quotation? This action cannot be undone and this quote will be permanently removed.
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            className="flex-1 py-3 bg-white hover:bg-neutral-50 text-neutral-700 font-medium text-sm rounded-xl transition-colors border border-neutral-200"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-medium text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -278,11 +360,13 @@ export default function CommissionDetailPage() {
     currentRequest,
     loadingDetail,
     isAcceptingQuote,
+    isRejectingQuote,
     isCanceling,
     isPublishingToPool,
   } = useSelector((state: RootState) => state.commission);
 
   const [confirmQuoteId, setConfirmQuoteId] = useState<string | null>(null);
+  const [rejectQuoteId, setRejectQuoteId] = useState<string | null>(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [showPublishConfirm, setShowPublishConfirm] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -301,11 +385,27 @@ export default function CommissionDetailPage() {
     if (!confirmQuoteId || !params.id) return;
     try {
       await dispatch(acceptCommissionQuote(confirmQuoteId)).unwrap();
-      toast.success("Báo giá đã được chấp nhận!");
+      toast.success("Quotation accepted successfully!");
       setConfirmQuoteId(null);
       router.push(`/cart`);
     } catch {
       // toast handled in thunk
+    }
+  };
+
+  const handleReject = (quoteId: string) => {
+    setRejectQuoteId(quoteId);
+  };
+
+  const handleConfirmReject = async () => {
+    if (!rejectQuoteId || !params.id) return;
+    try {
+      await dispatch(
+        rejectCommissionQuote({ quoteId: rejectQuoteId, requestId: params.id })
+      ).unwrap();
+      setRejectQuoteId(null);
+    } catch {
+      // handled in thunk
     }
   };
 
@@ -332,10 +432,10 @@ export default function CommissionDetailPage() {
   // Full-page loading
   if (loadingDetail || !currentRequest) {
     return (
-      <div className="bg-amazon-bgSecondary min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 text-neutral-600 animate-spin" />
-          <p className="text-[11px] font-black uppercase tracking-widest text-neutral-500">Loading details...</p>
+      <div className="bg-neutral-50 min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 bg-white p-6 rounded-2xl border border-neutral-100 shadow-sm">
+          <Loader2 className="w-8 h-8 text-neutral-400 animate-spin" />
+          <p className="text-sm font-medium text-neutral-500">Loading details...</p>
         </div>
       </div>
     );
@@ -355,7 +455,7 @@ export default function CommissionDetailPage() {
       currentRequest.status === "TargetRejected");
 
   return (
-    <div className="bg-amazon-bgSecondary text-amazon-text min-h-screen">
+    <div className="bg-neutral-50 text-neutral-900 min-h-screen font-sans">
       <ConfirmAcceptModal
         isOpen={!!confirmQuoteId}
         onConfirm={handleConfirmAccept}
@@ -363,41 +463,48 @@ export default function CommissionDetailPage() {
         isLoading={isAcceptingQuote}
       />
 
+      <ConfirmRejectModal
+        isOpen={!!rejectQuoteId}
+        onConfirm={handleConfirmReject}
+        onCancel={() => setRejectQuoteId(null)}
+        isLoading={isRejectingQuote}
+      />
+
       {/* Cancel Confirm Modal */}
       {showCancelConfirm && (
         <div
-          className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4 backdrop-blur-[2px]"
           onClick={() => setShowCancelConfirm(false)}
         >
           <div
-            className="bg-white border border-amazon-border rounded-sm w-full max-w-sm p-8 shadow-2xl text-center"
+            className="bg-white border border-neutral-100 rounded-2xl w-full max-w-sm p-8 shadow-2xl text-center animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto mb-5">
+            <div className="w-14 h-14 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-5">
               <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
-            <h3 className="text-[14px] font-black uppercase tracking-wider text-amazon-text mb-2">
-              Confirm cancel request
+            <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+              Cancel Request
             </h3>
-            <p className="text-[12px] text-amazon-textMuted mb-6">
+            <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
                 Are you sure you want to cancel this request? This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCancelConfirm(false)}
-                className="flex-1 py-3 bg-white hover:bg-neutral-50 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors border border-amazon-border"
+                className="flex-1 py-3 bg-white hover:bg-neutral-50 text-neutral-700 font-medium text-sm rounded-xl transition-colors border border-neutral-200"
               >
               Back
               </button>
               <button
                 onClick={handleCancelRequest}
                 disabled={isCanceling}
-                className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+                className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-medium text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
               >
                 {isCanceling ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  "Confirm cancel"
+                  "Confirm Cancel"
                 )}
               </button>
             </div>
@@ -408,38 +515,38 @@ export default function CommissionDetailPage() {
       {/* Publish Confirm Modal */}
       {showPublishConfirm && (
         <div
-          className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4 backdrop-blur-[2px]"
           onClick={() => setShowPublishConfirm(false)}
         >
           <div
-            className="bg-white border border-amazon-border rounded-sm w-full max-w-sm p-8 shadow-2xl text-center"
+            className="bg-white border border-neutral-100 rounded-2xl w-full max-w-sm p-8 shadow-2xl text-center animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-14 h-14 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto mb-5">
+            <div className="w-14 h-14 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto mb-5">
               <Globe className="w-6 h-6 text-blue-600" />
             </div>
-            <h3 className="text-[14px] font-black uppercase tracking-wider text-amazon-text mb-2">
-              Publish to pool
+            <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+              Publish to Market
             </h3>
-            <p className="text-[12px] text-amazon-textMuted mb-6">
+            <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
               Do you want to publish this request to the public market for other shops to quote? This action will remove the current shop assignment.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowPublishConfirm(false)}
-                className="flex-1 py-3 bg-white hover:bg-neutral-50 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors border border-amazon-border"
+                className="flex-1 py-3 bg-white hover:bg-neutral-50 text-neutral-700 font-medium text-sm rounded-xl transition-colors border border-neutral-200"
               >
-                Hủy
+                Cancel
               </button>
               <button
                 onClick={handlePublishToPool}
                 disabled={isPublishingToPool}
-                className="flex-1 py-3 bg-amazon-btnPrimary hover:brightness-95 text-amazon-text font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+                className="flex-1 py-3 bg-neutral-900 hover:bg-neutral-800 text-white font-medium text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
               >
                 {isPublishingToPool ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  "Confirm"
+                  "Publish"
                 )}
               </button>
             </div>
@@ -447,32 +554,33 @@ export default function CommissionDetailPage() {
         </div>
       )}
 
-      <div className="max-w-[1280px] mx-auto px-4 py-8 lg:py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back link */}
         <Link
           href="/my-commissions"
-          className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-amazon-textMuted hover:text-amazon-focus transition-colors mb-6"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-neutral-500 hover:text-blue-600 transition-colors mb-8 group"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to list
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Requests
         </Link>
 
         {/* 2-column grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           {/* ── Left Column: Request Info (col-span-1) ── */}
           <div className="lg:col-span-1 space-y-6">
             {/* Canceled Alert */}
             {isCanceled && (
-              <div className="bg-red-50 border border-red-200 rounded-sm p-4 flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
-                <p className="text-[12px] uppercase font-bold tracking-widest text-red-600">
-                  This request has been canceled
-                </p>
+              <div className="bg-red-50 border border-red-100 rounded-xl p-4 flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                <div>
+                    <h4 className="text-sm font-semibold text-red-800">Canceled</h4>
+                    <p className="text-sm text-red-600">This request has been permanently canceled.</p>
+                </div>
               </div>
             )}
 
             {/* Reference Image */}
             {currentRequest.referenceImages && (
-              <div className="relative w-full aspect-square rounded-sm overflow-hidden bg-neutral-100 border border-amazon-border shadow-sm">
+              <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-100 shadow-sm">
                 <Image
                   src={currentRequest.referenceImages}
                   alt={currentRequest.title}
@@ -484,78 +592,80 @@ export default function CommissionDetailPage() {
 
             {/* Title + Status */}
             <div>
-              <div className="flex items-start gap-3 mb-3">
-                <h1 className="text-2xl font-black text-amazon-text uppercase tracking-widest leading-snug flex-1">
+              <div className="flex items-start gap-3 mb-2">
+                <h1 className="text-xl font-bold text-neutral-900 leading-snug flex-1">
                   {currentRequest.title}
                 </h1>
                 <span
-                  className={`shrink-0 px-3 py-1.5 box-border rounded-sm border text-[11px] font-black uppercase tracking-widest whitespace-nowrap ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}
+                  className={`shrink-0 px-3 py-1 box-border rounded-md border text-xs font-semibold whitespace-nowrap ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}
                 >
                   {statusStyle.label}
                 </span>
               </div>
-
-              <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
-                ID: {currentRequest.commissionRequestId}
-              </p>
+              
+              <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-400 bg-neutral-100/50 px-2.5 py-1 rounded-md w-fit">
+                <Hash className="w-3 h-3"/>
+                {currentRequest.commissionRequestId}
+              </div>
             </div>
 
             {/* Details Card */}
-            <div className="bg-white rounded-sm border border-amazon-border p-6 space-y-4">
+            <div className="bg-white rounded-2xl border border-neutral-100 p-6 space-y-5 shadow-sm">
               {/* Shop target */}
-              {currentRequest.targetedShopId ? (
-                <div className="flex items-center gap-3">
-                  <Store className="w-4 h-4 text-neutral-400" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">Sent to:</span>
-                  <span className="font-black text-[12px] text-amazon-text">
-                    {currentRequest.targetedShopName || "Shop"}
-                  </span>
+              <div className="flex items-center justify-between border-b border-neutral-50 pb-4">
+                <div className="flex items-center gap-2 text-neutral-500">
+                    <Store className="w-4 h-4" />
+                    <span className="text-sm font-medium">Sent to:</span>
                 </div>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <Store className="w-4 h-4 text-neutral-400" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">Sent to:</span>
-                  <span className="font-black text-[12px] text-amazon-text">Public Market</span>
-                </div>
-              )}
+                <span className="font-semibold text-sm text-neutral-900">
+                    {currentRequest.targetedShopId ? (currentRequest.targetedShopName || "Shop") : "Public Market"}
+                </span>
+              </div>
 
               {/* Quantity */}
-              <div className="flex items-center gap-3">
-                <Hash className="w-4 h-4 text-neutral-400" />
-                <span className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">Quantity:</span>
-                <span className="font-black text-[12px] text-amazon-text">
+              <div className="flex items-center justify-between border-b border-neutral-50 pb-4">
+                <div className="flex items-center gap-2 text-neutral-500">
+                    <Hash className="w-4 h-4" />
+                    <span className="text-sm font-medium">Quantity:</span>
+                </div>
+                <span className="font-semibold text-sm text-neutral-900">
                   {currentRequest.quantity}
                 </span>
               </div>
 
               {/* Budget */}
-              <div className="flex items-center gap-3">
-                <Banknote className="w-4 h-4 text-neutral-400" />
-                <span className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">Budget:</span>
-                <span className="font-black text-[12px] text-amazon-price">
+              <div className="flex items-center justify-between border-b border-neutral-50 pb-4">
+                <div className="flex items-center gap-2 text-neutral-500">
+                    <Banknote className="w-4 h-4" />
+                    <span className="text-sm font-medium">Budget:</span>
+                </div>
+                <span className="font-bold text-sm text-green-600 bg-green-50 px-2 py-0.5 rounded-md">
                   {formatVND(currentRequest.minBudget)} –{" "}
                   {formatVND(currentRequest.maxBudget)}
                 </span>
               </div>
 
               {/* Date */}
-              <div className="flex items-center gap-3">
-                <Calendar className="w-4 h-4 text-neutral-400" />
-                <span className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">Created date:</span>
-                <span className="font-black text-[12px] text-amazon-text">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-neutral-500">
+                    <Calendar className="w-4 h-4" />
+                    <span className="text-sm font-medium">Date Created:</span>
+                </div>
+                <span className="font-semibold text-sm text-neutral-900">
                   {formatDate(currentRequest.createdAt)}
                 </span>
               </div>
             </div>
 
             {/* Description */}
-            <div className="bg-white rounded-sm border border-amazon-border p-6">
-              <h3 className="text-[11px] font-black uppercase tracking-widest text-amazon-focus mb-3">
-                Request Description
+            <div className="bg-white rounded-2xl border border-neutral-100 p-6 shadow-sm">
+              <h3 className="text-sm font-semibold text-neutral-900 mb-3 flex items-center gap-2">
+                <Info className="w-4 h-4 text-neutral-400" />
+                Request Details
               </h3>
-              <p className="text-[13px] text-amazon-text leading-relaxed whitespace-pre-wrap">
+              <div className="text-sm text-neutral-700 leading-relaxed whitespace-pre-wrap bg-neutral-50 p-4 rounded-xl border border-neutral-100 shadow-inner">
                 {currentRequest.description}
-              </p>
+              </div>
             </div>
 
             {/* Draft Action Buttons */}
@@ -564,20 +674,20 @@ export default function CommissionDetailPage() {
                 <button
                   onClick={() => setShowPublishConfirm(true)}
                   disabled={isPublishingToPool}
-                  className="flex-1 py-3.5 bg-amazon-btnPrimary hover:brightness-95 text-amazon-text font-black uppercase text-[11px] tracking-widest rounded-sm shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-1 py-3 bg-neutral-900 hover:bg-neutral-800 text-white font-semibold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
                 >
                   {isPublishingToPool ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <Globe className="w-4 h-4" />
                   )}
-                  Publish Request
+                  Publish
                 </button>
                 <button
                   onClick={() => setIsEditModalOpen(true)}
-                  className="flex-1 py-3.5 bg-white hover:bg-neutral-50 hover:text-amazon-text text-amazon-textMuted font-black uppercase text-[11px] tracking-widest rounded-sm transition-colors border border-amazon-border"
+                  className="flex-1 py-3 bg-white hover:bg-neutral-50 text-neutral-700 font-semibold text-sm rounded-xl transition-all border border-neutral-200 shadow-sm active:scale-[0.98]"
                 >
-                  Edit Request
+                  Edit Header
                 </button>
               </div>
             )}
@@ -587,7 +697,7 @@ export default function CommissionDetailPage() {
               <button
                 onClick={() => setShowCancelConfirm(true)}
                 disabled={isCanceling}
-                className="w-full py-3.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors border border-red-500/30 hover:border-red-500/50 flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3 bg-red-50 hover:bg-red-100 text-red-600 font-semibold text-sm rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] border border-red-100"
               >
                 {isCanceling ? (
                   <>
@@ -595,7 +705,7 @@ export default function CommissionDetailPage() {
                   </>
                 ) : (
                   <>
-                    <XCircle className="w-4 h-4" /> Cancel request
+                    <XCircle className="w-4 h-4" /> Cancel Request
                   </>
                 )}
               </button>
@@ -606,7 +716,7 @@ export default function CommissionDetailPage() {
               <button
                 onClick={() => setShowPublishConfirm(true)}
                 disabled={isPublishingToPool}
-                className="w-full py-3.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-black text-[11px] uppercase tracking-widest rounded-sm transition-colors border border-blue-500/30 hover:border-blue-500/50 flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold text-sm rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] border border-blue-100"
               >
                 {isPublishingToPool ? (
                   <>
@@ -614,7 +724,7 @@ export default function CommissionDetailPage() {
                   </>
                 ) : (
                   <>
-                    <Globe className="w-4 h-4" /> Publish to Public Market
+                    <Globe className="w-4 h-4" /> Publish to Market
                   </>
                 )}
               </button>
@@ -622,33 +732,40 @@ export default function CommissionDetailPage() {
           </div>
 
           {/* ── Right Column: Quotes / Bids (col-span-2) ── */}
-          <div className="lg:col-span-2">
-            <h2 className="text-[14px] font-black uppercase tracking-widest text-amazon-text mb-6">
-              Quotations from Shop
-            </h2>
+          <div className="lg:col-span-2 mt-8 lg:mt-0">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="bg-blue-50 text-blue-600 p-2 rounded-lg">
+                    <Clock className="w-5 h-5" />
+                </div>
+                <h2 className="text-xl font-bold text-neutral-900">
+                    Quotations from Builders
+                </h2>
+            </div>
 
             {currentRequest.quotes.length === 0 ? (
               /* Empty State */
-              <div className="bg-white rounded-sm border border-dashed border-amazon-border flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-16 h-16 rounded-full bg-neutral-50 border border-amazon-border flex items-center justify-center mb-5">
+              <div className="bg-white rounded-2xl border border-dashed border-neutral-200 flex flex-col items-center justify-center py-24 text-center shadow-sm">
+                <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-5 border border-neutral-100">
                   <Clock className="w-6 h-6 text-neutral-400" />
                 </div>
-                <h3 className="text-[12px] font-black uppercase tracking-widest text-amazon-text mb-2">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-2">
                   No quotations yet
                 </h3>
-                <p className="text-[12px] text-amazon-textMuted max-w-xs">
-                  Please wait for shop response...
+                <p className="text-sm text-neutral-500 max-w-sm">
+                  We are waiting for verified builders to review your request and submit their quotes...
                 </p>
               </div>
             ) : (
               /* Quotes List */
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {currentRequest.quotes.map((quote) => (
                   <QuoteCard
                     key={quote.commissionQuoteId}
                     quote={quote}
                     isAccepting={isAcceptingQuote}
+                    isRejecting={isRejectingQuote}
                     onAccept={handleAccept}
+                    onReject={handleReject}
                   />
                 ))}
               </div>

@@ -55,8 +55,8 @@ const formatCurrency = (amount: number) => `${amount.toLocaleString()}₫`;
 const SidebarComponentRow: FC<{ component: OrderItemComponent }> = ({
   component,
 }) => (
-  <div className="flex items-center gap-2 py-1.5">
-    <div className="relative w-8 h-8 bg-neutral-100 shrink-0 rounded-sm overflow-hidden border border-amazon-border">
+  <div className="flex items-center gap-2.5 py-2">
+    <div className="relative w-8 h-8 bg-white shrink-0 rounded-md overflow-hidden border border-neutral-100">
       {component.partImageUrl ? (
         <Image
           src={component.partImageUrl}
@@ -66,13 +66,13 @@ const SidebarComponentRow: FC<{ component: OrderItemComponent }> = ({
           className="object-contain p-0.5"
         />
       ) : (
-        <div className="w-full h-full bg-white" />
+        <div className="w-full h-full bg-neutral-50" />
       )}
     </div>
-    <span className="text-xs text-amazon-text capitalize truncate flex-1">
+    <span className="text-xs text-neutral-600 truncate flex-1">
       {component.partName}
     </span>
-    <span className="text-[10px] font-bold text-amazon-textMuted shrink-0">
+    <span className="text-[11px] text-neutral-400 shrink-0">
       ×{component.quantity}
     </span>
   </div>
@@ -109,8 +109,8 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
 
     return (
       <div
-        className={`flex flex-col gap-1 p-3 transition-colors ${
-          selected ? "bg-neutral-50" : "hover:bg-neutral-50"
+        className={`flex flex-col gap-1 px-4 py-3 transition-colors ${
+          selected ? "bg-amber-50/30" : "hover:bg-neutral-50/60"
         }`}
       >
         <div className="flex gap-3">
@@ -120,13 +120,13 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
               type="checkbox"
               checked={selected}
               onChange={() => onToggleSelect(item.orderItemId)}
-              className="w-4 h-4 accent-amazon-btnPrimary cursor-pointer"
+              className="w-[16px] h-[16px] accent-neutral-900 cursor-pointer rounded"
               aria-label={`Select ${item.productName}`}
             />
           </div>
 
           {/* Image */}
-          <div className="relative w-20 h-20 shrink-0 bg-bgSecondary">
+          <div className="relative w-[72px] h-[72px] shrink-0 bg-neutral-50 rounded-lg border border-neutral-100 overflow-hidden">
             {displayImage ? (
               <Image
                 src={displayImage}
@@ -136,38 +136,38 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <ShoppingBag className="w-6 h-6 text-amazon-textMuted" />
+                <ShoppingBag className="w-5 h-5 text-neutral-300" />
               </div>
             )}
           </div>
 
           {/* Info */}
           <div className="flex-1 flex flex-col min-w-0">
-            <div className="flex justify-between items-start mb-1">
-              <span className="text-[13px] font-bold text-amazon-text line-clamp-2 pr-4 leading-snug uppercase tracking-wide">
+            <div className="flex justify-between items-start mb-1.5">
+              <span className="text-sm text-neutral-800 line-clamp-2 pr-3 leading-snug">
                 {item.productName}
               </span>
-              <span className="text-[13px] font-bold text-amazon-price shrink-0 mt-0.5">
+              <span className="text-sm font-semibold text-neutral-900 shrink-0 mt-0.5 tabular-nums">
                 {item.totalPrice.toLocaleString()}₫
               </span>
             </div>
 
             {/* Quantity & Remove */}
-            <div className="flex items-center gap-2 mb-1 mt-1">
-              <div className="flex items-center gap-0 border border-amazon-border rounded-sm bg-white">
+            <div className="flex items-center gap-2 mt-auto">
+              <div className="flex items-center border border-neutral-200 rounded-lg bg-white">
                 <button
                   onClick={() =>
                     onUpdateQuantity(item.orderItemId, item.quantity - 1)
                   }
                   disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
-                  className="w-6 h-7 flex items-center justify-center text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 rounded-l-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Decrease quantity"
                 >
                   <Minus className="w-3 h-3" />
                 </button>
-                <span className="w-7 h-7 flex items-center justify-center text-xs font-bold text-amazon-text border-x border-amazon-border tabular-nums">
+                <span className="w-8 h-7 flex items-center justify-center text-xs text-neutral-800 border-x border-neutral-200 tabular-nums">
                   {updatingQuantity ? (
-                    <Loader2 className="w-3 h-3 animate-spin text-amazon-textMuted" />
+                    <Loader2 className="w-3 h-3 animate-spin text-neutral-400" />
                   ) : (
                     item.quantity
                   )}
@@ -177,7 +177,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
                     onUpdateQuantity(item.orderItemId, item.quantity + 1)
                   }
                   disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
-                  className="w-6 h-7 flex items-center justify-center text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 rounded-r-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Increase quantity"
                 >
                   <Plus className="w-3 h-3" />
@@ -186,7 +186,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
               <button
                 onClick={() => onRemove(item.orderItemId)}
                 disabled={removing}
-                className="text-amazon-textMuted hover:text-red-600 transition-colors disabled:opacity-40 ml-auto"
+                className="text-neutral-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-all disabled:opacity-40 ml-auto"
                 aria-label={`Remove ${item.productName}`}
               >
                 {removing ? (
@@ -201,16 +201,16 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
             {isCustom && (
               <button
                 onClick={() => setExpanded(!expanded)}
-                className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-amazon-textMuted hover:text-amazon-link transition-colors w-fit mt-auto"
+                className="flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-700 transition-colors w-fit mt-2"
               >
                 {expanded ? (
                   <>
-                    Hide components <ChevronUp className="w-3 h-3" />
+                    Hide components <ChevronUp className="w-3.5 h-3.5" />
                   </>
                 ) : (
                   <>
                     {item.orderItemComponents.length} components{" "}
-                    <ChevronDown className="w-3 h-3" />
+                    <ChevronDown className="w-3.5 h-3.5" />
                   </>
                 )}
               </button>
@@ -220,10 +220,12 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
 
         {/* Expanded component list */}
         {isCustom && expanded && (
-          <div className="ml-6 pl-3 border-l-2 border-amazon-border mt-2 space-y-0.5">
-            {item.orderItemComponents.map((comp) => (
-              <SidebarComponentRow key={comp.partId} component={comp} />
-            ))}
+          <div className="ml-7 pl-3 border-l-2 border-neutral-100 mt-2">
+            <div className="divide-y divide-neutral-50">
+              {item.orderItemComponents.map((comp) => (
+                <SidebarComponentRow key={comp.partId} component={comp} />
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -571,7 +573,7 @@ export const CartSidebar: FC = memo(() => {
     <>
       {/* OVERLAY */}
       <div
-        className={`fixed inset-0 bg-black/50 z-[60] transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[60] transition-opacity duration-300 ${
           isCartOpen ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
         aria-hidden={!isCartOpen}
@@ -580,7 +582,7 @@ export const CartSidebar: FC = memo(() => {
       {/* SIDEBAR CONTENT */}
       <div
         ref={sidebarRef}
-        className={`fixed top-0 right-0 h-full w-full md:w-[420px] bg-white border-l border-amazon-border z-[70] shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
+        className={`fixed top-0 right-0 h-full w-full md:w-[420px] bg-white z-[70] shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
           isCartOpen ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
@@ -588,207 +590,213 @@ export const CartSidebar: FC = memo(() => {
         aria-labelledby="cart-title"
       >
         {/* HEADER */}
-        <div className="flex items-center justify-between p-6 border-b border-amazon-border items-center">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
           <div className="flex items-baseline gap-3">
             <h2
               id="cart-title"
-              className="text-xl font-black font-oswald uppercase tracking-wider text-amazon-text"
+              className="text-lg font-semibold text-neutral-900"
             >
               Shopping Cart
             </h2>
             <Link
               href="/cart"
               onClick={handleClose}
-              className="text-xs font-bold tracking-widest uppercase text-amazon-textMuted hover:text-amazon-text transition-colors"
+              className="text-xs text-neutral-500 hover:text-neutral-800 transition-colors"
             >
-              View cart
+              View full cart
             </Link>
           </div>
           <button
             onClick={handleClose}
-            className="p-1 hover:bg-neutral-100 rounded-full transition-colors text-amazon-textMuted hover:text-amazon-text"
+            className="p-2 hover:bg-neutral-100 rounded-lg transition-colors text-neutral-400 hover:text-neutral-700"
             aria-label="Close cart"
           >
-            <X className="w-6 h-6 " />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* BODY (Scrollable) */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto">
           {serverCartLoading ? (
-            <div className="h-full flex flex-col items-center justify-center text-amazon-textMuted space-y-3">
-              <Loader2 className="w-8 h-8 animate-spin" />
-              <p className="text-sm font-bold uppercase tracking-widest text-amazon-btnSecondary mt-4">Loading cart...</p>
+            <div className="h-full flex flex-col items-center justify-center text-neutral-400 space-y-3">
+              <Loader2 className="w-7 h-7 animate-spin" />
+              <p className="text-sm text-neutral-500">Loading cart...</p>
             </div>
           ) : items.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-amazon-textMuted space-y-4">
-              <ShoppingBag className="w-12 h-12 opacity-20" />
-              <p className="font-medium text-amazon-text">Your cart is currently empty.</p>
+            <div className="h-full flex flex-col items-center justify-center px-6 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center">
+                <ShoppingBag className="w-7 h-7 text-neutral-400" />
+              </div>
+              <p className="text-sm text-neutral-600">Your cart is empty</p>
               <Link
                 href="/shop/all-products"
                 onClick={handleClose}
-                className="bg-amazon-btnPrimary text-amazon-text px-6 py-3 text-xs font-black uppercase tracking-widest hover:brightness-95 transition-colors inline-block text-center rounded-sm mt-2 shadow-sm"
+                className="bg-neutral-900 text-white px-6 py-2.5 text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors"
               >
                 Start Shopping
               </Link>
             </div>
           ) : (
-            shopGroups.map(({ shopId, shopName, items: shopItems }) => {
-              const shopVouchers =
-                shopVoucherGroups.find((g) => g.shopId === shopId)?.vouchers ??
-                [];
-              const shopPreview = cartPreview?.shopPreviews.find(
-                (s) => s.shopId === shopId,
-              );
-              return (
-                <div key={shopId} className="space-y-0">
-                  {/* Shop Header */}
-                  <div className="flex items-center gap-2 px-1 ">
-                    <Store className="w-4 h-4 text-amazon-textMuted shrink-0" />
-                    <span className="text-[11px] font-black uppercase tracking-widest text-amazon-text truncate">
-                      {shopName}
-                    </span>
-                  </div>
-
-                  {/* Shop Items */}
-                  <div className="space-y-3 pt-2">
-                    {shopItems.map((item) => (
-                      <SidebarCartItem
-                        key={item.orderItemId}
-                        item={item}
-                        onRemove={handleRemoveItem}
-                        removing={removingId === item.orderItemId}
-                        selected={selectedItemIds.has(item.orderItemId)}
-                        onToggleSelect={handleToggleSelect}
-                        onUpdateQuantity={handleUpdateQuantity}
-                        updatingQuantity={
-                          updatingQuantityId === item.orderItemId
-                        }
-                      />
-                    ))}
-                  </div>
-
-                  {/* Shop Voucher Footer */}
-                  <div className="px-1 py-2 border-t border-amazon-border mt-2 flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-xs text-amazon-textMuted">
-                        <Ticket className="w-3.5 h-3.5 text-amazon-btnSecondary" />
-                        <span className="font-bold uppercase tracking-wider text-[10px]">Shop Voucher</span>
-                      </div>
-                      {shopVouchers.length > 0 ? (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleOpenShopVoucherModal(shopId, shopName)
-                          }
-                          className="text-[10px] font-black uppercase tracking-widest text-amazon-btnSecondary hover:brightness-95 hover:underline transition-colors"
-                        >
-                          Select code ({shopVouchers.length})
-                        </button>
-                      ) : (
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">Enter Code</span>
-                      )}
+            <div className="divide-y divide-neutral-100">
+              {shopGroups.map(({ shopId, shopName, items: shopItems }) => {
+                const shopVouchers =
+                  shopVoucherGroups.find((g) => g.shopId === shopId)?.vouchers ??
+                  [];
+                const shopPreview = cartPreview?.shopPreviews.find(
+                  (s) => s.shopId === shopId,
+                );
+                return (
+                  <div key={shopId}>
+                    {/* Shop Header */}
+                    <div className="flex items-center gap-2 px-5 py-2.5 bg-neutral-50/80 border-b border-neutral-100">
+                      <Store className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                      <span className="text-xs font-medium text-neutral-700 truncate">
+                        {shopName}
+                      </span>
                     </div>
 
-                    {/* Shop voucher error */}
-                    {shopPreview?.shopVoucherError && (
-                      <p className="text-red-500 text-[10px] mt-1 font-bold uppercase tracking-wide">
-                        {shopPreview.shopVoucherError}
-                      </p>
-                    )}
+                    {/* Shop Items */}
+                    <div className="divide-y divide-neutral-50">
+                      {shopItems.map((item) => (
+                        <SidebarCartItem
+                          key={item.orderItemId}
+                          item={item}
+                          onRemove={handleRemoveItem}
+                          removing={removingId === item.orderItemId}
+                          selected={selectedItemIds.has(item.orderItemId)}
+                          onToggleSelect={handleToggleSelect}
+                          onUpdateQuantity={handleUpdateQuantity}
+                          updatingQuantity={
+                            updatingQuantityId === item.orderItemId
+                          }
+                        />
+                      ))}
+                    </div>
 
-                    {/* Applied Vouchers Breakdown UI (Sidebar Optimized) */}
-                    {(() => {
-                      const appliedVouchers = shopPreview?.appliedVoucherBreakdowns || [];
-                      if (appliedVouchers.length === 0) return null;
+                    {/* Shop Voucher Footer */}
+                    <div className="px-5 py-3 border-t border-neutral-100 flex flex-col gap-2 bg-neutral-50/40">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+                          <Ticket className="w-3.5 h-3.5 text-amber-500" />
+                          <span>Shop Voucher</span>
+                        </div>
+                        {shopVouchers.length > 0 ? (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleOpenShopVoucherModal(shopId, shopName)
+                            }
+                            className="text-xs text-amber-600 hover:text-amber-700 hover:underline transition-colors"
+                          >
+                            Select ({shopVouchers.length})
+                          </button>
+                        ) : (
+                          <span className="text-xs text-neutral-400">Enter code</span>
+                        )}
+                      </div>
 
-                      return (
-                        <div className="p-2.5 bg-neutral-50 border border-amazon-border border-dashed rounded-sm mt-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Tag className="w-3 h-3 text-amazon-focus" />
-                            <span className="text-[10px] font-black text-amazon-text uppercase tracking-widest">
-                              Applied Discounts
-                            </span>
-                          </div>
-                          <div className="space-y-1">
-                            {appliedVouchers.map((voucher: any, idx: number) => (
-                              <div key={idx} className="flex justify-between items-center text-[11px]">
-                                <span className="text-amazon-textMuted flex items-center gap-1 font-bold uppercase tracking-wider text-[10px]">
-                                  <span className="font-black text-amazon-text">{voucher.voucherCode}</span>
-                                  {voucher.discountType === "FixedAmount" && (
-                                    <span className="text-[8px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded-sm font-black tracking-widest">FIXED</span>
-                                  )}
-                                  {voucher.discountType === "Percentage" && (
-                                    <span className="text-[8px] bg-green-100 text-green-700 px-1 py-0.5 rounded-sm font-black tracking-widest">% OFF</span>
-                                  )}
-                                </span>
-                                <span className="font-black text-green-600 text-[11px]">
-                                  - {voucher.discountAmount.toLocaleString()}₫
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                          {appliedVouchers.length > 1 && (
-                            <div className="flex justify-between items-center mt-1.5 pt-1.5 border-t border-amazon-border">
-                              <span className="font-bold text-amazon-text uppercase tracking-widest text-[9px]">Total Shop Discount:</span>
-                              <span className="font-black text-green-600 text-[12px]">
-                                - {(shopPreview?.shopDiscountAmount || 0).toLocaleString()}₫
+                      {/* Shop voucher error */}
+                      {shopPreview?.shopVoucherError && (
+                        <p className="text-red-500 text-xs">
+                          {shopPreview.shopVoucherError}
+                        </p>
+                      )}
+
+                      {/* Applied Vouchers Breakdown UI (Sidebar Optimized) */}
+                      {(() => {
+                        const appliedVouchers = shopPreview?.appliedVoucherBreakdowns || [];
+                        if (appliedVouchers.length === 0) return null;
+
+                        return (
+                          <div className="p-3 bg-white border border-neutral-200 border-dashed rounded-lg">
+                            <div className="flex items-center gap-1.5 mb-2">
+                              <Tag className="w-3 h-3 text-green-600" />
+                              <span className="text-[11px] font-medium text-neutral-600">
+                                Applied Discounts
                               </span>
                             </div>
-                          )}
-                        </div>
-                      );
-                    })()}
+                            <div className="space-y-1.5">
+                              {appliedVouchers.map((voucher: any, idx: number) => (
+                                <div key={idx} className="flex justify-between items-center text-xs">
+                                  <span className="text-neutral-500 flex items-center gap-1.5">
+                                    <span className="font-mono text-[11px] text-neutral-700">{voucher.voucherCode}</span>
+                                    {voucher.discountType === "FixedAmount" && (
+                                      <span className="text-[9px] bg-blue-50 text-blue-600 px-1 py-0.5 rounded font-medium">Fixed</span>
+                                    )}
+                                    {voucher.discountType === "Percentage" && (
+                                      <span className="text-[9px] bg-green-50 text-green-600 px-1 py-0.5 rounded font-medium">% Off</span>
+                                    )}
+                                  </span>
+                                  <span className="font-medium text-green-600">
+                                    -{voucher.discountAmount.toLocaleString()}₫
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                            {appliedVouchers.length > 1 && (
+                              <div className="flex justify-between items-center mt-2 pt-2 border-t border-neutral-100 text-xs">
+                                <span className="text-neutral-600">Total shop discount</span>
+                                <span className="font-semibold text-green-600">
+                                  -{(shopPreview?.shopDiscountAmount || 0).toLocaleString()}₫
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </div>
-                </div>
-              );
-            })
+                );
+              })}
+            </div>
           )}
         </div>
 
         {/* FOOTER */}
         {items.length > 0 && (
-          <div className="border-t border-amazon-border p-6 space-y-4 bg-neutral-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+          <div className="border-t border-neutral-200 p-5 space-y-4 bg-white shadow-[0_-4px_12px_-2px_rgba(0,0,0,0.06)]">
             {/* COMPACT Ameko Platform Voucher */}
             {systemVouchers.length > 0 && (
-              <div className="pb-3 border-b border-amazon-border/50 mb-3">
+              <div className="pb-3 border-b border-neutral-100 mb-1">
                 <div
                   role="button"
                   tabIndex={0}
                   onClick={handleOpenSystemVoucherModal}
                   onKeyDown={(e) => e.key === 'Enter' && handleOpenSystemVoucherModal()}
-                  className="flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted hover:text-amazon-text transition-colors cursor-pointer"
+                  className="flex items-center justify-between text-sm text-neutral-600 hover:text-neutral-800 transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center gap-1.5">
-                    <Ticket className="w-4 h-4 text-amazon-btnSecondary" />
-                    <span>Ameko Voucher</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-md bg-amber-100 flex items-center justify-center">
+                      <Ticket className="w-3.5 h-3.5 text-amber-600" />
+                    </div>
+                    <span className="text-sm">Ameko Voucher</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {selectedSystemVoucherCode ? (
-                      <div className="flex items-center gap-1.5 bg-neutral-100 px-2 py-1 rounded-sm border border-amazon-border">
-                        <span className="text-amazon-text">{selectedSystemVoucherCode}</span>
+                      <div className="flex items-center gap-1.5 bg-neutral-100 px-2.5 py-1 rounded-md border border-neutral-200">
+                        <span className="text-xs font-mono text-neutral-700">{selectedSystemVoucherCode}</span>
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             dispatch(setSelectedSystemVoucher(null));
                           }}
-                          className="text-amazon-textMuted hover:text-red-600 transition-colors ml-1"
+                          className="text-neutral-400 hover:text-red-500 transition-colors ml-0.5"
                           aria-label="Remove system voucher"
                         >
                           <X className="w-3 h-3" />
                         </button>
                       </div>
                     ) : (
-                      <span className="text-amazon-btnSecondary">
-                        Select ({systemVouchers.length}) <ChevronRight className="w-3 h-3 inline" />
+                      <span className="text-xs text-amber-600 flex items-center gap-0.5">
+                        {systemVouchers.length} available <ChevronRight className="w-3 h-3 inline" />
                       </span>
                     )}
                   </div>
                 </div>
                 {/* System voucher error */}
                 {cartPreview?.systemVoucherError && (
-                  <p className="text-red-500 text-[9px] uppercase font-bold tracking-wider mt-1.5 text-right">
+                  <p className="text-red-500 text-xs mt-2 text-right">
                     {cartPreview.systemVoucherError}
                   </p>
                 )}
@@ -796,7 +804,7 @@ export const CartSidebar: FC = memo(() => {
             )}
 
             {/* Select All & Selection Count */}
-            <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -804,19 +812,19 @@ export const CartSidebar: FC = memo(() => {
                     selectedItemIds.size === items.length && items.length > 0
                   }
                   onChange={handleToggleSelectAll}
-                  className="w-4 h-4 accent-amazon-btnPrimary cursor-pointer"
+                  className="w-[16px] h-[16px] accent-neutral-900 cursor-pointer rounded"
                   aria-label="Select all items"
                 />
-                <span className="text-[11px] font-black text-amazon-text uppercase tracking-widest">
+                <span className="text-sm text-neutral-700">
                   Select All ({items.length})
                 </span>
               </label>
-              <span className="text-[11px] font-bold text-amazon-textMuted uppercase tracking-widest">
+              <span className="text-xs text-neutral-400">
                 {selectedItemIds.size} selected
               </span>
             </div>
 
-            <p className="text-amazon-textMuted text-[10px] mb-1">
+            <p className="text-xs text-neutral-400">
               Shipping & taxes calculated at checkout
             </p>
 
@@ -833,19 +841,19 @@ export const CartSidebar: FC = memo(() => {
                 (cartPreview?.totalDiscountAmount || 0) - totalShopDiscount;
               if (totalShopDiscount <= 0 && systemDiscountAmount <= 0) return null;
               return (
-                <div className="space-y-1.5 pt-2 border-t border-amazon-border mt-2">
+                <div className="space-y-2 pt-3 border-t border-neutral-100">
                   {totalShopDiscount > 0 && (
-                    <div className="flex items-center justify-between text-[11px] font-bold">
-                      <span className="text-amazon-textMuted uppercase tracking-widest">Shop Discount</span>
-                      <span className="text-green-600">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-neutral-500">Shop discount</span>
+                      <span className="text-green-600 font-medium">
                         -{formatCurrency(totalShopDiscount)}
                       </span>
                     </div>
                   )}
                   {systemDiscountAmount > 0 && (
-                    <div className="flex items-center justify-between text-[11px] font-bold">
-                      <span className="text-amazon-textMuted uppercase tracking-widest">Platform Discount</span>
-                      <span className="text-green-600">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-neutral-500">Platform discount</span>
+                      <span className="text-green-600 font-medium">
                         -{formatCurrency(systemDiscountAmount)}
                       </span>
                     </div>
@@ -854,26 +862,25 @@ export const CartSidebar: FC = memo(() => {
               );
             })()}
 
-            <div className="space-y-3">
+            <div>
               {/* Checkout Button */}
               <button
                 onClick={handleCheckout}
                 disabled={!hasSelection || isCalculatingPreview}
-                className={`w-full py-4 px-4 flex items-center justify-center gap-2 text-[13px] font-black uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 shadow-sm ${
+                className={`w-full py-3.5 px-4 flex items-center justify-center gap-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
                   hasSelection && !isCalculatingPreview
-                    ? "bg-amazon-btnPrimary text-amazon-text hover:brightness-95"
-                    : "bg-neutral-200 text-amazon-textMuted cursor-not-allowed border border-amazon-border"
+                    ? "bg-neutral-900 text-white hover:bg-neutral-800 active:scale-[0.98] shadow-sm"
+                    : "bg-neutral-100 text-neutral-400 cursor-not-allowed border border-neutral-200"
                 }`}
               >
-                <ShoppingBag className="w-4 h-4" />
                 {isCalculatingPreview ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" /> Processing...
                   </>
                 ) : hasSelection ? (
-                  `Checkout • ${formatCurrency((cartPreview?.totalCartSubTotal || 0) - (cartPreview?.totalDiscountAmount || 0))}`
+                  `Checkout · ${formatCurrency((cartPreview?.totalCartSubTotal || 0) - (cartPreview?.totalDiscountAmount || 0))}`
                 ) : (
-                  "Select Items"
+                  "Select items to checkout"
                 )}
               </button>
             </div>

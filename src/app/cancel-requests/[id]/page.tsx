@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Receipt, Store, Clock, AlertCircle, MessageSquare } from "lucide-react";
+import { ArrowLeft, Receipt, Clock, AlertCircle, MessageSquare } from "lucide-react";
 import { orderIssueService } from "@/src/services/orderIssue.service";
 import { OrderIssue } from "@/src/types/orderIssue.types";
 import toast from "react-hot-toast";
@@ -48,25 +48,25 @@ export default function CancelRequestDetailPage() {
     switch (status) {
       case 1:
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-700 border border-yellow-200">
+          <span className="px-3 py-1.5 rounded-md text-xs font-semibold bg-yellow-50 text-yellow-700 border border-yellow-200 shadow-sm">
             Pending
           </span>
         );
       case 2:
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+          <span className="px-3 py-1.5 rounded-md text-xs font-semibold bg-green-50 text-green-700 border border-green-200 shadow-sm">
             Approved
           </span>
         );
       case 3:
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
+          <span className="px-3 py-1.5 rounded-md text-xs font-semibold bg-red-50 text-red-700 border border-red-200 shadow-sm">
             Rejected
           </span>
         );
       default:
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-neutral-100 text-amazon-textMuted border border-amazon-border">
+          <span className="px-3 py-1.5 rounded-md text-xs font-semibold bg-neutral-100 text-neutral-600 border border-neutral-200 shadow-sm">
             Unknown
           </span>
         );
@@ -75,20 +75,22 @@ export default function CancelRequestDetailPage() {
 
   if (loading) {
     return (
-      <div className="bg-amazon-bgSecondary min-h-screen p-4 md:p-8 text-amazon-text flex justify-center items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amazon-btnPrimary"></div>
+      <div className="bg-neutral-50 min-h-[calc(100vh-4rem)] p-4 md:p-8 flex justify-center items-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-neutral-400"></div>
       </div>
     );
   }
 
   if (!issue) {
     return (
-      <div className="bg-amazon-bgSecondary min-h-screen p-4 md:p-8 text-amazon-text">
-        <div className="max-w-3xl mx-auto text-center py-20 bg-white border border-amazon-border rounded-sm shadow-sm">
-          <h2 className="text-xl text-amazon-textMuted">Cancel request not found.</h2>
+      <div className="bg-neutral-50 min-h-[calc(100vh-4rem)] p-4 md:p-8 font-sans">
+        <div className="max-w-2xl mx-auto text-center py-20 bg-white border border-neutral-100 rounded-2xl shadow-sm">
+          <AlertCircle className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-neutral-900 mb-2">Request Not Found</h2>
+          <p className="text-sm text-neutral-500 mb-8">We couldn't locate the details for this cancellation request.</p>
           <button 
             onClick={() => router.back()}
-            className="mt-6 px-6 py-2 bg-amazon-btnPrimary text-amazon-text font-semibold rounded-sm hover:opacity-90 transition-colors"
+            className="px-6 py-3 bg-neutral-900 text-white font-medium rounded-xl hover:bg-neutral-800 transition-colors shadow-sm active:scale-[0.98]"
           >
             Go Back
           </button>
@@ -98,56 +100,63 @@ export default function CancelRequestDetailPage() {
   }
 
   return (
-    <div className="bg-amazon-bgSecondary min-h-screen p-4 md:p-8 text-amazon-text w-full">
-      <div className="max-w-3xl mx-auto">
+    <div className="bg-neutral-50 min-h-[calc(100vh-4rem)] p-4 md:p-8 text-neutral-900 font-sans w-full">
+      <div className="max-w-3xl mx-auto py-4">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-amazon-textMuted hover:text-amazon-text transition-colors mb-4 group w-fit"
+          className="flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors mb-6 group w-fit"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-semibold uppercase tracking-wider">Back</span>
+          <div className="p-1.5 rounded-lg bg-white border border-neutral-200 shadow-sm group-hover:border-neutral-300 transition-colors">
+             <ArrowLeft className="w-4 h-4" />
+          </div>
+          <span className="text-sm font-medium">Back to Requests</span>
         </button>
 
-        <h1 className="text-2xl text-amazon-text mt-4 mb-6">
-          Cancel Request Details
+        <h1 className="text-2xl font-bold text-neutral-900 mb-6 tracking-tight">
+          Request Details
         </h1>
 
-        <div className="bg-white border border-amazon-border shadow-sm rounded-sm p-6 flex flex-col gap-6">
+        <div className="bg-white border border-neutral-100 shadow-sm rounded-2xl flex flex-col overflow-hidden">
           {/* Section 1: Order Info */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 p-6 border-b border-neutral-50 bg-white">
             <div>
-              <span className="text-amazon-textMuted text-xs block mb-1 uppercase tracking-wider">Order ID</span>
-              <div className="flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-neutral-400" />
-                <span className="text-amazon-text text-lg font-bold break-all">
+              <span className="text-neutral-500 text-xs font-semibold uppercase tracking-wider block mb-2">Order ID</span>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-neutral-50 rounded-lg border border-neutral-100">
+                    <Receipt className="w-5 h-5 text-neutral-400" />
+                </div>
+                <span className="text-neutral-900 text-lg font-mono font-bold break-all">
                   {issue.orderId}
                 </span>
               </div>
-              <div className="mt-2 text-amazon-price font-bold">
+              <div className="mt-3 text-amazon-price text-xl font-bold">
                 {formatCurrency(issue.orderTotalAmount)}
               </div>
             </div>
-            <div className="flex flex-col items-end gap-2">
-              {renderStatusBadge(issue.status)}
-              <div className="flex items-center gap-2 text-sm text-amazon-textMuted">
+            <div className="flex flex-col items-start md:items-end gap-3 w-full md:w-auto">
+              <div className="flex w-full md:w-auto justify-between md:justify-end items-center gap-4">
+                 <span className="text-xs font-semibold text-neutral-500 uppercase tracking-widest md:hidden">Status</span>
+                 {renderStatusBadge(issue.status)}
+              </div>
+              <div className="flex items-center gap-2 text-sm font-medium text-neutral-500 bg-neutral-50 px-3 py-1.5 rounded-lg border border-neutral-100 w-full md:w-auto justify-center">
                 <Clock className="w-4 h-4" />
                 <span>{new Date(issue.createdAt).toLocaleString("vi-VN")}</span>
               </div>
             </div>
           </div>
 
-          <div className="h-px w-full bg-amazon-border" />
-
           {/* Section 2: Issue Details */}
-          <div>
-            <span className="text-amazon-textMuted text-xs block mb-3 uppercase tracking-wider">Issue Details</span>
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="text-amazon-text font-semibold text-sm">
+          <div className="p-6">
+            <span className="text-neutral-500 text-xs font-semibold uppercase tracking-wider block mb-4">Reason for Cancellation</span>
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-red-50 rounded-lg shrink-0 border border-red-100">
+                 <AlertCircle className="w-5 h-5 text-red-500" />
+              </div>
+              <div className="flex-1 mt-1">
+                <p className="text-neutral-900 font-semibold text-base leading-relaxed mb-3">
                   {issue.reason}
                 </p>
-                <div className="bg-neutral-50 p-4 rounded-sm text-sm text-amazon-textMuted italic mt-2 border border-amazon-border">
+                <div className="bg-neutral-50 p-4 rounded-xl text-sm font-medium text-neutral-600 italic border border-neutral-100 shadow-inner">
                   "{issue.description}"
                 </div>
               </div>
@@ -156,14 +165,15 @@ export default function CancelRequestDetailPage() {
 
           {/* Section 3: Shop Response */}
           {issue.shopResponse && (
-            <div className="border-t border-amazon-border pt-6 mt-2">
-              <div className="flex items-center gap-2 text-blue-700 mb-2">
-                <MessageSquare className="w-5 h-5" />
-                <span className="text-sm font-semibold uppercase tracking-wider">
+            <div className="p-6 border-t border-neutral-50 bg-blue-50/30">
+              <div className="flex items-center gap-2 text-blue-700 mb-3">
+                <MessageSquare className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-widest">
                   Shop Response
                 </span>
               </div>
-              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-sm text-blue-800 mt-2">
+              <div className="bg-blue-50 border border-blue-100 p-5 rounded-xl text-blue-900 font-medium leading-relaxed shadow-sm relative">
+                <div className="absolute left-0 top-4 bottom-4 w-1 bg-blue-400 rounded-r-md opacity-70"></div>
                 {issue.shopResponse}
               </div>
             </div>

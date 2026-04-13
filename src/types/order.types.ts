@@ -21,10 +21,12 @@ export interface OrderItem {
   productImage: string | null;
   shopId: string;
   shopName: string | null;
+  // systemDiscountAmount?: number;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
   isCustom: boolean;
+  // expectedDeliveryDate?: string | null;
   note: string | null;
   customComponentIds: string[];
   orderItemComponents: OrderItemComponent[];
@@ -42,9 +44,11 @@ export interface CartData {
   subTotal: number;
   hasCancelRequest?: boolean;
   shippingFee: number;
+  systemDiscountAmount?: number;
   discountAmount: number;
   totalAmount: number;
   receiverName: string;
+  expectedDeliveryDate?: string | null;
   receiverPhone: string;
   shippingAddress: string;
   note: string | null;

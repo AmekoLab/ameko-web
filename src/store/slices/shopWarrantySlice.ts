@@ -37,10 +37,10 @@ export const fetchShopWarrantyRequests = createAsyncThunk(
       if (res.success) {
         return res.data;
       }
-      return rejectWithValue(res.message || "Không thể tải danh sách yêu cầu");
+      return rejectWithValue(res.message || "Failed to fetch warranty requests");
     } catch (error: unknown) {
       const err = error as { message?: string };
-      return rejectWithValue(err.message || "Không thể tải danh sách yêu cầu");
+      return rejectWithValue(err.message || "Failed to fetch warranty requests");
     }
   },
 );
@@ -51,14 +51,14 @@ export const submitShopWarrantyReview = createAsyncThunk(
     try {
       const res = await warrantyService.reviewWarrantyRequest(payload);
       if (res.success) {
-        toast.success("Đã xử lý yêu cầu thành công!");
+        toast.success("Processed warranty request successfully!");
         return res.data;
       }
-      return rejectWithValue(res.message || "Xử lý yêu cầu thất bại");
+      return rejectWithValue(res.message || "Failed to process warranty request");
     } catch (error: unknown) {
       const err = error as { message?: string };
-      toast.error(err.message || "Xử lý yêu cầu thất bại");
-      return rejectWithValue(err.message || "Xử lý yêu cầu thất bại");
+      toast.error(err.message || "Failed to process warranty request");
+      return rejectWithValue(err.message || "Failed to process warranty request");
     }
   },
 );
@@ -70,15 +70,15 @@ export const confirmShopReceipt = createAsyncThunk(
       const res = await warrantyService.confirmReceiveReturnItem(issueId);
       if (res.success) {
         toast.success(
-          "Xác nhận nhận hàng thành công! Đơn khiếu nại đã hoàn tất.",
+          "Confirmed receipt successfully! The warranty claim has been completed.",
         );
         return res.data;
       }
-      return rejectWithValue(res.message || "Xác nhận thất bại");
+      return rejectWithValue(res.message || "Failed to confirm receipt");
     } catch (error: unknown) {
       const err = error as { message?: string };
-      toast.error(err.message || "Xác nhận thất bại");
-      return rejectWithValue(err.message || "Xác nhận thất bại");
+      toast.error(err.message || "Failed to confirm receipt");
+      return rejectWithValue(err.message || "Failed to confirm receipt");
     }
   },
 );

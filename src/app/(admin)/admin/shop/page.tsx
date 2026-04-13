@@ -84,13 +84,13 @@ export default function AdminShopRequestsPage() {
           }),
         ).unwrap();
         toast.success(
-          `Đã ${actionType === "approve" ? "duyệt" : "từ chối"} shop thành công!`,
+          `Đã ${actionType === "approve" ? "approve" : "reject"} shop successfully!`,
         );
       }
       setSelectedShop(null);
       setActionType(null);
     } catch (error: any) {
-      toast.error(error.message || "Có lỗi xảy ra");
+      toast.error(error.message || "Handle admin decision failed");
     } finally {
       setIsProcessing(false);
     }

@@ -90,7 +90,7 @@ function VerifyEmailContent() {
       const msg =
         error?.response?.data?.message ||
         error?.message ||
-        "Gửi OTP thất bại.";
+        "Resend OTP failed.";
       toast.error(msg);
     } finally {
       setIsResending(false);

@@ -97,7 +97,7 @@ export default function CustomerOverviewSection({
         value: formatVND(data.totalRevenue),
       },
       {
-        label: "AOV",
+        label: "Average Order Value",
         value: formatVND(data.averageOrderValue),
       },
       {

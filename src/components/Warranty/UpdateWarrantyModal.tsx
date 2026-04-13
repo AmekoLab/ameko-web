@@ -89,7 +89,7 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
       setValue("evidenceUrl", url, { shouldValidate: true });
       setPreviewUrl(url);
     } catch {
-      toast.error("Tải ảnh lên thất bại, vui lòng thử lại");
+      toast.error("Upload image failed, please try again");
     } finally {
       setIsUploading(false);
     }
@@ -113,7 +113,7 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
       onSuccess();
     } catch (err: unknown) {
       const error = err as string;
-      toast.error(error || "Cập nhật yêu cầu thất bại");
+      toast.error(error || "Update warranty request failed");
     }
   };
 

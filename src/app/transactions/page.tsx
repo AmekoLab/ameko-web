@@ -8,17 +8,18 @@ import {
   PaginatedTransactions,
 } from "@/src/types/wallet.types";
 import toast from "react-hot-toast";
+import { Wallet, FilterX, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 // ─── Constants ────────────────────────────────────────────
 const TRANSACTION_TYPES: { label: string; value: number }[] = [
   { label: "All Types", value: -1 },
-  { label: "OrderPayment", value: 0 },
-  { label: "OrderRefund", value: 1 },
-  { label: "SalesRevenue", value: 2 },
+  { label: "Order Payment", value: 0 },
+  { label: "Order Refund", value: 1 },
+  { label: "Sales Revenue", value: 2 },
   { label: "Deposit", value: 3 },
   { label: "Withdrawal", value: 4 },
-  { label: "SalesPending", value: 5 },
-  { label: "ManualAdjustment", value: 6 },
+  { label: "Sales Pending", value: 5 },
+  { label: "Manual Adjustment", value: 6 },
 ];
 
 const TRANSACTION_STATUSES: { label: string; value: number }[] = [
@@ -29,7 +30,7 @@ const TRANSACTION_STATUSES: { label: string; value: number }[] = [
   { label: "Cancelled", value: 3 },
 ];
 
-const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
+const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 const SORT_OPTIONS = [
   { label: "Date Created", value: "createdAt" },
@@ -59,15 +60,15 @@ function formatDate(iso: string) {
 function getStatusColor(status: string) {
   switch (status.toLowerCase()) {
     case "completed":
-      return "text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-sm border border-emerald-200";
+      return "text-green-700 bg-green-50";
     case "pending":
-      return "text-amber-600 bg-amber-50 px-2 py-0.5 rounded-sm border border-amber-200";
+      return "text-yellow-700 bg-yellow-50";
     case "failed":
-      return "text-red-600 bg-red-50 px-2 py-0.5 rounded-sm border border-red-200";
+      return "text-red-700 bg-red-50";
     case "cancelled":
-      return "text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-sm border border-neutral-300";
+      return "text-neutral-600 bg-neutral-100";
     default:
-      return "text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-sm border border-neutral-300";
+      return "text-neutral-600 bg-neutral-100";
   }
 }
 
@@ -183,43 +184,46 @@ export default function TransactionsPage() {
 
   // ── Render ──────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-amazon-bgSecondary px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
+    <div className="min-h-[calc(100vh-4rem)] bg-neutral-50 px-4 py-8 sm:px-6 lg:px-8 font-sans w-full">
+      <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-amazon-text uppercase font-oswald tracking-widest">
-            Transaction History
-          </h1>
-          <p className="mt-1 text-sm text-amazon-textMuted uppercase font-bold tracking-widest">
-            View and filter all your wallet transactions
-          </p>
+           <h1 className="text-3xl font-bold text-neutral-900 tracking-tight flex items-center gap-3">
+             <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hidden sm:block shadow-sm border border-blue-100">
+               <Wallet className="w-6 h-6" />
+             </div>
+             Transaction History
+           </h1>
+           <p className="mt-2 text-sm text-neutral-500 font-medium">
+             Track and manage your wallet balances, deposits, and financial activity.
+           </p>
         </div>
 
         {/* ── Filters Card ──────────────────────────────── */}
-        <div className="mb-6 rounded-sm border border-amazon-border bg-white shadow-sm p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-[11px] font-black uppercase tracking-widest text-amazon-text">
-              Filters
+        <div className="mb-8 rounded-2xl border border-neutral-100 bg-white shadow-sm p-6 overflow-hidden">
+          <div className="mb-5 flex items-center justify-between border-b border-neutral-50 pb-4">
+            <h2 className="text-sm font-semibold text-neutral-900">
+              Filter Transactions
             </h2>
             <button
               onClick={handleClearFilters}
-              className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted transition-colors hover:text-amazon-text"
+              className="text-xs font-semibold text-neutral-400 hover:text-neutral-800 transition-colors flex items-center gap-1.5"
             >
-              Clear all
+              <FilterX className="w-3.5 h-3.5" /> Clear filters
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 items-end">
             {/* Type filter */}
             <div>
-              <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
                 Type
               </label>
               <select
                 id="filter-type"
                 value={filterType}
                 onChange={(e) => setFilterType(Number(e.target.value))}
-                className="w-full rounded-sm border border-amazon-border bg-white px-3 py-2 text-sm text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary"
+                className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
               >
                 {TRANSACTION_TYPES.map((t) => (
                   <option key={t.value} value={t.value}>
@@ -231,14 +235,14 @@ export default function TransactionsPage() {
 
             {/* Status filter */}
             <div>
-              <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
                 Status
               </label>
               <select
                 id="filter-status"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(Number(e.target.value))}
-                className="w-full rounded-sm border border-amazon-border bg-white px-3 py-2 text-sm text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary"
+                className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
               >
                 {TRANSACTION_STATUSES.map((s) => (
                   <option key={s.value} value={s.value}>
@@ -250,7 +254,7 @@ export default function TransactionsPage() {
 
             {/* From date */}
             <div>
-              <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
                 From Date
               </label>
               <input
@@ -258,13 +262,13 @@ export default function TransactionsPage() {
                 type="date"
                 value={filterFromDate}
                 onChange={(e) => setFilterFromDate(e.target.value)}
-                className="w-full rounded-sm border border-amazon-border bg-white px-3 py-2 text-sm text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary"
+                className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
               />
             </div>
 
             {/* To date */}
             <div>
-              <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
                 To Date
               </label>
               <input
@@ -272,43 +276,40 @@ export default function TransactionsPage() {
                 type="date"
                 value={filterToDate}
                 onChange={(e) => setFilterToDate(e.target.value)}
-                className="w-full rounded-sm border border-amazon-border bg-white px-3 py-2 text-sm text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary"
+                className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
               />
             </div>
-          </div>
-
-          <div className="mt-4 flex items-center gap-3">
-            <button
-              id="btn-apply-filters"
-              onClick={handleApplyFilters}
-              className="rounded-sm bg-amazon-btnPrimary px-5 py-2 text-[11px] font-black uppercase tracking-widest text-amazon-text transition-all hover:opacity-90 active:scale-[0.97]"
-            >
-              Apply Filters
-            </button>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
-              {totalCount} transaction{totalCount !== 1 ? "s" : ""} found
-            </span>
+            
+            <div className="w-full sm:col-span-2 lg:col-span-4 mt-2">
+               <button
+                 id="btn-apply-filters"
+                 onClick={handleApplyFilters}
+                 className="w-full bg-neutral-900 rounded-xl px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-neutral-800 active:scale-[0.98] shadow-sm flex items-center justify-center gap-2"
+               >
+                 Apply Filters
+               </button>
+            </div>
           </div>
         </div>
 
         {/* ── Sort & Page Size Controls ─────────────────── */}
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">Sort by:</label>
-            <div className="flex gap-1">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-4 px-1">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-xs font-semibold text-neutral-500">Sort By</span>
+            <div className="flex gap-2 bg-neutral-100/50 p-1 rounded-xl">
               {SORT_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => handleSortChange(opt.value)}
-                  className={`rounded-sm px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all border ${
+                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
                     queryParams.sortBy === opt.value
-                      ? "bg-amazon-btnPrimary text-amazon-text border-amazon-btnPrimary"
-                      : "text-amazon-textMuted bg-white border-amazon-border hover:bg-neutral-50 hover:text-amazon-text"
+                      ? "bg-white text-neutral-900 shadow-sm border border-neutral-200"
+                      : "text-neutral-500 hover:text-neutral-900 hover:bg-white/50 border border-transparent"
                   }`}
                 >
                   {opt.label}
                   {queryParams.sortBy === opt.value && (
-                    <span className="ml-1">
+                    <span className="ml-1 font-bold">
                       {queryParams.isAscending ? "↑" : "↓"}
                     </span>
                   )}
@@ -317,17 +318,17 @@ export default function TransactionsPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">Show:</label>
+          <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-neutral-200 shadow-sm">
+            <label className="text-xs font-semibold text-neutral-500">Show</label>
             <select
               id="page-size-select"
               value={queryParams.pageSize}
               onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-              className="rounded-sm border border-amazon-border bg-white px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-amazon-text outline-none focus:border-amazon-btnPrimary"
+              className="bg-transparent text-xs font-medium text-neutral-900 outline-none pr-1 focus:ring-0 cursor-pointer"
             >
               {PAGE_SIZE_OPTIONS.map((size) => (
                 <option key={size} value={size}>
-                  {size}
+                  {size} rows
                 </option>
               ))}
             </select>
@@ -335,75 +336,85 @@ export default function TransactionsPage() {
         </div>
 
         {/* ── Table ─────────────────────────────────────── */}
-        <div className="overflow-hidden rounded-sm border border-amazon-border bg-white shadow-sm">
+        <div className="rounded-2xl border border-neutral-100 bg-white shadow-sm overflow-hidden mb-6">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px]">
+            <table className="w-full min-w-[800px] text-sm text-left">
               <thead>
-                <tr className="border-b border-amazon-border bg-neutral-50 text-left text-[10px] font-black uppercase tracking-widest text-amazon-textMuted">
-                  <th className="px-5 py-3.5">Type</th>
-                  <th className="px-5 py-3.5">Description</th>
-                  <th className="px-5 py-3.5 text-right">
-                    Amount
-                  </th>
-                  <th className="px-5 py-3.5 text-right">Fee</th>
-                  <th className="px-5 py-3.5">Status</th>
-                  <th className="px-5 py-3.5">Date</th>
+                <tr className="bg-neutral-50/50 border-b border-neutral-100 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                  <th className="px-6 py-4">Transaction Details</th>
+                  <th className="px-6 py-4 hidden md:table-cell">Description</th>
+                  <th className="px-6 py-4 text-right">Amount</th>
+                  <th className="px-6 py-4 text-center">Status</th>
+                  <th className="px-6 py-4 text-right">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-amazon-border">
+              <tbody className="divide-y divide-neutral-50 bg-white">
                 {isLoading ? (
-                  // Loading skeleton rows
-                  Array.from({ length: queryParams.pageSize || 5 }).map(
-                    (_, i) => (
-                      <tr key={`skeleton-${i}`}>
-                        {Array.from({ length: 6 }).map((_, j) => (
-                          <td key={j} className="px-5 py-4">
-                            <div className="h-4 w-3/4 animate-pulse rounded bg-neutral-200" />
-                          </td>
-                        ))}
-                      </tr>
-                    ),
-                  )
+                  Array.from({ length: queryParams.pageSize || 10 }).map((_, i) => (
+                    <tr key={`skeleton-${i}`}>
+                      {Array.from({ length: 5 }).map((_, j) => (
+                        <td key={j} className={`px-6 py-5 ${j === 1 ? 'hidden md:table-cell' : ''}`}>
+                          <div className="h-5 w-full max-w-[120px] animate-pulse rounded-md bg-neutral-100" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
                 ) : transactions.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={6}
-                      className="px-5 py-16 text-center text-sm font-bold uppercase tracking-widest text-amazon-textMuted"
+                      colSpan={5}
+                      className="px-6 py-20 text-center"
                     >
-                      No transactions found. Try adjusting your filters.
+                      <div className="flex flex-col items-center justify-center">
+                         <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4">
+                            <Wallet className="w-8 h-8 text-neutral-300" />
+                         </div>
+                         <p className="text-base font-semibold text-neutral-900 mb-1">No transactions found</p>
+                         <p className="text-sm text-neutral-500">Try adjusting your filters to find what you're looking for.</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
                   transactions.map((tx) => (
                     <tr
                       key={tx.id}
-                      className="transition-colors hover:bg-neutral-50"
+                      className="transition-colors hover:bg-neutral-50/50 group"
                     >
-                      <td className="px-5 py-4">
-                        <span className="flex items-center gap-2 text-[11px] font-bold text-amazon-text">
-                          <span>{getTypeIcon(tx.type)}</span>
-                          <span className="capitalize">{tx.type}</span>
-                        </span>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-full bg-neutral-50 flex items-center justify-center border border-neutral-100 text-[15px] shrink-0">
+                               {getTypeIcon(tx.type)}
+                           </div>
+                           <span className="font-semibold text-neutral-900 capitalize block">
+                              {tx.type}
+                           </span>
+                        </div>
                       </td>
-                      <td className="max-w-[200px] truncate px-5 py-4 text-[11px] font-medium text-amazon-textMuted">
-                        {tx.description || "—"}
+                      <td className="px-6 py-5 hidden md:table-cell">
+                         <p className="max-w-[240px] truncate text-xs font-medium text-neutral-500 bg-neutral-50 px-2 py-1 rounded-md border border-neutral-100/50">
+                           {tx.description || "N/A"}
+                         </p>
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-right text-sm font-black text-amazon-price">
-                        {formatCurrency(tx.amount, tx.currency)}
+                      <td className="px-6 py-5 text-right">
+                         <div className="flex flex-col items-end gap-1">
+                            <span className="font-bold text-amazon-price whitespace-nowrap bg-green-50 px-2 py-0.5 rounded-md border border-green-100">
+                               {formatCurrency(tx.amount, tx.currency)}
+                            </span>
+                            {tx.feeAmount > 0 && (
+                               <span className="text-xs font-medium text-neutral-400">
+                                  Fee: {formatCurrency(tx.feeAmount, tx.currency)}
+                               </span>
+                            )}
+                         </div>
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-right text-[11px] font-black text-amazon-textMuted ">
-                        {tx.feeAmount > 0
-                          ? formatCurrency(tx.feeAmount, tx.currency)
-                          : "—"}
-                      </td>
-                      <td className="px-5 py-4">
+                      <td className="px-6 py-5 text-center">
                         <span
-                          className={`text-[10px] font-black uppercase tracking-widest ${getStatusColor(tx.status)}`}
+                          className={`text-xs font-semibold px-2.5 py-1 box-border rounded-md border shadow-sm whitespace-nowrap ${getStatusColor(tx.status)}`}
                         >
                           {tx.status}
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">
+                      <td className="px-6 py-5 text-right whitespace-nowrap text-xs font-medium text-neutral-500">
                         {formatDate(tx.createdAt)}
                       </td>
                     </tr>
@@ -416,86 +427,78 @@ export default function TransactionsPage() {
 
         {/* ── Pagination ──────────────────────────────────  */}
         {data && totalPages > 0 && (
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
-              Page{" "}
-              <span className="font-black text-amazon-text">{currentPage}</span>{" "}
-              of{" "}
-              <span className="font-black text-amazon-text">{totalPages}</span>
-              {" · "}
-              <span className="font-black text-amazon-text">
-                {totalCount}
-              </span>{" "}
-              total
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 px-1">
+            <p className="text-sm font-medium text-neutral-500">
+              Showing <span className="font-bold text-neutral-900">{transactions.length}</span> of{" "}
+              <span className="font-bold text-neutral-900">{totalCount}</span> transactions
             </p>
 
-            <div className="flex items-center gap-1">
-              {/* First */}
+            <div className="flex items-center gap-2">
               <button
-                id="btn-page-first"
                 disabled={!data.hasPreviousPage}
                 onClick={() => handlePageChange(1)}
-                className="rounded-sm px-2.5 py-1.5 text-[11px] font-black uppercase tracking-widest text-amazon-textMuted transition-colors bg-white border border-amazon-border hover:bg-neutral-50 hover:text-amazon-text disabled:cursor-not-allowed disabled:opacity-30"
+                className="p-2 rounded-xl bg-white border border-neutral-200 text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 transition-colors disabled:cursor-not-allowed disabled:opacity-40 shadow-sm active:scale-[0.98]"
               >
-                ««
+                <span className="sr-only">First</span>
+                <ChevronsLeft className="w-5 h-5" />
               </button>
-              {/* Prev */}
               <button
-                id="btn-page-prev"
                 disabled={!data.hasPreviousPage}
                 onClick={() => handlePageChange(currentPage - 1)}
-                className="rounded-sm px-2.5 py-1.5 text-[11px] font-black uppercase tracking-widest text-amazon-textMuted transition-colors bg-white border border-amazon-border hover:bg-neutral-50 hover:text-amazon-text disabled:cursor-not-allowed disabled:opacity-30"
+                className="p-2 rounded-xl bg-white border border-neutral-200 text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 transition-colors disabled:cursor-not-allowed disabled:opacity-40 shadow-sm active:scale-[0.98]"
               >
-                ‹ Prev
+                <span className="sr-only">Previous</span>
+                <ChevronLeft className="w-5 h-5" />
               </button>
 
               {/* Page numbers (show max 5 centered around current) */}
-              {(() => {
-                const maxVisible = 5;
-                let start = Math.max(
-                  1,
-                  currentPage - Math.floor(maxVisible / 2),
-                );
-                const end = Math.min(totalPages, start + maxVisible - 1);
-                if (end - start + 1 < maxVisible) {
-                  start = Math.max(1, end - maxVisible + 1);
-                }
+              <div className="flex items-center gap-1 mx-2">
+                  {(() => {
+                    const maxVisible = 5;
+                    let start = Math.max(
+                      1,
+                      currentPage - Math.floor(maxVisible / 2),
+                    );
+                    const end = Math.min(totalPages, start + maxVisible - 1);
+                    if (end - start + 1 < maxVisible) {
+                      start = Math.max(1, end - maxVisible + 1);
+                    }
 
-                return Array.from(
-                  { length: end - start + 1 },
-                  (_, i) => start + i,
-                ).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`min-w-[32px] rounded-sm border px-2.5 py-1.5 text-[11px] font-black uppercase tracking-widest transition-all ${
-                      page === currentPage
-                        ? "bg-amazon-btnPrimary text-amazon-text border-amazon-btnPrimary shadow-sm"
-                        : "text-amazon-textMuted bg-white border-amazon-border hover:bg-neutral-50 hover:text-amazon-text"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ));
-              })()}
+                    return Array.from(
+                      { length: end - start + 1 },
+                      (_, i) => start + i,
+                    ).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`min-w-[36px] h-[36px] rounded-xl text-sm font-bold transition-all flex items-center justify-center ${
+                          page === currentPage
+                            ? "bg-neutral-900 text-white shadow-md cursor-default"
+                            : "text-neutral-600 bg-white hover:bg-neutral-50 border border-transparent hover:border-neutral-200 active:scale-[0.98]"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ));
+                  })()}
+              </div>
 
-              {/* Next */}
               <button
-                id="btn-page-next"
                 disabled={!data.hasNextPage}
                 onClick={() => handlePageChange(currentPage + 1)}
-                className="rounded-sm px-2.5 py-1.5 text-[11px] font-black uppercase tracking-widest text-amazon-textMuted transition-colors bg-white border border-amazon-border hover:bg-neutral-50 hover:text-amazon-text disabled:cursor-not-allowed disabled:opacity-30"
+                className="p-2 rounded-xl bg-white border border-neutral-200 text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 transition-colors disabled:cursor-not-allowed disabled:opacity-40 shadow-sm active:scale-[0.98]"
               >
-                Next ›
+                <span className="sr-only">Next</span>
+                <ChevronRight className="w-5 h-5" />
               </button>
-              {/* Last */}
+
               <button
-                id="btn-page-last"
                 disabled={!data.hasNextPage}
                 onClick={() => handlePageChange(totalPages)}
-                className="rounded-sm px-2.5 py-1.5 text-[11px] font-black uppercase tracking-widest text-amazon-textMuted transition-colors bg-white border border-amazon-border hover:bg-neutral-50 hover:text-amazon-text disabled:cursor-not-allowed disabled:opacity-30"
+                className="p-2 rounded-xl bg-white border border-neutral-200 text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 transition-colors disabled:cursor-not-allowed disabled:opacity-40 shadow-sm active:scale-[0.98]"
               >
-                »»
+                <span className="sr-only">Last</span>
+                <ChevronsRight className="w-5 h-5" />
               </button>
             </div>
           </div>

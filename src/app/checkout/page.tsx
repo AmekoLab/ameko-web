@@ -73,78 +73,78 @@ const CheckoutItemRow = ({ item }: { item: OrderItem }) => {
     <div>
       <div className="flex gap-4 items-center">
         {/* Image with Badge */}
-        <div className="relative w-16 h-16  rounded-sm bg-white shrink-0">
+        <div className="relative w-16 h-16 rounded-lg bg-neutral-50 shrink-0 border border-neutral-100">
           {displayImage ? (
             <Image
               src={displayImage}
               alt={item.productName}
               fill
-              className="object-contain p-1 rounded-sm"
+              className="object-contain p-1 rounded-lg"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-amazon-textMuted" />
+              <ShoppingBag className="w-6 h-6 text-neutral-300" />
             </div>
           )}
-          <span className="absolute -top-2 -right-2 bg-neutral-200 text-amazon-text text-[11px] font-medium w-5 h-5 rounded-full flex items-center justify-center z-10 shadow-sm border border-amazon-border">
+          <span className="absolute -top-2 -right-2 bg-neutral-900 text-white text-[11px] font-medium w-5 h-5 rounded-full flex items-center justify-center z-10 shadow-sm border border-neutral-800">
             {item.quantity}
           </span>
         </div>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-sm text-amazon-text truncate capitalize uppercase tracking-widest">
+          <h3 className="font-medium text-sm text-neutral-800 truncate">
             {item.productName}
           </h3>
           {/* {item.shopName && (
-            <p className="text-xs text-amazon-textMuted mt-0.5 truncate">
-              Shop: <span className="font-medium text-amazon-text">{item.shopName}</span>
+            <p className="text-xs text-neutral-500 mt-0.5 truncate">
+              Shop: <span className="font-medium text-neutral-800">{item.shopName}</span>
             </p>
           )} */}
           {isCustom && (
             <button
               onClick={() => setShowComponents(!showComponents)}
-              className="text-[11px] font-bold text-amazon-link hover:underline flex items-center gap-0.5 mt-0.5 uppercase tracking-wider"
+              className="text-xs text-neutral-500 hover:text-neutral-800 flex items-center gap-1 mt-1 transition-colors"
             >
               {showComponents ? "Hide" : "View"} components
               {showComponents ? (
-                <ChevronUp className="w-3 h-3" />
+                <ChevronUp className="w-3.5 h-3.5" />
               ) : (
-                <ChevronDown className="w-3 h-3" />
+                <ChevronDown className="w-3.5 h-3.5" />
               )}
             </button>
           )}
         </div>
 
         {/* Price */}
-        <p className="font-bold text-sm text-amazon-price tabular-nums shrink-0 mt-0.5">
+        <p className="font-semibold text-sm text-neutral-900 tabular-nums shrink-0 mt-0.5">
           {item.totalPrice.toLocaleString("vi-VN")}₫
         </p>
       </div>
 
       {/* Inline component list */}
       {isCustom && showComponents && (
-        <div className="ml-20 mt-2 space-y-1.5 mb-2">
+        <div className="ml-[4.5rem] mt-3 space-y-2 mb-2 bg-neutral-50/50 p-2.5 rounded-lg border border-neutral-100">
           {item.orderItemComponents.map((comp) => (
             <div
               key={comp.partId}
-              className="flex items-center gap-2 text-xs text-amazon-textMuted"
+              className="flex items-center gap-2.5 text-xs text-neutral-600"
             >
-              <div className="relative w-6 h-6 shrink-0 rounded-sm overflow-hidden border border-amazon-border bg-neutral-50 mb-0.5">
+              <div className="relative w-7 h-7 shrink-0 rounded-md overflow-hidden border border-neutral-200 bg-white">
                 {comp.partImageUrl ? (
                   <Image
                     src={comp.partImageUrl}
                     alt={comp.partName}
                     fill
-                    sizes="24px"
-                    className="object-contain"
+                    sizes="28px"
+                    className="object-contain p-0.5"
                   />
                 ) : (
-                  <div className="w-full h-full bg-neutral-100" />
+                  <div className="w-full h-full bg-neutral-50" />
                 )}
               </div>
-              <span className="capitalize truncate font-medium text-amazon-text">{comp.partName}</span>
-              <span className="text-amazon-textMuted ml-auto shrink-0 font-bold">
+              <span className="truncate flex-1">{comp.partName}</span>
+              <span className="text-neutral-400 shrink-0">
                 ×{comp.quantity}
               </span>
             </div>
@@ -391,8 +391,8 @@ function CheckoutContent() {
   // ─── Loading ─────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-amazon-bgSecondary text-amazon-text">
-        <Loader2 className="w-8 h-8 animate-spin text-amazon-btnSecondary" />
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50 text-neutral-800">
+        <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
       </div>
     );
   }
@@ -400,13 +400,15 @@ function CheckoutContent() {
   // ─── Empty Cart ──────────────────────────────────────────
   if (!cart || cart.orderItems.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-amazon-bgSecondary text-center px-4">
-        <ShoppingBag className="w-16 h-16 text-amazon-btnSecondary mb-4 opacity-50" />
-        <h2 className="text-2xl font-black uppercase tracking-widest text-amazon-text mb-2">Your cart is empty</h2>
-        <p className="text-amazon-textMuted mb-6 font-medium">Add some products to checkout.</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-neutral-50 text-center px-4">
+        <div className="w-20 h-20 rounded-full bg-neutral-100 flex items-center justify-center mb-6">
+          <ShoppingBag className="w-9 h-9 text-neutral-400" />
+        </div>
+        <h2 className="text-2xl font-semibold text-neutral-900 mb-3">Your cart is empty</h2>
+        <p className="text-neutral-500 mb-8 max-w-md text-sm leading-relaxed">Add some products to checkout.</p>
         <Link
           href="/shop/all-products"
-          className="bg-amazon-btnPrimary text-amazon-text px-6 py-3 rounded-sm text-sm font-black uppercase tracking-widest hover:brightness-95 transition-colors shadow-sm"
+          className="bg-neutral-900 text-white px-8 py-3 rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors shadow-sm"
         >
           Return to Shop
         </Link>
@@ -416,78 +418,75 @@ function CheckoutContent() {
   // No selected items found
   if (selectedItems.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-amazon-bgSecondary text-center px-4">
-        <ShoppingBag className="w-16 h-16 text-amazon-btnSecondary mb-4 opacity-50" />
-        <h2 className="text-2xl font-black  uppercase tracking-widest text-amazon-text mb-2">No items selected</h2>
-        <p className="text-amazon-textMuted mb-6 font-medium">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-neutral-50 text-center px-4">
+        <div className="w-20 h-20 rounded-full bg-neutral-100 flex items-center justify-center mb-6">
+          <ShoppingBag className="w-9 h-9 text-neutral-400" />
+        </div>
+        <h2 className="text-2xl font-semibold text-neutral-900 mb-3">No items selected</h2>
+        <p className="text-neutral-500 mb-8 max-w-md text-sm leading-relaxed">
           Please go back to your cart and select items to checkout.
         </p>
         <Link
           href="/cart"
-          className="bg-amazon-btnPrimary text-amazon-text px-6 py-3 rounded-sm text-sm font-black uppercase tracking-widest hover:brightness-95 transition-colors shadow-sm"
+          className="bg-neutral-900 text-white px-8 py-3 rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors shadow-sm"
         >
           Return to Cart
         </Link>
       </div>
     );
   }
+
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row font-sans text-amazon-text bg-amazon-bgSecondary">
+    <div className="min-h-screen flex flex-col lg:flex-row font-sans text-neutral-800 bg-neutral-50">
       {/* ═══════════════════════════════════════════════════════
           LEFT COLUMN: CHECKOUT FORM
       ═══════════════════════════════════════════════════════ */}
-      <div className="flex-1 lg:flex-[0_0_58%] lg:order-1 order-2 bg-bgSecondary px-4 md:px-8 lg:px-14 py-8 lg:py-4 border-r border-amazon-border">
+      <div className="flex-1 lg:flex-[0_0_55%] lg:order-1 order-2 bg-white px-4 md:px-8 lg:px-14 py-8 lg:py-4 border-r border-neutral-200">
         <form
           id="checkout-form"
           onSubmit={handleSubmit}
           className="max-w-[600px] ml-auto mr-auto lg:mr-0"
         >
           {/* Logo */}
-          <Link href="/" className="block mb-6">
-            <h1 className="text-2xl font-black uppercase tracking-tight text-amazon-text">
+          <Link href="/" className="block mb-2">
+            <h1 className="text-3xl font-black tracking-tight text-neutral-900">
               AMEKO STORE
             </h1>
           </Link>
-{/* 
-          <Link
-            href="/cart"
-            className="text-amazon-link hover:underline transition-colors text-sm inline-flex items-center gap-1 mb-8 font-bold"
-          >
-            <ChevronRight className="w-4 h-4 rotate-180" /> Return to cart
-          </Link> */}
+
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-amazon-textMuted mb-6">
-            <Link href="/cart" className="text-amazon-link hover:underline">
+          <nav className="flex items-center gap-2 text-sm text-neutral-500 mb-10">
+            <Link href="/cart" className="hover:text-neutral-800 transition-colors">
               Cart
             </Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="font-black text-amazon-text">Information</span>
-            <ChevronRight className="w-3 h-3" />
+            <ChevronRight className="w-4 h-4" />
+            <span className="font-semibold text-neutral-900">Information</span>
+            <ChevronRight className="w-4 h-4" />
             <span>Payment</span>
           </nav>
 
 
           {/* ─── Shipping Information ─────────────────────── */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg tracking-tight text-amazon-text">Shipping Information</h2>
+          <div className="mb-10">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-xl font-medium text-neutral-900">Shipping Information</h2>
               <button
                 type="button"
                 onClick={handleAutoFill}
                 disabled={isAutoFilling}
                 title="Auto-fill using your profile data"
-                className="flex items-center gap-1.5 text-[11px] font-bold text-amazon-textMuted hover:text-amazon-link transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors disabled:opacity-50"
               >
                 {isAutoFilling ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <User className="w-3.5 h-3.5" />
+                  <User className="w-4 h-4" />
                 )}
-                AUTO-FILL
+                Auto-fill
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* Receiver Name */}
               <div>
                 <input
@@ -495,14 +494,14 @@ function CheckoutContent() {
                   placeholder="Receiver name *"
                   value={form.receiverName}
                   onChange={handleInputChange("receiverName")}
-                  className={`w-full h-[50px] px-3 border rounded-sm focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/30 text-[13px] placeholder:text-amazon-textMuted ${
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-shadow text-sm placeholder:text-neutral-400 ${
                     errors.receiverName
                       ? "border-red-400 bg-red-50"
-                      : "border-amazon-border bg-white"
+                      : "border-neutral-200 bg-white"
                   }`}
                 />
                 {errors.receiverName && (
-                  <p className="text-red-600 text-xs mt-1 font-bold">
+                  <p className="text-red-500 text-xs mt-1.5 ml-1">
                     {errors.receiverName}
                   </p>
                 )}
@@ -515,20 +514,20 @@ function CheckoutContent() {
                   placeholder="Phone number *"
                   value={form.receiverPhone}
                   onChange={handleInputChange("receiverPhone")}
-                  className={`w-full h-[50px] px-3 border rounded-sm focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/30 text-[13px]  placeholder:text-amazon-textMuted ${
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-shadow text-sm placeholder:text-neutral-400 ${
                     errors.receiverPhone
                       ? "border-red-400 bg-red-50"
-                      : "border-amazon-border bg-white"
+                      : "border-neutral-200 bg-white"
                   }`}
                 />
                 <div
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-amazon-textMuted cursor-help"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 cursor-help"
                   title="Phone number needed for shipping"
                 >
                   <HelpCircle className="w-4 h-4" />
                 </div>
                 {errors.receiverPhone && (
-                  <p className="text-red-600 text-xs mt-1 font-bold">
+                  <p className="text-red-500 text-xs mt-1.5 ml-1">
                     {errors.receiverPhone}
                   </p>
                 )}
@@ -541,14 +540,14 @@ function CheckoutContent() {
                   placeholder="Shipping address *"
                   value={form.shippingAddress}
                   onChange={handleInputChange("shippingAddress")}
-                  className={`w-full h-[50px] px-3 border rounded-sm focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/30 text-[13px] placeholder:text-amazon-textMuted ${
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-shadow text-sm placeholder:text-neutral-400 ${
                     errors.shippingAddress
                       ? "border-red-400 bg-red-50"
-                      : "border-amazon-border bg-white"
+                      : "border-neutral-200 bg-white"
                   }`}
                 />
                 {errors.shippingAddress && (
-                  <p className="text-red-600 text-xs mt-1 font-bold">
+                  <p className="text-red-500 text-xs mt-1.5 ml-1">
                     {errors.shippingAddress}
                   </p>
                 )}
@@ -560,21 +559,20 @@ function CheckoutContent() {
                 rows={3}
                 value={form.note}
                 onChange={handleInputChange("note")}
-                className="w-full px-3 py-3 border rounded-sm focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/30 text-[13px] placeholder:text-amazon-textMuted border-amazon-border bg-white resize-none"
+                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-shadow text-sm placeholder:text-neutral-400 border-neutral-200 bg-white resize-none"
                 maxLength={500}
               />
             </div>
 
             {/* ─── Payment Method ──────────────────────────── */}
-            {/* ─── Payment Method ──────────────────────────── */}
-            <h2 className="text-lg   text-amazon-text mb-4 mt-8 pt-8 border-t border-amazon-border">Payment Method</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <h2 className="text-xl font-medium text-neutral-900 mb-5 mt-4 pt-4 border-t border-neutral-100">Payment Method</h2>
+            <div className="grid grid-cols-1 gap-4">
               {/* Stripe */}
               <label
-                className={`flex items-center gap-3 p-4 border rounded-sm cursor-pointer transition-colors ${
+                className={`flex items-center gap-4 p-5 rounded-xl border cursor-pointer transition-all ${
                   paymentMethod === 0
-                    ? "border-amazon-focus ring-1 ring-amazon-focus/30 bg-neutral-50 shadow-sm"
-                    : "border-amazon-border bg-white hover:border-neutral-300"
+                    ? "border-neutral-900 bg-neutral-50 shadow-sm"
+                    : "border-neutral-200 bg-white hover:border-neutral-300"
                 }`}
               >
                 <input
@@ -583,20 +581,20 @@ function CheckoutContent() {
                   value={0}
                   checked={paymentMethod === 0}
                   onChange={() => setPaymentMethod(0)}
-                  className="accent-amazon-btnPrimary w-4 h-4 cursor-pointer"
+                  className="w-5 h-5 accent-neutral-900 cursor-pointer"
                 />
                 <div>
-                  <p className="text-sm font-bold text-amazon-text  ">Stripe (Credit Card)</p>
-                  <p className="text-[11px]  text-amazon-textMuted mt-0.5 ">Pay securely via Stripe</p>
+                  <p className="text-sm font-medium text-neutral-900">Stripe (Credit Card)</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">Pay securely via Stripe gateway</p>
                 </div>
               </label>
 
               {/* VN PAY*/}
               <label
-                className={`flex items-center gap-3 p-4 border rounded-sm cursor-pointer transition-colors ${
+                className={`flex items-center gap-4 p-5 rounded-xl border cursor-pointer transition-all ${
                   paymentMethod === 2
-                    ? "border-amazon-focus ring-1 ring-amazon-focus/30 bg-neutral-50 shadow-sm"
-                    : "border-amazon-border bg-white hover:border-neutral-300"
+                    ? "border-neutral-900 bg-neutral-50 shadow-sm"
+                    : "border-neutral-200 bg-white hover:border-neutral-300"
                 }`}
               >
                 <input
@@ -605,20 +603,20 @@ function CheckoutContent() {
                   value={2}
                   checked={paymentMethod === 2}
                   onChange={() => setPaymentMethod(2)}
-                  className="accent-amazon-btnPrimary w-4 h-4 cursor-pointer"
+                  className="w-5 h-5 accent-neutral-900 cursor-pointer"
                 />
                 <div className="flex flex-col">
-                  <span className="text-sm font-bold text-amazon-text  ">VN PAY</span>
-                  <span className="text-[11px]  text-amazon-textMuted mt-0.5 ">Pay securely via VN PAY</span>
+                  <span className="text-sm font-medium text-neutral-900">VNPay Gateway</span>
+                  <span className="text-xs text-neutral-500 mt-0.5">Pay securely via VNPay domestic transfer</span>
                 </div>
               </label>
 
               {/* Ameko Wallet */}
               <label
-                className={`flex items-center gap-3 p-4 border rounded-sm cursor-pointer transition-colors md:col-span-2 lg:col-span-1 ${
+                className={`flex items-center gap-4 p-5 rounded-xl border cursor-pointer transition-all ${
                   paymentMethod === 1
-                    ? "border-amazon-focus ring-1 ring-amazon-focus/30 bg-neutral-50 shadow-sm"
-                    : "border-amazon-border bg-white hover:border-neutral-300"
+                    ? "border-neutral-900 bg-neutral-50 shadow-sm"
+                    : "border-neutral-200 bg-white hover:border-neutral-300"
                 }`}
               >
                 <input
@@ -627,12 +625,12 @@ function CheckoutContent() {
                   value={1}
                   checked={paymentMethod === 1}
                   onChange={() => setPaymentMethod(1)}
-                  className="accent-amazon-btnPrimary w-4 h-4 cursor-pointer"
+                  className="w-5 h-5 accent-neutral-900 cursor-pointer"
                 />
                 <div className="flex flex-col">
-                  <span className="text-sm font-bold text-amazon-text  ">Ameko Wallet</span>
-                  <span className="text-[11px]  text-amazon-textMuted italic mt-0.5 ">
-                    Balance: {walletDetails?.balance?.toLocaleString("vi-VN") ?? 0}₫
+                  <span className="text-sm font-medium text-neutral-900">Ameko Wallet Balance</span>
+                  <span className="text-xs text-amber-600 font-medium mt-0.5">
+                    Available: {walletDetails?.balance?.toLocaleString("vi-VN") ?? 0}₫
                   </span>
                 </div>
               </label>
@@ -640,13 +638,13 @@ function CheckoutContent() {
           </div>
 
           {/* ─── Footer Actions ───────────────────────────── */}
-          <div className="mt-10 border-t border-amazon-border pt-6">
-            <p className="text-[11px] md:text-xs text-amazon-textMuted leading-relaxed mb-6 text-justify">
+          <div className="mt-1 border-t border-neutral-100 pt-1">
+            <p className="text-xs text-neutral-500 leading-relaxed text-justify">
               By placing your order, you confirm that you have read, understood, and agree to be bound by AMK Collective&apos;s{" "}
               <button
                 type="button"
                 onClick={() => setActivePolicy("terms")}
-                className="font-bold text-amazon-text hover:text-amazon-link hover:underline transition-colors"
+                className="font-medium text-neutral-800 hover:text-amber-600 transition-colors"
               >
                 Terms of Use and Sale
               </button>
@@ -654,7 +652,7 @@ function CheckoutContent() {
               <button
                 type="button"
                 onClick={() => setActivePolicy("privacy")}
-                className="font-bold text-amazon-text hover:text-amazon-link hover:underline transition-colors"
+                className="font-medium text-neutral-800 hover:text-amber-600 transition-colors"
               >
                 Privacy Policy
               </button>{" "}
@@ -662,7 +660,7 @@ function CheckoutContent() {
               <button
                 type="button"
                 onClick={() => setActivePolicy("returns")}
-                className="font-bold text-amazon-text hover:text-amazon-link hover:underline transition-colors"
+                className="font-medium text-neutral-800 hover:text-amber-600 transition-colors"
               >
                 Return & Refund Policy
               </button>
@@ -675,26 +673,26 @@ function CheckoutContent() {
       {/* ═══════════════════════════════════════════════════════
           RIGHT COLUMN: ORDER SUMMARY
       ═══════════════════════════════════════════════════════ */}
-      <div className="flex-1 lg:flex-[0_0_42%] lg:order-2 order-1 bg-amazon-bgSecondary border-l border-amazon-border px-4 md:px-8 lg:px-10 py-8 lg:py-12">
+      <div className="flex-1 lg:flex-[0_0_45%] lg:order-2 order-1 bg-neutral-50 lg:border-l border-neutral-200 px-4 md:px-8 lg:px-12 py-8 lg:py-12">
         {/* Mobile Toggle */}
         <button
           onClick={() => setIsSummaryOpen(!isSummaryOpen)}
-          className="lg:hidden flex w-full items-center justify-between border-b border-amazon-border pb-4 mb-6 bg-amazon-bgSecondary"
+          className="lg:hidden flex w-full items-center justify-between border-b border-neutral-200 pb-5 mb-6"
         >
-          <div className="flex items-center gap-2 text-amazon-text">
-            <ShoppingBag className="w-4 h-4" />
-            <span className="text-sm font-bold uppercase tracking-widest text-amazon-text">
+          <div className="flex items-center gap-2 text-neutral-700">
+            <ShoppingBag className="w-5 h-5 text-amber-600" />
+            <span className="text-sm font-medium">
               {isSummaryOpen ? "Hide" : "Show"} order summary
             </span>
             <ChevronDown
-              className={`w-3 h-3 text-amazon-textMuted transition-transform ${
+              className={`w-4 h-4 text-neutral-400 transition-transform ${
                 isSummaryOpen ? "rotate-180" : ""
               }`}
             />
           </div>
-          <span className="font-bold text-lg text-amazon-price">
+          <span className="font-semibold text-lg text-neutral-900 tabular-nums">
             {isCalculatingPreview ? (
-              <Loader2 className="w-5 h-5 animate-spin text-amazon-textMuted" />
+              <Loader2 className="w-5 h-5 animate-spin text-neutral-400 inline" />
             ) : (
               `${displayTotal.toLocaleString("vi-VN")}₫`
             )}
@@ -705,51 +703,53 @@ function CheckoutContent() {
         <div
           className={`lg:block ${
             isSummaryOpen ? "block" : "hidden"
-          } max-w-[400px]`}
+          } max-w-[440px] mx-auto lg:mx-0`}
         >
           {/* Product List — grouped by shop */}
-          {Object.entries(groupedItems).map(([shopName, items]) => (
-            <div key={shopName} className="bg-white rounded-sm  overflow-hidden  mb-4">
-              {/* Shop Header */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-amazon-border bg-neutral-50">
-                <Store className="w-4 h-4 text-amazon-textMuted shrink-0" />
-                <span className="font-black text-sm text-amazon-text uppercase tracking-widest truncate">
-                  {shopName}
-                </span>
+          <div className="space-y-6">
+            {Object.entries(groupedItems).map(([shopName, items]) => (
+              <div key={shopName} className="bg-white rounded-xl border border-neutral-200/80 overflow-hidden shadow-sm">
+                {/* Shop Header */}
+                <div className="flex items-center gap-2 px-5 py-3.5 border-b border-neutral-100 bg-neutral-50/50">
+                  <Store className="w-4 h-4 text-neutral-400 shrink-0" />
+                  <span className="font-medium text-sm text-neutral-800 truncate">
+                    {shopName}
+                  </span>
+                </div>
+                {/* Items */}
+                <div className="p-5 space-y-5">
+                  {items.map((item) => (
+                    <CheckoutItemRow key={item.orderItemId} item={item} />
+                  ))}
+                </div>
               </div>
-              {/* Items */}
-              <div className="p-4 space-y-4">
-                {items.map((item) => (
-                  <CheckoutItemRow key={item.orderItemId} item={item} />
-                ))}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
 
           {/* Cost Breakdown */}
-          <div className="space-y-3 border-t border-amazon-border pt-6 pb-6 mb-6 text-sm text-amazon-textMuted font-bold  tracking-wider">
-            <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span className="font-black text-amazon-text">
-                  {isCalculatingPreview ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-amazon-textMuted" />
-                  ) : (
-                    `${(cartPreview?.totalCartSubTotal ?? selectedTotal).toLocaleString("vi-VN")}₫`
-                  )}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping</span>
-                <span className="italic text-amazon-textMuted text-xs">
-                  Pay on delivery
-                </span>
-              </div>
-              {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (
-              <div className="flex justify-between">
+          <div className="space-y-3.5 mt-8 mb-6 text-sm text-neutral-600">
+            <div className="flex justify-between items-center">
+              <span>Subtotal</span>
+              <span className="font-medium text-neutral-900 tabular-nums">
+                {isCalculatingPreview ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-neutral-400 inline" />
+                ) : (
+                  `${(cartPreview?.totalCartSubTotal ?? selectedTotal).toLocaleString("vi-VN")}₫`
+                )}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span>Shipping</span>
+              <span className="italic text-neutral-400 text-xs">
+                Pay on delivery
+              </span>
+            </div>
+            {(cartPreview?.totalDiscountAmount ?? 0) > 0 && (
+              <div className="flex justify-between items-center">
                 <span>Discount</span>
-                <span className="font-black text-green-600">
+                <span className="font-medium text-green-600 tabular-nums">
                   {isCalculatingPreview ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-amazon-textMuted" />
+                    <Loader2 className="w-4 h-4 animate-spin text-neutral-400 inline" />
                   ) : (
                     `-${cartPreview!.totalDiscountAmount.toLocaleString("vi-VN")}₫`
                   )}
@@ -759,12 +759,12 @@ function CheckoutContent() {
           </div>
 
           {/* Total */}
-          <div className="flex justify-between items-center border-t border-amazon-border pt-6 mb-6">
-            <span className="text-base font-black uppercase tracking-widest text-amazon-text">Total</span>
+          <div className="flex justify-between items-end border-t border-neutral-200 pt-5 mb-8">
+            <span className="text-base font-medium text-neutral-800">Estimated Total</span>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-amazon-price tracking-tight">
+              <span className="text-3xl font-bold text-neutral-900 tracking-tight tabular-nums">
                 {isCalculatingPreview ? (
-                  <Loader2 className="w-6 h-6 animate-spin text-amazon-textMuted" />
+                  <Loader2 className="w-8 h-8 animate-spin text-neutral-400 inline" />
                 ) : (
                   `${displayTotal.toLocaleString("vi-VN")}₫`
                 )}
@@ -777,30 +777,29 @@ function CheckoutContent() {
             type="submit"
             form="checkout-form"
             disabled={submitting || isCalculatingPreview || cartPreview === null}
-            className="w-full bg-amazon-btnPrimary text-amazon-text hover:brightness-95 px-10 py-4 rounded-sm font-black uppercase  transition-colors text-[15px] shadow-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full bg-neutral-900 text-white hover:bg-neutral-800 py-4 rounded-xl font-semibold transition-all text-base shadow-md disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.98]"
           >
             {submitting ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
                 Processing...
               </>
             ) : paymentMethod === 1 ? (
               "Pay with Wallet"
             ) : paymentMethod === 2 ? (
-              "Pay with VN PAY"
+              "Pay with VNPay"
             ) : (
               "Pay with Stripe"
-            )
-            }
+            )}
           </button>
         </div>
       </div>
 
       {activePolicy && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6 transition-opacity">
-          <div className="bg-white rounded-sm shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden max-h-[85vh] animate-in slide-in-from-bottom duration-300 border border-amazon-border">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-amazon-border bg-neutral-50">
-              <h2 className="text-xl font-black uppercase tracking-widest text-amazon-text">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-4 sm:p-6 transition-opacity">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden max-h-[85vh] animate-in zoom-in-95 duration-200 border border-neutral-100">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-neutral-100 bg-white">
+              <h2 className="text-lg font-semibold text-neutral-900">
                 {activePolicy === "terms" && "Terms of Use and Sale"}
                 {activePolicy === "privacy" && "Privacy Policy"}
                 {activePolicy === "returns" && "Return & Refund Policy"}
@@ -808,13 +807,13 @@ function CheckoutContent() {
               <button
                 type="button"
                 onClick={() => setActivePolicy(null)}
-                className="p-2 text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-200 rounded-sm transition-colors focus:outline-none"
+                className="p-2 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 rounded-lg transition-colors focus:outline-none"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             
-            <div className="px-6 py-5 overflow-y-auto flex-1 text-sm text-amazon-textMuted space-y-4">
+            <div className="px-8 py-6 overflow-y-auto flex-1 text-sm text-neutral-600 space-y-4 leading-relaxed">
               {activePolicy === "terms" && (
                 <>
                   <p>Welcome to AMK Collective. By accessing our platform, you agree to these terms.</p>
@@ -838,11 +837,11 @@ function CheckoutContent() {
               )}
             </div>
 
-            <div className="p-4 sm:p-6 border-t border-amazon-border bg-neutral-50 mt-auto">
+            <div className="p-6 border-t border-neutral-100 bg-neutral-50 mt-auto">
               <button
                 type="button"
                 onClick={() => setActivePolicy(null)}
-                className="w-full bg-amazon-btnPrimary text-amazon-text py-2.5 rounded-sm font-black shadow-sm uppercase tracking-widest hover:brightness-95 transition-colors focus:outline-none"
+                className="w-full bg-neutral-900 text-white py-3 rounded-lg font-medium shadow-sm hover:bg-neutral-800 transition-colors focus:outline-none active:scale-[0.99]"
               >
                 I Understand & Close
               </button>
@@ -858,8 +857,8 @@ export default function CheckoutPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+        <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+          <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
         </div>
       }
     >

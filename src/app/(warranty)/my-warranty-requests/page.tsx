@@ -13,6 +13,8 @@ import {
   Eye,
   Undo2,
   Pencil,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
@@ -34,7 +36,7 @@ const STATUS_STYLES: Record<string, string> = {
   Rejected: "bg-red-50 border-red-200 text-red-700",
   AdminReviewing: "bg-purple-50 border-purple-200 text-purple-700",
   Completed: "bg-green-50 border-green-200 text-green-700",
-  AutoCancelled: "bg-gray-50 border-gray-200 text-gray-700",
+  AutoCancelled: "bg-neutral-100 border-neutral-200 text-neutral-700",
   Returning: "bg-blue-50 border-blue-200 text-blue-700",
   Returned: "bg-blue-50 border-blue-200 text-blue-700",
 };
@@ -60,32 +62,31 @@ const formatDate = (dateStr: string): string => {
 };
 
 const getStatusStyle = (statusName: string): string =>
-  STATUS_STYLES[statusName] || "bg-neutral-50 border-amazon-border text-amazon-textMuted";
+  STATUS_STYLES[statusName] || "bg-neutral-50 border-neutral-200 text-neutral-600";
 
 const getTypeLabel = (typeName: string): string =>
   TYPE_LABELS[typeName] || typeName;
 
 // ─── Loading Skeleton ──────────────────────────────────────
 const WarrantySkeleton: FC = () => (
-  <div className="bg-amazon-bgSecondary min-h-screen">
-    <div className="max-w-[900px] mx-auto px-4 md:px-8 py-12 lg:py-20 animate-pulse">
-      <div className="h-10 w-72 bg-neutral-200 rounded-sm mb-8" />
-      <div className="space-y-5">
+  <div className="bg-neutral-50 min-h-[calc(100vh-4rem)]">
+    <div className="max-w-4xl mx-auto px-4 md:px-8 py-12 lg:py-16 animate-pulse">
+      <div className="h-10 w-72 bg-neutral-200 rounded-xl mb-10" />
+      <div className="space-y-6">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white rounded-sm border border-amazon-border p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div className="h-5 w-44 bg-neutral-200 rounded-sm" />
-              <div className="h-6 w-24 bg-neutral-200 rounded-sm" />
+          <div key={i} className="bg-white rounded-2xl border border-neutral-100 p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-neutral-50">
+              <div className="h-6 w-44 bg-neutral-100 rounded-md" />
+              <div className="h-8 w-24 bg-neutral-100 rounded-lg" />
             </div>
-            <div className="space-y-2 mb-4">
-              <div className="h-4 w-60 bg-neutral-200 rounded-sm" />
-              <div className="h-4 w-40 bg-neutral-200 rounded-sm" />
-              <div className="h-4 w-36 bg-neutral-200 rounded-sm" />
+            <div className="space-y-3 mb-6">
+              <div className="h-5 w-60 bg-neutral-100 rounded-md" />
+              <div className="h-4 w-40 bg-neutral-100 rounded-md" />
             </div>
-            <div className="h-16 w-full bg-neutral-200 rounded-sm mb-4" />
-            <div className="flex gap-3">
-              <div className="h-10 w-28 bg-neutral-200 rounded-sm" />
-              <div className="h-10 w-32 bg-neutral-200 rounded-sm" />
+            <div className="h-32 w-full bg-neutral-100 rounded-xl mb-6" />
+            <div className="flex gap-3 pt-4 border-t border-neutral-50">
+              <div className="h-10 w-28 bg-neutral-200 rounded-xl" />
+              <div className="h-10 w-32 bg-neutral-200 rounded-xl" />
             </div>
           </div>
         ))}
@@ -96,14 +97,13 @@ const WarrantySkeleton: FC = () => (
 
 // ─── Empty State ───────────────────────────────────────────
 const EmptyWarranties: FC = () => (
-  <div className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-amazon-border bg-white rounded-sm">
-    <div className="w-16 h-16 rounded-full bg-neutral-50 border border-amazon-border flex items-center justify-center mb-5">
-      <ShieldCheck className="w-8 h-8 text-neutral-400" />
+  <div className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-neutral-200 bg-white rounded-2xl shadow-sm">
+    <div className="w-20 h-20 rounded-full bg-neutral-50 border border-neutral-100 flex items-center justify-center mb-6">
+      <ShieldCheck className="w-10 h-10 text-neutral-300" strokeWidth={1.5} />
     </div>
-    <h2 className="text-[14px] font-black uppercase tracking-widest text-amazon-text mb-2">No requests yet</h2>
-    <p className="text-[12px] text-amazon-textMuted max-w-sm">
-      You have not submitted any warranty or return requests. New requests will
-      appear here.
+    <h2 className="text-xl font-bold text-neutral-900 mb-2">No Requests Yet</h2>
+    <p className="text-sm text-neutral-500 max-w-sm leading-relaxed mb-6">
+      You have not submitted any warranty or return requests. Active and historical requests will appear here.
     </p>
   </div>
 );
@@ -130,42 +130,47 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
     request.requiresReturn && request.statusName === "AwaitingReturn";
 
   return (
-    <div className="bg-white rounded-sm border border-amazon-border overflow-hidden transition-shadow shadow-sm hover:shadow-md">
+    <div className="bg-white rounded-2xl border border-neutral-100 overflow-hidden transition-shadow shadow-sm hover:shadow-md hover:border-neutral-300 duration-300 flex flex-col group">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-amazon-border bg-neutral-50">
-        <div className="flex items-center gap-2">
-          {request.typeName === "ReturnRequest" ? (
-            <PackageOpen className="w-4.5 h-4.5 text-orange-500" />
-          ) : (
-            <ShieldCheck className="w-4.5 h-4.5 text-blue-500" />
-          )}
-          <span className="text-[12px] font-black uppercase tracking-widest text-amazon-text">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-50 bg-white">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-neutral-50 border border-neutral-100">
+             {request.typeName === "ReturnRequest" ? (
+               <PackageOpen className="w-5 h-5 text-neutral-600" />
+             ) : (
+               <ShieldCheck className="w-5 h-5 text-neutral-600" />
+             )}
+          </div>
+          <span className="text-sm font-bold text-neutral-900">
             {getTypeLabel(request.typeName)}
           </span>
         </div>
         <span
-          className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 box-border rounded-sm border ${getStatusStyle(request.statusName)}`}
+          className={`text-xs font-semibold px-3 py-1.5 box-border rounded-md border shadow-sm whitespace-nowrap ${getStatusStyle(request.statusName)}`}
         >
           {request.statusName}
         </span>
       </div>
 
       {/* Body */}
-      <div className="px-5 py-5 space-y-4">
+      <div className="px-6 py-6 space-y-6 flex-1">
         {/* Reason + Date */}
         <div>
-          <p className="text-[14px] font-bold text-amazon-text">{request.reason}</p>
-          <p className="text-[11px] font-bold tracking-widest uppercase text-amazon-textMuted flex items-center gap-1.5 mt-2">
-            <Calendar className="w-3.5 h-3.5" />
-            {formatDate(request.createdAt)}
-          </p>
+          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block mb-2">Request Details</span>
+          <p className="text-base font-semibold text-neutral-900 leading-relaxed border-l-2 border-neutral-300 pl-3">{request.reason}</p>
+          <div className="flex items-center gap-2 mt-3">
+             <span className="bg-neutral-100 text-neutral-600 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-neutral-200 flex items-center gap-1.5 w-fit">
+                <Calendar className="w-3.5 h-3.5" />
+                {formatDate(request.createdAt)}
+             </span>
+          </div>
         </div>
 
         {/* Refund Amount */}
         {request.refundAmount > 0 && (
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-amazon-textMuted">Refund Amount:</span>
-            <span className="text-[14px] text-amazon-price font-bold tracking-widest">
+          <div className="flex justify-between items-center bg-green-50 p-4 rounded-xl border border-green-100">
+             <span className="text-sm font-semibold text-green-800">Requested Refund Amount</span>
+             <span className="text-base text-green-700 font-bold bg-white px-3 py-1 rounded-lg border border-green-200 shadow-sm">
               {formatCurrency(request.refundAmount)}
             </span>
           </div>
@@ -173,84 +178,91 @@ const WarrantyCard: FC<WarrantyCardProps> = ({
 
         {/* Evidence */}
         {request.evidenceUrl && (
-          <div className="relative w-full h-40 rounded-sm overflow-hidden border border-amazon-border bg-neutral-50">
-            <Image
-              src={request.evidenceUrl}
-              alt="Evidence"
-              fill
-              className="object-contain"
-            />
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block mb-2">Evidence Image</span>
+            <div className="relative w-full h-48 rounded-xl overflow-hidden border border-neutral-200 bg-neutral-50 group-hover:border-neutral-300 transition-colors">
+              <Image
+                src={request.evidenceUrl}
+                alt="Evidence"
+                fill
+                className="object-contain"
+              />
+            </div>
           </div>
         )}
 
         {/* Shop Response */}
         {request.shopResponse && (
-          <div className="flex gap-3 p-4 rounded-sm bg-neutral-50 border border-amazon-border">
-            <Info className="w-4 h-4 text-neutral-400 flex-shrink-0 mt-0.5" />
-            <div className="min-w-0">
-              <p className="text-[11px] font-black uppercase tracking-widest text-amazon-textMuted mb-1">
-                Shop Response
-              </p>
-              <p className="text-[13px] text-amazon-text break-words">
-                {request.shopResponse}
-              </p>
+          <div className="flex flex-col gap-2 p-5 rounded-xl bg-blue-50/50 border border-blue-100 relative overflow-hidden">
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-400 opacity-60"></div>
+            <div className="flex items-center gap-2 text-blue-700 mb-1">
+               <Info className="w-4 h-4 flex-shrink-0" />
+               <p className="text-xs font-bold uppercase tracking-widest">
+                 Shop Response
+               </p>
             </div>
+            <p className="text-sm font-medium text-blue-900 leading-relaxed ml-6">
+              {request.shopResponse}
+            </p>
           </div>
         )}
 
         {/* Admin Note */}
         {request.adminNote && (
-          <div className="flex gap-3 p-4 rounded-sm bg-blue-50 border border-blue-200">
-            <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
-            <div className="min-w-0">
-              <p className="text-[11px] font-black uppercase tracking-widest text-blue-700 mb-1">
-                Admin Note
-              </p>
-              <p className="text-[13px] text-blue-800 break-words">
-                {request.adminNote}
-              </p>
-            </div>
+          <div className="flex flex-col gap-2 p-5 rounded-xl bg-purple-50/50 border border-purple-100 relative overflow-hidden mt-4">
+             <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-400 opacity-60"></div>
+             <div className="flex items-center gap-2 text-purple-700 mb-1">
+               <Info className="w-4 h-4 flex-shrink-0" />
+               <p className="text-xs font-bold uppercase tracking-widest">
+                 Admin Note
+               </p>
+             </div>
+             <p className="text-sm font-medium text-purple-900 leading-relaxed ml-6">
+               {request.adminNote}
+             </p>
           </div>
         )}
       </div>
 
       {/* Footer */}
-      <div className="flex flex-wrap items-center gap-3 px-5 py-4 border-t border-amazon-border bg-neutral-50">
-        <button className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-amazon-textMuted bg-white border border-amazon-border px-4 py-2 rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition-colors shadow-sm">
+      <div className="flex flex-wrap md:flex-nowrap items-center gap-3 px-6 py-5 border-t border-neutral-50 bg-neutral-50/50">
+        <button className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 text-sm font-semibold text-neutral-700 bg-white border border-neutral-200 px-5 py-2.5 rounded-xl hover:bg-neutral-50 hover:text-neutral-900 transition-all shadow-sm active:scale-[0.98]">
           <Eye className="w-4 h-4" />
           View Details
         </button>
 
-        {showWithdraw && (
-          <button
-            onClick={() => onWithdrawClick(request.id)}
-            disabled={isWithdrawing}
-            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-red-700 bg-red-50 border border-red-200 px-4 py-2 rounded-sm hover:bg-red-100 transition-colors disabled:opacity-50 shadow-sm"
-          >
-            <Undo2 className="w-4 h-4" />
-            Withdraw
-          </button>
-        )}
+        <div className="flex items-center gap-3 w-full md:w-auto md:ml-auto">
+          {showWithdraw && (
+            <button
+              onClick={() => onWithdrawClick(request.id)}
+              disabled={isWithdrawing}
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 text-sm font-semibold text-red-600 bg-red-50 border border-red-100 px-5 py-2.5 rounded-xl hover:bg-red-100 transition-all disabled:opacity-50 shadow-sm active:scale-[0.98]"
+            >
+              <Undo2 className="w-4 h-4" />
+              Withdraw
+            </button>
+          )}
 
-        {showEdit && (
-          <button
-            onClick={() => onEditClick(request)}
-            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-blue-700 bg-blue-50 border border-blue-200 px-4 py-2 rounded-sm hover:bg-blue-100 transition-colors shadow-sm"
-          >
-            <Pencil className="w-4 h-4" />
-            Edit
-          </button>
-        )}
+          {showEdit && (
+            <button
+              onClick={() => onEditClick(request)}
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 text-sm font-semibold text-neutral-700 bg-white border border-neutral-200 px-5 py-2.5 rounded-xl hover:bg-neutral-50 transition-all shadow-sm active:scale-[0.98]"
+            >
+              <Pencil className="w-4 h-4" />
+              Edit Request
+            </button>
+          )}
 
-        {showReturnShipping && (
-          <button
-            onClick={() => onShipClick(request.id)}
-            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-amazon-text bg-amazon-btnPrimary px-4 py-2 border border-amazon-btnPrimary rounded-sm hover:opacity-90 transition-colors shadow-sm"
-          >
-            <Truck className="w-4 h-4" />
-            Send Return Info
-          </button>
-        )}
+          {showReturnShipping && (
+            <button
+              onClick={() => onShipClick(request.id)}
+              className="flex-1 md:flex-none w-full md:w-auto inline-flex items-center justify-center gap-2 text-sm font-semibold text-white bg-blue-600 border border-blue-600 px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-all shadow-sm active:scale-[0.98]"
+            >
+              <Truck className="w-4 h-4" />
+              Send Return Details
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -267,24 +279,24 @@ const Pagination: FC<PaginationProps> = ({ current, total, onChange }) => {
   if (total <= 1) return null;
 
   return (
-    <div className="flex items-center justify-center gap-2 pt-8">
+    <div className="flex items-center justify-center gap-4 pt-10">
       <button
         disabled={current <= 1}
         onClick={() => onChange(current - 1)}
-        className="p-2 rounded-sm border border-amazon-border bg-white text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="p-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
       >
-        <ChevronLeft className="w-4 h-4" />
+        <ChevronLeft className="w-5 h-5" />
       </button>
-      <span className="text-[12px] font-bold uppercase tracking-widest text-amazon-textMuted px-3">
-        Page <span className="text-amazon-text">{current}</span> /{" "}
-        {total}
+      <span className="text-sm font-medium text-neutral-500 px-2">
+        Page <span className="text-neutral-900 font-bold">{current}</span> of{" "}
+        <span className="font-semibold">{total}</span>
       </span>
       <button
         disabled={current >= total}
         onClick={() => onChange(current + 1)}
-        className="p-2 rounded-sm border border-amazon-border bg-white text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="p-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
       >
-        <ChevronRight className="w-4 h-4" />
+        <ChevronRight className="w-5 h-5" />
       </button>
     </div>
   );
@@ -293,7 +305,7 @@ const Pagination: FC<PaginationProps> = ({ current, total, onChange }) => {
 // ─── Main Page ─────────────────────────────────────────────
 const MyWarrantiesPage: FC = () => {
   const dispatch = useAppDispatch();
-  const { warrantyList, pagination, loadingWarranties, isWithdrawing } =
+  const { warrantyList, pagination, loadingWarranties } =
     useAppSelector((state) => state.warranty);
 
   const [shipModalOpen, setShipModalOpen] = useState(false);
@@ -301,6 +313,11 @@ const MyWarrantiesPage: FC = () => {
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
   const [selectedUpdateIssue, setSelectedUpdateIssue] =
     useState<WarrantyRequest | null>(null);
+
+  // Modal State Management for Withdrawal
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+  const [withdrawingIssueId, setWithdrawingIssueId] = useState<string | null>(null);
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
 
   useEffect(() => {
     dispatch(fetchMyWarrantyRequests({ page: 1, pageSize: PAGE_SIZE }));
@@ -331,42 +348,59 @@ const MyWarrantiesPage: FC = () => {
     dispatch(fetchMyWarrantyRequests({ page: 1, pageSize: PAGE_SIZE }));
   }, [dispatch]);
 
-  const handleWithdraw = useCallback(
-    async (issueId: string) => {
-      const isConfirmed = window.confirm(
-        "Bạn có chắc chắn muốn hủy yêu cầu khiếu nại/bảo hành này? Hành động này không thể hoàn tác.",
-      );
-      if (!isConfirmed) return;
-      try {
-        await dispatch(withdrawWarranty(issueId)).unwrap();
-        dispatch(fetchMyWarrantyRequests({ page: 1, pageSize: PAGE_SIZE }));
-      } catch {
-        // error toast handled by thunk
-      }
-    },
-    [dispatch],
-  );
+  const handleWithdrawClick = useCallback((issueId: string) => {
+    setWithdrawingIssueId(issueId);
+    setIsWithdrawModalOpen(true);
+  }, []);
+
+  const handleConfirmWithdraw = useCallback(async () => {
+    if (!withdrawingIssueId) return;
+    setIsWithdrawing(true);
+    try {
+      await dispatch(withdrawWarranty(withdrawingIssueId)).unwrap();
+      dispatch(fetchMyWarrantyRequests({ page: 1, pageSize: PAGE_SIZE }));
+      setIsWithdrawModalOpen(false);
+      setWithdrawingIssueId(null);
+    } catch {
+      // error toast handled by thunk
+    } finally {
+      setIsWithdrawing(false);
+    }
+  }, [dispatch, withdrawingIssueId]);
+
+  const handleCancelWithdraw = useCallback(() => {
+    setIsWithdrawModalOpen(false);
+    setWithdrawingIssueId(null);
+  }, []);
 
   if (loadingWarranties) return <WarrantySkeleton />;
 
   return (
-    <div className="bg-amazon-bgSecondary min-h-screen text-amazon-text">
-      <div className="max-w-[900px] mx-auto px-4 md:px-8 py-12 lg:py-6">
-        <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-widest text-amazon-text mb-10 pb-4 border-b border-amazon-border">
-          Warranty & Return Requests
-        </h1>
+    <div className="bg-neutral-50 min-h-[calc(100vh-4rem)] text-neutral-900 font-sans">
+      <div className="max-w-4xl mx-auto px-4 md:px-8 py-8 lg:py-12">
+        <div className="mb-10 pb-6 border-b border-neutral-200">
+           <h1 className="text-3xl font-bold text-neutral-900 tracking-tight flex items-center gap-3">
+             <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hidden sm:block shadow-sm border border-blue-100">
+               <ShieldCheck className="w-6 h-6" />
+             </div>
+             Warranty & Returns
+           </h1>
+           <p className="mt-3 text-sm text-neutral-500 max-w-2xl leading-relaxed">
+             Manage and track your active warranty claims, refund requests, and product return sequences.
+           </p>
+        </div>
 
       {warrantyList.length === 0 ? (
         <EmptyWarranties />
       ) : (
         <>
-          <div className="space-y-5">
+          <div className="space-y-6">
             {warrantyList.map((req) => (
               <WarrantyCard
                 key={req.id}
                 request={req}
                 onShipClick={handleShipClick}
-                onWithdrawClick={handleWithdraw}
+                onWithdrawClick={handleWithdrawClick}
                 onEditClick={handleEditClick}
                 isWithdrawing={isWithdrawing}
               />
@@ -395,6 +429,51 @@ const MyWarrantiesPage: FC = () => {
         issue={selectedUpdateIssue}
         onSuccess={handleUpdateSuccess}
       />
+
+      {/* Withdraw Confirmation Modal */}
+      {isWithdrawModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl border border-neutral-100 max-w-[420px] w-full overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="px-6 py-8">
+              <div className="flex items-center justify-center mb-5">
+                <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center border border-red-100">
+                  <AlertTriangle className="w-8 h-8 text-red-600" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 text-center mb-3">
+                Confirm Withdrawal
+              </h3>
+              <p className="text-sm text-neutral-500 text-center leading-relaxed">
+                Are you sure you want to withdraw this warranty request? This action will permanently cancel the request process.
+              </p>
+            </div>
+            
+            <div className="px-6 py-5 bg-neutral-50 border-t border-neutral-100 flex items-center gap-3">
+              <button
+                onClick={handleCancelWithdraw}
+                disabled={isWithdrawing}
+                className="flex-1 py-3 bg-white border border-neutral-200 rounded-xl text-sm font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors disabled:opacity-50 shadow-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmWithdraw}
+                disabled={isWithdrawing}
+                className="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50 shadow-sm active:scale-[0.98]"
+              >
+                {isWithdrawing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Processing
+                  </>
+                ) : (
+                  "Withdraw claim"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );

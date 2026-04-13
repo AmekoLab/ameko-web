@@ -165,10 +165,10 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
       if (res.success && res.data) {
         setCurrentPost((prev) => ({ ...prev, title: res.data.title }));
         setIsEditing(false);
-        toast.success("Cập nhật bài viết thành công!");
+        toast.success("Update post successfully!");
       }
     } catch {
-      toast.error("Không thể cập nhật bài viết lúc này");
+      toast.error("Failed to update post");
     } finally {
       setIsUpdating(false);
     }

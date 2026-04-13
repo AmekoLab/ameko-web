@@ -1,6 +1,6 @@
 import { AuthWrapper } from "@/src/wrapper/AuthWrapper";
 import { Header } from "../../components/Header/Header";
-import "../globals.css";
+
 import { ReactNode } from "react";
 import { Footer } from "@/src/components/Footer/Footer";
 import LayoutWrapper from "@/src/wrapper/LayoutWrapper";
@@ -13,11 +13,6 @@ const oswald = Oswald({
   variable: "--font-oswald",
 });
 
-const inter = Inter({
-  subsets: ["latin", "vietnamese"],
-  display: "swap",
-  variable: "--font-inter",
-});
 
 export const metadata = {
   title: "AMEKO - Profile",
@@ -29,18 +24,16 @@ export default function UserLayout({ children }: { children: ReactNode }) {
     <LayoutWrapper>
       <AuthWrapper allowedRoles={["Customer", "Shop", "Admin"]}>
         <div
-          className={`flex flex-col min-h-screen bg-black ${inter.className} ${oswald.variable}`}
+          className={`flex flex-col min-h-screen bg-amazon-bgSecondary text-amazon-text font-sans ${oswald.variable}`}
         >
-          <div className={`${oswald.className} sticky top-0 z-50 w-full`}>
+          <div className="sticky top-0 z-40">
             <Header />
           </div>
 
           <div className="flex flex-1 min-h-0">
             {/* Main Content */}
 
-            <main className="flex-1 p-6 bg-black overflow-auto">
-              {children}
-            </main>
+            <main className="flex-grow">{children}</main>
           </div>
 
           {/* <Footer /> */}
