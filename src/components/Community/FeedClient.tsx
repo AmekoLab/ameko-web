@@ -35,7 +35,7 @@ export default function FeedClient({
         setHasMore(response.data.hasMore);
       } catch (err) {
         console.error(err);
-        setError("Không thể tải bài viết. Vui lòng thử lại.");
+        setError("Failed to load posts. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -78,7 +78,7 @@ export default function FeedClient({
       setHasMore(response.data.hasMore);
     } catch (err) {
       console.error(err);
-      setError("Không thể tải bài viết. Vui lòng thử lại.");
+      setError("Failed to load posts. Please try again.");
     } finally {
       setIsLoading(false);
     }

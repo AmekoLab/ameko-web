@@ -193,6 +193,14 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
 
   const isShop = !!post.shopId || post.role === "Shop";
 
+  const postDisplayName = (() => {
+    if (post.role === "Admin") return "Admin";
+    if (isShop) {
+      return (post as any).shopName  || post.username || post.userId;
+    }
+    return post.fullName || post.username || post.userId;
+  })();
+
   return (
     <>
       {/* 🔥 5. Render Modal Component ở ngoài cùng (sử dụng React Portal gián tiếp nhờ fixed position) */}
@@ -222,14 +230,14 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                       post.avatarUrl ||
                       "https://res.cloudinary.com/doezwafgz/image/upload/v1765602783/a0a1d1831b40575009c07fad4634ef52_y23lze.jpg"
                     }
-                    alt={post.fullName || post.username || post.userId}
+                    alt={postDisplayName}
                     fill
                   />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-lg text-amazon-text group-hover:underline">
-                      {post.username || post.fullName || post.userId}
+                      {postDisplayName}
                     </span>
                     <div title="Verified Shop">
                       <Store className="w-4 h-4 text-amazon-btnSecondary" />
@@ -253,14 +261,14 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                       post.avatarUrl ||
                       "https://res.cloudinary.com/doezwafgz/image/upload/v1765602783/a0a1d1831b40575009c07fad4634ef52_y23lze.jpg"
                     }
-                    alt={post.fullName || post.username || post.userId}
+                    alt={postDisplayName}
                     fill
                   />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm text-amazon-text">
-                      {post.fullName || post.username || post.userId}
+                      {postDisplayName}
                     </span>
                     {post.product?.isAvailable && (
                       <span className="bg-[#ce2a32] text-white text-[9px] px-1.5 py-0.5 rounded-sm font-bold uppercase tracking-wider">

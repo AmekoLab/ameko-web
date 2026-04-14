@@ -36,6 +36,22 @@ api.interceptors.response.use(
     return response.data;
   },
   async (error: AxiosError) => {
+    if (error.code === 'ECONNABORTED' || (error.message && error.message.includes('timeout'))) {
+      return Promise.reject({
+        success: false,
+        message: "Network is unstable or server is not responding. Please try again later!",
+        errors: "TIMEOUT"
+      });
+    }
+
+    if (error.message === 'Network Error') {
+      return Promise.reject({
+        success: false,
+        message: "Disconnected from network! Please check your connection!",
+        errors: "NETWORK_ERROR"
+      });
+    }
+
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
