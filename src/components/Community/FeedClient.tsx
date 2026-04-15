@@ -6,6 +6,7 @@ import { Post } from "@/src/types/social.types";
 import { PostCard } from "./PostCard";
 import { PostSkeleton } from "./PostSkeleton";
 import { RefreshCcw } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function FeedClient({
   initialPosts = [],
@@ -19,6 +20,7 @@ export default function FeedClient({
   const [error, setError] = useState<string | null>(null);
   const [, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState<boolean>(false);
+  const t = useTranslations("FeedClient");
 
   useEffect(() => {
     const fetchFeed = async () => {
@@ -35,7 +37,7 @@ export default function FeedClient({
         setHasMore(response.data.hasMore);
       } catch (err) {
         console.error(err);
-        setError("Failed to load posts. Please try again.");
+        setError(t("errorLoad"));
       } finally {
         setIsLoading(false);
       }
@@ -78,7 +80,7 @@ export default function FeedClient({
       setHasMore(response.data.hasMore);
     } catch (err) {
       console.error(err);
-      setError("Failed to load posts. Please try again.");
+      setError(t("errorLoad"));
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +106,7 @@ export default function FeedClient({
             onClick={retry}
             className="inline-flex items-center gap-2 bg-white border border-amazon-border text-amazon-text px-4 py-2 rounded-md text-xl font-bold uppercase hover:bg-neutral-50 transition-colors"
           >
-            <RefreshCcw className="w-3 h-3" /> Try Again
+            <RefreshCcw className="w-3 h-3" /> {t("tryAgain")}
           </button>
         </div>
       )}
@@ -112,7 +114,7 @@ export default function FeedClient({
       {!hasMore && !isLoading && (
         <div className="py-6 text-center opacity-50">
           <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">
-            End of Feed
+            {t("endOfFeed")}
           </p>
         </div>
       )}

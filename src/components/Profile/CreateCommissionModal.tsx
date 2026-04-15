@@ -8,30 +8,34 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/src/store/index";
 import { createCommissionRequest } from "@/src/store/slices/commissionSlice";
 import { uploadImage } from "@/src/utils/uploadImage";
+
 import { toast } from "react-toastify";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 
-const commissionSchema = z
-  .object({
-    title: z.string().min(1, "Title cannot be empty"),
-    layout: z.string().min(1, "Please specify a layout"),
-    switchPref: z.string().min(1, "Please specify switch preferences"),
-    keycapPref: z.string().min(1, "Please specify keycap preferences"),
-    casePlatePref: z.string().min(1, "Please specify case & plate preferences"),
-    additionalNotes: z.string().optional(),
-    quantity: z.number().min(1, "Minimum quantity is 1"),
-    minBudget: z.number().min(0, "Minimum budget must be >= 0"),
-    maxBudget: z.number().min(0, "Maximum budget must be >= 0"),
-    referenceImages: z.string().min(1, "Please upload a reference image"),
-    shopResponseWindowHours: z.number().min(24),
-    customerResponseWindowHours: z.number().min(24),
-  })
-  .refine((data) => data.maxBudget > data.minBudget, {
-    message: "Maximum budget must be greater than minimum budget",
-    path: ["maxBudget"],
-  });
+const getCommissionSchema = (t: any) =>
+  z
+    .object({
+      title: z.string().min(1, t("valEmptyTitle")),
+      layout: z.string().min(1, t("valEmptyLayout")),
+      switchPref: z.string().min(1, t("valEmptySwitch")),
+      keycapPref: z.string().min(1, t("valEmptyKeycap")),
+      casePlatePref: z.string().min(1, t("valEmptyCase")),
+      additionalNotes: z.string().optional(),
+      quantity: z.number().min(1, t("valMinQuantity")),
+      minBudget: z.number().min(0, t("valMinBudget")),
+      maxBudget: z.number().min(0, t("valMaxBudget")),
+      referenceImages: z.string().min(1, t("valEmptyImage")),
+      shopResponseWindowHours: z.number().min(24),
+      customerResponseWindowHours: z.number().min(24),
+    })
+    .refine((data) => data.maxBudget > data.minBudget, {
+      message: t("valBudgetMismatch"),
+      path: ["maxBudget"],
+    });
 
-type CommissionFormData = z.infer<typeof commissionSchema>;
+type CommissionFormData = z.infer<ReturnType<typeof getCommissionSchema>>;
 
 interface CreateCommissionModalProps {
   isOpen: boolean;
@@ -47,6 +51,8 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
   onSuccess,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const t = useTranslations("CreateCommissionModal");
+  const commissionSchema = useMemo(() => getCommissionSchema(t), [t]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -86,7 +92,7 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
       setValue("referenceImages", url, { shouldValidate: true });
       setPreviewUrl(url);
     } catch {
-      toast.error("Upload image failed, please try again");
+      toast.error(t("errorImageUpload"));
     } finally {
       setIsUploading(false);
     }
@@ -120,13 +126,13 @@ Additional Notes: ${data.additionalNotes || "None"}
         }),
       ).unwrap();
 
-      toast.success(isDraft ? "Saved as draft!" : "Request sent successfully!");
+      toast.success(isDraft ? t("successSaved") : t("successSent"));
       reset();
       setPreviewUrl(null);
       onClose();
       onSuccess?.();
     } catch (err) {
-      toast.error(typeof err === "string" ? err : "Failed to send request");
+      toast.error(typeof err === "string" ? err : t("errorSend"));
     }
   };
 
@@ -153,8 +159,8 @@ Additional Notes: ${data.additionalNotes || "None"}
         <div className="flex items-center justify-between px-6 py-5 border-b border-neutral-100 bg-white sticky top-0 z-10 hidden sm:flex">
           <h3 className="text-lg font-semibold text-neutral-900">
             {targetedShopId
-              ? "Send Quotation Request"
-              : "Post Public Request"}
+              ? t("titleSend")
+              : t("titlePost")}
           </h3>
           <button
             onClick={handleClose}
@@ -167,7 +173,7 @@ Additional Notes: ${data.additionalNotes || "None"}
         {/* Mobile Header (Shows only on small screens) */}
         <div className="flex items-center justify-between px-5 pt-5 pb-2 sm:hidden bg-white">
            <h3 className="text-lg font-semibold text-neutral-900">
-             {targetedShopId ? "Send Request" : "Post to Market"}
+             {targetedShopId ? t("titleSendMobile") : t("titlePostMobile")}
            </h3>
            <button onClick={handleClose} className="p-1 text-neutral-400 bg-neutral-50 rounded-full"><X className="w-5 h-5" /></button>
         </div>
@@ -180,11 +186,11 @@ Additional Notes: ${data.additionalNotes || "None"}
           {/* Title */}
           <div>
             <label className="block text-sm font-semibold text-neutral-900 mb-2">
-              Request Title <span className="text-red-500">*</span>
+              {t("requestTitle")} <span className="text-red-500">*</span>
             </label>
             <input
               {...register("title")}
-              placeholder="E.g.: Custom Alice Build with Oil Kings"
+              placeholder={t("titlePlaceholder")}
               className={`w-full border ${errors.title ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "border-neutral-200 focus:border-neutral-900 focus:ring-neutral-900"} bg-white text-neutral-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-colors`}
             />
             {errors.title && (
@@ -198,20 +204,20 @@ Additional Notes: ${data.additionalNotes || "None"}
             {/* Layout */}
             <div>
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Layout Preference <span className="text-red-500">*</span>
+                {t("layoutPref")} <span className="text-red-500">*</span>
               </label>
               <select
                 {...register("layout")}
                 className={`w-full border ${errors.layout ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "border-neutral-200 focus:border-neutral-900 focus:ring-neutral-900"} bg-white text-neutral-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-colors appearance-none cursor-pointer`}
               >
-                <option value="">Select layout</option>
+                <option value="">{t("selectLayout")}</option>
                 <option value="60%">60%</option>
                 <option value="65%">65%</option>
                 <option value="75%">75%</option>
                 <option value="TKL (80%)">TKL (80%)</option>
                 <option value="Full-size (100%)">Full-size (100%)</option>
                 <option value="Alice/Arisu">Alice/Arisu</option>
-                <option value="Other">Other</option>
+                <option value="Other">{t("other")}</option>
               </select>
               {errors.layout && (
                 <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
@@ -223,7 +229,7 @@ Additional Notes: ${data.additionalNotes || "None"}
              {/* Quantity */}
             <div>
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Quantity <span className="text-red-500">*</span>
+                {t("quantity")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -240,15 +246,15 @@ Additional Notes: ${data.additionalNotes || "None"}
           </div>
 
           <div className="space-y-6 bg-neutral-50 p-5 rounded-2xl border border-neutral-100">
-            <h4 className="text-sm font-bold text-neutral-900 uppercase tracking-widest border-b border-neutral-200 pb-2">Component Details</h4>
+            <h4 className="text-sm font-bold text-neutral-900 uppercase tracking-widest border-b border-neutral-200 pb-2">{t("componentDetails")}</h4>
             {/* Switch Preferences */}
             <div>
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Switches <span className="text-red-500">*</span>
+                {t("switches")} <span className="text-red-500">*</span>
               </label>
               <input
                 {...register("switchPref")}
-                placeholder="e.g., Thocky linear, tactile, silent, etc."
+                placeholder={t("switchPlaceholder")}
                 className={`w-full border ${errors.switchPref ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "border-neutral-200 focus:border-neutral-900 focus:ring-neutral-900"} bg-white text-neutral-900 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-colors`}
               />
               {errors.switchPref && (
@@ -259,11 +265,11 @@ Additional Notes: ${data.additionalNotes || "None"}
             {/* Keycap Preferences */}
             <div>
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Keycaps <span className="text-red-500">*</span>
+                {t("keycaps")} <span className="text-red-500">*</span>
               </label>
               <input
                 {...register("keycapPref")}
-                placeholder="e.g., Cherry profile, PBT material, dark colors"
+                placeholder={t("keycapPlaceholder")}
                 className={`w-full border ${errors.keycapPref ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "border-neutral-200 focus:border-neutral-900 focus:ring-neutral-900"} bg-white text-neutral-900 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-colors`}
               />
               {errors.keycapPref && (
@@ -274,11 +280,11 @@ Additional Notes: ${data.additionalNotes || "None"}
             {/* Case & Plate */}
             <div>
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Case & Plate <span className="text-red-500">*</span>
+                {t("casePlate")} <span className="text-red-500">*</span>
               </label>
               <input
                 {...register("casePlatePref")}
-                placeholder="e.g., Aluminum case (black), FR4 plate"
+                placeholder={t("casePlatePlaceholder")}
                 className={`w-full border ${errors.casePlatePref ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "border-neutral-200 focus:border-neutral-900 focus:ring-neutral-900"} bg-white text-neutral-900 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-colors`}
               />
               {errors.casePlatePref && (
@@ -290,12 +296,12 @@ Additional Notes: ${data.additionalNotes || "None"}
           {/* Additional Notes */}
           <div>
             <label className="block text-sm font-semibold text-neutral-900 mb-2">
-              Additional Notes
+              {t("additionalNotes")}
             </label>
             <textarea
               {...register("additionalNotes")}
               rows={2}
-              placeholder="Any other specific requirements?"
+              placeholder={t("additionalNotesPlaceholder")}
               className="w-full border border-neutral-200 bg-white text-neutral-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-900 focus:border-neutral-900 transition-colors resize-none placeholder-neutral-400"
             />
           </div>
@@ -304,7 +310,7 @@ Additional Notes: ${data.additionalNotes || "None"}
           <div className="grid grid-cols-2 gap-4 sm:gap-6 border-t border-neutral-100 pt-6">
             <div>
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Min Budget (VND)
+                {t("minBudget")}
               </label>
               <input
                 type="number"
@@ -319,7 +325,7 @@ Additional Notes: ${data.additionalNotes || "None"}
             </div>
             <div>
                <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Max Budget (VND)
+                {t("maxBudget")}
               </label>
               <input
                 type="number"
@@ -340,7 +346,7 @@ Additional Notes: ${data.additionalNotes || "None"}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Shop response window (hours)
+                {t("shopResponseWindow")}
               </label>
               <input
                 type="number"
@@ -357,7 +363,7 @@ Additional Notes: ${data.additionalNotes || "None"}
             </div>
             <div>
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Customer response window (hours)
+                {t("customerResponseWindow")}
               </label>
               <input
                 type="number"
@@ -377,7 +383,7 @@ Additional Notes: ${data.additionalNotes || "None"}
           {/* Image Upload */}
           <div>
             <label className="block text-sm font-semibold text-neutral-900 mb-2">
-              Reference image <span className="text-red-500">*</span>
+              {t("referenceImage")} <span className="text-red-500">*</span>
             </label>
             <input
               ref={fileInputRef}
@@ -420,7 +426,7 @@ Additional Notes: ${data.additionalNotes || "None"}
                   <Upload className={`w-8 h-8 ${errors.referenceImages ? "text-red-400" : "text-neutral-400"}`} />
                 )}
                 <span className={`text-sm font-medium ${errors.referenceImages ? "text-red-600" : ""}`}>
-                  {isUploading ? "Uploading image..." : "Click to select image"}
+                  {isUploading ? t("uploadingImage") : t("clickToSelectImage")}
                 </span>
               </button>
             )}
@@ -439,10 +445,10 @@ Additional Notes: ${data.additionalNotes || "None"}
             >
               {isSubmitting && submitType === "draft" ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                  <Loader2 className="w-4 h-4 animate-spin" /> {t("saving")}
                 </>
               ) : (
-                "Save Draft"
+                t("saveDraft")
               )}
             </button>
             <button
@@ -453,12 +459,12 @@ Additional Notes: ${data.additionalNotes || "None"}
             >
               {isSubmitting && submitType === "send" ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Sending...
+                  <Loader2 className="w-4 h-4 animate-spin" /> {t("sending")}
                 </>
               ) : targetedShopId ? (
-                "Send Request"
+                t("sendRequestBtn")
               ) : (
-                "Post to Pool"
+                t("postToPoolBtn")
               )}
             </button>
           </div>

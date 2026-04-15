@@ -50,21 +50,20 @@ export default function GlobalChatInitializer() {
   // ── Step 2: Connect socket & join SignalR groups ─────────────────────────
   // Runs independently after auth is confirmed. Once connected, joins all
   // existing conversation groups so real-time messages are delivered.
-  useEffect(() => {
+ useEffect(() => {
     if (!isInitialized) return;
 
     if (isAuthenticated) {
       const token = typeof window !== "undefined" ? (localStorage.getItem("token") ?? "") : "";
       if (!token) return;
+      
+      // Nếu đang kết nối rồi thì không làm gì cả
       if (isConnectedRef.current) return;
       isConnectedRef.current = true;
 
       (async () => {
         try {
           await socketService.connect(token, dispatch);
-          // After connecting, join all conversation groups. We read the slice
-          // state via a one-time selector result — the fetch may have already
-          // finished by the time the socket connects.
           const result = await dispatch(fetchInitialConversations());
           const conversations =
             (result.payload as { conversationId: number }[] | undefined) ?? [];
@@ -78,14 +77,13 @@ export default function GlobalChatInitializer() {
         }
       })();
     } else {
+      // Chỉ disconnect khi isAuthenticated = false (Đăng xuất)
       socketService.disconnect();
       isConnectedRef.current = false;
     }
 
-    return () => {
-      socketService.disconnect();
-      isConnectedRef.current = false;
-    };
+    // ❌ XÓA hàm return () => socketService.disconnect() ở đây.
+    // Chúng ta muốn socket sống xuyên suốt quá trình chuyển trang/đổi ngôn ngữ.
   }, [isAuthenticated, isInitialized, dispatch]);
 
   // ── Join group whenever a conversation is newly opened ───────────────────

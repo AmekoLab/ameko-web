@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "@/src/i18n/routing";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { logoutUser } from "@/src/store/action/authActions";
 import {
@@ -24,11 +24,14 @@ import {
   LogOut,
   LucideIcon,
 } from "lucide-react";
+import LanguageSwitcher from "@/src/components/LanguageSwitcher";
+import { useTranslations } from "next-intl";
 
 type MenuItem = { name: string; path: string };
-type MenuGroup = { groupName: string; icon: LucideIcon; items: MenuItem[] };
+type MenuGroup = { groupName: string; groupKey: string; icon: LucideIcon; items: MenuItem[] };
 
 export default function Sidebar({ role = "staff" }: { role?: string }) {
+  const t = useTranslations("Sidebar");
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     {},
@@ -56,99 +59,111 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
   // 1. Define menus
   const commonMenu: MenuGroup[] = [
     {
-      groupName: "Overview",
+      groupName: t("group_overview"),
+      groupKey: "overview",
       icon: Home,
-      items: [{ name: "Home", path: "/" }],
+      items: [{ name: t("home"), path: "/" }],
     },
   ];
 
   const adminMenu: MenuGroup[] = [
     {
-      groupName: "Dashboard",
+      groupName: t("group_dashboard"),
+      groupKey: "dashboard",
       icon: LayoutDashboard,
-      items: [{ name: "Admin Dashboard", path: "/admin/dashboard" }],
+      items: [{ name: t("adminDashboard"), path: "/admin/dashboard" }],
     },
     {
-      groupName: "User Management",
+      groupName: t("group_userManagement"),
+      groupKey: "userManagement",
       icon: Users,
       items: [
-        { name: "Users", path: "/admin/users" },
-        { name: "Shops", path: "/admin/shop" },
+        { name: t("users"), path: "/admin/users" },
+        { name: t("shops"), path: "/admin/shop" },
       ],
     },
     {
-      groupName: "Catalog",
+      groupName: t("group_catalog"),
+      groupKey: "catalog",
       icon: Package,
-      items: [{ name: "Categories", path: "/admin/categories" }],
+      items: [{ name: t("categories"), path: "/admin/categories" }],
     },
     {
-      groupName: "Financial",
+      groupName: t("group_financial"),
+      groupKey: "financial",
       icon: Wallet,
       items: [
-        { name: "Wallet", path: "/admin/wallet" },
-        { name: "Pending Withdrawals", path: "/admin/pending-withdrawals" },
-        { name: "Transactions", path: "/admin/transactions" },
-        { name: "Vouchers", path: "/admin/vouchers" },
+        { name: t("wallet"), path: "/admin/wallet" },
+        { name: t("pendingWithdrawals"), path: "/admin/pending-withdrawals" },
+        { name: t("transactions"), path: "/admin/transactions" },
+        { name: t("vouchers"), path: "/admin/vouchers" },
       ],
     },
     {
-      groupName: "Support",
+      groupName: t("group_support"),
+      groupKey: "support",
       icon: ShieldAlert,
-      items: [{ name: "Warranty Requests", path: "/admin/warranty-requests" }],
+      items: [{ name: t("warrantyRequests"), path: "/admin/warranty-requests" }],
     },
   ];
 
   const userMenu: MenuGroup[] = [
     {
-      groupName: "Management",
+      groupName: t("group_management"),
+      groupKey: "management",
       icon: CheckSquare,
       items: [
-        { name: "Tasks", path: "/user/tasks" },
-        { name: "Reports", path: "/user/reports" },
+        { name: t("tasks"), path: "/user/tasks" },
+        { name: t("reports"), path: "/user/reports" },
       ],
     },
   ];
 
   const shopMenu: MenuGroup[] = [
     {
-      groupName: "Dashboard",
+      groupName: t("group_dashboard"),
+      groupKey: "shopDashboard",
       icon: LayoutDashboard,
-      items: [{ name: "Shop Dashboard", path: "/shop/dashboard" }],
+      items: [{ name: t("shopDashboard"), path: "/shop/dashboard" }],
     },
     {
-      groupName: "Catalog",
+      groupName: t("group_catalog"),
+      groupKey: "shopCatalog",
       icon: Package,
       items: [
-        { name: "Categories", path: "/shop/categories" },
-        { name: "Parts", path: "/shop/parts" },
-        { name: "Assembled Products", path: "/shop/assembled-products" },
+        { name: t("categories"), path: "/shop/categories" },
+        { name: t("parts"), path: "/shop/parts" },
+        { name: t("assembledProducts"), path: "/shop/assembled-products" },
       ],
     },
     {
-      groupName: "Sales",
+      groupName: t("group_sales"),
+      groupKey: "sales",
       icon: ShoppingCart,
       items: [
-        { name: "Orders", path: "/shop/orders" },
+        { name: t("orders"), path: "/shop/orders" },
         // { name: "Wallet", path: "/shop/wallet" },
-        { name: "Vouchers", path: "/shop/vouchers" },
+        { name: t("vouchers"), path: "/shop/vouchers" },
       ],
     },
     {
-      groupName: "Commissions",
+      groupName: t("group_commissions"),
+      groupKey: "commissions",
       icon: FileText,
       items: [
-        { name: "Commissions", path: "/shop/commissions" },
-        { name: "Quote Management", path: "/shop/quoted-commissions" },
+        { name: t("commissions"), path: "/shop/commissions" },
+        { name: t("quoteManagement"), path: "/shop/quoted-commissions" },
       ],
     },
     {
-      groupName: "System",
+      groupName: t("group_system"),
+      groupKey: "system",
       icon: Settings,
       items: [
-        { name: "Shop Settings", path: "/shop/profile" },
-        { name: "Assembly Templates", path: "/shop/assembly-templates" },
-        { name: "Warranty Requests", path: "/shop/warranty-requests" },
-        { name: "Cancel Requests", path: "/shop/cancel-requests" },
+        { name: t("shopSettings"), path: "/shop/profile" },
+        { name: t("assemblyTemplates"), path: "/shop/assembly-templates" },
+        { name: t("warrantyRequests"), path: "/shop/warranty-requests" },
+        { name: t("cancelRequests"), path: "/shop/cancel-requests" },
       ],
     },
   ];
@@ -175,15 +190,15 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
     if (activeGroup) {
       setExpandedGroups((prev) => ({
         ...prev,
-        [activeGroup.groupName]: true,
+        [activeGroup.groupKey]: true,
       }));
     }
   }, [pathname, role]);
 
-  const toggleGroup = (groupName: string) => {
+  const toggleGroup = (groupKey: string) => {
     setExpandedGroups((prev) => ({
       ...prev,
-      [groupName]: !prev[groupName],
+      [groupKey]: !prev[groupKey],
     }));
   };
 
@@ -200,37 +215,57 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
       }`}
     >
       {/* User Profile Block */}
-      <div className="border-b border-amazon-border p-4">
-        {isCollapsed ? (
-          <div className="w-8 h-8 rounded-full bg-amazon-btnSecondary text-amazon-text flex items-center justify-center font-bold text-sm mx-auto shadow-sm">
-            {displayName ? displayName.charAt(0).toUpperCase() : "A"}
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-amazon-btnSecondary text-amazon-text flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
-              {displayName ? displayName.charAt(0).toUpperCase() : "A"}
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-white text-sm font-bold truncate">Hi, {displayName}</span>
-              <span className="text-white/60 text-[11px] font-medium uppercase tracking-wider truncate">
-                {user?.role || role}
-              </span>
-            </div>
-          </div>
-        )}
+     <div className="border-b border-amazon-border p-4">
+  {isCollapsed ? (
+    <div className="flex flex-col items-center gap-2">
+      <div className="w-8 h-8 rounded-full bg-amazon-btnSecondary text-amazon-text flex items-center justify-center font-bold text-sm mx-auto shadow-sm">
+        {displayName ? displayName.charAt(0).toUpperCase() : "A"}
       </div>
+      <div
+        className="w-8 h-8 rounded-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
+        title={t("language")}
+        onClick={() => setIsCollapsed(false)}
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 014 9 15 15 0 01-4 9 15 15 0 01-4-9 15 15 0 014-9z" />
+        </svg>
+      </div>
+    </div>
+  ) : (
+    <div className="flex items-center gap-3">
+      <div className="w-8 h-8 rounded-full bg-amazon-btnSecondary text-amazon-text flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+        {displayName ? displayName.charAt(0).toUpperCase() : "A"}
+      </div>
+      <div className="flex flex-col min-w-0 flex-1">
+        <span className="text-white text-sm font-bold truncate">
+          {t("hiName", { name: displayName })}
+        </span>
+        <span className="text-white/60 text-[11px] font-medium uppercase tracking-wider truncate">
+          {user?.role || role}
+        </span>
+      </div>
+      {/* LanguageSwitcher sits at the end of the same row */}
+      <div className="shrink-0">
+        <LanguageSwitcher />
+      </div>
+    </div>
+  )}
+</div>
+
+      
 
       {/* Menu Area */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar p-4 flex flex-col gap-2">
         {menu.map((group) => {
           const Icon = group.icon;
-          const isExpanded = expandedGroups[group.groupName] || false;
+          const isExpanded = expandedGroups[group.groupKey] || false;
           const isGroupActive = group.items.some((item) =>
             isItemActive(item.path),
           );
 
           return (
-            <div key={group.groupName} className="flex flex-col mb-1">
+            <div key={group.groupKey} className="flex flex-col mb-1">
               {/* Group Header */}
               {isCollapsed ? (
                 // Collapsed State: Icon only, navigate to first item or expand
@@ -244,7 +279,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
                     setIsCollapsed(false);
                     setExpandedGroups((prev) => ({
                       ...prev,
-                      [group.groupName]: true,
+                      [group.groupKey]: true,
                     }));
                   }}
                   title={group.groupName}
@@ -254,7 +289,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
               ) : (
                 // Expanded State: Full header with Accordion setup
                 <button
-                  onClick={() => toggleGroup(group.groupName)}
+                  onClick={() => toggleGroup(group.groupKey)}
                   className={`flex items-center justify-between p-3 rounded-sm transition-colors text-sm ${
                     isGroupActive && !isExpanded
                       ? "text-white font-bold"
@@ -314,26 +349,28 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
             className={`w-full flex items-center gap-2.5 rounded-sm transition-colors text-red-300 hover:bg-red-500/10 hover:text-red-400 ${
               isCollapsed ? "justify-center p-2" : "px-3 py-2 text-sm font-medium"
             }`}
-            title="Logout"
+            title={t("logout")}
           >
             <LogOut className="w-4.5 h-4.5" />
-            {!isCollapsed && <span>Logout</span>}
+            {!isCollapsed && <span>{t("logout")}</span>}
           </button>
         </div>
+
+       
 
         {/* Collapse Toggle */}
         <div className="px-4 pb-3 pt-1 flex justify-center items-center">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="w-full flex items-center justify-center p-2 rounded-sm text-white hover:text-amazon-text hover:bg-neutral-50 transition-colors"
-            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            title={isCollapsed ? t("expandSidebar") : t("collapseSidebar")}
           >
             {isCollapsed ? (
               <ChevronRight className="w-5 h-5" />
             ) : (
               <div className="flex items-center gap-2 text-sm font-medium">
                 <ChevronLeft className="w-4 h-4" />
-                Collapse Sidebar
+                {t("collapseSidebar")}
               </div>
             )}
           </button>

@@ -1,5 +1,5 @@
 "use client";
-import { FC, useRef, useState, useEffect } from "react";
+import { FC, useRef, useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,24 +11,32 @@ import { CommissionRequest } from "@/src/types/commission.types";
 import { uploadImage } from "@/src/utils/uploadImage";
 import { toast } from "react-toastify";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
-const editSchema = z
-  .object({
-    title: z.string().min(1, "Title cannot be empty"),
-    description: z.string().min(1, "Description cannot be empty"),
-    quantity: z.number().min(1, "Minimum quantity is 1"),
-    minBudget: z.number().min(0, "Minimum budget must be >= 0"),
-    maxBudget: z.number().min(0, "Maximum budget must be >= 0"),
-    referenceImages: z.string().min(1, "Please upload a reference image"),
-    shopResponseWindowHours: z.number().min(24),
-    customerResponseWindowHours: z.number().min(24),
-  })
-  .refine((data) => data.maxBudget > data.minBudget, {
-    message: "Maximum budget must be greater than minimum budget",
-    path: ["maxBudget"],
-  });
+const createEditSchema = (t: ReturnType<typeof useTranslations>) =>
+  z
+    .object({
+      title: z.string().min(1, t("validation.titleRequired")),
+      description: z.string().min(1, t("validation.descriptionRequired")),
+      quantity: z.number().min(1, t("validation.quantityMin", { min: 1 })),
+      minBudget: z.number().min(0, t("validation.minBudgetMin", { min: 0 })),
+      maxBudget: z.number().min(0, t("validation.maxBudgetMin", { min: 0 })),
+      referenceImages: z
+        .string()
+        .min(1, t("validation.referenceImageRequired")),
+      shopResponseWindowHours: z
+        .number()
+        .min(24, t("validation.responseWindowMin", { hours: 24 })),
+      customerResponseWindowHours: z
+        .number()
+        .min(24, t("validation.responseWindowMin", { hours: 24 })),
+    })
+    .refine((data) => data.maxBudget > data.minBudget, {
+      message: t("validation.maxBudgetGreaterThanMinBudget"),
+      path: ["maxBudget"],
+    });
 
-type EditFormData = z.infer<typeof editSchema>;
+type EditFormData = z.infer<ReturnType<typeof createEditSchema>>;
 
 interface EditCommissionModalProps {
   isOpen: boolean;
@@ -42,6 +50,9 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
   request,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const t = useTranslations("EditCommissionModal");
+  const tCommon = useTranslations("Common");
+  const editSchema = useMemo(() => createEditSchema(t), [t]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(
@@ -93,7 +104,7 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
       setValue("referenceImages", url, { shouldValidate: true });
       setPreviewUrl(url);
     } catch {
-      toast.error("Upload failed, please try again");
+      toast.error(t("uploadFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -120,7 +131,7 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
       // toast.success("Update successfully!");
       onClose();
     } catch (err) {
-      toast.error(typeof err === "string" ? err : "Update failed");
+      toast.error(typeof err === "string" ? err : t("updateFailed"));
     }
   };
 
@@ -144,22 +155,29 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-neutral-100 bg-white sticky top-0 z-10 hidden sm:flex">
           <h3 className="text-lg font-semibold text-neutral-900">
-            Edit Draft Request
+            {t("title")}
           </h3>
           <button
             onClick={handleClose}
+            aria-label={tCommon("close")}
             className="p-1.5 hover:bg-neutral-100 text-neutral-400 hover:text-neutral-800 rounded-lg transition-colors focus:outline-none"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
-        
+
         {/* Mobile Header (Shows only on small screens) */}
         <div className="flex items-center justify-between px-5 pt-5 pb-2 sm:hidden bg-white">
-           <h3 className="text-lg font-semibold text-neutral-900">
-             Edit Draft Request
-           </h3>
-           <button onClick={handleClose} className="p-1 text-neutral-400 bg-neutral-50 rounded-full"><X className="w-5 h-5" /></button>
+          <h3 className="text-lg font-semibold text-neutral-900">
+            {t("title")}
+          </h3>
+          <button
+            onClick={handleClose}
+            aria-label={tCommon("close")}
+            className="p-1 text-neutral-400 bg-neutral-50 rounded-full"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Form */}
@@ -170,16 +188,16 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
           {/* Title */}
           <div>
             <label className="block text-sm font-semibold text-neutral-900 mb-2">
-              Request Title <span className="text-red-500">*</span>
+              {t("requestTitle")} <span className="text-red-500">*</span>
             </label>
             <input
               {...register("title")}
-              placeholder="E.g.: Custom Alice Build with Oil Kings"
+              placeholder={t("requestTitlePlaceholder")}
               className={`w-full border ${errors.title ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "border-neutral-200 focus:border-neutral-900 focus:ring-neutral-900"} bg-white text-neutral-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-colors`}
             />
             {errors.title && (
               <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3"/> {errors.title.message}
+                <AlertTriangle className="w-3 h-3" /> {errors.title.message}
               </p>
             )}
           </div>
@@ -187,17 +205,18 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
           {/* Description */}
           <div>
             <label className="block text-sm font-semibold text-neutral-900 mb-2">
-              Detailed Description <span className="text-red-500">*</span>
+              {t("detailedDescription")} <span className="text-red-500">*</span>
             </label>
             <textarea
               {...register("description")}
               rows={4}
-              placeholder="Describe your request..."
+              placeholder={t("detailedDescriptionPlaceholder")}
               className={`w-full flex-1 min-h-[140px] border ${errors.description ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "border-neutral-200 focus:border-neutral-900 focus:ring-neutral-900"} bg-white text-neutral-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-colors resize-y placeholder-neutral-400 leading-relaxed`}
             />
             {errors.description && (
               <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
-                 <AlertTriangle className="w-3 h-3"/> {errors.description.message}
+                <AlertTriangle className="w-3 h-3" />{" "}
+                {errors.description.message}
               </p>
             )}
           </div>
@@ -205,7 +224,7 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
           {/* Quantity */}
           <div>
             <label className="block text-sm font-semibold text-neutral-900 mb-2">
-              Quantity <span className="text-red-500">*</span>
+              {tCommon("quantity")} <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
@@ -215,7 +234,7 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
             />
             {errors.quantity && (
               <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3"/> {errors.quantity.message}
+                <AlertTriangle className="w-3 h-3" /> {errors.quantity.message}
               </p>
             )}
           </div>
@@ -224,7 +243,7 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
           <div className="grid grid-cols-2 gap-4 sm:gap-6 border-t border-neutral-100 pt-6">
             <div>
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Min Budget (VND)
+                {t("minBudgetLabel")}
               </label>
               <input
                 type="number"
@@ -235,13 +254,14 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
               />
               {errors.minBudget && (
                 <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3"/> {errors.minBudget.message}
+                  <AlertTriangle className="w-3 h-3" />{" "}
+                  {errors.minBudget.message}
                 </p>
               )}
             </div>
             <div>
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Max Budget (VND)
+                {t("maxBudgetLabel")}
               </label>
               <input
                 type="number"
@@ -252,7 +272,8 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
               />
               {errors.maxBudget && (
                 <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3"/> {errors.maxBudget.message}
+                  <AlertTriangle className="w-3 h-3" />{" "}
+                  {errors.maxBudget.message}
                 </p>
               )}
             </div>
@@ -262,7 +283,7 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
           <div className="grid grid-cols-2 gap-4 sm:gap-6">
             <div>
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Shop Response Window (hrs)
+                {t("shopResponseWindowLabel")}
               </label>
               <input
                 type="number"
@@ -275,13 +296,14 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
               />
               {errors.shopResponseWindowHours && (
                 <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3"/> {errors.shopResponseWindowHours.message}
+                  <AlertTriangle className="w-3 h-3" />{" "}
+                  {errors.shopResponseWindowHours.message}
                 </p>
               )}
             </div>
             <div>
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Client Response Window (hrs)
+                {t("clientResponseWindowLabel")}
               </label>
               <input
                 type="number"
@@ -294,7 +316,8 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
               />
               {errors.customerResponseWindowHours && (
                 <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3"/> {errors.customerResponseWindowHours.message}
+                  <AlertTriangle className="w-3 h-3" />{" "}
+                  {errors.customerResponseWindowHours.message}
                 </p>
               )}
             </div>
@@ -303,7 +326,7 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
           {/* Image Upload */}
           <div>
             <label className="block text-sm font-semibold text-neutral-900 mb-2">
-              Reference Image <span className="text-red-500">*</span>
+              {t("referenceImage")} <span className="text-red-500">*</span>
             </label>
             <input
               ref={fileInputRef}
@@ -317,7 +340,7 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
               <div className="relative w-full h-48 rounded-2xl overflow-hidden border border-neutral-200 bg-neutral-50 shadow-inner group">
                 <Image
                   src={previewUrl}
-                  alt="Preview"
+                  alt={t("previewAlt")}
                   fill
                   className="object-cover transition-transform group-hover:scale-105"
                 />
@@ -343,16 +366,21 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
                 {isUploading ? (
                   <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
                 ) : (
-                  <Upload className={`w-8 h-8 ${errors.referenceImages ? "text-red-400" : "text-neutral-400"}`} />
+                  <Upload
+                    className={`w-8 h-8 ${errors.referenceImages ? "text-red-400" : "text-neutral-400"}`}
+                  />
                 )}
-                <span className={`text-sm font-medium ${errors.referenceImages ? "text-red-600" : ""}`}>
-                  {isUploading ? "Uploading image..." : "Click to select image"}
+                <span
+                  className={`text-sm font-medium ${errors.referenceImages ? "text-red-600" : ""}`}
+                >
+                  {isUploading ? t("uploadingImage") : t("clickToSelectImage")}
                 </span>
               </button>
             )}
             {errors.referenceImages && (
               <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3"/> {errors.referenceImages.message}
+                <AlertTriangle className="w-3 h-3" />{" "}
+                {errors.referenceImages.message}
               </p>
             )}
           </div>
@@ -366,10 +394,10 @@ export const EditCommissionModal: FC<EditCommissionModalProps> = ({
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                  <Loader2 className="w-4 h-4 animate-spin" /> {t("saving")}
                 </>
               ) : (
-                "Save Changes"
+                t("saveChanges")
               )}
             </button>
           </div>

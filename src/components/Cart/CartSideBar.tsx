@@ -25,6 +25,7 @@ import {
   Store,
   Tag,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
   setCartOpen,
@@ -41,8 +42,13 @@ import {
   setSelectedShopVouchers,
   selectSelectedSystemVoucherCode,
 } from "@/src/store/slices/voucherSlice";
-import { OrderItem, OrderItemComponent } from "@/src/types/order.types";
+import {
+  AppliedVoucherBreakdown,
+  OrderItem,
+  OrderItemComponent,
+} from "@/src/types/order.types";
 import { useRouter } from "next/navigation";
+import { usePathname } from "@/src/i18n/routing";
 import { toast } from "react-toastify";
 import { orderService } from "@/src/services/order.service";
 import { Voucher } from "@/src/services/voucher.service";
@@ -99,9 +105,10 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
     onUpdateQuantity,
     updatingQuantity,
   }) => {
+    const t = useTranslations("CartPage");
     const [expanded, setExpanded] = useState(false);
     const isCustom = item.isCustom && item.orderItemComponents.length > 0;
-    const isStrictCustomRequest = item.productName?.includes('Custom Request');
+    const isStrictCustomRequest = item.productName?.includes("Custom Request");
 
     const displayImage =
       item.productImage ||
@@ -121,7 +128,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
               checked={selected}
               onChange={() => onToggleSelect(item.orderItemId)}
               className="w-[16px] h-[16px] accent-neutral-900 cursor-pointer rounded"
-              aria-label={`Select ${item.productName}`}
+              aria-label={t("selectAriaLabel", { name: item.productName })}
             />
           </div>
 
@@ -159,9 +166,13 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
                   onClick={() =>
                     onUpdateQuantity(item.orderItemId, item.quantity - 1)
                   }
-                  disabled={isStrictCustomRequest || item.quantity <= 1 || updatingQuantity}
+                  disabled={
+                    isStrictCustomRequest ||
+                    item.quantity <= 1 ||
+                    updatingQuantity
+                  }
                   className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 rounded-l-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                  aria-label="Decrease quantity"
+                  aria-label={t("decreaseQuantity")}
                 >
                   <Minus className="w-3 h-3" />
                 </button>
@@ -176,9 +187,13 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
                   onClick={() =>
                     onUpdateQuantity(item.orderItemId, item.quantity + 1)
                   }
-                  disabled={isStrictCustomRequest || item.quantity >= 99 || updatingQuantity}
+                  disabled={
+                    isStrictCustomRequest ||
+                    item.quantity >= 99 ||
+                    updatingQuantity
+                  }
                   className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 rounded-r-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                  aria-label="Increase quantity"
+                  aria-label={t("increaseQuantity")}
                 >
                   <Plus className="w-3 h-3" />
                 </button>
@@ -187,7 +202,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
                 onClick={() => onRemove(item.orderItemId)}
                 disabled={removing}
                 className="text-neutral-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-all disabled:opacity-40 ml-auto"
-                aria-label={`Remove ${item.productName}`}
+                aria-label={t("removeAriaLabel", { name: item.productName })}
               >
                 {removing ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -205,11 +220,13 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
               >
                 {expanded ? (
                   <>
-                    Hide components <ChevronUp className="w-3.5 h-3.5" />
+                    {t("hideComponents")} <ChevronUp className="w-3.5 h-3.5" />
                   </>
                 ) : (
                   <>
-                    {item.orderItemComponents.length} components{" "}
+                    {t("sidebar.componentCount", {
+                      count: item.orderItemComponents.length,
+                    })}{" "}
                     <ChevronDown className="w-3.5 h-3.5" />
                   </>
                 )}
@@ -239,6 +256,9 @@ SidebarCartItem.displayName = "SidebarCartItem";
 // Main CartSidebar component
 // ═════════════════════════════════════════════════════════════
 export const CartSidebar: FC = memo(() => {
+  const t = useTranslations("CartPage");
+  const pathname = usePathname();
+  const isCheckoutPage = pathname?.includes("/checkout");
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isCartOpen, serverCart, serverCartLoading } = useAppSelector(
@@ -253,15 +273,14 @@ export const CartSidebar: FC = memo(() => {
   const selectedShopVoucherCodesMap = useAppSelector(
     (state) => state.voucher.selectedShopVoucherCodes,
   );
-  const applicableVouchers = useAppSelector(
-    (state) => state.voucher.applicableVouchers,
-  );
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   // Optimistic local items — updated immediately on quantity change so
   // useCartPreviewLogic receives fresh quantities without waiting for a
   // full server fetch to complete.
-  const [localItems, setLocalItems] = useState(() => serverCart?.orderItems ?? []);
+  const [localItems, setLocalItems] = useState(
+    () => serverCart?.orderItems ?? [],
+  );
 
   // Keep localItems in sync whenever the server cart updates
   useEffect(() => {
@@ -281,14 +300,14 @@ export const CartSidebar: FC = memo(() => {
       if (!map.has(key)) {
         map.set(key, {
           shopId: item.shopId,
-          shopName: item.shopName || "Shop",
+          shopName: item.shopName || t("shopFallbackName"),
           items: [],
         });
       }
       map.get(key)!.items.push(item);
     });
     return Array.from(map.values());
-  }, [items]);
+  }, [items, t]);
 
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [updatingQuantityId, setUpdatingQuantityId] = useState<string | null>(
@@ -337,14 +356,16 @@ export const CartSidebar: FC = memo(() => {
   const handleOpenSystemVoucherModal = useCallback(() => {
     setVoucherModal({
       isOpen: true,
-      title: "Chọn Ameko Voucher",
+      title: t("chooseAmekoVoucher"),
       vouchers: systemVouchers,
       subtotal: cartPreview?.totalCartSubTotal ?? 0,
       brandLabel: "Ameko",
-      selectedCodes: selectedSystemVoucherCode ? [selectedSystemVoucherCode] : [],
+      selectedCodes: selectedSystemVoucherCode
+        ? [selectedSystemVoucherCode]
+        : [],
       scope: { type: "system" },
     });
-  }, [systemVouchers, cartPreview, selectedSystemVoucherCode]);
+  }, [systemVouchers, cartPreview, selectedSystemVoucherCode, t]);
 
   const handleOpenShopVoucherModal = useCallback(
     (shopId: string, shopName: string) => {
@@ -356,7 +377,7 @@ export const CartSidebar: FC = memo(() => {
         .reduce((s, i) => s + i.totalPrice, 0);
       setVoucherModal({
         isOpen: true,
-        title: `Chọn Voucher từ ${shopName}`,
+        title: t("selectVoucherFrom", { shopName }),
         vouchers: group?.vouchers ?? [],
         subtotal: shopSubtotal,
         brandLabel: shopName,
@@ -364,7 +385,7 @@ export const CartSidebar: FC = memo(() => {
         scope: { type: "shop", shopId },
       });
     },
-    [items, selectedItemIds, shopVoucherGroups, selectedShopVoucherCodesMap],
+    [items, selectedItemIds, shopVoucherGroups, selectedShopVoucherCodesMap, t],
   );
 
   const handleVoucherConfirm = useCallback(
@@ -388,10 +409,13 @@ export const CartSidebar: FC = memo(() => {
     setVoucherModal((prev) => ({ ...prev, isOpen: false }));
   }, []);
 
-  const handleToggleSelect = useCallback((id: string) => {
-    if (!id) return;
-    dispatch(toggleItemSelection(id));
-  }, [dispatch]);
+  const handleToggleSelect = useCallback(
+    (id: string) => {
+      if (!id) return;
+      dispatch(toggleItemSelection(id));
+    },
+    [dispatch],
+  );
 
   const handleToggleSelectAll = useCallback(() => {
     const allIds = (serverCart?.orderItems ?? [])
@@ -409,9 +433,11 @@ export const CartSidebar: FC = memo(() => {
       setRemovingId(orderItemId);
       await dispatch(removeServerCartItem(orderItemId));
       // Remove from selection
-      dispatch(setAllSelectedItems(
-        selectedItemIdsArray.filter((id) => id !== orderItemId),
-      ));
+      dispatch(
+        setAllSelectedItems(
+          selectedItemIdsArray.filter((id) => id !== orderItemId),
+        ),
+      );
       setRemovingId(null);
     },
     [dispatch, selectedItemIdsArray],
@@ -430,7 +456,11 @@ export const CartSidebar: FC = memo(() => {
       setLocalItems((prev) =>
         prev.map((item) =>
           item.orderItemId === orderItemId
-            ? { ...item, quantity: newQuantity, totalPrice: item.unitPrice * newQuantity }
+            ? {
+                ...item,
+                quantity: newQuantity,
+                totalPrice: item.unitPrice * newQuantity,
+              }
             : item,
         ),
       );
@@ -453,17 +483,17 @@ export const CartSidebar: FC = memo(() => {
           } else {
             // Rollback optimistic update
             setLocalItems(previousItems);
-            toast.error(res.message || "Failed to update quantity");
+            toast.error(res.message || t("failedToUpdateQuantity"));
             setUpdatingQuantityId(null);
           }
         } catch {
           setLocalItems(previousItems);
-          toast.error("Failed to update quantity");
+          toast.error(t("failedToUpdateQuantity"));
           setUpdatingQuantityId(null);
         }
       }, 600);
     },
-    [dispatch, localItems],
+    [dispatch, localItems, t],
   );
 
   // Fetch cart & applicable vouchers when sidebar opens
@@ -474,11 +504,13 @@ export const CartSidebar: FC = memo(() => {
         if (fetchServerCart.fulfilled.match(action)) {
           const cartData = action.payload;
           if (cartData?.orderItems) {
-            dispatch(setAllSelectedItems(
-              cartData.orderItems
-                .map((item: { orderItemId: string }) => item.orderItemId)
-                .filter(Boolean),
-            ));
+            dispatch(
+              setAllSelectedItems(
+                cartData.orderItems
+                  .map((item: { orderItemId: string }) => item.orderItemId)
+                  .filter(Boolean),
+              ),
+            );
           }
         }
       });
@@ -501,9 +533,15 @@ export const CartSidebar: FC = memo(() => {
     dispatch(setCartOpen(false));
   }, [dispatch]);
 
+  useEffect(() => {
+    if (isCheckoutPage) {
+      dispatch(setCartOpen(false));
+    }
+  }, [isCheckoutPage, dispatch]);
+
   // Lock body scroll WITHOUT layout shift
   useEffect(() => {
-    if (isCartOpen) {
+    if (isCartOpen && !isCheckoutPage) {
       const scrollbarWidth =
         window.innerWidth - document.documentElement.clientWidth;
 
@@ -533,7 +571,7 @@ export const CartSidebar: FC = memo(() => {
         (header as HTMLElement).style.paddingRight = "";
       }
     };
-  }, [isCartOpen]);
+  }, [isCartOpen, isCheckoutPage]);
 
   // Close on click outside (skip when voucher modal is open)
   useEffect(() => {
@@ -548,26 +586,33 @@ export const CartSidebar: FC = memo(() => {
       handleClose();
     };
 
-    if (isCartOpen) {
+    if (isCartOpen && !isCheckoutPage) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isCartOpen, handleClose, voucherModal.isOpen]);
+  }, [isCartOpen, isCheckoutPage, handleClose, voucherModal.isOpen]);
 
   // Close on ESC key (skip when voucher modal is open — let the modal handle its own ESC)
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isCartOpen && !voucherModal.isOpen) {
+      if (
+        event.key === "Escape" &&
+        isCartOpen &&
+        !isCheckoutPage &&
+        !voucherModal.isOpen
+      ) {
         handleClose();
       }
     };
 
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [isCartOpen, handleClose, voucherModal.isOpen]);
+  }, [isCartOpen, isCheckoutPage, handleClose, voucherModal.isOpen]);
+
+  if (!isCartOpen || isCheckoutPage) return null;
 
   return (
     <>
@@ -596,20 +641,20 @@ export const CartSidebar: FC = memo(() => {
               id="cart-title"
               className="text-lg font-semibold text-neutral-900"
             >
-              Shopping Cart
+              {t("shoppingCartTitle")}
             </h2>
             <Link
               href="/cart"
               onClick={handleClose}
               className="text-xs text-neutral-500 hover:text-neutral-800 transition-colors"
             >
-              View full cart
+              {t("sidebar.viewFullCart")}
             </Link>
           </div>
           <button
             onClick={handleClose}
             className="p-2 hover:bg-neutral-100 rounded-lg transition-colors text-neutral-400 hover:text-neutral-700"
-            aria-label="Close cart"
+            aria-label={t("sidebar.closeCart")}
           >
             <X className="w-5 h-5" />
           </button>
@@ -620,28 +665,30 @@ export const CartSidebar: FC = memo(() => {
           {serverCartLoading ? (
             <div className="h-full flex flex-col items-center justify-center text-neutral-400 space-y-3">
               <Loader2 className="w-7 h-7 animate-spin" />
-              <p className="text-sm text-neutral-500">Loading cart...</p>
+              <p className="text-sm text-neutral-500">
+                {t("sidebar.loadingCart")}
+              </p>
             </div>
           ) : items.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center px-6 space-y-4">
               <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center">
                 <ShoppingBag className="w-7 h-7 text-neutral-400" />
               </div>
-              <p className="text-sm text-neutral-600">Your cart is empty</p>
+              <p className="text-sm text-neutral-600">{t("emptyCartTitle")}</p>
               <Link
                 href="/shop/all-products"
                 onClick={handleClose}
                 className="bg-neutral-900 text-white px-6 py-2.5 text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors"
               >
-                Start Shopping
+                {t("sidebar.startShopping")}
               </Link>
             </div>
           ) : (
             <div className="divide-y divide-neutral-100">
               {shopGroups.map(({ shopId, shopName, items: shopItems }) => {
                 const shopVouchers =
-                  shopVoucherGroups.find((g) => g.shopId === shopId)?.vouchers ??
-                  [];
+                  shopVoucherGroups.find((g) => g.shopId === shopId)
+                    ?.vouchers ?? [];
                 const shopPreview = cartPreview?.shopPreviews.find(
                   (s) => s.shopId === shopId,
                 );
@@ -678,7 +725,7 @@ export const CartSidebar: FC = memo(() => {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5 text-xs text-neutral-500">
                           <Ticket className="w-3.5 h-3.5 text-amber-500" />
-                          <span>Shop Voucher</span>
+                          <span>{t("shopVoucher")}</span>
                         </div>
                         {shopVouchers.length > 0 ? (
                           <button
@@ -688,10 +735,14 @@ export const CartSidebar: FC = memo(() => {
                             }
                             className="text-xs text-amber-600 hover:text-amber-700 hover:underline transition-colors"
                           >
-                            Select ({shopVouchers.length})
+                            {t("sidebar.selectWithCount", {
+                              count: shopVouchers.length,
+                            })}
                           </button>
                         ) : (
-                          <span className="text-xs text-neutral-400">Enter code</span>
+                          <span className="text-xs text-neutral-400">
+                            {t("sidebar.enterCode")}
+                          </span>
                         )}
                       </div>
 
@@ -704,7 +755,8 @@ export const CartSidebar: FC = memo(() => {
 
                       {/* Applied Vouchers Breakdown UI (Sidebar Optimized) */}
                       {(() => {
-                        const appliedVouchers = shopPreview?.appliedVoucherBreakdowns || [];
+                        const appliedVouchers =
+                          shopPreview?.appliedVoucherBreakdowns || [];
                         if (appliedVouchers.length === 0) return null;
 
                         return (
@@ -712,32 +764,55 @@ export const CartSidebar: FC = memo(() => {
                             <div className="flex items-center gap-1.5 mb-2">
                               <Tag className="w-3 h-3 text-green-600" />
                               <span className="text-[11px] font-medium text-neutral-600">
-                                Applied Discounts
+                                {t("appliedShopDiscounts")}
                               </span>
                             </div>
                             <div className="space-y-1.5">
-                              {appliedVouchers.map((voucher: any, idx: number) => (
-                                <div key={idx} className="flex justify-between items-center text-xs">
-                                  <span className="text-neutral-500 flex items-center gap-1.5">
-                                    <span className="font-mono text-[11px] text-neutral-700">{voucher.voucherCode}</span>
-                                    {voucher.discountType === "FixedAmount" && (
-                                      <span className="text-[9px] bg-blue-50 text-blue-600 px-1 py-0.5 rounded font-medium">Fixed</span>
-                                    )}
-                                    {voucher.discountType === "Percentage" && (
-                                      <span className="text-[9px] bg-green-50 text-green-600 px-1 py-0.5 rounded font-medium">% Off</span>
-                                    )}
-                                  </span>
-                                  <span className="font-medium text-green-600">
-                                    -{voucher.discountAmount.toLocaleString()}₫
-                                  </span>
-                                </div>
-                              ))}
+                              {appliedVouchers.map(
+                                (
+                                  voucher: AppliedVoucherBreakdown,
+                                  idx: number,
+                                ) => (
+                                  <div
+                                    key={idx}
+                                    className="flex justify-between items-center text-xs"
+                                  >
+                                    <span className="text-neutral-500 flex items-center gap-1.5">
+                                      <span className="font-mono text-[11px] text-neutral-700">
+                                        {voucher.voucherCode}
+                                      </span>
+                                      {voucher.discountType ===
+                                        "FixedAmount" && (
+                                        <span className="text-[9px] bg-blue-50 text-blue-600 px-1 py-0.5 rounded font-medium">
+                                          {t("fixed")}
+                                        </span>
+                                      )}
+                                      {voucher.discountType ===
+                                        "Percentage" && (
+                                        <span className="text-[9px] bg-green-50 text-green-600 px-1 py-0.5 rounded font-medium">
+                                          {t("percentOff")}
+                                        </span>
+                                      )}
+                                    </span>
+                                    <span className="font-medium text-green-600">
+                                      -{voucher.discountAmount.toLocaleString()}
+                                      ₫
+                                    </span>
+                                  </div>
+                                ),
+                              )}
                             </div>
                             {appliedVouchers.length > 1 && (
                               <div className="flex justify-between items-center mt-2 pt-2 border-t border-neutral-100 text-xs">
-                                <span className="text-neutral-600">Total shop discount</span>
+                                <span className="text-neutral-600">
+                                  {t("totalShopDiscount")}
+                                </span>
                                 <span className="font-semibold text-green-600">
-                                  -{(shopPreview?.shopDiscountAmount || 0).toLocaleString()}₫
+                                  -
+                                  {(
+                                    shopPreview?.shopDiscountAmount || 0
+                                  ).toLocaleString()}
+                                  ₫
                                 </span>
                               </div>
                             )}
@@ -762,19 +837,23 @@ export const CartSidebar: FC = memo(() => {
                   role="button"
                   tabIndex={0}
                   onClick={handleOpenSystemVoucherModal}
-                  onKeyDown={(e) => e.key === 'Enter' && handleOpenSystemVoucherModal()}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" && handleOpenSystemVoucherModal()
+                  }
                   className="flex items-center justify-between text-sm text-neutral-600 hover:text-neutral-800 transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-md bg-amber-100 flex items-center justify-center">
                       <Ticket className="w-3.5 h-3.5 text-amber-600" />
                     </div>
-                    <span className="text-sm">Ameko Voucher</span>
+                    <span className="text-sm">{t("ameloVoucher")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {selectedSystemVoucherCode ? (
                       <div className="flex items-center gap-1.5 bg-neutral-100 px-2.5 py-1 rounded-md border border-neutral-200">
-                        <span className="text-xs font-mono text-neutral-700">{selectedSystemVoucherCode}</span>
+                        <span className="text-xs font-mono text-neutral-700">
+                          {selectedSystemVoucherCode}
+                        </span>
                         <button
                           type="button"
                           onClick={(e) => {
@@ -782,14 +861,17 @@ export const CartSidebar: FC = memo(() => {
                             dispatch(setSelectedSystemVoucher(null));
                           }}
                           className="text-neutral-400 hover:text-red-500 transition-colors ml-0.5"
-                          aria-label="Remove system voucher"
+                          aria-label={t("removeSystemVoucherAriaLabel")}
                         >
                           <X className="w-3 h-3" />
                         </button>
                       </div>
                     ) : (
                       <span className="text-xs text-amber-600 flex items-center gap-0.5">
-                        {systemVouchers.length} available <ChevronRight className="w-3 h-3 inline" />
+                        {t("availableVouchers", {
+                          count: systemVouchers.length,
+                        })}{" "}
+                        <ChevronRight className="w-3 h-3 inline" />
                       </span>
                     )}
                   </div>
@@ -813,19 +895,19 @@ export const CartSidebar: FC = memo(() => {
                   }
                   onChange={handleToggleSelectAll}
                   className="w-[16px] h-[16px] accent-neutral-900 cursor-pointer rounded"
-                  aria-label="Select all items"
+                  aria-label={t("selectAllItemsAriaLabel")}
                 />
                 <span className="text-sm text-neutral-700">
-                  Select All ({items.length})
+                  {t("selectAllMobile", { count: items.length })}
                 </span>
               </label>
               <span className="text-xs text-neutral-400">
-                {selectedItemIds.size} selected
+                {t("sidebar.selectedCount", { count: selectedItemIds.size })}
               </span>
             </div>
 
             <p className="text-xs text-neutral-400">
-              Shipping & taxes calculated at checkout
+              {t("taxesAndShippingCalculatedAtCheckout")}
             </p>
 
             {/* Note: The old redundant 'Applied System Voucher' block was completely removed here to save space! */}
@@ -839,12 +921,15 @@ export const CartSidebar: FC = memo(() => {
                 ) || 0;
               const systemDiscountAmount =
                 (cartPreview?.totalDiscountAmount || 0) - totalShopDiscount;
-              if (totalShopDiscount <= 0 && systemDiscountAmount <= 0) return null;
+              if (totalShopDiscount <= 0 && systemDiscountAmount <= 0)
+                return null;
               return (
                 <div className="space-y-2 pt-3 border-t border-neutral-100">
                   {totalShopDiscount > 0 && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-neutral-500">Shop discount</span>
+                      <span className="text-neutral-500">
+                        {t("shopDiscount")}
+                      </span>
                       <span className="text-green-600 font-medium">
                         -{formatCurrency(totalShopDiscount)}
                       </span>
@@ -852,7 +937,9 @@ export const CartSidebar: FC = memo(() => {
                   )}
                   {systemDiscountAmount > 0 && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-neutral-500">Platform discount</span>
+                      <span className="text-neutral-500">
+                        {t("platformDiscount")}
+                      </span>
                       <span className="text-green-600 font-medium">
                         -{formatCurrency(systemDiscountAmount)}
                       </span>
@@ -875,12 +962,18 @@ export const CartSidebar: FC = memo(() => {
               >
                 {isCalculatingPreview ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Processing...
+                    <Loader2 className="w-4 h-4 animate-spin" />{" "}
+                    {t("processing")}
                   </>
                 ) : hasSelection ? (
-                  `Checkout · ${formatCurrency((cartPreview?.totalCartSubTotal || 0) - (cartPreview?.totalDiscountAmount || 0))}`
+                  t("sidebar.checkoutWithTotal", {
+                    total: formatCurrency(
+                      (cartPreview?.totalCartSubTotal || 0) -
+                        (cartPreview?.totalDiscountAmount || 0),
+                    ),
+                  })
                 ) : (
-                  "Select items to checkout"
+                  t("selectItemsToCheckout")
                 )}
               </button>
             </div>

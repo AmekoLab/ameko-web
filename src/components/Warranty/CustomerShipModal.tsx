@@ -12,13 +12,17 @@ import { uploadImage } from "@/src/utils/uploadImage";
 import { toast } from "react-toastify";
 import WarrantyTimeline from "@/src/components/Warranty/WarrantyTimeline";
 
-// ─── Zod Schema ────────────────────────────────────────────
-const customerShipSchema = z.object({
-  evidenceUrl: z.string().url("Please upload a photo of the shipping invoice"),
-  comment: z.string().min(1, "Please enter a note or tracking code"),
-});
+import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 
-type CustomerShipFormValues = z.infer<typeof customerShipSchema>;
+// ─── Zod Schema ────────────────────────────────────────────
+const getCustomerShipSchema = (t: any) =>
+  z.object({
+    evidenceUrl: z.string().url(t("valEvidence")),
+    comment: z.string().min(1, t("valComment")),
+  });
+
+type CustomerShipFormValues = z.infer<ReturnType<typeof getCustomerShipSchema>>;
 
 // ─── Props ─────────────────────────────────────────────────
 interface CustomerShipModalProps {
@@ -39,6 +43,8 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
   const { isSubmittingShipment } = useAppSelector((state) => state.warranty);
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const t = useTranslations("CustomerShipModal");
+  const schema = useMemo(() => getCustomerShipSchema(t), [t]);
 
   const {
     register,
@@ -47,7 +53,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
     reset,
     formState: { errors },
   } = useForm<CustomerShipFormValues>({
-    resolver: zodResolver(customerShipSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       evidenceUrl: "",
       comment: "",
@@ -64,7 +70,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
       setValue("evidenceUrl", url, { shouldValidate: true });
       setPreviewUrl(url);
     } catch {
-      toast.error("Upload failed, please try again");
+      toast.error(t("uploadFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -85,7 +91,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
       onSuccess();
     } catch (err: unknown) {
       const error = err as string;
-      toast.error(error || "Failed to submit return information");
+      toast.error(error || t("submitFailed"));
     }
   };
 
@@ -117,7 +123,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
         {/* Header */}
         <div className="sticky top-0 bg-white rounded-t-2xl border-b border-amazon-border px-6 py-4 flex items-center justify-between z-10">
           <h2 className="text-lg font-bold text-amazon-text">
-            Submit Return Information
+            {t("modalTitle")}
           </h2>
           <button
             onClick={handleClose}
@@ -130,27 +136,26 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 space-y-5">
           {/* Subtext */}
           <p className="text-sm text-amazon-textMuted">
-            Please take a photo of the shipping invoice from the post office or
-            clearly write the tracking code so the Shop can verify.
+            {t("modalSubtitle")}
           </p>
 
           {/* Timeline Section */}
           <div className="border border-amazon-border rounded-lg p-4">
             <h3 className="text-sm font-semibold text-amazon-text mb-3 uppercase tracking-wide">
-              Action history
+              {t("actionHistory")}
             </h3>
             <WarrantyTimeline issueId={issueId} />
           </div>
 
           {/* ── Evidence Upload ── */}
           <div>
-            <label className={labelClass}>Shipping invoice image</label>
+            <label className={labelClass}>{t("shippingInvoiceLabel")}</label>
             <div className="relative">
               {previewUrl ? (
                 <div className="relative w-full h-48 rounded-lg overflow-hidden border border-amazon-border">
                   <Image
                     src={previewUrl}
-                    alt="Shipping evidence"
+                    alt={t("shippingInvoiceAlt")}
                     fill
                     className="object-contain"
                   />
@@ -177,17 +182,17 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
                     <div className="flex flex-col items-center gap-2">
                       <Loader2 className="w-8 h-8 text-amazon-btnPrimary animate-spin" />
                       <span className="text-sm text-amazon-textMuted">
-                        Uploading...
+                        {t("uploading")}
                       </span>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2">
                       <ImagePlus className="w-8 h-8 text-neutral-400" />
                       <span className="text-sm text-amazon-textMuted">
-                        Click to upload image
+                        {t("clickToUpload")}
                       </span>
                       <span className="text-xs text-amazon-textMuted">
-                        PNG, JPG up to 5MB
+                        {t("uploadRequirements")}
                       </span>
                     </div>
                   )}
@@ -209,12 +214,12 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
           {/* ── Comment ── */}
           <div>
             <label htmlFor="comment" className={labelClass}>
-              Note / Tracking code
+              {t("commentLabel")}
             </label>
             <textarea
               id="comment"
               rows={4}
-              placeholder="E.g.: I shipped via Giao Hàng Tiết Kiệm, tracking code is..."
+              placeholder={t("commentPlaceholder")}
               className={inputClass + " resize-none"}
               {...register("comment")}
             />
@@ -231,7 +236,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
               disabled={isSubmittingShipment}
               className="px-5 py-2.5 text-sm font-medium text-amazon-text bg-white border border-amazon-border rounded-lg hover:bg-neutral-50 transition-colors disabled:opacity-50"
             >
-              Cancel
+              {t("cancelBtn")}
             </button>
             <button
               type="submit"
@@ -241,7 +246,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
               {isSubmittingShipment && (
                 <Loader2 className="w-4 h-4 animate-spin" />
               )}
-              Submit Evidence
+              {t("submitBtn")}
             </button>
           </div>
         </form>

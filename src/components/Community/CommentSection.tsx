@@ -7,6 +7,7 @@ import { SocialComment } from "@/src/types/social.types";
 import { socialService } from "@/src/services/social.service";
 import toast from "react-hot-toast";
 import { CommentItem } from "./CommentItem";
+import { useTranslations } from "next-intl";
 
 interface CommentSectionProps {
   postId: number;
@@ -20,6 +21,7 @@ export const CommentSection: FC<CommentSectionProps> = ({
   onCommentAdded,
   onCommentDeleted,
 }) => {
+  const t = useTranslations("CommentSection");
   const [comments, setComments] = useState<SocialComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [inputValue, setInputValue] = useState("");
@@ -53,7 +55,7 @@ export const CommentSection: FC<CommentSectionProps> = ({
       }
     } catch (error) {
       console.error("Failed to load comments", error);
-      toast.error("Không thể tải bình luận lúc này");
+      toast.error(t("errorLoad"));
     } finally {
       setLoading(false);
     }
@@ -93,7 +95,7 @@ export const CommentSection: FC<CommentSectionProps> = ({
     } catch (error) {
       console.error("Failed to post comment");
       setInputValue(content);
-      toast.error("Post comment failed");
+      toast.error(t("errorPost"));
     } finally {
       setIsPosting(false);
     }
@@ -115,7 +117,7 @@ export const CommentSection: FC<CommentSectionProps> = ({
               className="text-xs text-gray-500 font-bold hover:underline mb-2 flex items-center justify-center gap-1 self-center"
             >
               {isLoadingMore && <Loader2 className="w-3 h-3 animate-spin" />}
-              {isLoadingMore ? "Loading..." : "View previous comments"}
+              {isLoadingMore ? t("loading") : t("viewPrevious")}
             </button>
           )}
 
@@ -139,7 +141,7 @@ export const CommentSection: FC<CommentSectionProps> = ({
 
           {comments.length === 0 && (
             <p className="text-center text-xs text-gray-400 italic">
-              No comments yet. Be the first!
+              {t("noComments")}
             </p>
           )}
         </div>
@@ -172,7 +174,7 @@ export const CommentSection: FC<CommentSectionProps> = ({
               target.style.height = "auto";
               target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
             }}
-            placeholder="Write a comment..."
+            placeholder={t("placeholder")}
             rows={1}
             className="w-full bg-white border border-amazon-border text-amazon-text rounded-2xl px-4 py-2.5 text-sm outline-none focus:ring-1 focus:border-amazon-focus focus:ring-amazon-focus placeholder-gray-400 pr-10 resize-none overflow-y-auto"
             style={{ minHeight: "40px", maxHeight: "120px" }}

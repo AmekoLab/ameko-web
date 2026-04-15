@@ -1,40 +1,46 @@
 "use client";
 import { FC, ReactNode } from "react";
 import { Flame, Hash, Users, TrendingUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 // --- LEFT SIDEBAR ---
-export const LeftSidebar: FC = () => (
+export const LeftSidebar: FC = () => {
+  const t = useTranslations("CommunitySidebar");
+  return (
   <div className=" top-32 space-y-2">
     <SidebarLink
       icon={<Flame className="w-5 h-5 text-amazon-btnSecondary" />}
-      text="News Feed"
+      text={t("newsFeed")}
       active
     />
-    <SidebarLink icon={<Hash className="w-5 h-5" />} text="Explore Topics" />
-    <SidebarLink icon={<Users className="w-5 h-5" />} text="Groups" />
+    <SidebarLink icon={<Hash className="w-5 h-5" />} text={t("exploreTopics")} />
+    <SidebarLink icon={<Users className="w-5 h-5" />} text={t("groups")} />
     <SidebarLink
       icon={<TrendingUp className="w-5 h-5" />}
-      text="Trending Builds"
+      text={t("trendingBuilds")}
     />
 
     <div className="border-t border-amazon-border my-4"></div>
 
     <h3 className="text-md font-black uppercase text-amazon-textMuted mb-3 px-3 tracking-widest">
-      My Groups
+      {t("myGroups")}
     </h3>
-    <SidebarGroup text="Vietnam MechKey" />
-    <SidebarGroup text="Artisan Keycaps Market" />
-    <SidebarGroup text="Ameko Official Support" />
+    <SidebarGroup text={t("groupVietnamMechKey")} />
+    <SidebarGroup text={t("groupArtisanMarket")} />
+    <SidebarGroup text={t("groupOfficialSupport")} />
   </div>
-);
+  );
+};
 
 // --- RIGHT SIDEBAR ---
-export const RightSidebar: FC = () => (
+export const RightSidebar: FC = () => {
+  const t = useTranslations("CommunitySidebar");
+  return (
   <div className=" top-32 space-y-6">
     {/* Trending Tags */}
     <div className="bg-white p-4 rounded-sm shadow-sm border border-amazon-border">
       <h3 className="text-sm font-black uppercase mb-4 text-amazon-text">
-        Trending Tags
+        {t("trendingTags")}
       </h3>
       <div className="flex flex-wrap gap-2">
         {["#TKL", "#GMK", "#Artisan", "#AmekoBuild", "#DeskSetup"].map(
@@ -53,16 +59,17 @@ export const RightSidebar: FC = () => (
     {/* Top Builders */}
     <div className="bg-white p-4 rounded-md shadow-sm border border-amazon-border">
       <h3 className="text-sm font-black uppercase mb-4 text-amazon-text">
-        Top Builders
+        {t("topBuilders")}
       </h3>
       <ul className="space-y-4">
-        <BuilderRow name="KBD Fans" role="Verified Shop" />
-        <BuilderRow name="Tín Dev" role="Pro Builder" />
-        <BuilderRow name="Mochi Caps" role="Artisan" />
+        <BuilderRow name="KBD Fans" role={t("verifiedShop")} btnText={t("follow")} />
+        <BuilderRow name="Tín Dev" role={t("proBuilder")} btnText={t("follow")} />
+        <BuilderRow name="Mochi Caps" role={t("artisan")} btnText={t("follow")} />
       </ul>
     </div>
   </div>
-);
+  );
+};
 
 // Helper Components
 const SidebarLink = ({
@@ -95,7 +102,7 @@ const SidebarGroup = ({ text }: { text: string }) => (
   </div>
 );
 
-const BuilderRow = ({ name, role }: { name: string; role: string }) => (
+const BuilderRow = ({ name, role, btnText }: { name: string; role: string; btnText: string }) => (
   <li className="flex items-center gap-3">
     <div className="w-8 h-8 rounded-full bg-neutral-200"></div>
     <div>
@@ -104,6 +111,6 @@ const BuilderRow = ({ name, role }: { name: string; role: string }) => (
       </p>
       <p className="text-[10px] uppercase text-amazon-textMuted font-bold">{role}</p>
     </div>
-    <button className="ml-auto text-md font-bold text-amazon-link">Follow</button>
+    <button className="ml-auto text-md font-bold text-amazon-link">{btnText}</button>
   </li>
 );

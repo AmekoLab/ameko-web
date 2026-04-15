@@ -18,28 +18,6 @@ interface SplitPromoSectionProps {
   cards?: [SplitPromoCard, SplitPromoCard];
 }
 
-// ─── DEFAULT MOCK DATA ────────────────────────────────────────────────────────
-
-const defaultCards: [SplitPromoCard, SplitPromoCard] = [
-  {
-    title: "CUSTOM BUILDS",
-    subtitle: "Build your dream PC from scratch",
-    ctaText: "START BUILDING",
-    ctaHref: "/custom-build",
-    imageSrc:
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1773520076/home6_lcqhgc.jpg",
-  },
-
-  {
-    title: "PC CASES",
-    subtitle: "Premium towers for every setup",
-    ctaText: "SHOP CASES",
-    ctaHref: "/shop/all-products",
-    imageSrc:
-      "https://res.cloudinary.com/doezwafgz/image/upload/v1773519760/home4_scaovf.jpg",
-  },
-];
-
 // ─── CORNER BRACKETS SUB-COMPONENT ───────────────────────────────────────────
 
 // ─── CORNER BRACKETS SUB-COMPONENT (GHIM SÁT 4 CẠNH ẢNH) ───────────────
@@ -59,16 +37,39 @@ const CornerBrackets: FC = () => (
     <div className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-[#FFD814] opacity-0 group-hover:opacity-80 transition-all duration-700 ease-out z-20 pointer-events-none" />
   </>
 );
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
+import { useTranslations } from "next-intl";
 
 export const SplitPromoSection: FC<SplitPromoSectionProps> = ({
-  cards = defaultCards,
+  cards,
 }) => {
+  const t = useTranslations("SplitPromoSection");
+
+  const defaultCards: [SplitPromoCard, SplitPromoCard] = [
+    {
+      title: t("card1Title"),
+      subtitle: t("card1Subtitle"),
+      ctaText: t("card1Cta"),
+      ctaHref: "/custom-build",
+      imageSrc:
+        "https://res.cloudinary.com/doezwafgz/image/upload/v1773520076/home6_lcqhgc.jpg",
+    },
+    {
+      title: t("card2Title"),
+      subtitle: t("card2Subtitle"),
+      ctaText: t("card2Cta"),
+      ctaHref: "/shop/all-products",
+      imageSrc:
+        "https://res.cloudinary.com/doezwafgz/image/upload/v1773519760/home4_scaovf.jpg",
+    },
+  ];
+
+  const finalCards = cards || defaultCards;
+
   return (
     <section className="w-full bg-amazon-bgSecondary text-amazon-text py-6 overflow-hidden">
       <div className="w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 lg:gap-2">
-          {cards.map((card, index) => (
+          {finalCards.map((card, index) => (
             <Link
               key={index}
               href={card.ctaHref}
