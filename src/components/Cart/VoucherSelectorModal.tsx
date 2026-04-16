@@ -9,6 +9,7 @@ import {
   Check,
   Gift,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Voucher } from "@/src/services/voucher.service";
 
 // ─── Helpers ─────────────────────────────────────────────
@@ -17,14 +18,20 @@ function fmtVND(n: number): string {
   return n.toLocaleString("vi-VN") + "₫";
 }
 
-function fmtDiscount(v: Voucher): string {
+function fmtDiscount(
+  v: Voucher,
+  t: (key: string, values?: Record<string, string | number | Date>) => string,
+): string {
   if (v.discountType === "Percentage") {
-    const cap = v.maxDiscountAmount
-      ? ` (max ${fmtVND(v.maxDiscountAmount)})`
-      : "";
-    return `Discount ${v.value}%${cap}`;
+    if (v.maxDiscountAmount) {
+      return t("discountPercentageWithCap", {
+        value: v.value,
+        cap: fmtVND(v.maxDiscountAmount),
+      });
+    }
+    return t("discountPercentage", { value: v.value });
   }
-  return `Discount ${fmtVND(v.value)}`;
+  return t("discountFixed", { value: fmtVND(v.value) });
 }
 
 function fmtDate(iso: string): string {
@@ -76,6 +83,7 @@ const VoucherCard: FC<VoucherCardProps> = ({
   brandLabel,
   isFullyClaimed,
 }) => {
+  const t = useTranslations("CartPage.voucherModal");
   const progress = usageProgress(voucher);
   const isAlmostGone = progress >= 0.8;
   const isActive = selected || isApplied;
@@ -110,26 +118,29 @@ const VoucherCard: FC<VoucherCardProps> = ({
         <div>
           {/* Title */}
           <h4 className="text-sm font-bold text-gray-800 leading-tight line-clamp-2">
-            {fmtDiscount(voucher)}
+            {fmtDiscount(voucher, t)}
           </h4>
 
           {/* Targeted Badge (Voucher tặng riêng) */}
           {voucher.targetUserId && (
             <div className="inline-flex items-center gap-1 mt-1.5 px-1.5 py-0.5 bg-red-50 text-red-600 border border-red-100 rounded text-[10px] font-medium">
               <Gift className="w-3 h-3" />
-              Voucher For You
+              {t("voucherForYou")}
             </div>
           )}
 
           {/* Code */}
           <p className="text-xs text-gray-500 mt-1 line-clamp-1">
-            Code: <span className="font-medium text-gray-700">{voucher.description || voucher.name}</span>
+            {t("codeLabel")}:{" "}
+            <span className="font-medium text-gray-700">
+              {voucher.description || voucher.name}
+            </span>
           </p>
 
           {/* Min order */}
           {voucher.minOrderValue > 0 && (
             <div className="inline-block mt-1.5 px-2 py-0.5 bg-orange-50 text-orange-600 border border-orange-100 rounded text-[10px] font-medium">
-              Đơn tối thiểu {fmtVND(voucher.minOrderValue)}
+              {t("minimumOrder", { amount: fmtVND(voucher.minOrderValue) })}
             </div>
           )}
         </div>
@@ -147,14 +158,14 @@ const VoucherCard: FC<VoucherCardProps> = ({
                 </div>
                 {isAlmostGone && eligible && (
                   <span className="text-[10px] font-medium text-red-500 shrink-0">
-                    Sắp hết
+                    {t("almostGone")}
                   </span>
                 )}
               </div>
             )}
             <div className="flex items-center gap-1 text-[11px] text-gray-500">
               <Clock className="w-3 h-3 shrink-0" />
-              <span>End date: {fmtDate(voucher.endDate)}</span>
+              <span>{t("endDate", { date: fmtDate(voucher.endDate) })}</span>
             </div>
           </div>
 
@@ -180,13 +191,13 @@ const VoucherCard: FC<VoucherCardProps> = ({
             {isFullyClaimed ? (
               <div className="flex items-center gap-1 text-[11px] text-gray-500">
                 <AlertCircle className="w-3 h-3 shrink-0" />
-                <span>Voucher has been used up</span>
+                <span>{t("voucherUsedUp")}</span>
               </div>
             ) : (
               <div className="flex items-center gap-1 text-[11px] text-red-500 font-medium">
                 <AlertCircle className="w-3 h-3 shrink-0" />
                 <span>
-                  Buy more {fmtVND(remainingAmount)} to use
+                  {t("buyMoreToUse", { amount: fmtVND(remainingAmount) })}
                 </span>
               </div>
             )}
@@ -210,6 +221,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
   onConfirm,
   scope,
 }) => {
+  const t = useTranslations("CartPage.voucherModal");
   const [prevOpen, setPrevOpen] = useState(false);
   const [localSelectedCodes, setLocalSelectedCodes] = useState<Set<string>>(
     () => new Set(selectedCodes),
@@ -230,7 +242,9 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -313,20 +327,20 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
     if (!code) return;
     const found = vouchers.find((v) => v.code.toUpperCase() === code);
     if (!found) {
-      setCodeError("Mã không hợp lệ hoặc không tồn tại.");
+      setCodeError(t("invalidCode"));
       return;
     }
     const eligible = currentSubtotal >= found.minOrderValue;
     if (!eligible) {
       setCodeError(
-        `Đơn hàng chưa đạt mức tối thiểu ${fmtVND(found.minOrderValue)}.`,
+        t("minimumOrderNotMet", { amount: fmtVND(found.minOrderValue) }),
       );
       return;
     }
     setCodeError(null);
     onConfirm([found]); // Áp dụng mã tay cũng trả về đúng 1 voucher
     onClose();
-  }, [codeInput, vouchers, currentSubtotal, onConfirm, onClose]);
+  }, [codeInput, vouchers, currentSubtotal, onConfirm, onClose, t]);
 
   const handleOverlayClick = useCallback(
     (e: React.MouseEvent) => {
@@ -348,13 +362,12 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
       className="fixed inset-0 z-[80] flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity"
     >
       <div className="w-full md:max-w-[440px] h-[85vh] md:h-auto md:max-h-[85vh] bg-gray-50 md:rounded-xl rounded-t-xl flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
-        
         {/* ── Header ── */}
         <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 shrink-0">
           <div>
             <h3 className="font-semibold text-lg text-gray-800">{title}</h3>
             <p className="text-xs text-gray-500 mt-0.5">
-              Can choose {eligibleCount} voucher
+              {t("canChooseVouchers", { count: eligibleCount })}
             </p>
           </div>
           <button
@@ -379,7 +392,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                 setCodeError(null);
               }}
               onKeyDown={(e) => e.key === "Enter" && handleApplyCode()}
-              placeholder="Enter voucher code"
+              placeholder={t("enterVoucherCode")}
               className="flex-1 bg-transparent px-3 py-2.5 text-sm outline-none text-gray-800 placeholder:text-gray-400 uppercase"
             />
             <button
@@ -392,13 +405,11 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                   : "text-gray-400 cursor-not-allowed"
               }`}
             >
-              Apply
+              {t("apply")}
             </button>
           </div>
           {codeError && (
-            <p className="mt-2 text-xs font-medium text-red-500">
-              {codeError}
-            </p>
+            <p className="mt-2 text-xs font-medium text-red-500">{codeError}</p>
           )}
         </div>
 
@@ -407,7 +418,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
           {sortedVouchers.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400">
               <Ticket className="w-12 h-12 opacity-20 mb-3" />
-              <p className="text-sm">Không có mã giảm giá nào</p>
+              <p className="text-sm">{t("noVouchers")}</p>
             </div>
           ) : (
             <>
@@ -415,19 +426,24 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
               {targetedVouchers.length > 0 && (
                 <div>
                   <h4 className="text-sm font-semibold text-gray-800 mb-3 px-1">
-                    Voucher For You
+                    {t("voucherForYou")}
                   </h4>
                   <div className="space-y-3">
                     {targetedVouchers.map((v) => {
                       const meetsMinOrder = currentSubtotal >= v.minOrderValue;
-                      const isFullyClaimed = v.usageLimit > 0 && v.usedCount >= v.usageLimit;
+                      const isFullyClaimed =
+                        v.usageLimit > 0 && v.usedCount >= v.usageLimit;
                       const eligible = meetsMinOrder && !isFullyClaimed;
                       return (
                         <VoucherCard
                           key={v.id}
                           voucher={v}
                           eligible={eligible}
-                          remainingAmount={meetsMinOrder ? 0 : v.minOrderValue - currentSubtotal}
+                          remainingAmount={
+                            meetsMinOrder
+                              ? 0
+                              : v.minOrderValue - currentSubtotal
+                          }
                           selected={localSelectedCodes.has(v.code)}
                           isApplied={localSelectedCodes.has(v.code)}
                           onToggle={handleToggle}
@@ -444,19 +460,24 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
               {generalVouchers.length > 0 && (
                 <div>
                   <h4 className="text-sm font-semibold text-gray-800 mb-3 px-1">
-                    Voucher Ameko
+                    {t("generalVoucherGroup")}
                   </h4>
                   <div className="space-y-3">
                     {generalVouchers.map((v) => {
                       const meetsMinOrder = currentSubtotal >= v.minOrderValue;
-                      const isFullyClaimed = v.usageLimit > 0 && v.usedCount >= v.usageLimit;
+                      const isFullyClaimed =
+                        v.usageLimit > 0 && v.usedCount >= v.usageLimit;
                       const eligible = meetsMinOrder && !isFullyClaimed;
                       return (
                         <VoucherCard
                           key={v.id}
                           voucher={v}
                           eligible={eligible}
-                          remainingAmount={meetsMinOrder ? 0 : v.minOrderValue - currentSubtotal}
+                          remainingAmount={
+                            meetsMinOrder
+                              ? 0
+                              : v.minOrderValue - currentSubtotal
+                          }
                           selected={localSelectedCodes.has(v.code)}
                           isApplied={localSelectedCodes.has(v.code)}
                           onToggle={handleToggle}
@@ -477,8 +498,8 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-gray-700">
               {localSelectedCodes.size > 0
-                ? `Selected ${localSelectedCodes.size} voucher`
-                : "No voucher selected"}
+                ? t("selectedVoucherCount", { count: localSelectedCodes.size })
+                : t("noVoucherSelected")}
             </span>
             {localSelectedCodes.size > 0 && (
               <button
@@ -486,7 +507,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
                 onClick={() => setLocalSelectedCodes(new Set())}
                 className="text-xs font-medium text-gray-500 hover:text-red-500 transition-colors"
               >
-                Deselect
+                {t("deselect")}
               </button>
             )}
           </div>
@@ -494,7 +515,7 @@ const VoucherSelectorModal: FC<VoucherSelectorModalProps> = ({
             onClick={handleConfirm}
             className="w-full py-3 text-sm font-bold text-white rounded-lg transition-colors bg-amazon-btnPrimary hover:brightness-95 flex items-center justify-center shadow-sm"
           >
-            Confirm
+            {t("confirm")}
           </button>
         </div>
       </div>

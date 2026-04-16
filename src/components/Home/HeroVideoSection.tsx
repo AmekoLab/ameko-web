@@ -16,24 +16,26 @@ interface HeroVideoProps {
 
 // ─── DEFAULT MOCK DATA ────────────────────────────────────────────────────────
 
-const defaults = {
-  videoSrc:
-    "https://res.cloudinary.com/doezwafgz/video/upload/v1773517076/Galleon_homepage-hero_desktop_wurhlq.mp4",
-  title: "AMEKO",
-  subtitle: "DESIGN YOUR DREAM KEYBOARD",
-  ctaText: "START CUSTOMIZING",
-  ctaHref: "/custom-build",
-} as const;
+// ─── DEFAULT MOCK DATA ────────────────────────────────────────────────────────
 
 // ─── COMPONENT ────────────────────────────────────────────────────────────────
 
+import { useTranslations } from "next-intl";
+
 export const HeroVideoSection: FC<HeroVideoProps> = ({
-  videoSrc = defaults.videoSrc,
-  title = defaults.title,
-  subtitle = defaults.subtitle,
-  ctaText = defaults.ctaText,
-  ctaHref = defaults.ctaHref,
+  videoSrc,
+  title,
+  subtitle,
+  ctaText,
+  ctaHref,
 }) => {
+  const t = useTranslations("HeroVideoSection");
+  
+  const finalVideoSrc = videoSrc || "https://res.cloudinary.com/doezwafgz/video/upload/v1773517076/Galleon_homepage-hero_desktop_wurhlq.mp4";
+  const finalTitle = title || t("title");
+  const finalSubtitle = subtitle || t("subtitle");
+  const finalCtaText = ctaText || t("ctaText");
+  const finalCtaHref = ctaHref || "/custom-build";
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(true);
 
@@ -61,7 +63,7 @@ export const HeroVideoSection: FC<HeroVideoProps> = ({
         playsInline
         className="absolute inset-0 w-full h-full object-cover z-0"
       >
-        <source src={videoSrc} type="video/mp4" />
+        <source src={finalVideoSrc} type="video/mp4" />
       </video>
 
       {/* ── GRADIENT OVERLAY ──────────────────────────────────────────── */}
@@ -71,16 +73,16 @@ export const HeroVideoSection: FC<HeroVideoProps> = ({
       {/* ── CENTERED CONTENT ──────────────────────────────────────────── */}
       <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
         <h1 className="text-5xl md:text-7xl lg:text-[80px] font-light text-white uppercase tracking-[0.1em] mb-4 leading-none">
-          {title}
+          {finalTitle}
         </h1>
         <p className="text-xs md:text-sm font-bold text-gray-300 uppercase tracking-[0.3em] mb-8">
-          {subtitle}
+          {finalSubtitle}
         </p>
         <Link
-          href={ctaHref}
+          href={finalCtaHref}
           className="bg-amazon-btnPrimary text-amazon-text px-8 py-3 text-xs font-black uppercase tracking-widest hover:brightness-95 transition-all duration-300 rounded-md shadow-sm"
         >
-          {ctaText}
+          {finalCtaText}
         </Link>
       </div>
 
@@ -92,7 +94,7 @@ export const HeroVideoSection: FC<HeroVideoProps> = ({
       {/* ── PLAY / PAUSE TOGGLE (Bottom Right) ────────────────────────── */}
       <button
         onClick={togglePlayback}
-        aria-label={isPlaying ? "Pause video" : "Play video"}
+        aria-label={isPlaying ? t("pauseVideo") : t("playVideo")}
         className="absolute bottom-8 right-8 z-20 w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300 cursor-pointer"
       >
         {isPlaying ? (

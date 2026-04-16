@@ -4,17 +4,21 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/src/store/index";
 import { submitCommissionQuote } from "@/src/store/slices/commissionSlice";
 
-const quoteSchema = z.object({
-  quotedPrice: z.number().gt(0, "Invalid quoted price"),
-  estimatedDays: z.number().min(1, "Estimated days must be at least 1"),
-  shopNotes: z.string().min(10, "Please enter detailed notes for the customer"),
-});
+type TranslationFn = (key: string, values?: Record<string, unknown>) => string;
 
-type QuoteFormData = z.infer<typeof quoteSchema>;
+const quoteSchema = (t: TranslationFn) =>
+  z.object({
+    quotedPrice: z.number().gt(0, t("validation.invalidQuotedPrice")),
+    estimatedDays: z.number().min(1, t("validation.estimatedDaysMin")),
+    shopNotes: z.string().min(10, t("validation.notesMin")),
+  });
+
+type QuoteFormData = z.infer<ReturnType<typeof quoteSchema>>;
 
 interface SubmitQuoteModalProps {
   isOpen: boolean;
@@ -29,6 +33,8 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
   requestId,
   onSuccess,
 }) => {
+  const t = useTranslations("SubmitQuoteModal");
+  const tCommon = useTranslations("Common");
   const dispatch = useDispatch<AppDispatch>();
   const { isSubmittingQuote } = useSelector(
     (state: RootState) => state.commission,
@@ -40,7 +46,7 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
     reset,
     formState: { errors },
   } = useForm<QuoteFormData>({
-    resolver: zodResolver(quoteSchema),
+    resolver: zodResolver(quoteSchema(t as unknown as TranslationFn)),
     defaultValues: {
       quotedPrice: 0,
       estimatedDays: 1,
@@ -87,11 +93,10 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-amazon-border">
-          <h3 className="text-lg font-bold text-amazon-text">
-            Submit Quote
-          </h3>
+          <h3 className="text-lg font-bold text-amazon-text">{t("title")}</h3>
           <button
             onClick={handleClose}
+            aria-label={tCommon("close")}
             className="p-1 hover:bg-neutral-50 rounded-sm transition-colors text-amazon-textMuted hover:text-amazon-text"
           >
             <X className="w-5 h-5" />
@@ -103,18 +108,18 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
           {/* Quoted Price */}
           <div>
             <label className="block text-[13px] font-medium text-amazon-text mb-1">
-              Quoted Price <span className="text-red-500">*</span>
+              {t("labels.quotedPrice")} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
                 type="number"
                 {...register("quotedPrice", { valueAsNumber: true })}
                 min={0}
-                placeholder="1000000"
+                placeholder={t("placeholders.quotedPrice")}
                 className="w-full px-3 py-2 pr-14 border border-amazon-border rounded-sm text-[13px] font-medium text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition placeholder:text-neutral-400"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-neutral-400 font-medium">
-                VND
+                {t("units.vnd")}
               </span>
             </div>
             {errors.quotedPrice && (
@@ -127,18 +132,19 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
           {/* Estimated Days */}
           <div>
             <label className="block text-[13px] font-medium text-amazon-text mb-1">
-              Estimated Days <span className="text-red-500">*</span>
+              {t("labels.estimatedDays")}{" "}
+              <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
                 type="number"
                 {...register("estimatedDays", { valueAsNumber: true })}
                 min={1}
-                placeholder="7"
+                placeholder={t("placeholders.estimatedDays")}
                 className="w-full px-3 py-2 pr-14 border border-amazon-border rounded-sm text-[13px] font-medium text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition placeholder:text-neutral-400"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-neutral-400 font-medium">
-                Days
+                {t("units.days")}
               </span>
             </div>
             {errors.estimatedDays && (
@@ -151,12 +157,13 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
           {/* Shop Notes */}
           <div>
             <label className="block text-[13px] font-medium text-amazon-text mb-1">
-              Notes for Customer <span className="text-red-500">*</span>
+              {t("labels.notesForCustomer")}{" "}
+              <span className="text-red-500">*</span>
             </label>
             <textarea
               {...register("shopNotes")}
               rows={4}
-              placeholder="Describe quote details, time, materials..."
+              placeholder={t("placeholders.notes")}
               className="w-full px-3 py-2 border border-amazon-border rounded-sm text-[13px] font-medium text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition placeholder:text-neutral-400 resize-none"
             />
             {errors.shopNotes && (
@@ -173,7 +180,7 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
               onClick={handleClose}
               className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
             >
-              Cancel
+              {tCommon("cancel")}
             </button>
             <button
               type="submit"
@@ -182,10 +189,11 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
             >
               {isSubmittingQuote ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Sending...
+                  <Loader2 className="w-4 h-4 animate-spin" />{" "}
+                  {t("actions.sending")}
                 </>
               ) : (
-                "Submit Quote"
+                t("actions.submitQuote")
               )}
             </button>
           </div>

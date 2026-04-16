@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { checkStock, clearStockMap } from "@/src/store/slices/partsSlice";
 import { PartItem } from "@/src/types/part.types";
+import { useTranslations } from "next-intl";
 import {
   ClipboardCheck,
   Loader2,
@@ -24,11 +25,19 @@ export default function CheckStockModal({
   onClose,
   parts,
 }: CheckStockModalProps) {
+  const t = useTranslations("CheckStockModal");
   const dispatch = useAppDispatch();
   const { checkingStock, stockMap } = useAppSelector((state) => state.parts);
 
   const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const getPartTypeLabel = (partType: string) => {
+    if (partType === "kit") return t("typeKit");
+    if (partType === "component") return t("typeComponent");
+    if (partType === "accessory") return t("typeAccessory");
+    return partType;
+  };
 
   // Filter parts by search query
   const matchedParts = useMemo(() => {
@@ -103,9 +112,11 @@ export default function CheckStockModal({
               <ClipboardCheck className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-amazon-text">Check Stock</h2>
+              <h2 className="text-lg font-bold text-amazon-text">
+                {t("title")}
+              </h2>
               <p className="text-[12px] font-medium text-emerald-700 mt-0.5">
-                Search and verify part inventory
+                {t("subtitle")}
               </p>
             </div>
           </div>
@@ -125,14 +136,14 @@ export default function CheckStockModal({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Type part name to search..."
+              placeholder={t("searchPlaceholder")}
               autoFocus
               className="text-amazon-text font-medium text-[13px] w-full pl-9 pr-3 py-2 border border-amazon-border rounded-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition placeholder:text-neutral-400"
             />
           </div>
           {selectedIds.size > 0 && (
             <p className="text-[11px] font-medium text-emerald-600 mt-1.5">
-              {selectedIds.size} part{selectedIds.size > 1 ? "s" : ""} selected
+              {t("selectedParts", { count: selectedIds.size })}
             </p>
           )}
         </div>
@@ -142,12 +153,12 @@ export default function CheckStockModal({
           {query.trim() === "" ? (
             <div className="py-8 text-center text-amazon-textMuted text-[13px] font-medium">
               <Search className="w-8 h-8 mx-auto mb-3 opacity-30" />
-              Type a part name to start searching
+              {t("emptySearchPrompt")}
             </div>
           ) : matchedParts.length === 0 ? (
             <div className="py-8 text-center text-amazon-textMuted text-[13px] font-medium">
               <AlertCircle className="w-8 h-8 mx-auto mb-3 opacity-30" />
-              No parts match &quot;{query}&quot;
+              {t("noPartsMatch", { query })}
             </div>
           ) : (
             <div className="space-y-1">
@@ -156,7 +167,7 @@ export default function CheckStockModal({
                 onClick={selectAll}
                 className="w-full text-left text-[12px] font-medium text-emerald-600 hover:text-emerald-700 px-2 py-2 transition"
               >
-                {allMatchedSelected ? "Deselect all" : "Select all"} (
+                {allMatchedSelected ? t("deselectAll") : t("selectAll")} (
                 {matchedParts.length})
               </button>
 
@@ -204,7 +215,7 @@ export default function CheckStockModal({
                         {part.name}
                       </p>
                       <p className="text-[12px] text-amazon-textMuted truncate mt-1">
-                        <span className="capitalize">{part.partType}</span>
+                        <span>{getPartTypeLabel(part.partType)}</span>
                         {" · "}
                         {part.categoryName}
                       </p>
@@ -212,7 +223,9 @@ export default function CheckStockModal({
 
                     {/* Current stock */}
                     <div className="text-right shrink-0">
-                      <p className="text-[11px] font-medium text-amazon-textMuted mb-1">Current</p>
+                      <p className="text-[11px] font-medium text-amazon-textMuted mb-1">
+                        {t("current")}
+                      </p>
                       <p
                         className={`text-[13px] font-bold ${
                           part.stockQuantity <= 0
@@ -230,7 +243,7 @@ export default function CheckStockModal({
                     {stockResult !== null && (
                       <div className="text-right shrink-0 pl-3 ml-1 border-l border-amazon-border">
                         <p className="text-[11px] font-medium text-emerald-600 mb-1">
-                          Verified
+                          {t("verified")}
                         </p>
                         <p className="text-[13px] font-bold text-emerald-700">
                           {stockResult.toLocaleString("vi-VN")}
@@ -250,7 +263,7 @@ export default function CheckStockModal({
             onClick={handleClose}
             className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition shadow-sm"
           >
-            Close
+            {t("close")}
           </button>
           <button
             onClick={handleCheck}
@@ -260,12 +273,12 @@ export default function CheckStockModal({
             {checkingStock ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin text-white" />
-                Checking...
+                {t("checking")}
               </>
             ) : (
               <>
                 <PackageCheck className="w-4 h-4" />
-                Check Stock ({selectedIds.size})
+                {t("checkStockWithCount", { count: selectedIds.size })}
               </>
             )}
           </button>

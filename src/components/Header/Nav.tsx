@@ -1,12 +1,13 @@
 import { FC } from "react";
 import { NAV_ITEMS } from "../../data/nav";
-
+import { useTranslations } from "next-intl";
 type Props = {
   onNavigate?: () => void;
   orientation?: "horizontal" | "vertical";
 };
 
 export const Nav: FC<Props> = ({ onNavigate, orientation = "horizontal" }) => {
+  const t = useTranslations("Header");
   return (
     <nav
       aria-label="Primary"
@@ -28,7 +29,7 @@ export const Nav: FC<Props> = ({ onNavigate, orientation = "horizontal" }) => {
               onClick={onNavigate}
               className="text-sm uppercase tracking-widest text-white hover:text-[#f0c040] transition-colors"
             >
-              {item.label}
+              {t(item.label)}
             </a>
           </li>
         ))}

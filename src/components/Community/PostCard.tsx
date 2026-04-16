@@ -41,8 +41,10 @@ const REACTION_COLORS: Record<PostReactionType, string> = {
 import { socialService } from "@/src/services/social.service";
 import { CommentSection } from "./CommentSection";
 import { ImageModal } from "./ImageModal";
+import { useTranslations } from "next-intl";
 
 export const PostCard: FC<{ post: Post }> = ({ post }) => {
+  const t = useTranslations("PostCard");
   const [currentPost, setCurrentPost] = useState<Post>(post);
   const [userReaction, setUserReaction] = useState<PostReactionType | null>(
     post.currentUserReaction || null,
@@ -68,7 +70,8 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const currentUserStr = typeof window !== 'undefined' ? localStorage.getItem("user") : null;
+  const currentUserStr =
+    typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
   const isOwner = currentUser?.id === post.userId;
   const isAdmin = currentUser?.role === "Admin";
@@ -90,7 +93,6 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
     }
   };
 
-
   const handleOpenReactions = async () => {
     setIsReactionsModalOpen(true);
     setIsLoadingReactions(true);
@@ -100,7 +102,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
         setReactionsList(res.data);
       }
     } catch {
-      toast.error("Failed to load reactions");
+      toast.error(t("errorLoadReactions"));
     } finally {
       setIsLoadingReactions(false);
     }
@@ -142,17 +144,10 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
       // Rollback on fail
       setUserReaction(prevReaction);
       setReactionCount(prevReactionCount);
-      toast.error("Không thể thay đổi cảm xúc lúc này");
+      toast.error(t("errorReact"));
     } finally {
       setTimeout(() => setIsAnimating(false), 300);
     }
-  };
-
-  const handleShare = () => {
-    // TODO: [FEATURE] Copy link bài viết vào Clipboard hoặc mở popup Share Facebook
-    // const postUrl = `${window.location.origin}/post/${post.id}`;
-    // navigator.clipboard.writeText(postUrl);
-    // toast.success("Đã sao chép liên kết bài viết!");
   };
 
   const handleUpdatePost = async () => {
@@ -165,10 +160,10 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
       if (res.success && res.data) {
         setCurrentPost((prev) => ({ ...prev, title: res.data.title }));
         setIsEditing(false);
-        toast.success("Update post successfully!");
+        toast.success(t("successUpdate"));
       }
     } catch {
-      toast.error("Failed to update post");
+      toast.error(t("errorUpdate"));
     } finally {
       setIsUpdating(false);
     }
@@ -181,10 +176,10 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
       const res = await socialService.deletePost(currentPost.id);
       if (res.success) {
         setIsDeleted(true);
-        toast.success(res.message || "Post deleted permanently");
+        toast.success(res.message || t("successDelete"));
       }
     } catch {
-      toast.error("Failed to delete post");
+      toast.error(t("errorDelete"));
       setIsDeleting(false);
     }
   };
@@ -192,6 +187,14 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
   if (isDeleted) return null;
 
   const isShop = !!post.shopId || post.role === "Shop";
+
+  const postDisplayName = (() => {
+    if (post.role === "Admin") return "Admin";
+    if (isShop) {
+      return (post as any).shopName || post.username || post.userId;
+    }
+    return post.fullName || post.username || post.userId;
+  })();
 
   return (
     <>
@@ -222,14 +225,14 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                       post.avatarUrl ||
                       "https://res.cloudinary.com/doezwafgz/image/upload/v1765602783/a0a1d1831b40575009c07fad4634ef52_y23lze.jpg"
                     }
-                    alt={post.fullName || post.username || post.userId}
+                    alt={postDisplayName}
                     fill
                   />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-lg text-amazon-text group-hover:underline">
-                      {post.username || post.fullName || post.userId}
+                      {postDisplayName}
                     </span>
                     <div title="Verified Shop">
                       <Store className="w-4 h-4 text-amazon-btnSecondary" />
@@ -253,14 +256,14 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                       post.avatarUrl ||
                       "https://res.cloudinary.com/doezwafgz/image/upload/v1765602783/a0a1d1831b40575009c07fad4634ef52_y23lze.jpg"
                     }
-                    alt={post.fullName || post.username || post.userId}
+                    alt={postDisplayName}
                     fill
                   />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm text-amazon-text">
-                      {post.fullName || post.username || post.userId}
+                      {postDisplayName}
                     </span>
                     {post.product?.isAvailable && (
                       <span className="bg-[#ce2a32] text-white text-[9px] px-1.5 py-0.5 rounded-sm font-bold uppercase tracking-wider">
@@ -278,54 +281,54 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
 
           {/* Menu Option */}
           {canManage && (
-          <div className="relative">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-amazon-textMuted hover:text-amazon-text focus:outline-none"
-            >
-              <MoreHorizontal className="w-5 h-5" />
-            </button>
-            <AnimatePresence>
-              {isMenuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.1 }}
-                  className="absolute right-0 mt-2 w-48 bg-white border border-amazon-border rounded-md shadow-xl z-[99]"
-                >
-                  {isOwner && (
+            <div className="relative">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-amazon-textMuted hover:text-amazon-text focus:outline-none"
+              >
+                <MoreHorizontal className="w-5 h-5" />
+              </button>
+              <AnimatePresence>
+                {isMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.1 }}
+                    className="absolute right-0 mt-2 w-48 bg-white border border-amazon-border rounded-md shadow-xl z-[99]"
+                  >
+                    {isOwner && (
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          setIsEditing(true);
+                          setEditTitle(currentPost.title);
+                        }}
+                        className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 first:rounded-t-md transition-colors"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                        {t("editPost")}
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         setIsMenuOpen(false);
-                        setIsEditing(true);
-                        setEditTitle(currentPost.title);
+                        setShowDeleteConfirm(true);
                       }}
-                      className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 first:rounded-t-md transition-colors"
+                      disabled={isDeleting}
+                      className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 last:rounded-b-md transition-colors disabled:opacity-50"
                     >
-                      <Edit2 className="w-4 h-4" />
-                      Edit the post
+                      {isDeleting ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                      {t("deletePost")}
                     </button>
-                  )}
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      setShowDeleteConfirm(true);
-                    }}
-                    disabled={isDeleting}
-                    className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 last:rounded-b-md transition-colors disabled:opacity-50"
-                  >
-                    {isDeleting ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="w-4 h-4" />
-                    )}
-                    Delete post
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           )}
         </div>
 
@@ -337,14 +340,14 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
                 className="w-full bg-white border border-amazon-border rounded-md p-3 text-sm text-amazon-text outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus min-h-[100px] resize-y"
-                placeholder="What's on your mind?"
+                placeholder={t("placeholder")}
               />
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setIsEditing(false)}
                   className="px-4 py-1.5 text-xs font-bold uppercase text-amazon-textMuted hover:text-amazon-text transition-colors"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   onClick={handleUpdatePost}
@@ -356,7 +359,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                   ) : (
                     <Save className="w-3.5 h-3.5" />
                   )}
-                  Save
+                  {t("save")}
                 </button>
               </div>
             </div>
@@ -369,23 +372,27 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
           {post.product && (
             <div className="mt-3 bg-amazon-bgSecondary border border-amazon-border p-2 rounded-sm text-md text-amazon-textMuted space-y-1">
               <p>
-                <span className="font-bold text-amazon-link">Board:</span>{" "}
+                <span className="font-bold text-amazon-link">{t("board")}</span>{" "}
                 {post.product.name}
               </p>
               <p>
-                <span className="font-bold text-amazon-link">Switch:</span>{" "}
+                <span className="font-bold text-amazon-link">
+                  {t("switch")}
+                </span>{" "}
                 {post.product.price}
               </p>
               <p>
-                <span className="font-bold text-amazon-link">Keycaps:</span>{" "}
+                <span className="font-bold text-amazon-link">
+                  {t("quantity")}
+                </span>{" "}
                 {post.product.quantity}
               </p>
               <div className="pt-2">
                 <Link
                   href={`/shop/assembled-product/${post.product.id}`}
-                  className="inline-flex items-center justify-center bg-amazon-btnSecondary text-amazon-text px-3 py-1.5 rounded-sm text-xs font-black uppercase tracking-wider hover:brightness-95 transition-colors"
+                  className="inline-flex items-center justify-center bg-amazon-btnSecondary text-amazon-text px-3 py-1.5 rounded-sm text-xs font-black hover:brightness-95 transition-colors"
                 >
-                  View Product
+                  {t("viewProduct")}
                 </Link>
               </div>
             </div>
@@ -428,7 +435,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                 onClick={handleOpenReactions}
                 className="cursor-pointer hover:underline text-amazon-textMuted"
               >
-                {reactionCount} {reactionCount <= 1 ? "reaction" : "reactions"}
+                {t("reactionCount", { count: reactionCount })}
               </span>
             </div>
             <div className="flex gap-3">
@@ -436,9 +443,8 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                 onClick={() => setShowComments(!showComments)}
                 className="hover:underline"
               >
-                {commentCount} comments
+                {t("commentCount", { count: commentCount })}
               </button>
-              <span>0 shares</span>
             </div>
           </div>
 
@@ -468,7 +474,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                         key={type}
                         onClick={(e) => handleReact(e, type)}
                         className="text-2xl hover:scale-150 transition-transform origin-bottom px-1"
-                        title={type}
+                        title={t((type as string).toLowerCase())}
                       >
                         {emoji}
                       </button>
@@ -479,7 +485,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
 
               <button
                 onClick={(e) => handleReact(e, userReaction || "Like")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-sm hover:bg-neutral-50 transition-colors text-sm font-bold uppercase tracking-wider ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-sm hover:bg-neutral-50 transition-colors text-sm font-bold ${
                   userReaction
                     ? REACTION_COLORS[userReaction]
                     : "text-amazon-textMuted hover:text-amazon-text"
@@ -497,24 +503,16 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                     className={`w-4 h-4 transition-transform duration-200 ${isAnimating ? "scale-125" : "scale-100"}`}
                   />
                 )}
-                <span>{userReaction || "Like"}</span>
+                <span>{userReaction || t("like")}</span>
               </button>
             </div>
 
             <button
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center gap-2 px-4 py-2 rounded-sm hover:bg-neutral-50 transition-colors text-sm font-bold uppercase tracking-wider text-amazon-textMuted hover:text-amazon-text"
+              className="flex items-center gap-2 px-4 py-2 rounded-sm hover:bg-neutral-50 transition-colors text-sm font-bold  text-amazon-textMuted hover:text-amazon-text"
             >
               <MessageCircle className="w-4 h-4" />
-              Comment
-            </button>
-
-            <button
-              onClick={handleShare}
-              className="flex items-center gap-2 px-4 py-2 rounded-sm hover:bg-neutral-50 transition-colors text-sm font-bold uppercase tracking-wider text-amazon-textMuted hover:text-amazon-text"
-            >
-              <Share2 className="w-4 h-4" />
-              Share
+              {t("commentCount", { count: commentCount })}
             </button>
           </div>
         </div>
@@ -524,7 +522,9 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
             postId={post.id}
             initialCount={post.commentCount}
             onCommentAdded={() => setCommentCount((prev) => prev + 1)}
-            onCommentDeleted={() => setCommentCount(prev => Math.max(0, prev - 1))}
+            onCommentDeleted={() =>
+              setCommentCount((prev) => Math.max(0, prev - 1))
+            }
           />
         )}
       </motion.div>
@@ -533,7 +533,9 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
         <div className="fixed inset-0 z-[999] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white border border-amazon-border rounded-2xl w-full max-w-sm max-h-[70vh] flex flex-col">
             <div className="flex justify-between items-center p-4 border-b border-amazon-border">
-              <h2 className="text-amazon-text font-bold">Reactions</h2>
+              <h2 className="text-amazon-text font-bold">
+                {t("reactionsTitle")}
+              </h2>
               <button
                 onClick={() => setIsReactionsModalOpen(false)}
                 className="text-amazon-textMuted hover:text-amazon-text"
@@ -593,11 +595,11 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                 </div>
                 <h3 className="text-lg font-black uppercase tracking-wide text-amazon-text">
-                  Delete Item?
+                  {t("deleteItemTitle")}
                 </h3>
               </div>
               <p className="text-sm text-amazon-textMuted mb-6 leading-relaxed">
-                Are you sure you want to permanently delete this? This action cannot be undone.
+                {t("deleteItemDesc")}
               </p>
               <div className="flex items-center justify-end gap-3">
                 <button
@@ -605,7 +607,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                   disabled={isDeleting}
                   className="px-4 py-2 text-sm font-bold text-amazon-textMuted hover:text-amazon-text transition-colors disabled:opacity-50"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   onClick={executeDelete}
@@ -613,7 +615,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                   className="px-4 py-2 text-sm font-bold uppercase tracking-wider bg-[#ce2a32] hover:bg-red-600 text-white rounded-sm transition-colors flex items-center gap-2 disabled:opacity-50"
                 >
                   <Trash2 className="w-4 h-4" />
-                  Delete
+                  {t("deleteBtn")}
                 </button>
               </div>
             </motion.div>

@@ -1,8 +1,9 @@
 "use client";
 
-import { X, Loader2, Package, ExternalLink } from "lucide-react";
+import { X, Loader2, Package } from "lucide-react";
 import { useAppSelector } from "@/src/store/hook";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import {
   PartItem,
   PartType,
@@ -27,23 +28,34 @@ function parseSpecifications(raw: string | null): PartSpecifications | null {
   }
 }
 
-const PART_TYPE_STYLES: Record<
-  PartType,
-  { label: string; color: string; bg: string }
-> = {
-  kit: { label: "Kit", color: "text-purple-700", bg: "bg-purple-50 border border-purple-200" },
-  component: { label: "Component", color: "text-blue-700", bg: "bg-blue-50 border border-blue-200" },
+const getPartTypeStyles = (t: (key: string) => string) => ({
+  kit: {
+    label: t("typeKit"),
+    color: "text-purple-700",
+    bg: "bg-purple-50 border border-purple-200",
+  },
+  component: {
+    label: t("typeComponent"),
+    color: "text-blue-700",
+    bg: "bg-blue-50 border border-blue-200",
+  },
   accessory: {
-    label: "Accessory",
+    label: t("typeAccessory"),
     color: "text-emerald-700",
     bg: "bg-emerald-50 border border-emerald-200",
   },
-};
+});
 
-const STATUS_MAP: Record<number, { label: string; cls: string }> = {
-  1: { label: "Active", cls: "bg-neutral-100 text-amazon-text border border-amazon-border" },
-  0: { label: "Inactive", cls: "bg-red-50 text-red-600 border border-red-200" },
-};
+const getStatusMap = (t: (key: string) => string) => ({
+  1: {
+    label: t("statusActive"),
+    cls: "bg-neutral-100 text-amazon-text border border-amazon-border",
+  },
+  0: {
+    label: t("statusInactive"),
+    cls: "bg-red-50 text-red-600 border border-red-200",
+  },
+});
 
 interface PartDetailModalProps {
   isOpen: boolean;
@@ -54,6 +66,7 @@ export default function PartDetailModal({
   isOpen,
   onClose,
 }: PartDetailModalProps) {
+  const t = useTranslations("PartDetailModal");
   const { selectedPart, detailLoading } = useAppSelector(
     (state) => state.parts,
   );
@@ -69,7 +82,7 @@ export default function PartDetailModal({
       <div className="bg-white rounded-sm shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto border border-amazon-border">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-amazon-border bg-neutral-50 shrink-0">
-          <h2 className="text-lg font-bold text-amazon-text">Part Details</h2>
+          <h2 className="text-lg font-bold text-amazon-text">{t("title")}</h2>
           <button
             onClick={handleClose}
             className="p-1 rounded-sm hover:bg-white border border-transparent hover:border-amazon-border transition shadow-sm"
@@ -83,11 +96,13 @@ export default function PartDetailModal({
           {detailLoading ? (
             <div className="flex items-center justify-center py-16 text-amazon-textMuted gap-2">
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span className="text-[13px] font-medium">Loading part details...</span>
+              <span className="text-[13px] font-medium">
+                {t("loadingDetails")}
+              </span>
             </div>
           ) : !selectedPart ? (
             <div className="py-16 text-center text-amazon-textMuted text-[13px] font-medium">
-              Part not found.
+              {t("partNotFound")}
             </div>
           ) : (
             <PartDetailContent part={selectedPart} />
@@ -100,7 +115,7 @@ export default function PartDetailModal({
             onClick={handleClose}
             className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition shadow-sm"
           >
-            Close
+            {t("close")}
           </button>
         </div>
       </div>
@@ -110,13 +125,17 @@ export default function PartDetailModal({
 
 // --- Detail Content ---
 function PartDetailContent({ part }: { part: PartItem }) {
-  const typeStyle = PART_TYPE_STYLES[part.partType] || {
+  const t = useTranslations("PartDetailModal");
+  const partTypeStyles = getPartTypeStyles(t);
+  const statusMap = getStatusMap(t);
+
+  const typeStyle = partTypeStyles[part.partType as PartType] || {
     label: part.partType,
     color: "text-gray-700",
     bg: "bg-gray-100",
   };
-  const statusInfo = STATUS_MAP[part.status] || {
-    label: "Unknown",
+  const statusInfo = statusMap[part.status] || {
+    label: t("statusUnknown"),
     cls: "bg-gray-100 text-gray-600",
   };
   const specs = parseSpecifications(part.specifications);
@@ -147,7 +166,7 @@ function PartDetailContent({ part }: { part: PartItem }) {
             <div className="w-28 h-28 rounded-sm bg-neutral-50 border border-dashed border-amazon-border overflow-hidden flex items-center justify-center hover:bg-white transition shadow-sm">
               <Image
                 src={part.defaultLayerImageUrl}
-                alt="Layer"
+                alt={t("layerAlt")}
                 width={112}
                 height={112}
                 className="object-contain w-full h-full p-2"
@@ -160,8 +179,12 @@ function PartDetailContent({ part }: { part: PartItem }) {
         {/* Info */}
         <div className="flex-1 min-w-0 space-y-3">
           <div>
-            <h3 className="text-[18px] font-bold text-amazon-text truncate">{part.name}</h3>
-            <p className="text-[12px] text-amazon-textMuted mt-1 truncate">{part.slug}</p>
+            <h3 className="text-[18px] font-bold text-amazon-text truncate">
+              {part.name}
+            </h3>
+            <p className="text-[12px] text-amazon-textMuted mt-1 truncate">
+              {part.slug}
+            </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <span
@@ -188,9 +211,13 @@ function PartDetailContent({ part }: { part: PartItem }) {
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard label="Price" value={formatPrice(part.price)} valueColor="text-amazon-price" />
         <StatCard
-          label="Stock"
+          label={t("statPrice")}
+          value={formatPrice(part.price)}
+          valueColor="text-amazon-price"
+        />
+        <StatCard
+          label={t("statStock")}
           value={part.stockQuantity.toLocaleString("vi-VN")}
           valueColor={
             part.stockQuantity <= 0
@@ -200,14 +227,20 @@ function PartDetailContent({ part }: { part: PartItem }) {
                 : "text-amazon-text"
           }
         />
-        <StatCard label="Shop" value={part.shopName} />
-        <StatCard label="ID" value={part.id.slice(0, 8) + "..."} small />
+        <StatCard label={t("statShop")} value={part.shopName} />
+        <StatCard
+          label={t("statId")}
+          value={part.id.slice(0, 8) + "..."}
+          small
+        />
       </div>
 
       {/* Recipe (kit) */}
       {(part.recipeSwitchCount > 0 || part.recipeStabilizerCount > 0) && (
         <div className="p-5 bg-purple-50 border border-purple-200 rounded-sm shadow-sm">
-          <p className="text-[13px] font-bold text-purple-800 mb-4">Kit Recipe</p>
+          <p className="text-[13px] font-bold text-purple-800 mb-4">
+            {t("kitRecipe")}
+          </p>
           <div className="flex gap-8">
             {part.recipeSwitchCount > 0 && (
               <div className="text-center">
@@ -215,7 +248,7 @@ function PartDetailContent({ part }: { part: PartItem }) {
                   {part.recipeSwitchCount}
                 </p>
                 <p className="text-[12px] font-medium text-purple-600 mt-1">
-                  Switches
+                  {t("recipeSwitches")}
                 </p>
               </div>
             )}
@@ -225,7 +258,7 @@ function PartDetailContent({ part }: { part: PartItem }) {
                   {part.recipeStabilizerCount}
                 </p>
                 <p className="text-[12px] font-medium text-purple-600 mt-1">
-                  Stabilizers
+                  {t("recipeStabilizers")}
                 </p>
               </div>
             )}
@@ -237,7 +270,7 @@ function PartDetailContent({ part }: { part: PartItem }) {
       {specs && specs.workflow && (
         <div className="p-5 bg-neutral-50 border border-amazon-border rounded-sm space-y-4 shadow-sm">
           <p className="text-[13px] font-bold text-amazon-text">
-            Specifications (Workflow)
+            {t("specificationsWorkflow")}
           </p>
           <div className="divide-y divide-amazon-border">
             {specs.workflow.map((step: PartWorkflowStep, idx: number) => (
@@ -253,7 +286,9 @@ function PartDetailContent({ part }: { part: PartItem }) {
                     <p className="text-[13px] font-medium text-amazon-text">
                       {step.title}
                     </p>
-                    <p className="text-[11px] text-amazon-textMuted mt-0.5">{step.step}</p>
+                    <p className="text-[11px] text-amazon-textMuted mt-0.5">
+                      {step.step}
+                    </p>
                   </div>
                 </div>
                 <span className="text-[13px] font-bold text-amazon-text">
@@ -266,7 +301,6 @@ function PartDetailContent({ part }: { part: PartItem }) {
       )}
 
       {/* Image URLs */}
-     
     </div>
   );
 }
@@ -293,23 +327,6 @@ function StatCard({
       >
         {value}
       </p>
-    </div>
-  );
-}
-
-function ImageLink({ label, url }: { label: string; url: string }) {
-  return (
-    <div className="flex items-center gap-3 text-[12px] text-amazon-textMuted bg-neutral-50 border border-amazon-border p-2 rounded-sm shadow-sm">
-      <span className="font-medium text-amazon-text shrink-0">{label}:</span>
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="truncate hover:text-amazon-btnPrimary transition flex items-center gap-1"
-      >
-        {url}
-        <ExternalLink className="w-3 h-3 shrink-0 ml-1" />
-      </a>
     </div>
   );
 }

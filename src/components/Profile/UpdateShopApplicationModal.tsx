@@ -1,17 +1,20 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useCallback, useEffect, useMemo } from "react";
+import {
+  useForm,
+  type UseFormRegister,
+  type UseFormSetValue,
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { updateShopProfile } from "@/src/store/slices/shopSlice";
-import {
-  UpdateShopSchema,
-  UpdateShopSchemaType,
-} from "@/src/features/shop/schemas/updateShop.schema";
+import { UpdateShopSchemaType } from "@/src/features/shop/schemas/updateShop.schema";
 import { ShopResponse } from "@/src/types/shop.types";
 import { toast } from "react-toastify";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
+import { z } from "zod";
 import {
   X,
   Camera,
@@ -33,11 +36,35 @@ export const UpdateShopApplicationModal = ({
   onClose,
   shopData,
 }: UpdateShopApplicationModalProps) => {
+  const t = useTranslations("UpdateShopApplicationModal");
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.shop);
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+
+  const validationSchema = useMemo(
+    () =>
+      z.object({
+        shopName: z.string().min(3, t("validationShopNameMin")),
+        bio: z.string().optional(),
+        address: z.string().min(5, t("validationAddressMin")),
+        phoneNumber: z
+          .string()
+          .regex(/^[0-9]{10}$/, t("validationPhoneInvalid")),
+        contactEmail: z.string().email(t("validationEmailInvalid")),
+        bankName: z.string().min(1, t("validationBankNameRequired")),
+        bankAccountNumber: z
+          .string()
+          .min(1, t("validationBankAccountNumberRequired")),
+        bankAccountName: z
+          .string()
+          .min(1, t("validationBankAccountNameRequired")),
+        logoImage: z.any().optional(),
+        bannerImage: z.any().optional(),
+      }),
+    [t],
+  );
 
   const {
     register,
@@ -46,7 +73,7 @@ export const UpdateShopApplicationModal = ({
     reset,
     formState: { errors },
   } = useForm<UpdateShopSchemaType>({
-    resolver: zodResolver(UpdateShopSchema),
+    resolver: zodResolver(validationSchema),
   });
 
   // Pre-fill form with existing shop data when modal opens
@@ -78,12 +105,17 @@ export const UpdateShopApplicationModal = ({
   const onSubmit = async (data: UpdateShopSchemaType) => {
     try {
       await dispatch(updateShopProfile(data)).unwrap();
-      toast.success(
-        "Application updated successfully! Please wait for approval.",
-      );
+      toast.success(t("toastUpdateSuccess"));
       onClose();
-    } catch (error: any) {
-      toast.error(error?.message || "Update failed. Please try again.");
+    } catch (error: unknown) {
+      const errorMessage =
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof (error as { message?: unknown }).message === "string"
+          ? (error as { message: string }).message || t("toastUpdateFailed")
+          : t("toastUpdateFailed");
+      toast.error(errorMessage);
     }
   };
 
@@ -100,15 +132,15 @@ export const UpdateShopApplicationModal = ({
         <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
           <div>
             <h3 className="text-xl font-bold font-oswald uppercase text-gray-900 flex items-center gap-3">
-              Update Shop Application
+              {t("title")}
             </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Update your information and resubmit for approval.
-            </p>
+            <p className="text-sm text-gray-500 mt-1">{t("subtitle")}</p>
           </div>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-gray-100 rounded-full"
+            title={t("close")}
+            aria-label={t("close")}
           >
             <X className="w-6 h-6" />
           </button>
@@ -125,7 +157,7 @@ export const UpdateShopApplicationModal = ({
               <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
               <div>
                 <p className="text-sm font-bold text-red-700">
-                  Rejection Reason
+                  {t("rejectionReason")}
                 </p>
                 <p className="text-sm text-red-600 mt-1">
                   {shopData.adminNote}
@@ -146,6 +178,8 @@ export const UpdateShopApplicationModal = ({
                 preview={bannerPreview}
                 setPreview={setBannerPreview}
                 error={errors.bannerImage?.message as string}
+                previewAlt={t("previewAlt")}
+                bannerPrompt={t("bannerPrompt")}
               />
 
               {/* Logo Upload (Overlapping) */}
@@ -158,6 +192,8 @@ export const UpdateShopApplicationModal = ({
                   preview={logoPreview}
                   setPreview={setLogoPreview}
                   error={errors.logoImage?.message as string}
+                  previewAlt={t("previewAlt")}
+                  bannerPrompt={t("bannerPrompt")}
                 />
               </div>
             </div>
@@ -167,22 +203,22 @@ export const UpdateShopApplicationModal = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <InputLabel
-                    label="Shop Name"
+                    label={t("labelShopName")}
                     error={errors.shopName?.message}
                     required
                   />
                   <input
                     {...register("shopName")}
                     className="form-input text-lg font-bold"
-                    placeholder="Shop Name..."
+                    placeholder={t("placeholderShopName")}
                   />
                 </div>
                 <div>
-                  <InputLabel label="Slogan / Bio" />
+                  <InputLabel label={t("labelSloganBio")} />
                   <input
                     {...register("bio")}
                     className="form-input"
-                    placeholder="Short slogan or description..."
+                    placeholder={t("placeholderSloganBio")}
                   />
                 </div>
               </div>
@@ -194,44 +230,44 @@ export const UpdateShopApplicationModal = ({
             <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
               <User className="text-[#ce2a32]" />
               <h3 className="text-lg font-bold text-gray-800 uppercase">
-                Contact Details
+                {t("sectionContactDetails")}
               </h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <InputLabel
-                  label="Contact Email"
+                  label={t("labelContactEmail")}
                   error={errors.contactEmail?.message}
                   required
                 />
                 <input
                   {...register("contactEmail")}
                   className="form-input"
-                  placeholder="email@domain.com"
+                  placeholder={t("placeholderContactEmail")}
                 />
               </div>
               <div>
                 <InputLabel
-                  label="Phone Number"
+                  label={t("labelPhoneNumber")}
                   error={errors.phoneNumber?.message}
                   required
                 />
                 <input
                   {...register("phoneNumber")}
                   className="form-input"
-                  placeholder="09xxx..."
+                  placeholder={t("placeholderPhoneNumber")}
                 />
               </div>
               <div className="md:col-span-2">
                 <InputLabel
-                  label="Pickup Address"
+                  label={t("labelPickupAddress")}
                   error={errors.address?.message}
                   required
                 />
                 <input
                   {...register("address")}
                   className="form-input"
-                  placeholder="Warehouse pickup address..."
+                  placeholder={t("placeholderPickupAddress")}
                 />
               </div>
             </div>
@@ -242,44 +278,44 @@ export const UpdateShopApplicationModal = ({
             <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
               <CreditCard className="text-[#ce2a32]" />
               <h3 className="text-lg font-bold text-gray-800 uppercase">
-                Banking Information
+                {t("sectionBankingInformation")}
               </h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <InputLabel
-                  label="Bank Name"
+                  label={t("labelBankName")}
                   error={errors.bankName?.message}
                   required
                 />
                 <input
                   {...register("bankName")}
                   className="form-input"
-                  placeholder="Bank Name"
+                  placeholder={t("placeholderBankName")}
                 />
               </div>
               <div>
                 <InputLabel
-                  label="Account Holder Name"
+                  label={t("labelAccountHolderName")}
                   error={errors.bankAccountName?.message}
                   required
                 />
                 <input
                   {...register("bankAccountName")}
                   className="form-input uppercase"
-                  placeholder="Account Holder Name"
+                  placeholder={t("placeholderAccountHolderName")}
                 />
               </div>
               <div className="md:col-span-2">
                 <InputLabel
-                  label="Account Number"
+                  label={t("labelAccountNumber")}
                   error={errors.bankAccountNumber?.message}
                   required
                 />
                 <input
                   {...register("bankAccountNumber")}
                   className="form-input font-mono"
-                  placeholder="Account Number"
+                  placeholder={t("placeholderAccountNumber")}
                 />
               </div>
             </div>
@@ -292,7 +328,7 @@ export const UpdateShopApplicationModal = ({
               onClick={onClose}
               className="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
@@ -300,10 +336,13 @@ export const UpdateShopApplicationModal = ({
               className="px-6 py-2.5 bg-black text-white font-bold uppercase tracking-wider rounded-lg hover:bg-[#ce2a32] disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-md hover:shadow-lg text-sm"
             >
               {loading ? (
-                <span className="flex items-center gap-2">Processing...</span>
+                <span className="flex items-center gap-2">
+                  {t("processing")}
+                </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  Resubmit Application <CheckCircle2 className="w-4 h-4" />
+                  {t("resubmitApplication")}{" "}
+                  <CheckCircle2 className="w-4 h-4" />
                 </span>
               )}
             </button>
@@ -338,12 +377,14 @@ export const UpdateShopApplicationModal = ({
 // --- Image Upload Area ---
 interface ImageUploadAreaProps {
   name: "logoImage" | "bannerImage";
-  register: any;
-  setValue: any;
+  register: UseFormRegister<UpdateShopSchemaType>;
+  setValue: UseFormSetValue<UpdateShopSchemaType>;
   preview: string | null;
   setPreview: (url: string | null) => void;
   error?: string;
   type: "banner" | "logo";
+  previewAlt: string;
+  bannerPrompt: string;
 }
 
 const ImageUploadArea = ({
@@ -354,6 +395,8 @@ const ImageUploadArea = ({
   setPreview,
   error,
   type,
+  previewAlt,
+  bannerPrompt,
 }: ImageUploadAreaProps) => {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -405,16 +448,14 @@ const ImageUploadArea = ({
         />
 
         {preview ? (
-          <Image src={preview} alt="Preview" fill className="object-cover" />
+          <Image src={preview} alt={previewAlt} fill className="object-cover" />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 z-10">
             <Camera
               className={`${type === "banner" ? "w-8 h-8" : "w-6 h-6"} mb-2`}
             />
             {type === "banner" && (
-              <span className="text-sm font-medium">
-                Drag Banner Here or Click
-              </span>
+              <span className="text-sm font-medium">{bannerPrompt}</span>
             )}
           </div>
         )}

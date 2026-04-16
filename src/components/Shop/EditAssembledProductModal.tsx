@@ -5,6 +5,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { X, Loader2, Plus, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { updateAssembledProduct } from "@/src/store/slices/assembledProductsSlice";
 import { fetchParts } from "@/src/store/slices/partsSlice";
@@ -14,37 +15,41 @@ import { PartItem } from "@/src/types/part.types";
 import { toast } from "react-toastify";
 
 // --- ZOD SCHEMA ---
-const detailSchema = z.object({
-  baseKitId: z.string().min(1, "Base Kit ID is required"),
-  componentId: z.string().min(1, "Component ID is required"),
-  quantity: z.string().min(1, "Quantity is required"),
-  soundUrl: z.string().optional(),
-});
+const detailSchema = (t: (key: string) => string) =>
+  z.object({
+    baseKitId: z.string().min(1, t("validationBaseKitRequired")),
+    componentId: z.string().min(1, t("validationComponentRequired")),
+    quantity: z.string().min(1, t("validationQuantityRequired")),
+    soundUrl: z.string().optional(),
+  });
 
-const editAssembledProductSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Product name is required")
-    .max(200, "Max 200 characters"),
-  view3DUrl: z.string().optional(),
-  price: z.string().min(1, "Price is required"),
-  description: z
-    .string()
-    .min(1, "Description is required")
-    .max(2000, "Max 2000 characters"),
-  quantity: z.string().min(1, "Quantity is required"),
-  image1: z.string().optional(),
-  image2: z.string().optional(),
-  image3: z.string().optional(),
-  layout: z.string().optional(),
-  mounting: z.string().optional(),
-  pcb: z.string().optional(),
-  connection: z.string().optional(),
-  battery: z.string().optional(),
-  details: z.array(detailSchema).min(1, "At least one component is required"),
-});
+const editAssembledProductSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z
+      .string()
+      .min(1, t("validationProductNameRequired"))
+      .max(200, t("validationProductNameMax")),
+    view3DUrl: z.string().optional(),
+    price: z.string().min(1, t("validationPriceRequired")),
+    description: z
+      .string()
+      .min(1, t("validationDescriptionRequired"))
+      .max(2000, t("validationDescriptionMax")),
+    quantity: z.string().min(1, t("validationQuantityRequired")),
+    image1: z.string().optional(),
+    image2: z.string().optional(),
+    image3: z.string().optional(),
+    layout: z.string().optional(),
+    mounting: z.string().optional(),
+    pcb: z.string().optional(),
+    connection: z.string().optional(),
+    battery: z.string().optional(),
+    details: z
+      .array(detailSchema(t))
+      .min(1, t("validationAtLeastOneComponent")),
+  });
 
-type EditFormValues = z.infer<typeof editAssembledProductSchema>;
+type EditFormValues = z.infer<ReturnType<typeof editAssembledProductSchema>>;
 
 interface EditAssembledProductModalProps {
   isOpen: boolean;
@@ -59,10 +64,12 @@ export default function EditAssembledProductModal({
   onSuccess,
   product,
 }: EditAssembledProductModalProps) {
+  const t = useTranslations("EditAssembledProductModal");
   const dispatch = useAppDispatch();
   const { updating } = useAppSelector((state) => state.assembledProducts);
   const { currentShop } = useAppSelector((state) => state.shop);
   const { parts } = useAppSelector((state) => state.parts);
+  const schema = useMemo(() => editAssembledProductSchema(t), [t]);
 
   // Fetch shop & parts when modal opens
   useEffect(() => {
@@ -98,7 +105,7 @@ export default function EditAssembledProductModal({
     reset,
     formState: { errors },
   } = useForm<EditFormValues>({
-    resolver: zodResolver(editAssembledProductSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       name: "",
       view3DUrl: "",
@@ -194,11 +201,11 @@ export default function EditAssembledProductModal({
           })),
         }),
       ).unwrap();
-      toast.success("Assembled product updated successfully!");
+      toast.success(t("updatedSuccess"));
       onSuccess();
       onClose();
     } catch (err: unknown) {
-      toast.error((err as string) || "Failed to update assembled product");
+      toast.error((err as string) || t("updateFailed"));
     }
   };
 
@@ -223,10 +230,17 @@ export default function EditAssembledProductModal({
   }
 
   const tabs = [
-    { key: "basic" as const, label: "Basic Info" },
-    { key: "specs" as const, label: "Specifications" },
-    { key: "components" as const, label: "Components" },
+    { key: "basic" as const, label: t("tabBasicInfo") },
+    { key: "specs" as const, label: t("tabSpecifications") },
+    { key: "components" as const, label: t("tabComponents") },
   ];
+
+  const getPartTypeLabel = (type: string) => {
+    if (type === "kit") return t("typeKit");
+    if (type === "component") return t("typeComponent");
+    if (type === "accessory") return t("typeAccessory");
+    return type;
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -234,11 +248,9 @@ export default function EditAssembledProductModal({
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-amazon-border">
           <div>
-            <h2 className="text-lg font-bold text-amazon-text">
-              Edit Assembled Product
-            </h2>
+            <h2 className="text-lg font-bold text-amazon-text">{t("title")}</h2>
             <p className="text-[12px] text-amazon-textMuted mt-0.5">
-              Update the assembled product details.
+              {t("subtitle")}
             </p>
           </div>
           <button
@@ -274,11 +286,11 @@ export default function EditAssembledProductModal({
           {activeTab === "basic" && (
             <div className="space-y-4">
               <div>
-                <label className={labelClass}>Product Name *</label>
+                <label className={labelClass}>{t("productName")} *</label>
                 <input
                   {...register("name")}
                   className={inputClass}
-                  placeholder="e.g. Bàn phím thủ công"
+                  placeholder={t("productNamePlaceholder")}
                 />
                 {errors.name && (
                   <p className={errorClass}>{errors.name.message}</p>
@@ -287,7 +299,7 @@ export default function EditAssembledProductModal({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Price (VND) *</label>
+                  <label className={labelClass}>{t("price")} *</label>
                   <input
                     type="number"
                     {...register("price")}
@@ -299,7 +311,7 @@ export default function EditAssembledProductModal({
                   )}
                 </div>
                 <div>
-                  <label className={labelClass}>Quantity *</label>
+                  <label className={labelClass}>{t("quantity")} *</label>
                   <input
                     type="number"
                     {...register("quantity")}
@@ -313,7 +325,7 @@ export default function EditAssembledProductModal({
               </div>
 
               <div>
-                <label className={labelClass}>Description *</label>
+                <label className={labelClass}>{t("description")} *</label>
                 <textarea
                   {...register("description")}
                   className={`${inputClass} resize-none`}
@@ -325,47 +337,49 @@ export default function EditAssembledProductModal({
               </div>
 
               <div className="space-y-3">
-                <p className="text-[14px] font-bold text-amazon-text">Image URLs</p>
+                <p className="text-[14px] font-bold text-amazon-text">
+                  {t("imageUrls")}
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-[12px] font-medium text-amazon-textMuted mb-2">
-                      Image 1
+                      {t("image1")}
                     </label>
                     <input
                       {...register("image1")}
                       className={inputClass}
-                      placeholder="https://..."
+                      placeholder={t("urlPlaceholder")}
                     />
                   </div>
                   <div>
                     <label className="block text-[12px] font-medium text-amazon-textMuted mb-2">
-                      Image 2
+                      {t("image2")}
                     </label>
                     <input
                       {...register("image2")}
                       className={inputClass}
-                      placeholder="https://..."
+                      placeholder={t("urlPlaceholder")}
                     />
                   </div>
                   <div>
                     <label className="block text-[12px] font-medium text-amazon-textMuted mb-2">
-                      Image 3
+                      {t("image3")}
                     </label>
                     <input
                       {...register("image3")}
                       className={inputClass}
-                      placeholder="https://..."
+                      placeholder={t("urlPlaceholder")}
                     />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className={labelClass}>3D Model URL (.glb)</label>
+                <label className={labelClass}>{t("model3dUrl")}</label>
                 <input
                   {...register("view3DUrl")}
                   className={inputClass}
-                  placeholder="https://...model.glb"
+                  placeholder={t("modelUrlPlaceholder")}
                 />
               </div>
             </div>
@@ -376,47 +390,47 @@ export default function EditAssembledProductModal({
             <div className="space-y-4">
               <div className="p-5 bg-indigo-50 border border-indigo-200 rounded-sm shadow-sm">
                 <p className="text-[13px] font-bold text-indigo-800 mb-4">
-                  Keyboard Specifications
+                  {t("keyboardSpecifications")}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className={labelClass}>Layout</label>
+                    <label className={labelClass}>{t("layout")}</label>
                     <input
                       {...register("layout")}
                       className={inputClass}
-                      placeholder="e.g. 85%, 75%, TKL"
+                      placeholder={t("layoutPlaceholder")}
                     />
                   </div>
                   <div>
-                    <label className={labelClass}>Mounting</label>
+                    <label className={labelClass}>{t("mounting")}</label>
                     <input
                       {...register("mounting")}
                       className={inputClass}
-                      placeholder="e.g. Gasket Mount"
+                      placeholder={t("mountingPlaceholder")}
                     />
                   </div>
                   <div>
-                    <label className={labelClass}>PCB</label>
+                    <label className={labelClass}>{t("pcb")}</label>
                     <input
                       {...register("pcb")}
                       className={inputClass}
-                      placeholder="e.g. 1.2mm Flex-cut, Hotswap"
+                      placeholder={t("pcbPlaceholder")}
                     />
                   </div>
                   <div>
-                    <label className={labelClass}>Connection</label>
+                    <label className={labelClass}>{t("connection")}</label>
                     <input
                       {...register("connection")}
                       className={inputClass}
-                      placeholder="e.g. Tri-mode"
+                      placeholder={t("connectionPlaceholder")}
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className={labelClass}>Battery</label>
+                    <label className={labelClass}>{t("battery")}</label>
                     <input
                       {...register("battery")}
                       className={inputClass}
-                      placeholder="e.g. 2250mAh x 2"
+                      placeholder={t("batteryPlaceholder")}
                     />
                   </div>
                 </div>
@@ -429,7 +443,7 @@ export default function EditAssembledProductModal({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-[14px] font-bold text-amazon-text">
-                  Component Details ({fields.length})
+                  {t("componentDetails", { count: fields.length })}
                 </p>
                 <button
                   type="button"
@@ -444,7 +458,7 @@ export default function EditAssembledProductModal({
                   className="px-3 py-1.5 text-[12px] font-medium text-amazon-text bg-amazon-bgSecondary border border-amazon-btnPrimary/20 rounded-sm hover:bg-amazon-btnPrimary/20 transition flex items-center gap-1 shadow-sm"
                 >
                   <Plus className="w-3 h-3" />
-                  Add Component
+                  {t("addComponent")}
                 </button>
               </div>
 
@@ -462,7 +476,7 @@ export default function EditAssembledProductModal({
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-[13px] font-bold text-amazon-textMuted">
-                        Component #{index + 1}
+                        {t("componentIndex", { index: index + 1 })}
                       </span>
                       {fields.length > 1 && (
                         <button
@@ -478,13 +492,13 @@ export default function EditAssembledProductModal({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[13px] font-medium text-amazon-text mb-1">
-                          Base Kit *
+                          {t("baseKit")} *
                         </label>
                         <select
                           {...register(`details.${index}.baseKitId`)}
                           className={inputClass}
                         >
-                          <option value="">— Select a kit —</option>
+                          <option value="">{t("selectKit")}</option>
                           {kitParts.map((kit) => (
                             <option key={kit.id} value={kit.id}>
                               {kit.name} ({kit.slug})
@@ -499,20 +513,15 @@ export default function EditAssembledProductModal({
                       </div>
                       <div>
                         <label className="block text-[13px] font-medium text-amazon-text mb-1">
-                          Component *
+                          {t("component")} *
                         </label>
                         <select
                           {...register(`details.${index}.componentId`)}
                           className={inputClass}
                         >
-                          <option value="">— Select a component —</option>
+                          <option value="">{t("selectComponent")}</option>
                           {Object.entries(partsByType).map(([type, items]) => (
-                            <optgroup
-                              key={type}
-                              label={
-                                type.charAt(0).toUpperCase() + type.slice(1)
-                              }
-                            >
+                            <optgroup key={type} label={getPartTypeLabel(type)}>
                               {items.map((part) => (
                                 <option key={part.id} value={part.id}>
                                   {part.name} — {formatPrice(part.price)}
@@ -529,7 +538,7 @@ export default function EditAssembledProductModal({
                       </div>
                       <div>
                         <label className="block text-[13px] font-medium text-amazon-text mb-1">
-                          Quantity *
+                          {t("quantity")} *
                         </label>
                         <input
                           type="number"
@@ -545,12 +554,12 @@ export default function EditAssembledProductModal({
                       </div>
                       <div>
                         <label className="block text-[13px] font-medium text-amazon-text mb-1">
-                          Sound URL
+                          {t("soundUrl")}
                         </label>
                         <input
                           {...register(`details.${index}.soundUrl`)}
                           className={inputClass}
-                          placeholder="YouTube embed URL (optional)"
+                          placeholder={t("soundUrlPlaceholder")}
                         />
                       </div>
                     </div>
@@ -568,15 +577,17 @@ export default function EditAssembledProductModal({
               disabled={updating}
               className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               disabled={updating}
               className="px-5 py-2 text-[13px] font-medium text-amazon-text bg-amazon-btnPrimary border border-amazon-border rounded-sm hover:brightness-95 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
             >
-              {updating && <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />}
-              {updating ? "Updating..." : "Update Product"}
+              {updating && (
+                <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />
+              )}
+              {updating ? t("updating") : t("updateProduct")}
             </button>
           </div>
         </form>

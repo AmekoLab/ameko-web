@@ -5,22 +5,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "react-toastify";
 import { Loader2, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { updateVoucherThunk } from "@/src/store/slices/voucherSlice";
 import { Voucher, VoucherStatus } from "@/src/services/voucher.service";
 
 // ─── Zod Schema ──────────────────────────────────────────
 
-const updateVoucherSchema = z.object({
-  name: z.string().min(1, "Voucher name cannot be empty"),
-  description: z.string().min(1, "Description cannot be empty"),
-  endDate: z.string().min(1, "Select end date"),
-  usageLimit: z.string().min(1, "Cannot be empty"),
-  status: z.string().min(1, "Select status"),
-  maxUsesPerUser: z.string().optional(),
-});
+type TranslationFn = (key: string, values?: Record<string, unknown>) => string;
 
-type UpdateVoucherFormValues = z.infer<typeof updateVoucherSchema>;
+const updateVoucherSchema = (t: TranslationFn) =>
+  z.object({
+    name: z.string().min(1, t("validation.nameRequired")),
+    description: z.string().min(1, t("validation.descriptionRequired")),
+    endDate: z.string().min(1, t("validation.endDateRequired")),
+    usageLimit: z.string().min(1, t("validation.usageLimitRequired")),
+    status: z.string().min(1, t("validation.statusRequired")),
+    maxUsesPerUser: z.string().optional(),
+  });
+
+type UpdateVoucherFormValues = z.infer<ReturnType<typeof updateVoucherSchema>>;
 
 // ─── Helpers ─────────────────────────────────────────────
 
@@ -50,22 +54,35 @@ interface Props {
 }
 
 export default function UpdateVoucherModal({ voucher, onClose }: Props) {
+  const t = useTranslations("UpdateVoucherModal");
+  const tCommon = useTranslations("Common");
   const dispatch = useAppDispatch();
   const { isUpdatingVoucher } = useAppSelector((state) => state.voucher);
+
+  const getVoucherTypeLabel = (type: string) => {
+    const map: Record<string, string> = {
+      Promotion: t("voucherType.promotion"),
+      Negotiation: t("voucherType.negotiation"),
+      Compensation: t("voucherType.compensation"),
+    };
+    return map[type] ?? type;
+  };
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<UpdateVoucherFormValues>({
-    resolver: zodResolver(updateVoucherSchema),
+    resolver: zodResolver(updateVoucherSchema(t as unknown as TranslationFn)),
     defaultValues: {
       name: voucher.name,
       description: voucher.description,
       endDate: toDatetimeLocal(voucher.endDate),
       usageLimit: String(voucher.usageLimit),
       status: String(statusStringToEnum(voucher.status)),
-      maxUsesPerUser: voucher.maxUsesPerUser ? String(voucher.maxUsesPerUser) : "",
+      maxUsesPerUser: voucher.maxUsesPerUser
+        ? String(voucher.maxUsesPerUser)
+        : "",
     },
   });
 
@@ -80,14 +97,17 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
             endDate: new Date(data.endDate).toISOString(),
             usageLimit: Number(data.usageLimit),
             status: Number(data.status) as VoucherStatus,
-            maxUsesPerUser: (data.maxUsesPerUser && Number(data.maxUsesPerUser) > 0) ? Number(data.maxUsesPerUser) : null,
+            maxUsesPerUser:
+              data.maxUsesPerUser && Number(data.maxUsesPerUser) > 0
+                ? Number(data.maxUsesPerUser)
+                : null,
           },
         }),
       ).unwrap();
-      toast.success(result.message || "Voucher updated successfully!");
+      toast.success(result.message || t("toast.updateSuccess"));
       onClose();
     } catch (err: unknown) {
-      toast.error(typeof err === "string" ? err : "Failed to update voucher");
+      toast.error(typeof err === "string" ? err : t("toast.updateFailed"));
     }
   };
 
@@ -101,12 +121,11 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
       <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-sm bg-white p-6 shadow-xl border border-amazon-border">
         {/* Header */}
         <div className="flex items-center justify-between mb-3 pb-2 border-b border-amazon-border">
-          <h2 className="text-lg font-bold text-amazon-text">
-            Update Voucher
-          </h2>
+          <h2 className="text-lg font-bold text-amazon-text">{t("title")}</h2>
           <button
             type="button"
             onClick={onClose}
+            aria-label={tCommon("close")}
             className="rounded-sm p-1.5 text-amazon-textMuted hover:bg-neutral-50 hover:text-amazon-text transition border border-transparent hover:border-amazon-border"
           >
             <X className="h-5 w-5" />
@@ -115,9 +134,13 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
 
         {/* Readonly info */}
         <div className="mb-4 rounded-sm bg-neutral-50 border border-amazon-border px-4 py-3 text-[13px] text-amazon-textMuted flex items-center gap-2">
-          <span className="font-medium font-mono text-amazon-text">{voucher.code}</span>
+          <span className="font-medium font-mono text-amazon-text">
+            {voucher.code}
+          </span>
           <span className="text-neutral-300">|</span>
-          <span className="font-medium">{voucher.type}</span>
+          <span className="font-medium">
+            {getVoucherTypeLabel(voucher.type)}
+          </span>
           <span className="text-neutral-300">|</span>
           <span className="font-medium">
             {voucher.discountType === "Percentage"
@@ -129,14 +152,14 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Name */}
           <div>
-            <label className={labelCls}>Voucher Name</label>
+            <label className={labelCls}>{t("labels.voucherName")}</label>
             <input {...register("name")} className={inputCls} />
             {errors.name && <p className={errCls}>{errors.name.message}</p>}
           </div>
 
           {/* Description */}
           <div>
-            <label className={labelCls}>Description</label>
+            <label className={labelCls}>{t("labels.description")}</label>
             <textarea
               {...register("description")}
               rows={2}
@@ -149,7 +172,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
 
           {/* End Date */}
           <div>
-            <label className={labelCls}>End Date</label>
+            <label className={labelCls}>{t("labels.endDate")}</label>
             <input
               type="datetime-local"
               {...register("endDate")}
@@ -163,7 +186,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
           {/* Usage Limit + Status + Max Uses Per User row */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className={labelCls}>Usage Limit</label>
+              <label className={labelCls}>{t("labels.usageLimit")}</label>
               <input
                 type="number"
                 {...register("usageLimit")}
@@ -174,15 +197,26 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
               )}
             </div>
             <div>
-              <label className={labelCls}>Max Uses / User</label>
-              <input type="number" {...register("maxUsesPerUser")} placeholder="Unlimited" className={inputCls} />
-              {errors.maxUsesPerUser && <p className={errCls}>{errors.maxUsesPerUser.message}</p>}
+              <label className={labelCls}>{t("labels.maxUsesPerUser")}</label>
+              <input
+                type="number"
+                {...register("maxUsesPerUser")}
+                placeholder={t("placeholders.unlimited")}
+                className={inputCls}
+              />
+              {errors.maxUsesPerUser && (
+                <p className={errCls}>{errors.maxUsesPerUser.message}</p>
+              )}
             </div>
             <div>
-              <label className={labelCls}>Status</label>
+              <label className={labelCls}>{t("labels.status")}</label>
               <select {...register("status")} className={inputCls}>
-                <option value={String(VoucherStatus.Active)}>Active</option>
-                <option value={String(VoucherStatus.Disabled)}>Disabled</option>
+                <option value={String(VoucherStatus.Active)}>
+                  {t("status.active")}
+                </option>
+                <option value={String(VoucherStatus.Disabled)}>
+                  {t("status.disabled")}
+                </option>
               </select>
             </div>
           </div>
@@ -194,7 +228,7 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
               onClick={onClose}
               className="rounded-sm border border-amazon-border bg-white px-5 py-2.5 text-[13px] font-medium text-amazon-textMuted transition hover:bg-neutral-50 hover:text-amazon-text"
             >
-              Cancel
+              {tCommon("cancel")}
             </button>
             <button
               type="submit"
@@ -204,7 +238,9 @@ export default function UpdateVoucherModal({ voucher, onClose }: Props) {
               {isUpdatingVoucher && (
                 <Loader2 className="h-4 w-4 animate-spin text-amazon-textMuted" />
               )}
-              Save Changes
+              {isUpdatingVoucher
+                ? t("actions.saving")
+                : t("actions.saveChanges")}
             </button>
           </div>
         </form>

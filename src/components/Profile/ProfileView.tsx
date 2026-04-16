@@ -2,6 +2,7 @@
 
 import { FC, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Product } from "@/src/types/profile";
 import { ShopPublicProfile } from "@/src/types/shop.types";
 import { Post } from "@/src/types/social.types";
@@ -29,6 +30,7 @@ export const ProfileView: FC<{
   profile: ShopPublicProfile;
   initialPosts: Post[];
 }> = ({ profile, initialPosts }) => {
+  const t = useTranslations("ProfileView");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -67,15 +69,15 @@ export const ProfileView: FC<{
             : [];
           const mapped = items.map((item) => ({
             id: item.id,
-            name: item.name || "Untitled Product",
+            name: item.name || t("untitledProduct"),
             price: item.price
               ? `${item.price.toLocaleString("vi-VN")}₫`
-              : "Contact",
+              : t("contact"),
             image: item.image1 || item.image2 || item.image3 || "",
-            category: item.layout || "Keyboard",
+            category: item.layout || t("defaultCategory"),
             status: (item.quantity != null && item.quantity > 0
-              ? "In Stock"
-              : "Sold Out") as Product["status"],
+              ? t("inStock")
+              : t("soldOut")) as Product["status"],
           }));
 
           if (!ignore) {
@@ -151,7 +153,7 @@ export const ProfileView: FC<{
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
       {/* SIDEBAR */}
       <div className="lg:col-span-4 xl:col-span-3">
-        <div >
+        <div>
           <ProfileSidebar profile={profile} />
         </div>
       </div>
@@ -162,10 +164,10 @@ export const ProfileView: FC<{
         <div className="bg-white rounded-sm shadow-sm border border-amazon-border mb-3  top-[70px] z-30">
           <div className="flex overflow-x-auto no-scrollbar">
             {[
-              { id: "posts", label: "Posts", icon: List },
-              { id: "shop", label: "Shop", icon: ShoppingBag },
-              { id: "showcase", label: "Showcase", icon: ImageIcon },
-              { id: "reviews", label: "Reviews", icon: Star },
+              { id: "posts", label: t("tabPosts"), icon: List },
+              { id: "shop", label: t("tabShop"), icon: ShoppingBag },
+              // { id: "showcase", label: t("tabShowcase"), icon: ImageIcon },
+              // { id: "reviews", label: t("tabReviews"), icon: Star },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -210,7 +212,7 @@ export const ProfileView: FC<{
                     <PackageOpen className="w-8 h-8 text-neutral-400" />
                   </div>
                   <p className="text-amazon-textMuted font-medium">
-                    No products found.
+                    {t("noProducts")}
                   </p>
                 </div>
               )}
@@ -221,7 +223,7 @@ export const ProfileView: FC<{
             <div className="bg-white p-16 text-center rounded-sm border border-amazon-border">
               <ImageIcon className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
               <p className="text-amazon-textMuted font-medium">
-                Showcase is being updated...
+                {t("showcaseUpdating")}
               </p>
             </div>
           )}
@@ -246,7 +248,7 @@ export const ProfileView: FC<{
                     <div className="bg-white p-16 text-center rounded-sm border border-amazon-border">
                       <Star className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
                       <p className="text-amazon-textMuted font-medium">
-                        No reviews yet.
+                        {t("noReviews")}
                       </p>
                     </div>
                   )}

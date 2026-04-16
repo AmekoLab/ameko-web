@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,13 +9,15 @@ import { approveShopWithdrawal } from "@/src/store/slices/adminWalletSlice";
 import { uploadImage } from "@/src/utils/uploadImage";
 import { toast } from "react-toastify";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 
 // ─── Zod Schema ──────────────────────────────────────────
-const approveSchema = z.object({
-  reason: z.string().min(1, "Please enter a reason"),
-});
+const createApproveSchema = (t: (key: string) => string) =>
+  z.object({
+    reason: z.string().min(1, t("validationReasonRequired")),
+  });
 
-type ApproveFormData = z.infer<typeof approveSchema>;
+type ApproveFormData = z.infer<ReturnType<typeof createApproveSchema>>;
 
 // ─── Component ───────────────────────────────────────────
 interface ApproveWithdrawalModalProps {
@@ -33,8 +35,13 @@ export default function ApproveWithdrawalModal({
   onClose,
   onSuccess,
 }: ApproveWithdrawalModalProps) {
+  const t = useTranslations("ApproveWithdrawalModal");
+  const locale = useLocale();
+  const numberLocale = locale === "vi" ? "vi-VN" : "en-US";
+
   const dispatch = useAppDispatch();
   const { approveLoading } = useAppSelector((state) => state.adminWallet);
+  const approveSchema = useMemo(() => createApproveSchema(t), [t]);
 
   const [, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -50,7 +57,7 @@ export default function ApproveWithdrawalModal({
   } = useForm<ApproveFormData>({
     resolver: zodResolver(approveSchema),
     defaultValues: {
-      reason: "Transfer successful",
+      reason: t("defaultReason"),
     },
   });
 
@@ -68,7 +75,7 @@ export default function ApproveWithdrawalModal({
       const url = await uploadImage(file);
       setUploadedUrl(url);
     } catch {
-      toast.error("Upload image failed. Please try again.");
+      toast.error(t("toastUploadFailed"));
       setImageFile(null);
       setImagePreview(null);
     } finally {
@@ -86,7 +93,7 @@ export default function ApproveWithdrawalModal({
 
   const onSubmit = async (data: ApproveFormData) => {
     if (!uploadedUrl) {
-      toast.error("Please upload transfer evidence image.");
+      toast.error(t("toastEvidenceRequired"));
       return;
     }
 
@@ -122,15 +129,13 @@ export default function ApproveWithdrawalModal({
       <div className="relative bg-white rounded-md shadow-xl w-full max-w-lg border border-amazon-border overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-amazon-border bg-white">
-          <h2 className="text-lg font-bold text-amazon-text">
-            Approve Withdrawal
-          </h2>
+          <h2 className="text-lg font-bold text-amazon-text">{t("title")}</h2>
           <button
             type="button"
             onClick={handleClose}
             className="px-2 py-1 text-[11px] font-medium text-amazon-textMuted rounded-sm hover:bg-neutral-50 border border-transparent hover:border-amazon-border transition-colors"
           >
-            Close
+            {t("close")}
           </button>
         </div>
 
@@ -139,21 +144,21 @@ export default function ApproveWithdrawalModal({
           {/* Transfer Amount Display */}
           <div className="bg-neutral-50 rounded-sm p-3 border border-amazon-border text-center flex flex-col gap-1">
             <p className="text-[11px] text-amazon-textMuted">
-              Amount to transfer
+              {t("amountToTransfer")}
             </p>
             <p className="text-lg font-bold text-green-600">
-              {amount.toLocaleString("vi-VN")}₫
+              {amount.toLocaleString(numberLocale)}₫
             </p>
           </div>
 
           {/* Reason */}
           <div className="space-y-1">
             <label className="block text-[11px] font-medium text-amazon-text">
-              Approval reason
+              {t("approvalReason")}
             </label>
             <textarea
               rows={2}
-              placeholder="Enter reason..."
+              placeholder={t("reasonPlaceholder")}
               className={`w-full border rounded-sm p-2 outline-none transition-colors resize-none text-[11px] text-amazon-text ${
                 errors.reason
                   ? "border-red-400 focus:border-red-500"
@@ -171,7 +176,7 @@ export default function ApproveWithdrawalModal({
           {/* Evidence Image Upload */}
           <div className="space-y-1">
             <label className="block text-[11px] font-medium text-amazon-text">
-              Transfer evidence image
+              {t("transferEvidenceImage")}
             </label>
 
             {!imagePreview ? (
@@ -181,17 +186,17 @@ export default function ApproveWithdrawalModal({
                 className="w-full border border-dashed border-amazon-border rounded-sm py-6 flex flex-col items-center justify-center gap-1 hover:bg-neutral-50 transition-colors bg-white"
               >
                 <p className="text-[11px] font-medium text-blue-600">
-                  Click to upload image
+                  {t("clickToUploadImage")}
                 </p>
                 <p className="text-[10px] text-amazon-textMuted">
-                  PNG, JPG up to 5MB
+                  {t("uploadHint")}
                 </p>
               </button>
             ) : (
               <div className="relative rounded-sm border border-amazon-border overflow-hidden bg-neutral-100 mt-2">
                 <Image
                   src={imagePreview}
-                  alt="Evidence preview"
+                  alt={t("evidencePreviewAlt")}
                   width={500}
                   height={300}
                   className="w-full h-40 object-contain"
@@ -201,14 +206,14 @@ export default function ApproveWithdrawalModal({
                 {uploading && (
                   <div className="absolute inset-0 bg-neutral-900/40 flex items-center justify-center">
                     <span className="text-white text-[11px] font-medium">
-                      Uploading...
+                      {t("uploading")}
                     </span>
                   </div>
                 )}
 
                 {uploadedUrl && !uploading && (
                   <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full px-2 py-0.5 text-[10px] font-bold">
-                    Uploaded
+                    {t("uploaded")}
                   </div>
                 )}
 
@@ -219,7 +224,7 @@ export default function ApproveWithdrawalModal({
                   disabled={uploading}
                   className="absolute bottom-2 right-2 rounded-sm bg-white border border-amazon-border px-2 py-1 text-[10px] font-medium text-amazon-text hover:bg-neutral-50 transition-colors shadow-sm disabled:opacity-50"
                 >
-                  Change
+                  {t("change")}
                 </button>
               </div>
             )}
@@ -240,14 +245,14 @@ export default function ApproveWithdrawalModal({
               onClick={handleClose}
               className="px-4 py-1.5 text-[11px] font-medium border border-amazon-border rounded-sm hover:bg-neutral-50 text-amazon-text transition-colors"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               disabled={isProcessing || !uploadedUrl}
               className="px-4 py-1.5 rounded-sm bg-green-600 border border-green-700 text-[11px] font-medium text-white transition-colors hover:bg-green-700 hover:border-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {approveLoading ? "Processing..." : "Confirm Approval"}
+              {approveLoading ? t("processing") : t("confirmApproval")}
             </button>
           </div>
         </form>

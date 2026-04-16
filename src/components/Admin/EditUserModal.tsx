@@ -1,29 +1,31 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { adminUpdateUser } from "@/src/store/slices/adminUsersSlice";
 import { toast } from "react-toastify";
 import { AdminUserItem, UpdateUserPayload } from "@/src/types/admin.types";
 
 // --- ZOD SCHEMA ---
-const updateUserSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  role: z.number().min(0).max(2),
-  status: z.number().min(0).max(1),
-  gender: z.number().min(0).max(2),
-  dateOfBirth: z.string().min(1, "Date of birth is required"),
-  phoneNumber: z.string().min(1, "Phone number is required"),
-  emailConfirmed: z.boolean(),
-  phoneNumberConfirmed: z.boolean(),
-});
+const updateUserSchema = (t: ReturnType<typeof useTranslations>) =>
+  z.object({
+    firstName: z.string().min(1, t("validation.firstNameRequired")),
+    lastName: z.string().min(1, t("validation.lastNameRequired")),
+    email: z.string().email(t("validation.emailInvalid")),
+    role: z.number().min(0).max(2),
+    status: z.number().min(0).max(1),
+    gender: z.number().min(0).max(2),
+    dateOfBirth: z.string().min(1, t("validation.dobRequired")),
+    phoneNumber: z.string().min(1, t("validation.phoneRequired")),
+    emailConfirmed: z.boolean(),
+    phoneNumberConfirmed: z.boolean(),
+  });
 
-type UpdateUserFormValues = z.infer<typeof updateUserSchema>;
+type UpdateUserFormValues = z.infer<ReturnType<typeof updateUserSchema>>;
 
 // Map roleName string → numeric value
 const roleNameToNumber = (roleName: string): number => {
@@ -66,8 +68,10 @@ export default function EditUserModal({
   onClose,
   onSuccess,
 }: EditUserModalProps) {
+  const t = useTranslations("EditUserModal");
   const dispatch = useAppDispatch();
   const { updating } = useAppSelector((state) => state.adminUsers);
+  const schema = useMemo(() => updateUserSchema(t), [t]);
 
   const {
     register,
@@ -75,7 +79,7 @@ export default function EditUserModal({
     reset,
     formState: { errors },
   } = useForm<UpdateUserFormValues>({
-    resolver: zodResolver(updateUserSchema),
+    resolver: zodResolver(schema),
   });
 
   // Pre-fill form when user changes
@@ -106,11 +110,12 @@ export default function EditUserModal({
         gender: Number(data.gender),
       };
       await dispatch(adminUpdateUser({ userId: user.id, payload })).unwrap();
-      toast.success("User updated successfully!");
+      toast.success(t("toast.updateSuccess"));
       onSuccess();
       onClose();
-    } catch (err: any) {
-      toast.error(err || "Failed to update user");
+    } catch (err: unknown) {
+      const message = typeof err === "string" ? err : t("toast.updateFailed");
+      toast.error(message);
     }
   };
 
@@ -133,7 +138,7 @@ export default function EditUserModal({
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-200">
           <div>
-            <h2 className="text-lg font-bold text-gray-800">Edit User</h2>
+            <h2 className="text-lg font-bold text-gray-800">{t("title")}</h2>
             <p className="text-sm text-gray-500">@{user.username}</p>
           </div>
           <button
@@ -141,7 +146,7 @@ export default function EditUserModal({
             className="px-2 py-1 text-[11px] font-medium text-gray-500 rounded hover:bg-gray-100 transition"
             disabled={updating}
           >
-            Close
+            {t("close")}
           </button>
         </div>
 
@@ -150,22 +155,22 @@ export default function EditUserModal({
           {/* Row: First Name + Last Name */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>First Name</label>
+              <label className={labelClass}>{t("firstName")}</label>
               <input
                 {...register("firstName")}
                 className={inputClass}
-                placeholder="First name"
+                placeholder={t("firstNamePlaceholder")}
               />
               {errors.firstName && (
                 <p className={errorClass}>{errors.firstName.message}</p>
               )}
             </div>
             <div>
-              <label className={labelClass}>Last Name</label>
+              <label className={labelClass}>{t("lastName")}</label>
               <input
                 {...register("lastName")}
                 className={inputClass}
-                placeholder="Last name"
+                placeholder={t("lastNamePlaceholder")}
               />
               {errors.lastName && (
                 <p className={errorClass}>{errors.lastName.message}</p>
@@ -175,12 +180,12 @@ export default function EditUserModal({
 
           {/* Email */}
           <div>
-            <label className={labelClass}>Email</label>
+            <label className={labelClass}>{t("email")}</label>
             <input
               {...register("email")}
               type="email"
               className={inputClass}
-              placeholder="user@example.com"
+              placeholder={t("emailPlaceholder")}
             />
             {errors.email && (
               <p className={errorClass}>{errors.email.message}</p>
@@ -189,11 +194,11 @@ export default function EditUserModal({
 
           {/* Phone Number */}
           <div>
-            <label className={labelClass}>Phone Number</label>
+            <label className={labelClass}>{t("phoneNumber")}</label>
             <input
               {...register("phoneNumber")}
               className={inputClass}
-              placeholder="0909090000"
+              placeholder={t("phoneNumberPlaceholder")}
             />
             {errors.phoneNumber && (
               <p className={errorClass}>{errors.phoneNumber.message}</p>
@@ -203,42 +208,42 @@ export default function EditUserModal({
           {/* Row: Role + Status + Gender */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className={labelClass}>Role</label>
+              <label className={labelClass}>{t("role")}</label>
               <select
                 {...register("role", { valueAsNumber: true })}
                 className={inputClass}
               >
-                <option value={0}>Customer</option>
-                <option value={1}>Shop</option>
-                <option value={2}>Admin</option>
+                <option value={0}>{t("roleCustomer")}</option>
+                <option value={1}>{t("roleShop")}</option>
+                <option value={2}>{t("roleAdmin")}</option>
               </select>
             </div>
             <div>
-              <label className={labelClass}>Status</label>
+              <label className={labelClass}>{t("status")}</label>
               <select
                 {...register("status", { valueAsNumber: true })}
                 className={inputClass}
               >
-                <option value={0}>Active</option>
-                <option value={1}>Banned</option>
+                <option value={0}>{t("statusActive")}</option>
+                <option value={1}>{t("statusBanned")}</option>
               </select>
             </div>
             <div>
-              <label className={labelClass}>Gender</label>
+              <label className={labelClass}>{t("gender")}</label>
               <select
                 {...register("gender", { valueAsNumber: true })}
                 className={inputClass}
               >
-                <option value={0}>Male</option>
-                <option value={1}>Female</option>
-                <option value={2}>Other</option>
+                <option value={0}>{t("genderMale")}</option>
+                <option value={1}>{t("genderFemale")}</option>
+                <option value={2}>{t("genderOther")}</option>
               </select>
             </div>
           </div>
 
           {/* Date of Birth */}
           <div>
-            <label className={labelClass}>Date of Birth</label>
+            <label className={labelClass}>{t("dateOfBirth")}</label>
             <input
               {...register("dateOfBirth")}
               type="date"
@@ -262,7 +267,7 @@ export default function EditUserModal({
                 htmlFor="emailConfirmed"
                 className="text-sm font-semibold text-gray-700"
               >
-                Email Confirmed
+                {t("emailConfirmed")}
               </label>
             </div>
             <div className="flex items-center gap-2">
@@ -276,7 +281,7 @@ export default function EditUserModal({
                 htmlFor="phoneNumberConfirmed"
                 className="text-sm font-semibold text-gray-700"
               >
-                Phone Confirmed
+                {t("phoneConfirmed")}
               </label>
             </div>
           </div>
@@ -289,14 +294,14 @@ export default function EditUserModal({
               disabled={updating}
               className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition disabled:opacity-50"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               disabled={updating}
               className="px-5 py-2 text-[11px] font-bold text-neutral-50 bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center gap-2"
             >
-              {updating ? "Saving..." : "Save Changes"}
+              {updating ? t("saving") : t("saveChanges")}
             </button>
           </div>
         </form>

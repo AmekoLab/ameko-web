@@ -21,6 +21,7 @@ import { CreatePostPayload } from "@/src/types/social.types";
 import { assembledProductService } from "@/src/services/assembledProduct.service";
 import { AssembledProductItem } from "@/src/types/assembledProduct.types";
 import { useAppSelector } from "@/src/store/hook";
+import { useTranslations } from "next-intl";
 
 const DEFAULT_AVATAR =
   "https://res.cloudinary.com/doezwafgz/image/upload/v1765602783/a0a1d1831b40575009c07fad4634ef52_y23lze.jpg";
@@ -50,6 +51,7 @@ export const CreatePost: FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const currentShop = useAppSelector((state) => state.shop.currentShop);
+  const t = useTranslations("CreatePost");
 
   // Focus textarea when modal opens
   useEffect(() => {
@@ -97,7 +99,7 @@ export const CreatePost: FC = () => {
 
   const handlePost = async () => {
     if (!title.trim()) {
-      setError("Vui lòng nhập nội dung bài viết.");
+      setError(t("errorEmptyContent"));
       return;
     }
 
@@ -135,7 +137,7 @@ export const CreatePost: FC = () => {
       setIsModalOpen(false);
     } catch (err) {
       console.error(err);
-      setError("Không thể đăng bài lúc này. Vui lòng thử lại.");
+      setError(t("errorPost"));
     } finally {
       setIsPosting(false);
     }
@@ -178,9 +180,7 @@ export const CreatePost: FC = () => {
   const handleTagProductsClick = async () => {
     const shopId = getCurrentShopId();
     if (!shopId) {
-      setProductError(
-        "Không tìm thấy shopId hợp lệ. Vui lòng đảm bảo tài khoản đã có Shop và đăng nhập lại.",
-      );
+      setProductError(t("errorShopId"));
       setShowProductPicker(true);
       return;
     }
@@ -196,7 +196,7 @@ export const CreatePost: FC = () => {
       setShopProducts(response.data || []);
     } catch (err) {
       console.error(err);
-      setProductError("Không thể tải danh sách sản phẩm để tag.");
+      setProductError(t("errorLoadProducts"));
       setShopProducts([]);
     } finally {
       setIsLoadingProducts(false);
@@ -239,7 +239,7 @@ export const CreatePost: FC = () => {
             onClick={() => setIsModalOpen(true)}
             className="flex-1 text-left bg-neutral-100 hover:bg-neutral-200 rounded-full px-4 py-2.5 text-sm text-amazon-textMuted transition-colors cursor-pointer"
           >
-            {userName} What are you thinking?
+            {t("placeholderTrigger", { userName })}
           </button>
         </div>
 
@@ -263,7 +263,7 @@ export const CreatePost: FC = () => {
               className="flex items-center gap-2 px-4 py-1.5 rounded-lg hover:bg-neutral-50 transition-colors text-sm text-amazon-textMuted font-medium"
             >
               <ImageIcon className="w-5 h-5 text-green-500" />
-              <span className="hidden sm:inline">Photo/Video</span>
+              <span className="hidden sm:inline">{t("photoVideo")}</span>
             </button>
             <button
               type="button"
@@ -271,7 +271,7 @@ export const CreatePost: FC = () => {
               className="flex items-center gap-2 px-4 py-1.5 rounded-lg hover:bg-neutral-50 transition-colors text-sm text-amazon-textMuted font-medium"
             >
               <Smile className="w-5 h-5 text-yellow-500" />
-              <span className="hidden sm:inline">Feeling/Activity</span>
+              <span className="hidden sm:inline">{t("feelingActivity")}</span>
             </button>
           </div>
         </div>
@@ -311,7 +311,7 @@ export const CreatePost: FC = () => {
               {/* ---- Header ---- */}
               <div className="flex items-center justify-between p-4 border-b border-amazon-border">
                 <div className="w-9" /> {/* Spacer for centering */}
-                <h2 className="text-lg font-bold text-amazon-text">Create Post</h2>
+                <h2 className="text-lg font-bold text-amazon-text">{t("createPost")}</h2>
                 <button
                   type="button"
                   onClick={handleCloseModal}
@@ -339,7 +339,7 @@ export const CreatePost: FC = () => {
                     className="flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-md bg-neutral-100 hover:bg-neutral-200 border border-amazon-border transition-colors text-xs text-amazon-textMuted"
                   >
                     <Lock className="w-3 h-3" />
-                    <p>Public</p>
+                    <p>{t("public")}</p>
                     {/* <ChevronDown className="w-3 h-3" /> */}
                   </div>
                 </div>
@@ -364,10 +364,7 @@ export const CreatePost: FC = () => {
                   <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-amazon-bgSecondary border border-amazon-border rounded-lg">
                     <ShoppingCart className="w-4 h-4 text-amazon-btnSecondary" />
                     <span className="text-xs text-amazon-textMuted">
-                      Sản phẩm:{" "}
-                      <span className="text-amazon-text font-medium">
-                        {selectedProductName}
-                      </span>
+                      {t("taggedProduct", { productName: selectedProductName })}
                     </span>
                     <button
                       type="button"
@@ -423,7 +420,7 @@ export const CreatePost: FC = () => {
                   <div className="mb-3 border border-amazon-border rounded-lg p-3 bg-amazon-bgSecondary">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-medium text-amazon-textMuted">
-                        Chọn sản phẩm để tag
+                        {t("selectProduct")}
                       </span>
                       <button
                         type="button"
@@ -448,7 +445,7 @@ export const CreatePost: FC = () => {
                       !productError &&
                       shopProducts.length === 0 && (
                         <p className="text-xs text-gray-500 py-2">
-                          Không tìm thấy sản phẩm nào.
+                          {t("noProductsFound")}
                         </p>
                       )}
 
@@ -467,7 +464,7 @@ export const CreatePost: FC = () => {
                                 {product.name}
                               </p>
                               <p className="text-[11px] text-amazon-textMuted">
-                                ID: {product.id}
+                                {t("productId", { productId: product.id })}
                               </p>
                             </button>
                           ))}
@@ -483,14 +480,14 @@ export const CreatePost: FC = () => {
               {/* ---- Addons Row ---- */}
               <div className="p-4 mx-4 mb-3 border border-amazon-border rounded-lg flex items-center justify-between gap-3 bg-white shadow-sm">
                 <span className="text-sm text-amazon-text font-medium whitespace-nowrap">
-                  Add to your post
+                  {t("addToPost")}
                 </span>
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
                     onClick={handleImageUpload}
                     className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
-                    title="Photo/video"
+                    title={t("photoVideo")}
                   >
                     <ImageIcon className="w-5 h-5 text-green-500" />
                   </button>
@@ -498,35 +495,35 @@ export const CreatePost: FC = () => {
                     type="button"
                     onClick={handleTagProductsClick}
                     className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
-                    title="Tag products"
+                    title={t("actionTag")}
                   >
                     <UserPlus className="w-5 h-5 text-blue-500" />
                   </button>
                   <button
                     type="button"
                     className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
-                    title="Feeling/Activity"
+                    title={t("feelingActivity")}
                   >
                     <Smile className="w-5 h-5 text-yellow-500" />
                   </button>
                   <button
                     type="button"
                     className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
-                    title="Check in"
+                    title={t("actionCheckIn")}
                   >
                     <MapPin className="w-5 h-5 text-red-500" />
                   </button>
                   <button
                     type="button"
                     className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
-                    title="GIF"
+                    title={t("actionGif")}
                   >
                     <Gift className="w-5 h-5 text-teal-400" />
                   </button>
                   <button
                     type="button"
                     className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
-                    title="More"
+                    title={t("actionMore")}
                   >
                     <MoreHorizontal className="w-5 h-5 text-amazon-textMuted" />
                   </button>
@@ -546,7 +543,7 @@ export const CreatePost: FC = () => {
                   }`}
                 >
                   {isPosting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {isPosting ? "Posting..." : "Post"}
+                  {isPosting ? t("posting") : t("postBtn")}
                 </button>
               </div>
             </motion.div>

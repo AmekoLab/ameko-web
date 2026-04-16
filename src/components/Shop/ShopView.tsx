@@ -18,6 +18,7 @@ import {
 import { assembledProductService } from "@/src/services/assembledProduct.service";
 import type { AssembledProductItem } from "@/src/types/assembledProduct.types";
 import type { Product, ProductSpecs } from "@/src/types/product";
+import { useTranslations } from "next-intl";
 
 /*
   CONSTANTS
@@ -112,6 +113,7 @@ function mapToProduct(ap: AssembledProductItem): Product {
   MAIN COMPONENT
  */
 export default function ShopView() {
+  const t = useTranslations("ShopView");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -334,10 +336,10 @@ export default function ShopView() {
         <div className="max-w-[1800px] mx-auto px-6 md:px-12 py-2 md:py-4">
           <div className="flex flex-col gap-1">
             <h1 className="text-3xl md:text-4xl font-bold text-amazon-text tracking-tight">
-              Ameko Best Sellers
+              {t("title")}
             </h1>
             <span className="text-sm md:text-base text-amazon-textMuted font-normal">
-              Our most popular products based on sales. Updated frequently.
+              {t("subtitle")}
             </span>
           </div>
         </div>
@@ -386,7 +388,7 @@ export default function ShopView() {
             aria-label="Toggle filters"
           >
             <SlidersHorizontal className="w-4 h-4" />
-            Filter
+            {t("filter")}
             {hasActiveFilters && (
               <span className="ml-1 px-1.5 py-0.5 bg-amazon-btnSecondary text-amazon-text text-xs font-bold rounded-none">
                 {selectedCategories.length + selectedAvailability.length}
@@ -478,7 +480,7 @@ export default function ShopView() {
                   {/* Product Grid */}
                   <div className="flex items-center gap-2 ml-auto p-4 justify-end">
             <span className="text-[11px] text-amazon-textMuted uppercase font-bold tracking-[0.2em] hidden md:inline-block">
-              Sort by:
+              {t("sortBy")}
             </span>
             <div className="relative">
               <select
@@ -487,10 +489,10 @@ export default function ShopView() {
                 className="appearance-none bg-white pl-0 pr-8 py-2 pl-4 text-sm font-bold text-amazon-text border border-amazon-border focus:ring-0 cursor-pointer uppercase tracking-wide rounded-sm shadow-sm"
                 aria-label="Sort products"
               >
-                <option value="featured" className="bg-white text-amazon-text">Featured</option>
-                <option value="newest" className="bg-white text-amazon-text">Date, new to old</option>
-                <option value="price-asc" className="bg-white text-amazon-text">Price, low to high</option>
-                <option value="price-desc" className="bg-white text-amazon-text">Price, high to low</option>
+                <option value="featured" className="bg-white text-amazon-text">{t("sortFeatured")}</option>
+                <option value="newest" className="bg-white text-amazon-text">{t("sortNewest")}</option>
+                <option value="price-asc" className="bg-white text-amazon-text">{t("sortPriceAsc")}</option>
+                <option value="price-desc" className="bg-white text-amazon-text">{t("sortPriceDesc")}</option>
               </select>
               <ArrowUpDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-amazon-textMuted" />
             </div>
@@ -518,7 +520,7 @@ export default function ShopView() {
                       onClick={handleLoadMore}
                       className="bg-white text-amazon-text border border-amazon-border shadow-sm font-bold uppercase text-sm tracking-[0.12em] px-12 py-4 hover:bg-neutral-50 transition-colors"
                     >
-                      Load More
+                      {t("loadMore")}
                     </button>
                   </div>
                 )}
@@ -528,16 +530,16 @@ export default function ShopView() {
               <div className="py-20 text-center border border-dashed border-amazon-border bg-white mt-10">
                 <div className="max-w-md mx-auto">
                   <p className="text-amazon-text font-bold mb-2">
-                    No products match your filters.
+                    {t("noProductsMsg")}
                   </p>
                   <p className="text-amazon-textMuted text-sm mb-6">
-                    Try adjusting your filters or clearing them to see all products.
+                    {t("noProductsSubMsg")}
                   </p>
                   <button
                     onClick={handleClearFilters}
                     className="px-6 py-3 bg-amazon-btnPrimary text-amazon-text text-sm font-bold uppercase tracking-widest hover:brightness-95 transition-all"
                   >
-                    Clear all filters
+                    {t("clearAllFilters")}
                   </button>
                 </div>
               </div>
@@ -557,53 +559,45 @@ export default function ShopView() {
       {/* Khối 1: Trải dài cả 2 cột (giống phần "Gaming Keyboards" trong ảnh) */}
       <div className="md:col-span-2">
         <h2 className="text-2xl font-bold text-amazon-text mb-4">
-          About Our Keyboards
+          {t("aboutTitle")}
         </h2>
         <p className="text-sm md:text-base leading-relaxed">
-          Every keyboard sold by AmekoLab is hand-assembled by our expert
-          team using premium components sourced from trusted manufacturers.
-          We specialize in custom mechanical keyboards for gamers,
-          developers, and enthusiasts who demand precision.
+          {t("aboutDesc")}
         </p>
       </div>
 
       {/* Khối 2: Nằm ở cột trái */}
       <div>
         <h2 className="text-xl font-bold text-amazon-text mb-4">
-          Customization
+          {t("customizationTitle")}
         </h2>
         <p className="text-sm leading-relaxed">
-          Can&apos;t find exactly what you&apos;re looking for? Use our
-          Custom Lab to spec out your dream keyboard — choose your layout,
-          switch, keycap set, and more. We build it, test it, and ship it
-          directly to you.
+          {t("customizationDesc")}
         </p>
       </div>
 
       {/* Khối 3: Nằm ở cột phải */}
       <div>
         <h2 className="text-xl font-bold text-amazon-text mb-4">
-          Warranty & Support
+          {t("warrantyTitle")}
         </h2>
         <p className="text-sm leading-relaxed">
-          All keyboards come with a 1-year warranty covering manufacturing
-          defects. Our support team is available 7 days a week to help
-          with setup, troubleshooting, and any questions you might have.
+          {t("warrantyDesc")}
         </p>
       </div>
 
-            <div>
-              <h2 className="text-xl font-bold text-amazon-text mb-4">  What to look for in a gaming keyboard </h2>
-              <p>Gaming keyboards come in all shapes, sizes, and feels, so when you’re considering yours, you’ll want to compare:</ p>
-              <ul>
-                <li>Switches and typing feel: Rubber dome, mechanical, or optical</li>
-                <li>Size and layout: Full-sized, TKL, 60%, and more</li>
-                <li>Design: Lots of RGB or artistic keycaps</li>
-                <li>  Connectivity: Wired or wireless</li>
-                <li>Extra features: Macro keys, media controls, wrist rest</li>
-                <li>Price: From budget-friendly to premium custom builds</li> 
-              </ul>
-            </div>
+      <div>
+        <h2 className="text-xl font-bold text-amazon-text mb-4">{t("guideTitle")}</h2>
+        <p>{t("guideIntro")}</p>
+        <ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
+          <li>{t("guidePoint1")}</li>
+          <li>{t("guidePoint2")}</li>
+          <li>{t("guidePoint3")}</li>
+          <li>{t("guidePoint4")}</li>
+          <li>{t("guidePoint5")}</li>
+          <li>{t("guidePoint6")}</li> 
+        </ul>
+      </div>
 
     </div>
   </div>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { deletePart } from "@/src/store/slices/partsSlice";
 import { PartItem } from "@/src/types/part.types";
+import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import { AlertTriangle, Trash2, X, Loader2 } from "lucide-react";
 
@@ -20,6 +21,7 @@ export default function DeletePartModal({
   onSuccess,
   part,
 }: DeletePartModalProps) {
+  const t = useTranslations("DeletePartModal");
   const dispatch = useAppDispatch();
   const { deleting } = useAppSelector((state) => state.parts);
   const [confirmText, setConfirmText] = useState("");
@@ -28,21 +30,30 @@ export default function DeletePartModal({
 
   const canDelete = confirmText === part.name;
 
+  const partTypeLabel =
+    part.partType === "kit"
+      ? t("typeKit")
+      : part.partType === "component"
+        ? t("typeComponent")
+        : part.partType === "accessory"
+          ? t("typeAccessory")
+          : part.partType;
+
   const handleDelete = async () => {
     if (!canDelete) return;
 
     try {
       const result = await dispatch(deletePart(part.id)).unwrap();
       if (result.success) {
-        toast.success("Part deleted successfully!");
+        toast.success(t("deletedSuccess"));
         setConfirmText("");
         onClose();
         onSuccess();
       } else {
-        toast.error(result.message || "Failed to delete part");
+        toast.error(result.message || t("deleteFailed"));
       }
     } catch (error: unknown) {
-      toast.error((error as string) || "Failed to delete part");
+      toast.error((error as string) || t("deleteFailed"));
     }
   };
 
@@ -69,9 +80,11 @@ export default function DeletePartModal({
               <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-amazon-text">Delete Part</h2>
+              <h2 className="text-lg font-bold text-amazon-text">
+                {t("title")}
+              </h2>
               <p className="text-[12px] font-medium text-red-700 mt-0.5">
-                This action cannot be undone
+                {t("subtitle")}
               </p>
             </div>
           </div>
@@ -87,16 +100,20 @@ export default function DeletePartModal({
         {/* Body */}
         <div className="px-6 py-5 space-y-5">
           <p className="text-[14px] font-medium text-amazon-textMuted">
-            You are about to permanently delete the part:
+            {t("warningMessage")}
           </p>
 
           {/* Part info card */}
           <div className="bg-neutral-50 rounded-sm border border-amazon-border p-4">
-            <p className="font-bold text-amazon-text text-[14px]">{part.name}</p>
+            <p className="font-bold text-amazon-text text-[14px]">
+              {part.name}
+            </p>
             <p className="text-[13px] font-medium text-amazon-textMuted mt-1">
-              Type:{" "}
-              <span className="font-medium text-amazon-text capitalize">{part.partType}</span>{" "}
-              &middot; Category:{" "}
+              {t("typeLabel")}:{" "}
+              <span className="font-medium text-amazon-text capitalize">
+                {partTypeLabel}
+              </span>{" "}
+              &middot; {t("categoryLabel")}:{" "}
               <span className="font-medium text-amazon-text capitalize">
                 {part.categoryName}
               </span>
@@ -107,8 +124,7 @@ export default function DeletePartModal({
           {/* Confirmation input */}
           <div>
             <label className="block text-[13px] font-medium text-amazon-textMuted mb-2">
-              Type <span className="font-bold text-amazon-text">{part.name}</span>{" "}
-              to confirm:
+              {t("confirmInputLabel", { name: part.name })}
             </label>
             <input
               type="text"
@@ -128,7 +144,7 @@ export default function DeletePartModal({
             disabled={deleting}
             className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
           >
-            Cancel
+            {t("cancel")}
           </button>
           <button
             onClick={handleDelete}
@@ -138,12 +154,12 @@ export default function DeletePartModal({
             {deleting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin text-white" />
-                Deleting...
+                {t("deleting")}
               </>
             ) : (
               <>
                 <Trash2 className="w-4 h-4" />
-                Delete Part
+                {t("deletePart")}
               </>
             )}
           </button>

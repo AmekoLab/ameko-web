@@ -2,6 +2,7 @@
 
 import { FC, useEffect, useState } from "react";
 import { User, Store, Shield } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   warrantyService,
   WarrantyHistoryItem,
@@ -30,15 +31,15 @@ const ROLE_STYLES: Record<
   },
 };
 
-const ACTION_LABELS: Record<string, string> = {
-  Create: "Request created",
-  ShopApprove: "Shop approved",
-  ShopReject: "Shop rejected",
-  AdminDecision: "Admin decision",
-  UserShippedReturn: "Customer shipped return",
-  ShopReceivedReturn: "Shop received return",
-  AutoCancel: "Auto canceled",
-  Completed: "Completed",
+const ACTION_TRANSLATION_KEYS: Record<string, string> = {
+  Create: "actions.create",
+  ShopApprove: "actions.shopApprove",
+  ShopReject: "actions.shopReject",
+  AdminDecision: "actions.adminDecision",
+  UserShippedReturn: "actions.userShippedReturn",
+  ShopReceivedReturn: "actions.shopReceivedReturn",
+  AutoCancel: "actions.autoCancel",
+  Completed: "actions.completed",
 };
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -52,9 +53,6 @@ const formatDate = (dateStr: string): string => {
 
 const getRoleStyle = (roleName: string) =>
   ROLE_STYLES[roleName] || ROLE_STYLES.Customer;
-
-const getActionLabel = (actionName: string): string =>
-  ACTION_LABELS[actionName] || actionName;
 
 // ─── Skeleton ──────────────────────────────────────────────
 const TimelineSkeleton: FC = () => (
@@ -82,8 +80,21 @@ interface WarrantyTimelineProps {
 }
 
 const WarrantyTimeline: FC<WarrantyTimelineProps> = ({ issueId }) => {
+  const t = useTranslations("WarrantyTimeline");
   const [history, setHistory] = useState<WarrantyHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const getActionLabel = (actionName: string): string => {
+    const key = ACTION_TRANSLATION_KEYS[actionName];
+    return key ? t(key) : actionName;
+  };
+
+  const getRoleLabel = (roleName: string): string => {
+    if (roleName === "Customer") return t("roles.customer");
+    if (roleName === "Shop") return t("roles.shop");
+    if (roleName === "Admin") return t("roles.admin");
+    return roleName;
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -113,7 +124,7 @@ const WarrantyTimeline: FC<WarrantyTimelineProps> = ({ issueId }) => {
   if (history.length === 0) {
     return (
       <p className="text-sm text-gray-400 italic text-center py-6">
-        No action history yet
+        {t("empty")}
       </p>
     );
   }
@@ -144,7 +155,7 @@ const WarrantyTimeline: FC<WarrantyTimelineProps> = ({ issueId }) => {
                   <span
                     className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide ${role.badge}`}
                   >
-                    {item.actorRoleName}
+                    {getRoleLabel(item.actorRoleName)}
                   </span>
                   <span className="text-xs text-gray-400">
                     {formatDate(item.createdAt)}

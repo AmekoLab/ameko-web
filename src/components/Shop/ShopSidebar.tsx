@@ -2,6 +2,8 @@
 
 import { FC, useState, useCallback, useMemo, memo } from "react";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 // Constants
 const AVAILABILITY_STATUS = {
@@ -149,6 +151,7 @@ export const ShopSidebar: FC<ShopSidebarProps> = ({
   categoryList = [],
   layoutList = [],
 }) => {
+  const t = useTranslations("ShopSidebar");
   const handleCategoryChange = useCallback(
     (value: string) => onFilterChange("categories", value),
     [onFilterChange],
@@ -167,17 +170,17 @@ export const ShopSidebar: FC<ShopSidebarProps> = ({
   const availabilityOptions = useMemo<FilterOption[]>(
     () => [
       {
-        label: "In Stock",
+        label: t("inStock"),
         value: AVAILABILITY_STATUS.IN_STOCK,
         count: productCounts[AVAILABILITY_STATUS.IN_STOCK],
       },
       {
-        label: "Out of Stock",
+        label: t("outOfStock"),
         value: AVAILABILITY_STATUS.OUT_OF_STOCK,
         count: productCounts[AVAILABILITY_STATUS.OUT_OF_STOCK],
       },
     ],
-    [productCounts],
+    [productCounts, t],
   );
 
   const categoryOptions = useMemo<FilterOption[]>(
@@ -212,17 +215,17 @@ export const ShopSidebar: FC<ShopSidebarProps> = ({
       {/* Promo Box */}
       <div className="bg-amazon-bgSecondary border border-amazon-border p-5 mb-2">
         <p className="text-[10px] font-black uppercase tracking-[0.25em] text-amazon-textMuted mb-1">
-          Exclusive
+          {t("promoExclusive")}
         </p>
         <p className="text-sm font-bold uppercase tracking-wide text-amazon-text mb-1">
-          AmekoLab Custom Lab
+          {t("promoTitle")}
         </p>
         <p className="text-xs text-amazon-textMuted mb-4 leading-relaxed">
-          Design your own custom keyboard from scratch — your layout, your switches, your way.
+          {t("promoDesc")}
         </p>
-        <button className="text-amazon-link text-[11px] font-bold uppercase tracking-widest hover:text-amazon-focus transition-colors">
-          CUSTOMIZE NOW &gt;
-        </button>
+        <Link href="/custom-build" className="text-amazon-link text-[11px] font-bold uppercase tracking-widest hover:text-amazon-focus transition-colors">
+          {t("promoCta")}
+        </Link>
       </div>
 
       {/* Clear All Button */}
@@ -234,14 +237,14 @@ export const ShopSidebar: FC<ShopSidebarProps> = ({
             aria-label="Clear all filters"
           >
             <X className="w-3.5 h-3.5" />
-            Clear All Filters
+            {t("clearAllFilters")}
           </button>
         </div>
       )}
 
       {/* Availability Filter */}
       <FilterGroup
-        title="Availability"
+        title={t("filterAvailability")}
         selectedValues={filters.availability}
         onChange={handleAvailabilityChange}
         options={availabilityOptions}
@@ -249,7 +252,7 @@ export const ShopSidebar: FC<ShopSidebarProps> = ({
 
       {/* Category Filter */}
       <FilterGroup
-        title="Product Type"
+        title={t("filterProductType")}
         selectedValues={filters.categories}
         onChange={handleCategoryChange}
         options={categoryOptions}
@@ -258,7 +261,7 @@ export const ShopSidebar: FC<ShopSidebarProps> = ({
       {/* Layout Filter */}
       {layoutOptions.length > 0 && (
         <FilterGroup
-          title="Layout"
+          title={t("filterLayout")}
           selectedValues={filters.layout}
           onChange={handleLayoutChange}
           options={layoutOptions}

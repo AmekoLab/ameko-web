@@ -10,6 +10,7 @@ import { useAppDispatch } from "@/src/store/hook";
 import { fetchServerCart, setCartOpen } from "@/src/store/slices/cartSlice";
 import { orderService } from "@/src/services/order.service";
 import { toast } from "react-toastify";
+import { useTranslations } from "next-intl";
 
 interface ProductCardProps {
   product: Product;
@@ -21,6 +22,7 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations("ProductCard");
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const thumbnail =
@@ -35,7 +37,7 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
     // Auth guard: redirect unauthenticated users to login
     const token = localStorage.getItem("token");
     if (!token) {
-      toast.info("Please login to add product to cart", {
+      toast.info(t("loginRequired"), {
         position: "top-right",
         theme: "dark",
       });
@@ -53,7 +55,7 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
         quantity: 1,
         isCustom: false,
       });
-      toast.success(`${product.name} added to cart!`, {
+      toast.success(t("addedToCart", { productName: product.name }), {
         position: "top-right",
         theme: "dark",
       
@@ -63,7 +65,7 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
     } catch (err: unknown) {
       const e2 = err as { response?: { data?: { message?: string } } };
       toast.error(
-        e2.response?.data?.message || "Failed to add item to cart. Please try again.",
+        e2.response?.data?.message || t("addFailed"),
         { position: "top-right", theme: "dark" },
       );
     } finally {
@@ -161,7 +163,7 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
           ) : (
             <ShoppingCart className="w-5 h-5 shrink-0" />
           )}
-          <span className="text-sm">{isAddingToCart ? "Adding..." : "Add to Cart"}</span>
+          <span className="text-sm">{isAddingToCart ? t("adding") : t("addToCart")}</span>
         </button>
       </div>
     </div>

@@ -11,6 +11,7 @@ import {
   FileText,
 } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/src/store/index";
 import {
@@ -33,6 +34,9 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
   profile,
   kitCategoryId = "4a84738d-736c-4ab8-af97-b9db8df05ba3",
 }) => {
+  const t = useTranslations("ProfileHeader");
+  const followersModalTitle = t("followersModalTitle") as "Followers";
+  const followingModalTitle = t("followingModalTitle") as "Following";
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCommissionModalOpen, setIsCommissionModalOpen] = useState(false);
@@ -43,7 +47,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
     title: "Followers" | "Following";
   }>({
     isOpen: false,
-    title: "Followers",
+    title: followersModalTitle,
   });
 
   const { user, isAuthenticated } = useSelector(
@@ -158,7 +162,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
             </div>
             <div
               className="absolute bottom-4 right-4 w-4 h-4 bg-green-500 border-2 border-white rounded-full"
-              title="Online"
+              title={t("online")}
             ></div>
           </div>
 
@@ -169,7 +173,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                 {profile.shopName}
               </h1>
               <span className="inline-flex items-center gap-1 bg-amazon-btnSecondary text-amazon-text px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border border-amazon-border">
-                <CheckCircle className="w-3 h-3" /> Verified Shop
+                <CheckCircle className="w-3 h-3" /> {t("verifiedShop")}
               </span>
             </div>
 
@@ -189,23 +193,23 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
               {/* Followers: Click to open Followers Modal */}
               <div
                 className="cursor-pointer hover:opacity-70 transition-opacity"
-                onClick={() => openFollowsModal("Followers")}
+                onClick={() => openFollowsModal(followersModalTitle)}
               >
                 <span className="font-semibold text-amazon-text">
                   {localFollowersCount}
                 </span>{" "}
-                <span className="text-amazon-text">followers</span>
+                <span className="text-amazon-text">{t("followers")}</span>
               </div>
 
               {/* Following: Click to open Following Modal */}
               <div
                 className="cursor-pointer hover:opacity-70 transition-opacity"
-                onClick={() => openFollowsModal("Following")}
+                onClick={() => openFollowsModal(followingModalTitle)}
               >
                 <span className="font-semibold text-amazon-text">
                   {profile.followingCount || 0}
                 </span>{" "}
-                <span className="text-amazon-text">following</span>
+                <span className="text-amazon-text">{t("following")}</span>
               </div>
             </div>
           </div>
@@ -217,7 +221,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                 href="/shop/profile"
                 className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-neutral-50 text-amazon-text font-bold text-sm rounded-sm transition-colors border border-amazon-border shadow-sm"
               >
-                <Settings className="w-4 h-4" /> Edit Shop Profile
+                <Settings className="w-4 h-4" /> {t("editShopProfile")}
               </Link>
             ) : (
               <>
@@ -233,10 +237,10 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                 >
                   {isFollowing ? (
                     <>
-                      Following <ChevronDown className="w-4 h-4" />
+                      {t("followingBtn")} <ChevronDown className="w-4 h-4" />
                     </>
                   ) : (
-                    "Follow"
+                    t("followBtn")
                   )}
                 </button>
 
@@ -246,7 +250,7 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                     onClick={() => setIsDropdownOpen((prev) => !prev)}
                     className="flex items-center gap-2 px-6 py-2 bg-amazon-btnPrimary text-amazon-text hover:brightness-95 font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm"
                   >
-                    Set Custom Key <ChevronDown className="w-4 h-4" />
+                    {t("setCustomKey")} <ChevronDown className="w-4 h-4" />
                   </button>
 
                   {isDropdownOpen && (
@@ -256,7 +260,8 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                         className="flex items-center gap-2 px-4 py-2.5 text-sm text-amazon-text hover:bg-neutral-50 transition-colors"
                         onClick={() => setIsDropdownOpen(false)}
                       >
-                        <Wrench className="w-4 h-4" /> Customize Configuration
+                        <Wrench className="w-4 h-4" />{" "}
+                        {t("customizeConfiguration")}
                       </Link>
                       <button
                         onClick={() => {
@@ -265,16 +270,19 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                         }}
                         className="flex items-center gap-2 px-4 py-2.5 text-sm text-amazon-text hover:bg-neutral-50 transition-colors w-full text-left"
                       >
-                        <FileText className="w-4 h-4" /> Send Quotation Request
+                        <FileText className="w-4 h-4" />{" "}
+                        {t("sendQuotationRequest")}
                       </button>
                     </div>
                   )}
                 </div>
-                <button 
-                  onClick={() => dispatch(startConversationThunk(profile.userId))}
+                <button
+                  onClick={() =>
+                    dispatch(startConversationThunk(profile.userId))
+                  }
                   className="flex items-center gap-2 px-4 py-2 bg-white border border-amazon-border hover:bg-neutral-50 text-amazon-text font-bold text-sm rounded-sm transition-colors shadow-sm"
                 >
-                  <MessageCircle className="w-4 h-4" /> Chat
+                  <MessageCircle className="w-4 h-4" /> {t("chat")}
                 </button>
               </>
             )}

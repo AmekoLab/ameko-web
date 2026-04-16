@@ -3,6 +3,7 @@
 import { X, Loader2, ExternalLink, Box, Cpu } from "lucide-react";
 import { useAppSelector } from "@/src/store/hook";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { AssembledProductItem } from "@/src/types/assembledProduct.types";
 
 function formatPrice(price: number) {
@@ -21,6 +22,7 @@ export default function AssembledProductDetailModal({
   isOpen,
   onClose,
 }: AssembledProductDetailModalProps) {
+  const t = useTranslations("AssembledProductDetailModal");
   const { selectedProduct, detailLoading } = useAppSelector(
     (state) => state.assembledProducts,
   );
@@ -36,9 +38,7 @@ export default function AssembledProductDetailModal({
       <div className="bg-white rounded-sm shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto border border-amazon-border">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-amazon-border bg-neutral-50 shrink-0">
-          <h2 className="text-lg font-bold text-amazon-text">
-            Assembled Product Details
-          </h2>
+          <h2 className="text-lg font-bold text-amazon-text">{t("title")}</h2>
           <button
             onClick={handleClose}
             className="p-1 rounded-sm hover:bg-white border border-transparent hover:border-amazon-border transition shadow-sm"
@@ -52,11 +52,13 @@ export default function AssembledProductDetailModal({
           {detailLoading ? (
             <div className="flex items-center justify-center py-16 text-amazon-textMuted gap-2">
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span className="text-[13px] font-medium">Loading product details...</span>
+              <span className="text-[13px] font-medium">
+                {t("loadingDetails")}
+              </span>
             </div>
           ) : !selectedProduct ? (
             <div className="py-16 text-center text-amazon-textMuted text-[14px] font-medium">
-              Product not found.
+              {t("productNotFound")}
             </div>
           ) : (
             <DetailContent product={selectedProduct} />
@@ -69,7 +71,7 @@ export default function AssembledProductDetailModal({
             onClick={handleClose}
             className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition shadow-sm"
           >
-            Close
+            {t("close")}
           </button>
         </div>
       </div>
@@ -78,6 +80,7 @@ export default function AssembledProductDetailModal({
 }
 
 function DetailContent({ product }: { product: AssembledProductItem }) {
+  const t = useTranslations("AssembledProductDetailModal");
   const images = [product.image1, product.image2, product.image3].filter(
     (img): img is string => Boolean(img),
   );
@@ -96,7 +99,10 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
               >
                 <Image
                   src={img}
-                  alt={`${product.name} image ${idx + 1}`}
+                  alt={t("productImageAlt", {
+                    name: product.name,
+                    index: idx + 1,
+                  })}
                   width={96}
                   height={96}
                   className="object-cover w-full h-full"
@@ -110,9 +116,13 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
         {/* Info */}
         <div className="flex-1 min-w-0 space-y-3">
           <div>
-            <h3 className="text-xl font-bold text-amazon-text truncate">{product.name}</h3>
+            <h3 className="text-xl font-bold text-amazon-text truncate">
+              {product.name}
+            </h3>
             {product.slug && (
-              <p className="text-[12px] text-amazon-textMuted mt-1 truncate">{product.slug}</p>
+              <p className="text-[12px] text-amazon-textMuted mt-1 truncate">
+                {product.slug}
+              </p>
             )}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -120,7 +130,7 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
               {formatPrice(product.price)}
             </span>
             <span className="text-[12px] font-medium text-amazon-textMuted ml-2 border border-amazon-border px-2 py-0.5 rounded-sm shadow-sm bg-white">
-              Qty: {product.quantity}
+              {t("qtyLabel")}: {product.quantity}
             </span>
           </div>
           {product.description && (
@@ -139,21 +149,26 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
         product.battery) && (
         <div className="p-5 bg-indigo-50 border border-indigo-200 rounded-sm shadow-sm">
           <p className="text-[14px] font-bold text-indigo-800 mb-4">
-            Keyboard Specifications
+            {t("keyboardSpecifications")}
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {product.layout && (
-              <SpecCard label="Layout" value={product.layout} />
+              <SpecCard label={t("specLayout")} value={product.layout} />
             )}
             {product.mounting && (
-              <SpecCard label="Mounting" value={product.mounting} />
+              <SpecCard label={t("specMounting")} value={product.mounting} />
             )}
-            {product.pcb && <SpecCard label="PCB" value={product.pcb} />}
+            {product.pcb && (
+              <SpecCard label={t("specPcb")} value={product.pcb} />
+            )}
             {product.connection && (
-              <SpecCard label="Connection" value={product.connection} />
+              <SpecCard
+                label={t("specConnection")}
+                value={product.connection}
+              />
             )}
             {product.battery && (
-              <SpecCard label="Battery" value={product.battery} />
+              <SpecCard label={t("specBattery")} value={product.battery} />
             )}
           </div>
         </div>
@@ -161,10 +176,20 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard label="Price" value={formatPrice(product.price)} valueColor="text-amazon-price" />
-        <StatCard label="Quantity" value={String(product.quantity)} />
-        {product.shopName && <StatCard label="Shop" value={product.shopName} />}
-        <StatCard label="ID" value={product.id.slice(0, 8) + "..."} small />
+        <StatCard
+          label={t("statPrice")}
+          value={formatPrice(product.price)}
+          valueColor="text-amazon-price"
+        />
+        <StatCard label={t("statQuantity")} value={String(product.quantity)} />
+        {product.shopName && (
+          <StatCard label={t("statShop")} value={product.shopName} />
+        )}
+        <StatCard
+          label={t("statId")}
+          value={product.id.slice(0, 8) + "..."}
+          small
+        />
       </div>
 
       {/* Components */}
@@ -172,7 +197,7 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
         <div className="p-5 bg-neutral-50 border border-amazon-border rounded-sm space-y-4 shadow-sm">
           <p className="text-[13px] font-bold text-amazon-text flex items-center gap-2">
             <Cpu className="w-4 h-4" />
-            Components ({product.details.length})
+            {t("components", { count: product.details.length })}
           </p>
           <div className="divide-y divide-amazon-border rounded-sm overflow-hidden">
             {product.details.map((detail, idx) => (
@@ -185,7 +210,7 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
                     {detail.componentName || detail.componentId}
                   </p>
                   <p className="text-[12px] text-amazon-textMuted mt-0.5 truncate">
-                    Kit: {detail.baseKitName || detail.baseKitId}
+                    {t("kitLabel")}: {detail.baseKitName || detail.baseKitId}
                   </p>
                   {detail.soundUrl && (
                     <a
@@ -194,7 +219,7 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
                       rel="noopener noreferrer"
                       className="text-[11px] font-medium text-amazon-btnPrimary hover:opacity-80 flex items-center gap-1 mt-1"
                     >
-                      Sound test
+                      {t("soundTest")}
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   )}
@@ -212,7 +237,9 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
       {product.view3DUrl && (
         <div className="flex items-center gap-3 text-[12px] font-medium text-amazon-textMuted bg-neutral-50 border border-amazon-border p-2 rounded-sm shadow-sm">
           <Box className="w-3.5 h-3.5 shrink-0" />
-          <span className="font-bold text-amazon-text shrink-0">3D Model:</span>
+          <span className="font-bold text-amazon-text shrink-0">
+            {t("model3dLabel")}:
+          </span>
           <a
             href={product.view3DUrl}
             target="_blank"
@@ -224,7 +251,6 @@ function DetailContent({ product }: { product: AssembledProductItem }) {
           </a>
         </div>
       )}
-
     </div>
   );
 }

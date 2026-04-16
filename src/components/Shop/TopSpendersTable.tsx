@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { shopDashboardService } from "@/src/services/shopDashboard.service";
 import type {
   TopSpendersResponse,
@@ -32,6 +33,7 @@ interface TopSpendersTableProps {
 }
 
 export default function TopSpendersTable({ filters }: TopSpendersTableProps) {
+  const t = useTranslations("TopSpendersTable");
   const [data, setData] = useState<TopSpendersResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -74,36 +76,52 @@ export default function TopSpendersTable({ filters }: TopSpendersTableProps) {
     <div className="flex flex-col h-full w-full min-h-0 bg-white border border-amazon-border shadow-sm rounded-md overflow-hidden">
       {/* Header - Siêu mỏng, không Icon */}
       <div className="px-3 py-2.5 border-b border-amazon-border bg-neutral-50 shrink-0">
-        <h3 className="text-sm font-bold text-amazon-text">Top VIP Customers</h3>
+        <h3 className="text-sm font-bold text-amazon-text">{t("title")}</h3>
       </div>
 
       {/* Table Area */}
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center min-h-0">
-          <p className="text-xs text-amazon-textMuted">Loading...</p>
+          <p className="text-xs text-amazon-textMuted">{t("loading")}</p>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-10 bg-neutral-50 text-[11px] text-amazon-textMuted font-medium border-b border-amazon-border shadow-sm">
               <tr>
-                <th className="px-2 py-1.5 font-medium whitespace-nowrap">#</th>
-                <th className="px-2 py-1.5 font-medium whitespace-nowrap">Customer</th>
-                <th className="px-2 py-1.5 font-medium whitespace-nowrap">Orders</th>
-                <th className="px-2 py-1.5 font-medium whitespace-nowrap">Spent</th>
-                <th className="px-2 py-1.5 font-medium whitespace-nowrap">Last Order</th>
+                <th className="px-2 py-1.5 font-medium whitespace-nowrap">
+                  {t("colRank")}
+                </th>
+                <th className="px-2 py-1.5 font-medium whitespace-nowrap">
+                  {t("colCustomer")}
+                </th>
+                <th className="px-2 py-1.5 font-medium whitespace-nowrap">
+                  {t("colOrders")}
+                </th>
+                <th className="px-2 py-1.5 font-medium whitespace-nowrap">
+                  {t("colSpent")}
+                </th>
+                <th className="px-2 py-1.5 font-medium whitespace-nowrap">
+                  {t("colLastOrder")}
+                </th>
               </tr>
             </thead>
             <tbody>
               {!data?.items?.length ? (
                 <tr>
-                  <td colSpan={5} className="px-2 py-6 text-center text-amazon-textMuted text-xs">
-                    No data available.
+                  <td
+                    colSpan={5}
+                    className="px-2 py-6 text-center text-amazon-textMuted text-xs"
+                  >
+                    {t("noData")}
                   </td>
                 </tr>
               ) : (
                 data.items.map((item, idx) => (
-                  <tr key={item.customerId} className="border-b border-amazon-border hover:bg-neutral-50 transition-colors">
+                  <tr
+                    key={item.customerId}
+                    className="border-b border-amazon-border hover:bg-neutral-50 transition-colors"
+                  >
                     {/* Rank */}
                     <td className="px-2 py-1.5 w-8">
                       <span className="inline-flex items-center justify-center w-5 h-5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-600">
@@ -143,7 +161,11 @@ export default function TopSpendersTable({ filters }: TopSpendersTableProps) {
       {data && data.totalPages > 0 && (
         <div className="px-3 py-1.5 flex items-center justify-between border-t border-amazon-border bg-white shrink-0">
           <span className="text-[10px] text-amazon-textMuted">
-            Page <span className="font-medium text-amazon-text">{data.currentPage}</span>/{data.totalPages}
+            {t("page")}{" "}
+            <span className="font-medium text-amazon-text">
+              {data.currentPage}
+            </span>
+            /{data.totalPages}
           </span>
           <div className="flex items-center gap-1.5">
             <button
@@ -151,14 +173,14 @@ export default function TopSpendersTable({ filters }: TopSpendersTableProps) {
               disabled={!data.hasPreviousPage}
               className={btnClass}
             >
-              Prev
+              {t("prev")}
             </button>
             <button
               onClick={() => setPage((p) => p + 1)}
               disabled={!data.hasNextPage}
               className={btnClass}
             >
-              Next
+              {t("next")}
             </button>
           </div>
         </div>

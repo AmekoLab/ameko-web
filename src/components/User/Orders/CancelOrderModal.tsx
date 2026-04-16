@@ -4,13 +4,18 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { orderIssueService } from "@/src/services/orderIssue.service";
 import { toast } from "react-toastify";
+import { useTranslations } from "next-intl";
 
-const schema = z.object({
-  reason: z.string().min(3, "Reason must be at least 3 characters"),
-  description: z.string().optional(),
-});
+const createCancelOrderSchema = (t: (key: string) => string) =>
+  z.object({
+    reason: z.string().min(3, t("validationReasonMin")),
+    description: z.string().optional(),
+  });
 
-type FormData = z.infer<typeof schema>;
+type FormData = {
+  reason: string;
+  description?: string;
+};
 
 interface CancelOrderModalProps {
   isOpen: boolean;
@@ -19,8 +24,16 @@ interface CancelOrderModalProps {
   orderId: string | null;
 }
 
-export default function CancelOrderModal({ isOpen, onClose, onSuccess, orderId }: CancelOrderModalProps) {
+export default function CancelOrderModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  orderId,
+}: CancelOrderModalProps) {
+  const t = useTranslations("CancelOrderModal");
   const [loading, setLoading] = useState(false);
+  const schema = React.useMemo(() => createCancelOrderSchema(t), [t]);
+
   const {
     register,
     handleSubmit,
@@ -44,15 +57,19 @@ export default function CancelOrderModal({ isOpen, onClose, onSuccess, orderId }
       });
 
       if (res.success) {
-        toast.success("Request submitted successfully. Please wait for Shop approval.");
+        toast.success(t("toastSubmitSuccess"));
         reset();
         onSuccess();
         onClose();
       } else {
-        toast.error(res.message || "Failed to submit cancel request");
+        toast.error(res.message || t("toastSubmitFailed"));
       }
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred");
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error
+          ? error.message || t("toastUnknownError")
+          : t("toastUnknownError"),
+      );
     } finally {
       setLoading(false);
     }
@@ -61,11 +78,9 @@ export default function CancelOrderModal({ isOpen, onClose, onSuccess, orderId }
   return (
     <div className="bg-black/80 backdrop-blur-sm fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="bg-white border border-amazon-border rounded-sm w-full max-w-md p-6 relative shadow-xl">
-        <h2 className="text-red-600 font-bold text-xl mb-4">
-          Cancel Order
-        </h2>
+        <h2 className="text-red-600 font-bold text-xl mb-4">{t("title")}</h2>
         <p className="text-amazon-textMuted text-[13px] mb-4">
-          Please tell us why you want to cancel this order.
+          {t("description")}
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -73,10 +88,12 @@ export default function CancelOrderModal({ isOpen, onClose, onSuccess, orderId }
             <input
               {...register("reason")}
               className="bg-white text-amazon-text border border-amazon-border rounded-sm w-full py-2 px-3 text-[13px] focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus placeholder-neutral-400 mb-1"
-              placeholder="Reason for cancellation..."
+              placeholder={t("reasonPlaceholder")}
             />
             {errors.reason && (
-              <p className="text-red-500 text-xs mt-1">{errors.reason.message}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {errors.reason.message}
+              </p>
             )}
           </div>
 
@@ -85,10 +102,12 @@ export default function CancelOrderModal({ isOpen, onClose, onSuccess, orderId }
               {...register("description")}
               rows={3}
               className="bg-white text-amazon-text border border-amazon-border rounded-sm w-full py-2 px-3 text-[13px] focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus placeholder-neutral-400 mb-1 resize-none"
-              placeholder="Additional details..."
+              placeholder={t("detailsPlaceholder")}
             />
             {errors.description && (
-              <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {errors.description.message}
+              </p>
             )}
           </div>
 
@@ -99,7 +118,7 @@ export default function CancelOrderModal({ isOpen, onClose, onSuccess, orderId }
               className="text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 px-4 py-2 transition-colors rounded-sm border border-amazon-border bg-white font-medium text-sm"
               disabled={loading}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
@@ -109,7 +128,7 @@ export default function CancelOrderModal({ isOpen, onClose, onSuccess, orderId }
               {loading && (
                 <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
               )}
-              Submit Request
+              {loading ? t("submitting") : t("submitRequest")}
             </button>
           </div>
         </form>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import { shopDashboardService } from "@/src/services/shopDashboard.service";
 import type {
@@ -60,6 +61,7 @@ interface CustomerOverviewSectionProps {
 export default function CustomerOverviewSection({
   filters,
 }: CustomerOverviewSectionProps) {
+  const t = useTranslations("CustomerOverviewSection");
   const [data, setData] = useState<CustomerOverviewData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -70,11 +72,10 @@ export default function CustomerOverviewSection({
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const result =
-          await shopDashboardService.getCustomerOverview(filters);
+        const result = await shopDashboardService.getCustomerOverview(filters);
         if (!cancelled) setData(result);
       } catch (error: any) {
-        const msg = error?.message || "Failed to load data.";
+        const msg = error?.message || t("fetchFailed");
         if (!cancelled) toast.error(msg);
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -93,43 +94,44 @@ export default function CustomerOverviewSection({
 
     return [
       {
-        label: "Total Revenue",
+        label: t("totalRevenue"),
         value: formatVND(data.totalRevenue),
       },
       {
-        label: "Average Order Value",
+        label: t("averageOrderValue"),
         value: formatVND(data.averageOrderValue),
       },
       {
-        label: "Customers",
+        label: t("customers"),
         value: formatNumber(data.totalCustomers),
-        subtext: `New: ${formatNumber(data.newCustomers)}  ·  Returning: ${formatNumber(data.returningCustomers)}`,
+        subtext: t("newReturning", {
+          newCount: formatNumber(data.newCustomers),
+          returningCount: formatNumber(data.returningCustomers),
+        }),
       },
       {
-        label: "Retention",
+        label: t("retention"),
         value: `${data.repeatRate.toFixed(1)}%`,
-        subtext: `Repeat: ${formatNumber(data.repeatCustomers)}`, // Rút gọn chữ để chống tràn
+        subtext: t("repeatShort", {
+          count: formatNumber(data.repeatCustomers),
+        }), // Rút gọn chữ để chống tràn
       },
       {
-        label: "Orders",
+        label: t("orders"),
         value: formatNumber(data.totalOrders),
-        subtext: `Freq: ${data.purchaseFrequency}`, // Rút gọn chữ để chống tràn
+        subtext: t("freqShort", { frequency: data.purchaseFrequency }), // Rút gọn chữ để chống tràn
       },
     ];
-  }, [data]);
+  }, [data, t]);
 
   return (
     <section>
       {data && !isLoading && (
         <p className="text-[12px] text-amazon-textMuted text-right">
-          Data from{" "}
-          <span className="text-amazon-text font-medium">
-            {new Date(data.fromUtc).toLocaleDateString("vi-VN")}
-          </span>{" "}
-          to{" "}
-          <span className="text-amazon-text font-medium">
-            {new Date(data.toUtc).toLocaleDateString("vi-VN")}
-          </span>
+          {t("dataRange", {
+            from: new Date(data.fromUtc).toLocaleDateString("vi-VN"),
+            to: new Date(data.toUtc).toLocaleDateString("vi-VN"),
+          })}
         </p>
       )}
       {/* Metric Cards Grid - Thu nhỏ gap từ gap-4 xuống gap-2 */}
@@ -155,14 +157,11 @@ export default function CustomerOverviewSection({
         </div>
       ) : (
         <div className="text-center py-6 text-amazon-textMuted bg-white border border-amazon-border shadow-sm rounded-md">
-          <p className="text-sm font-medium">No data available.</p>
+          <p className="text-sm font-medium">{t("noData")}</p>
         </div>
       )}
 
       {/* Date Range Footer - Ép sát lên trên với mt-1.5 và chữ text-[10px] */}
-      
-      
-    
     </section>
   );
 }

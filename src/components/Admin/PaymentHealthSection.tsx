@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { PaymentHealthData } from "@/src/types/admin.types";
 import { adminService } from "@/src/services/admin.service";
 
@@ -11,37 +12,36 @@ function formatVND(amount: number): string {
   return amount.toLocaleString("vi-VN") + " ₫";
 }
 
-/** Map payment method enum to a human-readable label */
-function mapMethodName(method: number): string {
-  switch (method) {
-    case 0:
-      return "COD";
-    case 1:
-      return "Banking";
-    case 2:
-      return "E-Wallet  ";
-    default:
-      return "Unknown";
-  }
-}
-
-/** Map payment type enum to a human-readable label */
-function mapTypeName(type: number): string {
-  switch (type) {
-    case 0:
-      return "Order Payment";
-    case 1:
-      return "Subscription/Deposit";
-    default:
-      return "Unknown";
-  }
-}
-
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export default function PaymentHealthSection() {
+  const t = useTranslations("PaymentHealth");
   const [data, setData] = useState<PaymentHealthData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const mapMethodName = (method: number): string => {
+    switch (method) {
+      case 0:
+        return t("methodCOD");
+      case 1:
+        return t("methodBanking");
+      case 2:
+        return t("methodEWallet");
+      default:
+        return t("methodUnknown");
+    }
+  };
+
+  const mapTypeName = (type: number): string => {
+    switch (type) {
+      case 0:
+        return t("typeOrderPayment");
+      case 1:
+        return t("typeSubscription");
+      default:
+        return t("typeUnknown");
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,9 +63,13 @@ export default function PaymentHealthSection() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full w-full gap-2 min-h-0">
-        <h2 className="text-sm font-bold text-amazon-text mb-0 shrink-0">Payment Health</h2>
+        <h2 className="text-sm font-bold text-amazon-text mb-0 shrink-0">
+          {t("title")}
+        </h2>
         <div className="flex items-center justify-center flex-1">
-          <p className="text-amazon-textMuted text-sm font-medium">Loading...</p>
+          <p className="text-amazon-textMuted text-sm font-medium">
+            {t("loading")}
+          </p>
         </div>
       </div>
     );
@@ -74,10 +78,10 @@ export default function PaymentHealthSection() {
   if (!data) {
     return (
       <div className="flex flex-col h-full w-full gap-2 min-h-0">
-        <h2 className="text-sm font-bold text-amazon-text mb-0 shrink-0">Payment Health</h2>
-        <p className="text-amazon-textMuted text-sm">
-          Failed to load payment health data.
-        </p>
+        <h2 className="text-sm font-bold text-amazon-text mb-0 shrink-0">
+          {t("title")}
+        </h2>
+        <p className="text-amazon-textMuted text-sm">{t("errorLoad")}</p>
       </div>
     );
   }
@@ -87,21 +91,26 @@ export default function PaymentHealthSection() {
   const topCards = [
     {
       id: "payment-volume",
-      label: "Payment Volume",
+      label: t("cardVolume"),
       value: formatVND(data.successfulPaymentVolume),
       sub: null,
     },
     {
       id: "success-rate",
-      label: "Success Rate",
+      label: t("cardSuccessRate"),
       value: `${data.paymentSuccessRate}%`,
       sub: null,
     },
     {
       id: "total-payments",
-      label: "Total Payments",
+      label: t("cardTotalPayments"),
       value: data.totalPayments,
-      sub: `Success: ${data.successfulPayments} | Failed: ${data.failedPayments} | Refund: ${data.refundedPayments}`,
+      sub: `${t("subSuccess", { n: data.successfulPayments })} | ${t(
+        "subFailed",
+        {
+          n: data.failedPayments,
+        },
+      )} | ${t("subRefund", { n: data.refundedPayments })}`,
     },
   ];
 
@@ -109,7 +118,9 @@ export default function PaymentHealthSection() {
 
   return (
     <div className="flex flex-col h-full w-full gap-2 min-h-0">
-      <h2 className="text-sm font-bold text-amazon-text mb-0 shrink-0">Payment Health</h2>
+      <h2 className="text-sm font-bold text-amazon-text mb-0 shrink-0">
+        {t("title")}
+      </h2>
 
       {/* Top Row – Summary Cards */}
       <div className="shrink-0 grid grid-cols-3 gap-2">
@@ -126,7 +137,9 @@ export default function PaymentHealthSection() {
                 {card.value}
               </p>
               {card.sub && (
-                <span className="text-[10px] text-amazon-textMuted leading-tight mt-0.5">{card.sub}</span>
+                <span className="text-[10px] text-amazon-textMuted leading-tight mt-0.5">
+                  {card.sub}
+                </span>
               )}
             </div>
           );
@@ -138,41 +151,53 @@ export default function PaymentHealthSection() {
         {/* Metrics by Method */}
         <div className="bg-white border border-amazon-border shadow-sm rounded-md p-4 flex flex-col">
           <h3 className="text-[11px] font-bold text-amazon-text mb-2 shrink-0">
-            Metrics by Method
+            {t("metricsByMethod")}
           </h3>
 
           {data.methodMetrics.length === 0 ? (
-            <p className="text-sm text-amazon-textMuted">No data available.</p>
+            <p className="text-sm text-amazon-textMuted">{t("noData")}</p>
           ) : (
             <div className="flex flex-col gap-2 mt-1">
-              {data.methodMetrics.map((m: { method: number; total: number; successful: number; failed: number }, idx: number) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between py-1.5 border-b border-amazon-border last:border-b-0"
-                >
-                  <span className="text-xs font-semibold text-amazon-text">
-                    {mapMethodName(m.method)}
-                  </span>
-                  <div className="flex items-center gap-4">
-                    <span className="text-[11px] text-amazon-textMuted">
-                      Total:{" "}
-                      <span className="text-amazon-text font-bold">{m.total}</span>
+              {data.methodMetrics.map(
+                (
+                  m: {
+                    method: number;
+                    total: number;
+                    successful: number;
+                    failed: number;
+                  },
+                  idx: number,
+                ) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between py-1.5 border-b border-amazon-border last:border-b-0"
+                  >
+                    <span className="text-xs font-semibold text-amazon-text">
+                      {mapMethodName(m.method)}
                     </span>
-                    <span className="text-[11px] text-amazon-textMuted">
-                      Success:{" "}
-                      <span className="text-green-600 font-bold">
-                        {m.successful}
+                    <div className="flex items-center gap-4">
+                      <span className="text-[11px] text-amazon-textMuted">
+                        {t("labelTotal")}{" "}
+                        <span className="text-amazon-text font-bold">
+                          {m.total}
+                        </span>
                       </span>
-                    </span>
-                    <span className="text-[11px] text-amazon-textMuted">
-                      Failed:{" "}
-                      <span className="text-red-500 font-bold">
-                        {m.failed}
+                      <span className="text-[11px] text-amazon-textMuted">
+                        {t("labelSuccess")}{" "}
+                        <span className="text-green-600 font-bold">
+                          {m.successful}
+                        </span>
                       </span>
-                    </span>
+                      <span className="text-[11px] text-amazon-textMuted">
+                        {t("labelFailed")}{" "}
+                        <span className="text-red-500 font-bold">
+                          {m.failed}
+                        </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ),
+              )}
             </div>
           )}
         </div>
@@ -180,35 +205,42 @@ export default function PaymentHealthSection() {
         {/* Metrics by Type */}
         <div className="bg-white border border-amazon-border shadow-sm rounded-md p-4 flex flex-col">
           <h3 className="text-[11px] font-bold text-amazon-text mb-2 shrink-0">
-            Metrics by Type
+            {t("metricsByType")}
           </h3>
 
           {data.typeMetrics.length === 0 ? (
-            <p className="text-sm text-amazon-textMuted">No data available.</p>
+            <p className="text-sm text-amazon-textMuted">{t("noData")}</p>
           ) : (
             <div className="flex flex-col gap-2 mt-1">
-              {data.typeMetrics.map((t: { type: number; total: number; amount: number }, idx: number) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between py-1.5 border-b border-amazon-border last:border-b-0"
-                >
-                  <span className="text-xs font-semibold text-amazon-text">
-                    {mapTypeName(t.type)}
-                  </span>
-                  <div className="flex items-center gap-4">
-                    <span className="text-[11px] text-amazon-textMuted">
-                      Count:{" "}
-                      <span className="text-amazon-text font-bold">{t.total}</span>
+              {data.typeMetrics.map(
+                (
+                  metric: { type: number; total: number; amount: number },
+                  idx: number,
+                ) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between py-1.5 border-b border-amazon-border last:border-b-0"
+                  >
+                    <span className="text-xs font-semibold text-amazon-text">
+                      {mapTypeName(metric.type)}
                     </span>
-                    <span className="text-[11px] text-amazon-textMuted">
-                      Amount:{" "}
-                      <span className="text-green-600 font-bold">
-                        {formatVND(t.amount)}
+                    <div className="flex items-center gap-4">
+                      <span className="text-[11px] text-amazon-textMuted">
+                        {t("labelCount")}{" "}
+                        <span className="text-amazon-text font-bold">
+                          {metric.total}
+                        </span>
                       </span>
-                    </span>
+                      <span className="text-[11px] text-amazon-textMuted">
+                        {t("labelAmount")}{" "}
+                        <span className="text-green-600 font-bold">
+                          {formatVND(metric.amount)}
+                        </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ),
+              )}
             </div>
           )}
         </div>

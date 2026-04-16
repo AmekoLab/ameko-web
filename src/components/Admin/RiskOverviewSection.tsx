@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { RiskOverviewData } from "@/src/types/admin.types";
 import { adminService } from "@/src/services/admin.service";
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export default function RiskOverviewSection() {
+  const t = useTranslations("RiskOverview");
   const [data, setData] = useState<RiskOverviewData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -31,10 +33,12 @@ export default function RiskOverviewSection() {
     return (
       <div className="flex flex-col h-full w-full gap-2 min-h-0">
         <h2 className="text-sm font-bold text-amazon-text mb-0 shrink-0">
-          Risk &amp; Dispute Overview
+          {t("title")}
         </h2>
         <div className="flex items-center justify-center flex-1">
-          <p className="text-amazon-textMuted text-sm font-medium">Loading...</p>
+          <p className="text-amazon-textMuted text-sm font-medium">
+            {t("loading")}
+          </p>
         </div>
       </div>
     );
@@ -44,11 +48,9 @@ export default function RiskOverviewSection() {
     return (
       <div className="flex flex-col h-full w-full gap-2 min-h-0">
         <h2 className="text-sm font-bold text-amazon-text mb-0 shrink-0">
-          Risk &amp; Dispute Overview
+          {t("title")}
         </h2>
-        <p className="text-amazon-textMuted text-sm">
-          Failed to load risk overview data.
-        </p>
+        <p className="text-amazon-textMuted text-sm">{t("errorLoad")}</p>
       </div>
     );
   }
@@ -58,32 +60,35 @@ export default function RiskOverviewSection() {
   const cards = [
     {
       id: "risk-rates",
-      label: "Risk Rates",
+      label: t("cardRiskRates"),
       value: `${data.cancelRate}%`,
       sub: (
         <span className="text-[11px] text-amazon-textMuted leading-tight mt-1">
-          Refund Rate: {data.refundRate}% | Issue Rate: {data.issueRate}%
+          {t("subRefundRate", { n: data.refundRate })} |{" "}
+          {t("subIssueRate", { n: data.issueRate })}
         </span>
       ),
     },
     {
       id: "active-requests",
-      label: "Active Requests & Issues",
+      label: t("cardActiveRequests"),
       value: data.openIssues,
       sub: (
         <span className="text-[11px] text-amazon-textMuted leading-tight mt-1">
-          Cancel Req: {data.cancelRequests} | Refund Req:{" "}
-          {data.refundRequests} | Disputes: {data.disputeRequests}
+          {t("subCancelReq", { n: data.cancelRequests })} |{" "}
+          {t("subRefundReq", { n: data.refundRequests })} |{" "}
+          {t("subDisputes", { n: data.disputeRequests })}
         </span>
       ),
     },
     {
       id: "order-impact",
-      label: "Order Impact",
+      label: t("cardOrderImpact"),
       value: data.cancelledOrders,
       sub: (
         <span className="text-[11px] text-amazon-textMuted leading-tight mt-1">
-          Refunded: {data.refundedOrders} | Total Orders: {data.totalOrders}
+          {t("subRefunded", { n: data.refundedOrders })} |{" "}
+          {t("subTotalOrders", { n: data.totalOrders })}
         </span>
       ),
     },
@@ -94,7 +99,7 @@ export default function RiskOverviewSection() {
   return (
     <div className="flex flex-col h-full w-full gap-2 min-h-0">
       <h2 className="text-sm font-bold text-amazon-text mb-0 shrink-0 pt-4">
-        Risk &amp; Dispute Overview
+        {t("title")}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">

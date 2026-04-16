@@ -11,18 +11,24 @@ import { updateWarranty } from "@/src/store/slices/warrantySlice";
 import { WarrantyRequest } from "@/src/services/warranty.service";
 import { uploadImage } from "@/src/utils/uploadImage";
 import { toast } from "react-toastify";
+import { useTranslations } from "next-intl";
 
 // ─── Zod Schema ────────────────────────────────────────────
-const updateWarrantySchema = z.object({
-  type: z.number().refine((v) => v === 0 || v === 1 || v === 2, {
-    message: "Please select request type",
-  }),
-  reason: z.string().min(1, "Please enter a reason"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
-  evidenceUrl: z.string().url("Please upload evidence image"),
-});
+const createUpdateWarrantySchema = (t: ReturnType<typeof useTranslations>) =>
+  z.object({
+    type: z.number().refine((v) => v === 0 || v === 1 || v === 2, {
+      message: t("validation.selectRequestType"),
+    }),
+    reason: z.string().min(1, t("validation.reasonRequired")),
+    description: z
+      .string()
+      .min(10, t("validation.descriptionMinLength", { min: 10 })),
+    evidenceUrl: z.string().url(t("validation.uploadEvidenceImage")),
+  });
 
-type UpdateWarrantyFormValues = z.infer<typeof updateWarrantySchema>;
+type UpdateWarrantyFormValues = z.infer<
+  ReturnType<typeof createUpdateWarrantySchema>
+>;
 
 // ─── Props ─────────────────────────────────────────────────
 interface UpdateWarrantyModalProps {
@@ -44,6 +50,7 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
   onSuccess,
 }) => {
   const dispatch = useAppDispatch();
+  const t = useTranslations("UpdateWarrantyModal");
   const { isUpdatingWarranty } = useAppSelector((state) => state.warranty);
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -56,7 +63,7 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
     reset,
     formState: { errors },
   } = useForm<UpdateWarrantyFormValues>({
-    resolver: zodResolver(updateWarrantySchema),
+    resolver: zodResolver(createUpdateWarrantySchema(t)),
     defaultValues: {
       type: 0,
       reason: "",
@@ -89,7 +96,7 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
       setValue("evidenceUrl", url, { shouldValidate: true });
       setPreviewUrl(url);
     } catch {
-      toast.error("Upload image failed, please try again");
+      toast.error(t("toast.uploadImageFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -113,7 +120,7 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
       onSuccess();
     } catch (err: unknown) {
       const error = err as string;
-      toast.error(error || "Update warranty request failed");
+      toast.error(error || t("toast.updateFailed"));
     }
   };
 
@@ -144,9 +151,7 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white rounded-t-2xl border-b border-amazon-border px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-lg font-bold text-amazon-text">
-            Update warranty request
-          </h2>
+          <h2 className="text-lg font-bold text-amazon-text">{t("title")}</h2>
           <button
             onClick={handleClose}
             className="p-1 rounded-lg hover:bg-neutral-100 transition-colors"
@@ -158,7 +163,7 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 space-y-5">
           {/* ── Request Type ── */}
           <div>
-            <label className={labelClass}>Request type</label>
+            <label className={labelClass}>{t("requestType")}</label>
             <Controller
               name="type"
               control={control}
@@ -218,12 +223,11 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
                         )}
                       </div>
                       <span className="text-sm font-semibold text-amazon-text">
-                        Return &amp; Refund
+                        {t("requestTypeOptions.returnAndRefund")}
                       </span>
                     </div>
                     <p className="text-xs text-amazon-textMuted mt-1 ml-7">
-                      Request to return the physical product to the Shop before
-                      receiving a refund.
+                      {t("requestTypeOptions.returnAndRefundDescription")}
                     </p>
                   </button>
 
@@ -250,12 +254,11 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
                         )}
                       </div>
                       <span className="text-sm font-semibold text-amazon-text">
-                        Warranty / Instant Refund
+                        {t("requestTypeOptions.warrantyInstantRefund")}
                       </span>
                     </div>
                     <p className="text-xs text-amazon-textMuted mt-1 ml-7">
-                      No return required. Suitable for minor compensation or
-                      private agreement.
+                      {t("requestTypeOptions.warrantyInstantRefundDescription")}
                     </p>
                   </button>
                 </div>
@@ -267,12 +270,12 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
           {/* ── Reason ── */}
           <div>
             <label htmlFor="reason" className={labelClass}>
-              Complaint reason
+              {t("complaintReason")}
             </label>
             <input
               id="reason"
               type="text"
-              placeholder="E.g.: Product has key defect"
+              placeholder={t("complaintReasonPlaceholder")}
               className={inputClass}
               {...register("reason")}
             />
@@ -284,12 +287,14 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
           {/* ── Description ── */}
           <div>
             <label htmlFor="description" className={labelClass}>
-              Detailed issue description
+              {t("detailedIssueDescription")}
             </label>
             <textarea
               id="description"
               rows={4}
-              placeholder="Describe the issue in detail (at least 10 characters)..."
+              placeholder={t("detailedIssueDescriptionPlaceholder", {
+                min: 10,
+              })}
               className={inputClass + " resize-none"}
               {...register("description")}
             />
@@ -300,13 +305,13 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
 
           {/* ── Evidence Upload ── */}
           <div>
-            <label className={labelClass}>Evidence image</label>
+            <label className={labelClass}>{t("evidenceImage")}</label>
             <div className="relative">
               {previewUrl ? (
                 <div className="relative w-full h-48 rounded-lg overflow-hidden border border-amazon-border">
                   <Image
                     src={previewUrl}
-                    alt="Evidence"
+                    alt={t("evidenceAlt")}
                     fill
                     className="object-contain"
                   />
@@ -333,17 +338,17 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
                     <div className="flex flex-col items-center gap-2">
                       <Loader2 className="w-8 h-8 text-amazon-btnPrimary animate-spin" />
                       <span className="text-sm text-amazon-textMuted">
-                        Uploading...
+                        {t("uploading")}
                       </span>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2">
                       <ImagePlus className="w-8 h-8 text-neutral-400" />
                       <span className="text-sm text-amazon-textMuted">
-                        Click to upload image
+                        {t("clickToUploadImage")}
                       </span>
                       <span className="text-xs text-amazon-textMuted">
-                        PNG, JPG up to 5MB
+                        {t("imageFormatHint")}
                       </span>
                     </div>
                   )}
@@ -370,7 +375,7 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
               disabled={isUpdatingWarranty}
               className="px-5 py-2.5 text-sm font-medium text-amazon-text bg-white border border-amazon-border rounded-lg hover:bg-neutral-50 transition-colors disabled:opacity-50"
             >
-              Cancel
+              {t("actions.cancel")}
             </button>
             <button
               type="submit"
@@ -380,7 +385,7 @@ const UpdateWarrantyModal: FC<UpdateWarrantyModalProps> = ({
               {isUpdatingWarranty && (
                 <Loader2 className="w-4 h-4 animate-spin" />
               )}
-              Update
+              {t("actions.update")}
             </button>
           </div>
         </form>

@@ -1,0 +1,75 @@
+@import "tailwindcss";
+@config "../../../tailwind.config.ts";
+
+/* Đã xóa sạch tàn dư Dark Mode cũ cho nhẹ file */
+
+/* 1. Amazon Ember Regular (Chữ thường) */
+@font-face {
+  font-family: 'Amazon Ember';
+  src: url('/fonts/AmazonEmber-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* 2. Amazon Ember Bold (Chữ in đậm) */
+@font-face {
+  font-family: 'Amazon Ember';
+  src: url('/fonts/AmazonEmber-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* 3. Amazon Ember Italic (Chữ in nghiêng - Đã sửa lại đúng tên và logic) */
+@font-face {
+  font-family: 'Amazon Ember';
+  src: url('/fonts/AmazonEmber-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* KHAI BÁO CƠ BẢN CHO TOÀN TRANG */
+body {
+  font-family: 'Amazon Ember', Arial, sans-serif;
+  background-color: #F9F9FA; /* Nền xám nhạt (Thay cho theme.amazon.bgSecondary) */
+  color: #0F1111;            /* Chữ đen nhánh (Thay cho theme.amazon.text) */
+}
+
+/* --- CUSTOM SWIPER STYLES (Giữ nguyên của bạn) --- */
+
+/* Đổi màu mũi tên navigation */
+.hero-swiper .swiper-button-next,
+.hero-swiper .swiper-button-prev {
+  color: #fff;
+  width: 50px;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.hero-swiper .swiper-button-next:after,
+.hero-swiper .swiper-button-prev:after {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.hero-swiper .swiper-button-next:hover,
+.hero-swiper .swiper-button-prev:hover {
+  background: #ce2a32; /* Màu đỏ Cherry */
+  color: white;
+}
+
+/* Đổi màu dấu chấm pagination */
+.hero-swiper .swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  background: white;
+  opacity: 0.5;
+  transition: all 0.3s;
+}
+
+.hero-swiper .swiper-pagination-bullet-active {
+  background: #ce2a32; /* Màu đỏ Cherry */
+  opacity: 1;
+}

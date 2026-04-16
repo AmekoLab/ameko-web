@@ -1,26 +1,30 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { X, Loader2, Upload } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { createCategory } from "@/src/store/slices/categoriesSlice";
 import { toast } from "react-toastify";
 import { CategoryItem } from "@/src/types/category.types";
 
 // --- ZOD SCHEMA ---
-const createCategorySchema = z.object({
-  name: z
-    .string()
-    .min(1, "Category name is required")
-    .max(100, "Max 100 characters"),
-  parentId: z.string().optional(),
-  isActive: z.boolean(),
-});
+const createCategorySchema = (t: (key: string) => string) =>
+  z.object({
+    name: z
+      .string()
+      .min(1, t("validationNameRequired"))
+      .max(100, t("validationNameMax")),
+    parentId: z.string().optional(),
+    isActive: z.boolean(),
+  });
 
-type CreateCategoryFormValues = z.infer<typeof createCategorySchema>;
+type CreateCategoryFormValues = z.infer<
+  ReturnType<typeof createCategorySchema>
+>;
 
 interface CreateCategoryModalProps {
   isOpen: boolean;
@@ -39,11 +43,13 @@ export default function CreateCategoryModal({
   parentOptions,
   mode,
 }: CreateCategoryModalProps) {
+  const t = useTranslations("CreateCategoryModal");
   const dispatch = useAppDispatch();
   const { creating } = useAppSelector((state) => state.categories);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const schema = useMemo(() => createCategorySchema(t), [t]);
 
   const {
     register,
@@ -51,7 +57,7 @@ export default function CreateCategoryModal({
     reset,
     formState: { errors },
   } = useForm<CreateCategoryFormValues>({
-    resolver: zodResolver(createCategorySchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       name: "",
       parentId: "",
@@ -69,12 +75,12 @@ export default function CreateCategoryModal({
           thumbnailImage: thumbnailFile,
         }),
       ).unwrap();
-      toast.success("Category created successfully!");
+      toast.success(t("createdSuccess"));
       handleReset();
       onSuccess();
       onClose();
     } catch (err: any) {
-      toast.error(err || "Failed to create category");
+      toast.error(err || t("createFailed"));
     }
   };
 
@@ -123,11 +129,9 @@ export default function CreateCategoryModal({
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-amazon-border">
           <div>
-            <h2 className="text-lg font-bold text-amazon-text">Create Category</h2>
+            <h2 className="text-lg font-bold text-amazon-text">{t("title")}</h2>
             <p className="text-[12px] text-amazon-textMuted5">
-              {mode === "admin"
-                ? "This will be a global category available to all shops."
-                : "This will be a private category for your shop."}
+              {mode === "admin" ? t("adminDescription") : t("shopDescription")}
             </p>
           </div>
           <button
@@ -143,11 +147,11 @@ export default function CreateCategoryModal({
         <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-5">
           {/* Name */}
           <div>
-            <label className={labelClass}>Category Name</label>
+            <label className={labelClass}>{t("categoryName")}</label>
             <input
               {...register("name")}
               className={inputClass}
-              placeholder="e.g. Keycap, Switch, Case..."
+              placeholder={t("namePlaceholder")}
             />
             {errors.name && <p className={errorClass}>{errors.name.message}</p>}
           </div>
@@ -155,11 +159,13 @@ export default function CreateCategoryModal({
           {/* Parent Category */}
           <div>
             <label className={labelClass}>
-              Parent Category{" "}
-              <span className="font-normal text-amazon-textMuted">(optional)</span>
+              {t("parentCategory")}{" "}
+              <span className="font-normal text-amazon-textMuted">
+                ({t("optional")})
+              </span>
             </label>
             <select {...register("parentId")} className={inputClass}>
-              <option value="">— None (root category) —</option>
+              <option value="">{t("noneRootCategory")}</option>
               {rootParents.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
@@ -168,7 +174,7 @@ export default function CreateCategoryModal({
             </select>
             {mode === "shop" && (
               <p className="text-[11px] text-amazon-textMuted mt-1">
-                Select a global category to create a sub-category under it.
+                {t("shopParentHint")}
               </p>
             )}
           </div>
@@ -176,14 +182,16 @@ export default function CreateCategoryModal({
           {/* Thumbnail Image */}
           <div>
             <label className={labelClass}>
-              Thumbnail Image{" "}
-              <span className="font-normal text-amazon-textMuted">(optional)</span>
+              {t("thumbnailImage")}{" "}
+              <span className="font-normal text-amazon-textMuted">
+                ({t("optional")})
+              </span>
             </label>
             {thumbnailPreview ? (
               <div className="relative w-full h-36 border border-amazon-border overflow-hidden bg-neutral-50 rounded-sm">
                 <img
                   src={thumbnailPreview}
-                  alt="Thumbnail preview"
+                  alt={t("thumbnailPreviewAlt")}
                   className="w-full h-full object-contain"
                 />
                 <button
@@ -201,7 +209,9 @@ export default function CreateCategoryModal({
                 className="w-full h-28 border border-dashed border-amazon-border rounded-sm flex flex-col items-center justify-center gap-2 text-amazon-textMuted hover:border-amazon-btnPrimary hover:text-amazon-btnPrimary hover:bg-neutral-50 transition"
               >
                 <Upload className="w-5 h-5" />
-                <span className="text-[12px] font-medium">Click to upload</span>
+                <span className="text-[12px] font-medium">
+                  {t("clickToUpload")}
+                </span>
               </button>
             )}
             <input
@@ -225,7 +235,7 @@ export default function CreateCategoryModal({
               htmlFor="isActive"
               className="text-[13px] font-medium text-amazon-text mt-[1px]"
             >
-              Set as Active
+              {t("setAsActive")}
             </label>
           </div>
 
@@ -237,15 +247,17 @@ export default function CreateCategoryModal({
               disabled={creating}
               className="px-5 py-2.5 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               disabled={creating}
               className="px-5 py-2.5 text-[13px] font-medium text-amazon-text bg-amazon-btnPrimary border border-amazon-border rounded-sm hover:brightness-95 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
             >
-              {creating && <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />}
-              {creating ? "Creating..." : "Create Category"}
+              {creating && (
+                <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />
+              )}
+              {creating ? t("creating") : t("createCategory")}
             </button>
           </div>
         </form>

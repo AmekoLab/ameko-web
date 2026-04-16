@@ -2,6 +2,7 @@
 
 import { ShopResponse, ShopStatus } from "@/src/types/shop.types";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 
 interface ShopApplicationModalProps {
   isOpen: boolean;
@@ -14,32 +15,49 @@ export const ShopApplicationModal = ({
   onClose,
   shopData,
 }: ShopApplicationModalProps) => {
+  const locale = useLocale();
+  const t = useTranslations("ShopApplicationModal");
+  const dateLocale = locale === "vi" ? "vi-VN" : "en-US";
+
   if (!isOpen || !shopData) return null;
 
   // Helper render status badge
   const renderStatus = (status: ShopStatus) => {
-    const baseClasses = "px-1.5 py-0.5 rounded-sm text-[10px] font-medium border whitespace-nowrap";
+    const baseClasses =
+      "px-1.5 py-0.5 rounded-sm text-[10px] font-medium border whitespace-nowrap";
     switch (status) {
       case ShopStatus.PendingApproval:
         return (
-          <span className={`${baseClasses} bg-yellow-50 text-yellow-700 border-yellow-200`}>
-            Pending
+          <span
+            className={`${baseClasses} bg-yellow-50 text-yellow-700 border-yellow-200`}
+          >
+            {t("statusPending")}
           </span>
         );
       case ShopStatus.Active:
         return (
-          <span className={`${baseClasses} bg-green-50 text-green-700 border-green-200`}>
-            Active
+          <span
+            className={`${baseClasses} bg-green-50 text-green-700 border-green-200`}
+          >
+            {t("statusActive")}
           </span>
         );
       case ShopStatus.Rejected:
         return (
-          <span className={`${baseClasses} bg-red-50 text-red-700 border-red-200`}>
-            Rejected
+          <span
+            className={`${baseClasses} bg-red-50 text-red-700 border-red-200`}
+          >
+            {t("statusRejected")}
           </span>
         );
       default:
-        return <span className={`${baseClasses} bg-neutral-50 text-neutral-600 border-neutral-200`}>Unknown</span>;
+        return (
+          <span
+            className={`${baseClasses} bg-neutral-50 text-neutral-600 border-neutral-200`}
+          >
+            {t("statusUnknown")}
+          </span>
+        );
     }
   };
 
@@ -56,11 +74,11 @@ export const ShopApplicationModal = ({
         <div className="flex justify-between items-center p-4 border-b border-amazon-border bg-white sticky top-0 z-10">
           <div>
             <h3 className="text-lg font-bold text-amazon-text flex items-center gap-2">
-              Shop Application Details
+              {t("title")}
               {renderStatus(shopData.status)}
             </h3>
             <p className="text-[11px] text-amazon-textMuted mt-0.5">
-              Application ID:{" "}
+              {t("applicationIdLabel")}{" "}
               <span className="font-mono text-[10px] bg-neutral-50 border border-amazon-border px-1 py-0.5 rounded-sm">
                 {shopData.id}
               </span>
@@ -70,7 +88,7 @@ export const ShopApplicationModal = ({
             onClick={onClose}
             className="px-2 py-1 text-[11px] font-medium text-amazon-textMuted rounded-sm hover:bg-neutral-50 border border-transparent hover:border-amazon-border transition-colors"
           >
-            Close
+            {t("close")}
           </button>
         </div>
 
@@ -83,13 +101,13 @@ export const ShopApplicationModal = ({
               {shopData.bannerUrl ? (
                 <Image
                   src={shopData.bannerUrl}
-                  alt="Banner"
+                  alt={t("bannerAlt")}
                   fill
                   className="object-cover"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-[11px] text-amazon-textMuted font-medium">
-                  No Banner
+                  {t("noBanner")}
                 </div>
               )}
             </div>
@@ -99,13 +117,13 @@ export const ShopApplicationModal = ({
                 {shopData.logoUrl ? (
                   <Image
                     src={shopData.logoUrl}
-                    alt="Logo"
+                    alt={t("logoAlt")}
                     fill
                     className="object-cover"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[10px] text-amazon-textMuted font-medium">
-                    No Logo
+                    {t("noLogo")}
                   </div>
                 )}
               </div>
@@ -116,26 +134,45 @@ export const ShopApplicationModal = ({
             {/* 2. GENERAL INFO */}
             <section className="bg-white p-4 rounded-sm border border-amazon-border shadow-sm">
               <h4 className="text-[12px] font-bold text-amazon-text mb-3 pb-2 border-b border-amazon-border">
-                General Information
+                {t("sectionGeneralInfo")}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InfoItem label="Shop Name" value={shopData.shopName} isBold />
-                <InfoItem label="Contact Email" value={shopData.contactEmail} />
-                <InfoItem label="Phone Number" value={shopData.phoneNumber} />
                 <InfoItem
-                  label="Created At"
+                  label={t("fieldShopName")}
+                  value={shopData.shopName}
+                  isBold
+                  fallback={t("notAvailable")}
+                />
+                <InfoItem
+                  label={t("fieldContactEmail")}
+                  value={shopData.contactEmail}
+                  fallback={t("notAvailable")}
+                />
+                <InfoItem
+                  label={t("fieldPhoneNumber")}
+                  value={shopData.phoneNumber}
+                  fallback={t("notAvailable")}
+                />
+                <InfoItem
+                  label={t("fieldCreatedAt")}
                   value={new Date(shopData.createdAt).toLocaleDateString(
-                    "vi-VN",
+                    dateLocale,
                   )}
+                  fallback={t("notAvailable")}
                 />
                 <div className="md:col-span-2">
                   <InfoItem
-                    label="Pickup Address"
+                    label={t("fieldPickupAddress")}
                     value={shopData.address}
+                    fallback={t("notAvailable")}
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <InfoItem label="Bio / Description" value={shopData.bio} />
+                  <InfoItem
+                    label={t("fieldBioDescription")}
+                    value={shopData.bio}
+                    fallback={t("notAvailable")}
+                  />
                 </div>
               </div>
             </section>
@@ -143,25 +180,36 @@ export const ShopApplicationModal = ({
             {/* 3. LEGAL & BANKING */}
             <section className="bg-white p-4 rounded-sm border border-amazon-border shadow-sm">
               <h4 className="text-[12px] font-bold text-amazon-text mb-3 pb-2 border-b border-amazon-border">
-                Legal & Banking
+                {t("sectionLegalBanking")}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoItem
-                  label="Citizen ID (CCCD)"
+                  label={t("fieldCitizenId")}
                   value={shopData.citizenId}
+                  fallback={t("notAvailable")}
                 />
-                <InfoItem label="Tax Code" value={shopData.taxCode} />
-                <div className="col-span-1 md:col-span-2 h-px bg-amazon-border my-1"></div>
-                <InfoItem label="Bank Name" value={shopData.bankName} />
                 <InfoItem
-                  label="Account Holder"
+                  label={t("fieldTaxCode")}
+                  value={shopData.taxCode}
+                  fallback={t("notAvailable")}
+                />
+                <div className="col-span-1 md:col-span-2 h-px bg-amazon-border my-1"></div>
+                <InfoItem
+                  label={t("fieldBankName")}
+                  value={shopData.bankName}
+                  fallback={t("notAvailable")}
+                />
+                <InfoItem
+                  label={t("fieldAccountHolder")}
                   value={shopData.bankAccountName}
+                  fallback={t("notAvailable")}
                 />
                 <div className="md:col-span-2">
                   <InfoItem
-                    label="Bank Account Number"
+                    label={t("fieldBankAccountNumber")}
                     value={shopData.bankAccountNumber}
                     className="font-mono bg-neutral-50 border border-amazon-border px-1.5 py-0.5 rounded-sm w-fit"
+                    fallback={t("notAvailable")}
                   />
                 </div>
               </div>
@@ -175,7 +223,7 @@ export const ShopApplicationModal = ({
             onClick={onClose}
             className="px-4 py-1.5 bg-white border border-amazon-border text-[11px] font-medium text-amazon-text rounded-sm hover:bg-neutral-50 transition-colors"
           >
-            Close
+            {t("close")}
           </button>
         </div>
       </div>
@@ -184,13 +232,27 @@ export const ShopApplicationModal = ({
 };
 
 // Helper Component displaying individual lines of info
-const InfoItem = ({ label, value, isBold, className = "" }: any) => (
+interface InfoItemProps {
+  label: string;
+  value?: string | null;
+  isBold?: boolean;
+  className?: string;
+  fallback: string;
+}
+
+const InfoItem = ({
+  label,
+  value,
+  isBold,
+  className = "",
+  fallback,
+}: InfoItemProps) => (
   <div>
     <p className="text-[10px] text-amazon-textMuted mb-0.5">{label}</p>
     <p
       className={`text-[11px] text-amazon-text ${isBold ? "font-bold" : ""} ${className}`}
     >
-      {value || "N/A"}
+      {value || fallback}
     </p>
   </div>
 );

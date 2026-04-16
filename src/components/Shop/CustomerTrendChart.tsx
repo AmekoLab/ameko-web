@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -57,11 +58,13 @@ function CustomTooltip({
   return (
     <div className="bg-white border border-amazon-border rounded-md px-4 py-3 shadow-md">
       <p className="text-xs text-amazon-textMuted mb-2 font-medium">
-        {label ? new Date(label).toLocaleDateString("vi-VN", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        }) : ""}
+        {label
+          ? new Date(label).toLocaleDateString("vi-VN", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })
+          : ""}
       </p>
       {payload.map((entry) => (
         <div
@@ -76,9 +79,7 @@ function CustomTooltip({
             <span className="text-amazon-text">{entry.name}</span>
           </span>
           <span className="font-bold text-amazon-text">
-            {entry.dataKey === "revenue"
-              ? formatVND(entry.value)
-              : entry.value}
+            {entry.dataKey === "revenue" ? formatVND(entry.value) : entry.value}
           </span>
         </div>
       ))}
@@ -92,7 +93,10 @@ interface CustomerTrendChartProps {
   filters?: CustomerOverviewParams;
 }
 
-export default function CustomerTrendChart({ filters }: CustomerTrendChartProps) {
+export default function CustomerTrendChart({
+  filters,
+}: CustomerTrendChartProps) {
+  const t = useTranslations("CustomerTrendChart");
   const [data, setData] = useState<CustomerTrendItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -120,7 +124,10 @@ export default function CustomerTrendChart({ filters }: CustomerTrendChartProps)
 
   return (
     <div className="h-full w-full flex flex-col p-4">
-      <h3 className="text-base font-bold text-amazon-text mb-2"> Trend Customers</h3>
+      <h3 className="text-base font-bold text-amazon-text mb-2">
+        {" "}
+        {t("title")}
+      </h3>
 
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center min-h-0">
@@ -128,7 +135,7 @@ export default function CustomerTrendChart({ filters }: CustomerTrendChartProps)
         </div>
       ) : data.length === 0 ? (
         <div className="flex-1 flex items-center justify-center min-h-0 text-amazon-textMuted text-sm font-medium">
-          Không có dữ liệu
+          {t("noData")}
         </div>
       ) : (
         <ResponsiveContainer width="100%" height="100%">
@@ -189,7 +196,7 @@ export default function CustomerTrendChart({ filters }: CustomerTrendChartProps)
               yAxisId="left"
               type="monotone"
               dataKey="revenue"
-              name="Revenue"
+              name={t("legendRevenue")}
               fill="url(#colorRevenue)"
               stroke="#22c55e"
               strokeWidth={2}
@@ -200,11 +207,16 @@ export default function CustomerTrendChart({ filters }: CustomerTrendChartProps)
               yAxisId="right"
               type="monotone"
               dataKey="orders"
-              name="Orders"
+              name={t("legendOrders")}
               stroke="#007185"
               strokeWidth={2}
               dot={{ r: 4, fill: "#007185", strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: "#007185", strokeWidth: 2, stroke: "#fff" }}
+              activeDot={{
+                r: 6,
+                fill: "#007185",
+                strokeWidth: 2,
+                stroke: "#fff",
+              }}
             />
           </ComposedChart>
         </ResponsiveContainer>

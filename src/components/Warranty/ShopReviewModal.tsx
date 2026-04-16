@@ -2,10 +2,19 @@
 
 import { FC, useMemo } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, Loader2, CheckCircle2, XCircle, Calendar, Sparkles, AlertCircle } from "lucide-react";
+import {
+  X,
+  Loader2,
+  CheckCircle2,
+  XCircle,
+  Calendar,
+  Sparkles,
+  AlertCircle,
+} from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { submitShopWarrantyReview } from "@/src/store/slices/shopWarrantySlice";
 import { WarrantyRequest } from "@/src/services/warranty.service";
@@ -44,14 +53,13 @@ function parseAiAnalysis(rawString?: string | null): AiAnalysisStatus {
 }
 
 // ─── Zod Schema ────────────────────────────────────────────
-const shopReviewSchema = z.object({
-  approve: z.boolean({ message: "Please select a decision" }),
-  shopResponse: z
-    .string()
-    .min(5, "Please enter a response for the customer (at least 5 characters)"),
-});
+const createShopReviewSchema = (t: ReturnType<typeof useTranslations>) =>
+  z.object({
+    approve: z.boolean({ message: t("validation.selectDecision") }),
+    shopResponse: z.string().min(5, t("validation.responseMin")),
+  });
 
-type ShopReviewFormValues = z.infer<typeof shopReviewSchema>;
+type ShopReviewFormValues = z.infer<ReturnType<typeof createShopReviewSchema>>;
 
 // ─── Props ─────────────────────────────────────────────────
 interface ShopReviewModalProps {
@@ -83,11 +91,15 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
   issue,
   onSuccess,
 }) => {
+  const t = useTranslations("ShopReviewModal");
   const dispatch = useAppDispatch();
   const { isReviewingWarranty } = useAppSelector((state) => state.shopWarranty);
 
   // Memoized AI analysis — avoids re-parsing JSON on every form keystroke
-  const aiAnalysis = useMemo(() => parseAiAnalysis(issue?.aiAnalysisResult), [issue?.aiAnalysisResult]);
+  const aiAnalysis = useMemo(
+    () => parseAiAnalysis(issue?.aiAnalysisResult),
+    [issue?.aiAnalysisResult],
+  );
 
   const {
     register,
@@ -96,7 +108,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
     reset,
     formState: { errors },
   } = useForm<ShopReviewFormValues>({
-    resolver: zodResolver(shopReviewSchema),
+    resolver: zodResolver(createShopReviewSchema(t)),
     defaultValues: {
       approve: undefined,
       shopResponse: "",
@@ -119,8 +131,13 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
       onClose();
       onSuccess();
     } catch (err: unknown) {
-      const error = err as string;
-      toast.error(error || "Failed to process warranty request");
+      let errorMessage = t("toast.processFailed");
+      if (typeof err === "string" && err) {
+        errorMessage = err;
+      } else if (err instanceof Error && err.message) {
+        errorMessage = err.message;
+      }
+      toast.error(errorMessage);
     }
   };
 
@@ -138,6 +155,20 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
   const labelClass = "block text-sm font-medium text-amazon-text mb-1.5";
   const errorClass = "text-xs text-red-500 mt-1";
 
+  const getAiFailureMessage = (message?: string) => {
+    if (!message) return t("aiAnalysis.errors.unavailable");
+    if (message === "AI processing failed.") {
+      return t("aiAnalysis.errors.processingFailed");
+    }
+    if (message === "AI response format is unrecognized.") {
+      return t("aiAnalysis.errors.unrecognizedFormat");
+    }
+    if (message === "Could not parse AI analysis data.") {
+      return t("aiAnalysis.errors.parseFailed");
+    }
+    return message;
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
@@ -151,7 +182,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
         {/* Header */}
         <div className="sticky top-0 bg-neutral-50 rounded-t-md border-b border-amazon-border px-6 py-4 flex items-center justify-between z-10">
           <h2 className="text-lg font-bold text-amazon-text">
-            Review warranty request
+            {t("header.title")}
           </h2>
           <button
             onClick={handleClose}
@@ -178,7 +209,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
             )}
             <div>
               <p className="text-sm font-medium text-amazon-text">
-                {issue.customerName || "Customer"}
+                {issue.customerName || t("customerFallback")}
               </p>
               <p className="text-xs text-amazon-textMuted flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
@@ -189,8 +220,12 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
 
           {/* Reason & Description */}
           <div>
-            <p className="text-sm font-medium text-amazon-text">{issue.reason}</p>
-            <p className="text-sm text-amazon-textMuted mt-1">{issue.description}</p>
+            <p className="text-sm font-medium text-amazon-text">
+              {issue.reason}
+            </p>
+            <p className="text-sm text-amazon-textMuted mt-1">
+              {issue.description}
+            </p>
           </div>
 
           {/* Evidence Image */}
@@ -198,7 +233,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
             <div className="relative w-full h-48 rounded-sm overflow-hidden borderbg-white">
               <Image
                 src={issue.evidenceUrl}
-                alt="Evidence from customer"
+                alt={t("evidenceAlt")}
                 fill
                 className="object-contain"
               />
@@ -209,7 +244,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
           {issue.refundAmount > 0 && (
             <div className="flex items-center justify-between p-3 rounded-sm bg-neutral-50 border border-amazon-border">
               <span className="text-sm text-amazon-text">
-                Requested refund amount
+                {t("requestedRefundAmount")}
               </span>
               <span className="text-lg font-bold text-amazon-price">
                 {formatCurrency(issue.refundAmount)}
@@ -218,7 +253,9 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
           )}
 
           {/* Expected Action */}
-          <p className="text-xs text-amazon-textMuted italic">{issue.expectedAction}</p>
+          <p className="text-xs text-amazon-textMuted italic">
+            {issue.expectedAction}
+          </p>
         </div>
 
         {/* ── AI ANALYSIS SECTION ── */}
@@ -227,9 +264,13 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
             {/* Header */}
             <div className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-amazon-border">
               <Sparkles className="w-4 h-4 text-violet-500" />
-              <span className="text-[18px] font-bold text-violet-700 tracking-wide">Ameko Assistant</span>
+              <span className="text-[18px] font-bold text-violet-700 tracking-wide">
+                {t("aiAnalysis.assistantTitle")}
+              </span>
               <div className="flex items-center gap-2 pt-1">
-                <span className="text-[10px] text-amazon-textMuted">(Ameko Assistant is AI and can make mistakes.)</span>
+                <span className="text-[10px] text-amazon-textMuted">
+                  {t("aiAnalysis.assistantDisclaimer")}
+                </span>
               </div>
             </div>
 
@@ -238,8 +279,12 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
               <div className="px-4 py-3 bg-red-50/60 flex items-start gap-2.5">
                 <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-xs font-semibold text-red-600">Analysis Unavailable</p>
-                  <p className="text-[11px] text-red-500/80 mt-0.5">{aiAnalysis.message}</p>
+                  <p className="text-xs font-semibold text-red-600">
+                    {t("aiAnalysis.unavailable")}
+                  </p>
+                  <p className="text-[11px] text-red-500/80 mt-0.5">
+                    {getAiFailureMessage(aiAnalysis.message)}
+                  </p>
                 </div>
               </div>
             ) : (
@@ -248,18 +293,28 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                 {/* Row 1: Category & Sentiment side-by-side */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <span className="text-amazon-textMuted text-[10px] block mb-0.5 font-medium">Category</span>
-                    <span className="text-amazon-text text-xs font-semibold">{aiAnalysis.data.Category}</span>
+                    <span className="text-amazon-textMuted text-[10px] block mb-0.5 font-medium">
+                      {t("aiAnalysis.labels.category")}
+                    </span>
+                    <span className="text-amazon-text text-xs font-semibold">
+                      {aiAnalysis.data.Category}
+                    </span>
                   </div>
                   <div>
-                    <span className="text-amazon-textMuted text-[10px] block mb-0.5 font-medium">Sentiment</span>
-                    <span className="text-amazon-text text-xs font-semibold">{aiAnalysis.data.Sentiment}</span>
+                    <span className="text-amazon-textMuted text-[10px] block mb-0.5 font-medium">
+                      {t("aiAnalysis.labels.sentiment")}
+                    </span>
+                    <span className="text-amazon-text text-xs font-semibold">
+                      {aiAnalysis.data.Sentiment}
+                    </span>
                   </div>
                 </div>
 
                 {/* Row 2: Summary */}
                 <div>
-                  <span className="text-amazon-textMuted text-[10px] block mb-0.5 font-medium">Summary</span>
+                  <span className="text-amazon-textMuted text-[10px] block mb-0.5 font-medium">
+                    {t("aiAnalysis.labels.summary")}
+                  </span>
                   <p className="text-amazon-text text-xs leading-relaxed bg-neutral-50 border border-amazon-border rounded-sm p-2.5">
                     {aiAnalysis.data.Summary}
                   </p>
@@ -268,12 +323,18 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                 {/* Row 3: Recommendation & Confidence */}
                 <div className="flex items-center justify-between pt-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-amazon-textMuted text-[10px] font-medium">Recommendation:</span>
+                    <span className="text-amazon-textMuted text-[10px] font-medium">
+                      {t("aiAnalysis.labels.recommendation")}
+                    </span>
                     <span
                       className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
-                        aiAnalysis.data.Recommendation.toLowerCase().includes("approve")
+                        aiAnalysis.data.Recommendation.toLowerCase().includes(
+                          "approve",
+                        )
                           ? "bg-green-100 text-green-700 border border-green-200"
-                          : aiAnalysis.data.Recommendation.toLowerCase().includes("reject")
+                          : aiAnalysis.data.Recommendation.toLowerCase().includes(
+                                "reject",
+                              )
                             ? "bg-red-100 text-red-700 border border-red-200"
                             : "bg-amber-100 text-amber-700 border border-amber-200"
                       }`}
@@ -282,7 +343,8 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                     </span>
                   </div>
                   <span className="text-[12px] text-amazon-text font-medium">
-                    Confidence: {typeof aiAnalysis.data.ConfidenceScore === "number"
+                    {t("aiAnalysis.labels.confidence")}{" "}
+                    {typeof aiAnalysis.data.ConfidenceScore === "number"
                       ? `${(aiAnalysis.data.ConfidenceScore * 100).toFixed(0)}%`
                       : aiAnalysis.data.ConfidenceScore}
                   </span>
@@ -295,7 +357,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
         {/* Timeline Section */}
         <div className="px-6 py-5 border-b border-amazon-border">
           <h3 className="text-sm font-bold text-amazon-text mb-3">
-            Action history
+            {t("timeline.title")}
           </h3>
           <WarrantyTimeline issueId={issue.id} />
         </div>
@@ -308,7 +370,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
           >
             {/* ── Decision Radio ── */}
             <div>
-              <label className={labelClass}>Shop's decision</label>
+              <label className={labelClass}>{t("form.decisionLabel")}</label>
               <Controller
                 name="approve"
                 control={control}
@@ -339,10 +401,10 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                               : "text-amazon-text"
                           }`}
                         >
-                          Approve
+                          {t("form.approve")}
                         </p>
                         <p className="text-xs text-amazon-textMuted mt-0.5">
-                          Accept request
+                          {t("form.approveHint")}
                         </p>
                       </div>
                     </button>
@@ -372,10 +434,10 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                               : "text-amazon-text"
                           }`}
                         >
-                          Reject
+                          {t("form.reject")}
                         </p>
                         <p className="text-xs text-amazon-textMuted mt-0.5">
-                          Reject request
+                          {t("form.rejectHint")}
                         </p>
                       </div>
                     </button>
@@ -390,12 +452,12 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
             {/* ── Shop Response ── */}
             <div>
               <label htmlFor="shopResponse" className={labelClass}>
-                Response to customer
+                {t("form.responseLabel")}
               </label>
               <textarea
                 id="shopResponse"
                 rows={4}
-                placeholder="Enter return instructions or reason for rejection..."
+                placeholder={t("form.responsePlaceholder")}
                 className="w-full rounded-sm border border-amazon-border px-3 py-2.5 text-sm text-amazon-text placeholder-neutral-400 focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary outline-none transition-colors resize-none"
                 {...register("shopResponse")}
               />
@@ -412,7 +474,7 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                 disabled={isReviewingWarranty}
                 className="px-5 py-2 text-sm font-medium text-amazon-text bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 transition-colors disabled:opacity-50 shadow-sm"
               >
-                Cancel
+                {t("actions.cancel")}
               </button>
               <button
                 type="submit"
@@ -426,24 +488,24 @@ const ShopReviewModal: FC<ShopReviewModalProps> = ({
                 {isReviewingWarranty && (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 )}
-                Confirm decision
+                {t("actions.confirmDecision")}
               </button>
             </div>
           </form>
         ) : (
           <div className="px-6 py-5">
             <h3 className="text-sm font-bold text-amazon-text mb-2">
-              Shop's response
+              {t("readonly.responseTitle")}
             </h3>
             <div className="bg-white border border-amazon-border rounded-sm p-4 text-sm text-amazon-text whitespace-pre-wrap">
-              {issue.shopResponse || "No response"}
+              {issue.shopResponse || t("readonly.noResponse")}
             </div>
             <div className="flex justify-end mt-5">
               <button
                 onClick={handleClose}
                 className="px-5 py-2 text-sm font-medium text-amazon-text bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 transition-colors shadow-sm"
               >
-                Close
+                {t("actions.close")}
               </button>
             </div>
           </div>

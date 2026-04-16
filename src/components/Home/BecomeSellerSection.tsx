@@ -3,8 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Users, TrendingUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export const BecomeSellerSection = () => {
+  const t = useTranslations("BecomeSellerSection");
   return (
     <section className="relative w-full pt-20 pb-26 lg:pb-40 px-4 lg:px-8 bg-amazon-bg text-amazon-text overflow-hidden ">
       {/* Background Decor */}
@@ -16,18 +18,16 @@ export const BecomeSellerSection = () => {
           <div className="space-y-8">
             <div>
               <span className="text-amazon-btnSecondary font-bold tracking-widest uppercase text-xs mb-3 block">
-                Partner with AMEKO
+                {t("subtitle")}
               </span>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold uppercase leading-[0.9] mb-6">
-                Turn Your Passion <br />
+                {t("titleLine1")} <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-amazon-text to-amazon-textMuted">
-                  Into Profit.
+                  {t("titleLine2")}
                 </span>
               </h2>
               <p className="text-amazon-textMuted text-lg max-w-xl leading-relaxed">
-                Join the premier marketplace for mechanical keyboard
-                enthusiasts. Reach thousands of potential buyers and build your
-                own brand with our professional tools today.
+                {t("description")}
               </p>
             </div>
 
@@ -35,13 +35,13 @@ export const BecomeSellerSection = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               <BenefitItem
                 icon={<Users className="w-6 h-6 text-amazon-btnSecondary" />}
-                title="Dedicated Community"
-                desc="Connect directly with thousands of custom keyboard collectors and enthusiasts."
+                title={t("benefit1Title")}
+                desc={t("benefit1Desc")}
               />
               <BenefitItem
                 icon={<TrendingUp className="w-6 h-6 text-amazon-btnSecondary" />}
-                title="Maximize Revenue"
-                desc="Access powerful analytics and management tools to scale your business."
+                title={t("benefit2Title")}
+                desc={t("benefit2Desc")}
               />
             </div>
 
@@ -51,12 +51,12 @@ export const BecomeSellerSection = () => {
                 href="/shop/register"
                 className="group inline-flex items-center gap-3 px-8 py-4 bg-amazon-btnPrimary text-amazon-text font-bold uppercase tracking-widest text-sm rounded-md hover:brightness-95 transition-all duration-300 shadow-sm"
               >
-                Start Selling Now
+                {t("ctaText")}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <p className="mt-4 text-xs text-amazon-textMuted flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                Free registration. Approval within 24 hours.
+                {t("freeReg")}
               </p>
             </div>
           </div>
@@ -75,15 +75,14 @@ export const BecomeSellerSection = () => {
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-2 h-2 rounded-full bg-amazon-btnSecondary animate-pulse" />
                 <span className="text-xs font-bold uppercase tracking-wider text-amazon-textMuted">
-                  Success Story
+                  {t("badgeLabel")}
                 </span>
               </div>
               <p className="text-sm font-medium text-amazon-text italic">
-                "AMEKO helped me scale my artisan keycap business to over 500
-                orders a month."
+                {t("quote")}
               </p>
               <p className="text-xs text-amazon-textMuted mt-2 font-bold uppercase not-italic">
-                — Alex D., Keycap Artisan
+                {t("quoteAuthor")}
               </p>
             </div>
           </div>

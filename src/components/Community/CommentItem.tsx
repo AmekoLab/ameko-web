@@ -6,6 +6,7 @@ import { Edit2, Loader2, Trash2, AlertTriangle } from "lucide-react";
 import { SocialComment } from "@/src/types/social.types";
 import { socialService } from "@/src/services/social.service";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 interface CommentItemProps {
   comment: SocialComment;
@@ -14,6 +15,7 @@ interface CommentItemProps {
 }
 
 export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, onCommentDeleted }) => {
+  const t = useTranslations("CommentItem");
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -38,10 +40,10 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
       if (res.success && res.data) {
         if (onCommentUpdated) onCommentUpdated(res.data);
         setIsEditing(false);
-        toast.success("Comment updated successfully");
+        toast.success(t("successUpdate"));
       }
     } catch {
-      toast.error("Failed to update comment");
+      toast.error(t("errorUpdate"));
     } finally {
       setIsUpdating(false);
     }
@@ -61,10 +63,10 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
         
       if (res.success) {
         if (onCommentDeleted) onCommentDeleted(comment.id);
-        toast.success(res.message || "Comment deleted permanently");
+        toast.success(res.message || t("successDelete"));
       }
     } catch {
-      toast.error("Failed to delete comment");
+      toast.error(t("errorDelete"));
       setIsDeleting(false);
     }
   };
@@ -78,7 +80,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
               comment.avatarUrl ||
               "https://res.cloudinary.com/doezwafgz/image/upload/v1765602783/a0a1d1831b40575009c07fad4634ef52_y23lze.jpg"
             }
-            alt={comment.username || "User"}
+            alt={comment.username || t("user")}
             fill
             className="object-cover"
           />
@@ -110,7 +112,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
                     onClick={() => setIsEditing(false)}
                     className="text-gray-400 hover:text-white transition-colors"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                   <button 
                     onClick={handleUpdate}
@@ -118,7 +120,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
                     className="text-amazon-btnSecondary hover:underline font-bold flex items-center gap-1"
                   >
                     {isUpdating && <Loader2 className="w-3 h-3 animate-spin"/>}
-                    Save
+                    {t("save")}
                   </button>
                 </div>
               </div>
@@ -135,7 +137,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
                   <button
                     onClick={() => setIsEditing(true)}
                     className="p-1 text-gray-500 hover:text-white"
-                    title="Edit comment"
+                    title={t("editComment")}
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
@@ -144,7 +146,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
                   onClick={handleDeleteClick}
                   disabled={isDeleting}
                   className="p-1 text-gray-500 hover:text-red-500"
-                  title="Delete comment"
+                  title={t("deleteComment")}
                 >
                   {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                 </button>
@@ -154,12 +156,12 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
 
           {/* Footer của comment (Like, Reply, Time) */}
           <div className="flex items-center gap-3 px-3 mt-1 text-[10px] font-bold text-gray-500">
-            <button className="hover:underline">Like</button>
-            <button className="hover:underline">Reply</button>
+            <button className="hover:underline">{t("like")}</button>
+            <button className="hover:underline">{t("reply")}</button>
             <div className="flex items-center gap-1 font-normal">
               <span>{new Date(comment.createdAt).toLocaleString()}</span>
               {comment.isEdited && (
-                <span className="text-amazon-textMuted italic">(edited)</span>
+                <span className="text-amazon-textMuted italic">{t("edited")}</span>
               )}
             </div>
           </div>
@@ -181,12 +183,12 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                 </div>
                 <h3 className="text-lg font-black uppercase tracking-wide text-amazon-text">
-                  Delete Comment?
+                  {t("deleteTitle")}
                 </h3>
               </div>
               
               <p className="text-sm text-amazon-textMuted mb-6 leading-relaxed">
-                Are you sure you want to delete this comment? This action cannot be undone.
+                {t("deleteDesc")}
               </p>
               
               <div className="flex items-center justify-end gap-3">
@@ -195,7 +197,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
                   disabled={isDeleting}
                   className="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white transition-colors disabled:opacity-50"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   onClick={executeDelete}
@@ -203,7 +205,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
                   className="px-4 py-2 text-sm font-bold uppercase tracking-wider bg-red-600 hover:bg-red-700 text-white rounded-sm transition-colors flex items-center gap-2 disabled:opacity-50"
                 >
                   <Trash2 className="w-4 h-4" />
-                  Delete
+                  {t("deleteBtn")}
                 </button>
               </div>
             </motion.div>

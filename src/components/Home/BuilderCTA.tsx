@@ -5,8 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Settings, MousePointer2, Layers } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export const BuilderCTA: FC = () => {
+  const t = useTranslations("BuilderCTA");
   return (
     <section className="relative bg-amazon-bg text-amazon-text py-24 overflow-hidden">
       {/* Background Pattern  */}
@@ -24,21 +26,18 @@ export const BuilderCTA: FC = () => {
               viewport={{ once: true }}
             >
               <span className="text-amazon-btnSecondary font-bold tracking-widest uppercase text-sm mb-2 block">
-                The Core Experience
+                {t("sectionSubtitle")}
               </span>
               <h2 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter leading-[0.9] mb-6 text-amazon-text">
-                Build Your <br />
+                {t("titleLine1")} <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-amazon-text to-amazon-textMuted">
-                  Own Legacy
+                  {t("titleLine2")}
                 </span>
               </h2>
               <p className="text-amazon-textMuted text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                Do not just settle for pre-built keyboards. With our
-                state-of-the-art <strong>Ameko 3D Builder</strong>, you have the
-                power to create a keyboard that reflects your unique style and
-                preferences. Choose from a vast selection of components,
-                customize layouts, and see your design come to life in real-time
-                3D preview.
+                {t.rich("description", {
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
               </p>
             </motion.div>
 
@@ -46,23 +45,20 @@ export const BuilderCTA: FC = () => {
             <div className="grid grid-cols-3 gap-4 border-t border-amazon-border pt-8">
               <div className="flex flex-col items-center lg:items-start gap-2">
                 <Layers className="w-8 h-8 text-amazon-btnSecondary" />
-                <span className="text-xs font-bold uppercase text-amazon-textMuted">
-                  Multi-Layer <br />
-                  Customization
+                <span className="text-xs font-bold uppercase text-amazon-textMuted tracking-tight lg:tracking-normal text-center lg:text-left">
+                  {t("feature1")}
                 </span>
               </div>
               <div className="flex flex-col items-center lg:items-start gap-2">
                 <MousePointer2 className="w-8 h-8 text-amazon-btnSecondary" />
-                <span className="text-xs font-bold uppercase text-amazon-textMuted">
-                  Drag & Drop <br />
-                  Interface
+                <span className="text-xs font-bold uppercase text-amazon-textMuted tracking-tight lg:tracking-normal text-center lg:text-left">
+                  {t("feature2")}
                 </span>
               </div>
               <div className="flex flex-col items-center lg:items-start gap-2">
                 <Settings className="w-8 h-8 text-amazon-btnSecondary" />
-                <span className="text-xs font-bold uppercase text-amazon-textMuted">
-                  Real-time <br />
-                  3D Preview
+                <span className="text-xs font-bold uppercase text-amazon-textMuted tracking-tight lg:tracking-normal text-center lg:text-left">
+                  {t("feature3")}
                 </span>
               </div>
             </div>
@@ -70,10 +66,10 @@ export const BuilderCTA: FC = () => {
             {/* CTA Button */}
             <div className="pt-4">
               <Link
-                href="/builder"
+                href="/custom-build"
                 className="inline-flex items-center justify-center bg-amazon-btnPrimary text-amazon-text px-10 py-4 text-sm font-bold uppercase tracking-widest hover:brightness-95 transition-all duration-300 rounded-md shadow-sm"
               >
-                Start Building Now
+                {t("ctaText")}
               </Link>
             </div>
           </div>
@@ -96,10 +92,10 @@ export const BuilderCTA: FC = () => {
               {/* Floating Badge */}
               <div className="absolute top-10 right-10 bg-white backdrop-blur-md border border-amazon-border p-4 rounded-sm text-center shadow-sm">
                 <span className="block text-3xl font-bold text-amazon-text">
-                  100+
+                  {t("badgeValue")}
                 </span>
                 <span className="text-[10px] uppercase font-bold text-amazon-textMuted">
-                  Parts Available
+                  {t("badgeLabel")}
                 </span>
               </div>
             </motion.div>
