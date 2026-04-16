@@ -272,7 +272,8 @@
     "reactionsTitle": "Cảm Xúc",
     "deleteItemTitle": "Xóa nội dung này?",
     "deleteItemDesc": "Bạn có chắc chắn muốn xóa vĩnh viễn không? Dữ liệu không thể khôi phục.",
-    "deleteBtn": "Xóa"
+    "deleteBtn": "Xóa",
+    "quantity": "Số lượng: "
   },
   "FeedClient": {
     "errorLoad": "Lỗi tải bản tin cộng đồng. Xin vui lòng thử lại.",
@@ -641,7 +642,20 @@
     "assemblyProgress": "Tiến độ lắp ráp",
     "shippingFee": "Phí vận chuyển:",
     "systemVoucher": "Voucher hệ thống:",
-    "finalTotal": "Tổng thanh toán:"
+    "finalTotal": "Tổng thanh toán:",
+    "status": {
+      "pending": "Chờ xử lý",
+      "processing": "Đang xử lý",
+      "shipped": "Đã giao",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "returned": "Đã trả hàng",
+      "paid": "Đã thanh toán",
+      "released": "Đã giải ngân",
+      "refunded": "Đã hoàn tiền",
+      "failed": "Thất bại",
+      "unpaid": "Chưa thanh toán"
+    }
   },
   "page": {
     "title": "Lịch sử đơn hàng",
@@ -1015,5 +1029,1988 @@
         "line3": "Tiền hoàn sẽ được xử lý về phương thức thanh toán ban đầu trong vòng 5-7 ngày làm việc kể từ khi nhận được hàng trả lại."
       }
     }
+  },
+  "ProfileView": {
+    "tabPosts": "Bài viết",
+    "tabShop": "Cửa hàng",
+    "tabShowcase": "Showcase",
+    "tabReviews": "Đánh giá",
+    "noProducts": "Không có sản phẩm nào.",
+    "showcaseUpdating": "Showcase đang được cập nhật...",
+    "noReviews": "Chưa có đánh giá nào.",
+    "inStock": "Còn hàng",
+    "soldOut": "Hết hàng",
+    "contact": "Liên hệ",
+    "untitledProduct": "Sản phẩm chưa đặt tên",
+    "defaultCategory": "Bàn phím"
+  },
+  "ProfileHeader": {
+    "verifiedShop": "Cửa hàng đã xác minh",
+    "followers": "người theo dõi",
+    "following": "đang theo dõi",
+    "editShopProfile": "Chỉnh sửa hồ sơ cửa hàng",
+    "followingBtn": "Đang theo dõi",
+    "followBtn": "Theo dõi",
+    "setCustomKey": "Tùy chỉnh phím",
+    "customizeConfiguration": "Tùy chỉnh cấu hình",
+    "sendQuotationRequest": "Gửi yêu cầu báo giá",
+    "chat": "Nhắn tin",
+    "online": "Đang hoạt động",
+    "followersModalTitle": "Followers",
+    "followingModalTitle": "Following"
+  },
+  "ProfilePage": {
+    "shopNotFound": "Không tìm thấy cửa hàng",
+    "shopProfileDescription": "Hồ sơ cửa hàng trên AMEKO"
+  },
+  "ShopDashboardPage": {
+    "startDateLaterError": "Ngày bắt đầu không thể sau ngày kết thúc.",
+    "pageTitle": "Bảng điều khiển cửa hàng",
+    "pageDesc": "Theo dõi hiệu suất cửa hàng và thông tin chuyên sâu về khách hàng.",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "granularity": "Độ chi tiết",
+    "day": "Ngày",
+    "week": "Tuần",
+    "month": "Tháng",
+    "churnDays": "Số ngày churn",
+    "clear": "Xóa"
+  },
+  "CustomerOverviewSection": {
+    "fetchFailed": "Không thể tải dữ liệu.",
+    "totalRevenue": "Tổng doanh thu",
+    "averageOrderValue": "Giá trị đơn trung bình",
+    "customers": "Khách hàng",
+    "newReturning": "Mới: {newCount}  ·  Quay lại: {returningCount}",
+    "retention": "Tỷ lệ giữ chân",
+    "repeatShort": "Mua lại: {count}",
+    "orders": "Đơn hàng",
+    "freqShort": "Tần suất: {frequency}",
+    "dataRange": "Dữ liệu từ {from} đến {to}",
+    "noData": "Không có dữ liệu."
+  },
+  "CustomerTrendChart": {
+    "title": "Xu hướng khách hàng",
+    "noData": "Không có dữ liệu",
+    "legendRevenue": "Doanh thu",
+    "legendOrders": "Đơn hàng"
+  },
+  "PurchaseFrequencyCards": {
+    "title": "Tần suất mua hàng",
+    "ordersPerCustomer": "Đơn / Khách hàng",
+    "avgRepurchaseCycle": "Chu kỳ mua lại TB",
+    "avgRepurchaseCycleValue": "{days} ngày",
+    "customersWithOrders": "Khách có đơn hàng",
+    "totalOrders": "Tổng đơn hàng",
+    "noData": "Không có dữ liệu."
+  },
+  "TopSpendersTable": {
+    "title": "Khách VIP chi tiêu cao",
+    "loading": "Đang tải...",
+    "colRank": "#",
+    "colCustomer": "Khách hàng",
+    "colOrders": "Đơn hàng",
+    "colSpent": "Chi tiêu",
+    "colLastOrder": "Đơn gần nhất",
+    "noData": "Không có dữ liệu.",
+    "page": "Trang",
+    "prev": "Trước",
+    "next": "Sau"
+  },
+  "ChurnRiskTable": {
+    "title": "Khách hàng có nguy cơ rời bỏ",
+    "subtitle": "Những khách hàng chưa mua hàng gần đây",
+    "loading": "Đang tải...",
+    "colCustomer": "Khách hàng",
+    "colInactive": "Không hoạt động",
+    "colOrders": "Đơn hàng",
+    "colValue": "Giá trị",
+    "colAction": "Hành động",
+    "noData": "Không có khách hàng có nguy cơ rời bỏ.",
+    "inactiveDays": "{days} ngày",
+    "remind": "Nhắc nhở",
+    "page": "Trang",
+    "prev": "Trước",
+    "next": "Sau"
+  },
+  "ConversionSummarySection": {
+    "title": "Chuyển đổi đơn hàng",
+    "paidRate": "Tỷ lệ đã thanh toán",
+    "completed": "Hoàn tất",
+    "cancelRate": "Tỷ lệ hủy",
+    "orderRatioShort": "{count}/{total} đơn",
+    "noData": "Không có dữ liệu."
+  },
+  "ShopCategoriesPage": {
+    "pageTitle": "Quản lý danh mục",
+    "pageDesc": "Quản lý danh mục cửa hàng. Dùng danh mục toàn cục làm danh mục cha cho các danh mục con riêng của bạn.",
+    "addCategory": "Thêm danh mục",
+    "tabAll": "Tất cả",
+    "tabGlobal": "Toàn cục",
+    "tabMyShop": "Cửa hàng của tôi",
+    "loadingCategories": "Đang tải danh mục...",
+    "noCategoriesFound": "Không tìm thấy danh mục nào.",
+    "typePrivate": "Riêng tư",
+    "typeGlobal": "Toàn cục",
+    "yours": "của bạn",
+    "subCategoriesTitle": "Danh mục con",
+    "partsTitle": "Linh kiện",
+    "statusActive": "Hoạt động",
+    "statusInactive": "Không hoạt động",
+    "editCategory": "Chỉnh sửa danh mục",
+    "deleteCategory": "Xóa danh mục"
+  },
+  "CreateCategoryModal": {
+    "validationNameRequired": "Tên danh mục là bắt buộc",
+    "validationNameMax": "Tối đa 100 ký tự",
+    "title": "Tạo danh mục",
+    "adminDescription": "Đây sẽ là danh mục toàn cục, dùng chung cho tất cả cửa hàng.",
+    "shopDescription": "Đây sẽ là danh mục riêng cho cửa hàng của bạn.",
+    "createdSuccess": "Tạo danh mục thành công!",
+    "createFailed": "Không thể tạo danh mục",
+    "categoryName": "Tên danh mục",
+    "namePlaceholder": "vd: Keycap, Switch, Case...",
+    "parentCategory": "Danh mục cha",
+    "optional": "tùy chọn",
+    "noneRootCategory": "- Không có (danh mục gốc) -",
+    "shopParentHint": "Chọn một danh mục toàn cục để tạo danh mục con bên dưới.",
+    "thumbnailImage": "Ảnh thu nhỏ",
+    "thumbnailPreviewAlt": "Xem trước ảnh thu nhỏ",
+    "clickToUpload": "Nhấn để tải lên",
+    "setAsActive": "Đặt là hoạt động",
+    "cancel": "Hủy",
+    "creating": "Đang tạo...",
+    "createCategory": "Tạo danh mục"
+  },
+  "EditCategoryModal": {
+    "validationNameRequired": "Tên danh mục là bắt buộc",
+    "validationNameMax": "Tối đa 100 ký tự",
+    "title": "Chỉnh sửa danh mục",
+    "updatedSuccess": "Cập nhật danh mục thành công!",
+    "updateFailed": "Không thể cập nhật danh mục",
+    "globalCategory": "Danh mục toàn cục",
+    "privateCategory": "Danh mục riêng",
+    "categoryName": "Tên danh mục",
+    "namePlaceholder": "vd: Keycap, Switch, Case...",
+    "parentCategory": "Danh mục cha",
+    "optional": "tùy chọn",
+    "noneRootCategory": "- Không có (danh mục gốc) -",
+    "thumbnailImage": "Ảnh thu nhỏ",
+    "thumbnailPreviewAlt": "Xem trước ảnh thu nhỏ",
+    "clickToUpload": "Nhấn để tải lên",
+    "setAsActive": "Đặt là hoạt động",
+    "cancel": "Hủy",
+    "saving": "Đang lưu...",
+    "saveChanges": "Lưu thay đổi"
+  },
+  "DeleteCategoryModal": {
+    "deletedSuccess": "Xóa danh mục thành công!",
+    "deleteFailed": "Không thể xóa danh mục",
+    "title": "Xóa danh mục",
+    "confirmDeleteTitle": "Bạn có chắc chắn muốn xóa danh mục này?",
+    "confirmDeleteBody": "Hành động này sẽ xóa mềm \"{name}\" ({type}). Không thể hoàn tác dễ dàng.",
+    "typeGlobal": "toàn cục",
+    "typePrivate": "riêng tư",
+    "fieldName": "Tên",
+    "fieldType": "Loại",
+    "fieldSlug": "Slug",
+    "cannotDeleteTitle": "Không thể xóa \"{name}\"",
+    "hasSubCategories": "{count, plural, one {Có # danh mục con} other {Có # danh mục con}}",
+    "hasPartsAssigned": "{count, plural, one {Có # linh kiện được gán} other {Có # linh kiện được gán}}",
+    "removeDependenciesHint": "Hãy xóa toàn bộ danh mục con và linh kiện trước khi xóa.",
+    "cancel": "Hủy",
+    "deleting": "Đang xóa...",
+    "delete": "Xóa"
+  },
+  "ShopPartsPage": {
+    "pageTitle": "Quản lý linh kiện",
+    "partsDescriptionPrefix": "Quản lý linh kiện và thành phần của cửa hàng.",
+    "partsDescriptionSuffix": "tổng số linh kiện.",
+    "checkStock": "Kiểm tra tồn kho",
+    "createPart": "Tạo linh kiện",
+    "searchPlaceholder": "Tìm kiếm linh kiện...",
+    "tabAll": "Tất cả",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "addonAll": "Addon: Tất cả",
+    "addonEligible": "Có thể làm Addon",
+    "addonNotAddon": "Không phải Addon",
+    "loadingParts": "Đang tải linh kiện...",
+    "noPartsFound": "Không tìm thấy linh kiện.",
+    "colPart": "Linh kiện",
+    "colType": "Loại",
+    "colCategory": "Danh mục",
+    "colPrice": "Giá",
+    "colStock": "Tồn kho",
+    "colStatus": "Trạng thái",
+    "colAddon": "Addon",
+    "colRecipe": "Công thức",
+    "colActions": "Thao tác",
+    "statusActive": "Hoạt động",
+    "statusInactive": "Không hoạt động",
+    "statusUnknown": "Không xác định",
+    "addonLabel": "Addon",
+    "recipeSwitches": "switch",
+    "recipeStabs": "stab",
+    "viewPart": "Xem linh kiện",
+    "editPart": "Chỉnh sửa linh kiện",
+    "deletePart": "Xóa linh kiện"
+  },
+  "CreatePartModal": {
+    "validationPartNameRequired": "Tên linh kiện là bắt buộc",
+    "validationPartNameMax": "Tối đa 200 ký tự",
+    "validationPartTypeRequired": "Loại linh kiện là bắt buộc",
+    "validationPriceRequired": "Giá là bắt buộc",
+    "validationStockRequired": "Tồn kho là bắt buộc",
+    "validationDescriptionRequired": "Mô tả là bắt buộc",
+    "validationCategoryRequired": "Danh mục là bắt buộc",
+    "workflowCaseTitle": "Chọn Vỏ",
+    "workflowPlateTitle": "Chọn Plate",
+    "workflowSwitchTitle": "Chọn Switch",
+    "workflowStabilizerTitle": "Chọn Stabilizer",
+    "workflowKeycapTitle": "Chọn Keycap",
+    "createdSuccess": "Tạo linh kiện thành công!",
+    "createFailed": "Không thể tạo linh kiện",
+    "title": "Tạo linh kiện",
+    "subtitle": "Thêm linh kiện mới vào kho của cửa hàng.",
+    "partName": "Tên linh kiện",
+    "partNamePlaceholder": "vd: Kit 75 v2",
+    "partType": "Loại linh kiện",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "price": "Giá (VND)",
+    "pricePlaceholder": "vd: 20000",
+    "stockQuantity": "Số lượng tồn kho",
+    "stockQuantityPlaceholder": "vd: 100000",
+    "category": "Danh mục",
+    "selectCategory": "— Chọn danh mục —",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "Mô tả linh kiện này...",
+    "kitRecipeConfiguration": "Cấu hình công thức kit",
+    "switchCount": "Số lượng switch",
+    "switchCountPlaceholder": "vd: 82",
+    "stabilizerCount": "Số lượng stabilizer",
+    "stabilizerCountPlaceholder": "vd: 5",
+    "specAutoGeneratedHint": "Thông số (công thức + quy trình) sẽ được tự động tạo và gửi dưới dạng JSON.",
+    "isAddonEligible": "Có thể làm Addon",
+    "thumbnailImage": "Ảnh thumbnail",
+    "layerImage": "Ảnh layer",
+    "optional": "tùy chọn",
+    "thumbnailPreviewAlt": "Xem trước ảnh thumbnail",
+    "layerPreviewAlt": "Xem trước ảnh layer",
+    "thumbnail": "Thumbnail",
+    "cancel": "Hủy",
+    "creating": "Đang tạo...",
+    "createPart": "Tạo linh kiện"
+  },
+  "EditPartModal": {
+    "validationPartNameRequired": "Tên linh kiện là bắt buộc",
+    "validationPartNameMax": "Tối đa 200 ký tự",
+    "validationPartTypeRequired": "Loại linh kiện là bắt buộc",
+    "validationPriceRequired": "Giá là bắt buộc",
+    "validationStockRequired": "Tồn kho là bắt buộc",
+    "validationCategoryRequired": "Danh mục là bắt buộc",
+    "workflowCaseTitle": "Chọn Vỏ",
+    "workflowPlateTitle": "Chọn Plate",
+    "workflowSwitchTitle": "Chọn Switch",
+    "workflowStabilizerTitle": "Chọn Stabilizer",
+    "workflowKeycapTitle": "Chọn Keycap",
+    "updatedSuccess": "Cập nhật linh kiện thành công!",
+    "updateFailed": "Không thể cập nhật linh kiện",
+    "title": "Chỉnh sửa linh kiện",
+    "subtitle": "Cập nhật thông tin linh kiện.",
+    "partName": "Tên linh kiện",
+    "partNamePlaceholder": "vd: Kit 75 v2",
+    "partType": "Loại linh kiện",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "price": "Giá (VND)",
+    "pricePlaceholder": "vd: 20000",
+    "stockQuantity": "Số lượng tồn kho",
+    "stockQuantityPlaceholder": "vd: 100000",
+    "category": "Danh mục",
+    "selectCategory": "— Chọn danh mục —",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "Mô tả linh kiện này...",
+    "optional": "tùy chọn",
+    "kitRecipeConfiguration": "Cấu hình công thức kit",
+    "switchCount": "Số lượng switch",
+    "switchCountPlaceholder": "vd: 82",
+    "stabilizerCount": "Số lượng stabilizer",
+    "stabilizerCountPlaceholder": "vd: 5",
+    "specAutoGeneratedHint": "Thông số (công thức + quy trình) sẽ được tự động tạo và gửi dưới dạng JSON.",
+    "isAddonEligible": "Có thể làm Addon",
+    "thumbnailImage": "Ảnh thumbnail",
+    "layerImage": "Ảnh layer",
+    "thumbnailPreviewAlt": "Xem trước ảnh thumbnail",
+    "layerPreviewAlt": "Xem trước ảnh layer",
+    "thumbnail": "Thumbnail",
+    "cancel": "Hủy",
+    "updating": "Đang cập nhật...",
+    "updatePart": "Cập nhật linh kiện"
+  },
+  "DeletePartModal": {
+    "deletedSuccess": "Xóa linh kiện thành công!",
+    "deleteFailed": "Không thể xóa linh kiện",
+    "title": "Xóa linh kiện",
+    "subtitle": "Hành động này không thể hoàn tác",
+    "warningMessage": "Bạn sắp xóa vĩnh viễn linh kiện:",
+    "typeLabel": "Loại",
+    "categoryLabel": "Danh mục",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "confirmInputLabel": "Nhập {name} để xác nhận:",
+    "cancel": "Hủy",
+    "deleting": "Đang xóa...",
+    "deletePart": "Xóa linh kiện"
+  },
+  "CheckStockModal": {
+    "title": "Kiểm tra tồn kho",
+    "subtitle": "Tìm kiếm và đối soát tồn kho linh kiện",
+    "searchPlaceholder": "Nhập tên linh kiện để tìm kiếm...",
+    "selectedParts": "{count, plural, one {Đã chọn # linh kiện} other {Đã chọn # linh kiện}}",
+    "emptySearchPrompt": "Nhập tên linh kiện để bắt đầu tìm kiếm",
+    "noPartsMatch": "Không có linh kiện nào khớp \"{query}\"",
+    "selectAll": "Chọn tất cả",
+    "deselectAll": "Bỏ chọn tất cả",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "current": "Hiện tại",
+    "verified": "Đã xác minh",
+    "close": "Đóng",
+    "checking": "Đang kiểm tra...",
+    "checkStockWithCount": "Kiểm tra tồn kho ({count})"
+  },
+  "PartDetailModal": {
+    "title": "Chi tiết linh kiện",
+    "loadingDetails": "Đang tải chi tiết linh kiện...",
+    "partNotFound": "Không tìm thấy linh kiện.",
+    "close": "Đóng",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "statusActive": "Hoạt động",
+    "statusInactive": "Không hoạt động",
+    "statusUnknown": "Không xác định",
+    "layerAlt": "Layer",
+    "statPrice": "Giá",
+    "statStock": "Tồn kho",
+    "statShop": "Cửa hàng",
+    "statId": "ID",
+    "kitRecipe": "Công thức kit",
+    "recipeSwitches": "Switch",
+    "recipeStabilizers": "Stabilizer",
+    "specificationsWorkflow": "Thông số (quy trình)"
+  },
+  "ShopAssembledProductsPage": {
+    "pageTitle": "Sản phẩm lắp ráp",
+    "pageDescPrefix": "Quản lý các sản phẩm bàn phím lắp ráp của cửa hàng.",
+    "pageDescSuffix": "tổng số sản phẩm.",
+    "createProduct": "Tạo sản phẩm",
+    "searchPlaceholder": "Tìm kiếm sản phẩm lắp ráp...",
+    "loadingProducts": "Đang tải sản phẩm lắp ráp...",
+    "noProductsFound": "Không tìm thấy sản phẩm lắp ráp.",
+    "colProduct": "Sản phẩm",
+    "colLayout": "Layout",
+    "colPrice": "Giá",
+    "colQty": "Số lượng",
+    "colSpecs": "Thông số",
+    "colComponents": "Linh kiện",
+    "colActions": "Thao tác",
+    "viewProduct": "Xem sản phẩm",
+    "editProduct": "Chỉnh sửa sản phẩm",
+    "deleteProduct": "Xóa sản phẩm"
+  },
+  "AssembledProductDetailModal": {
+    "title": "Chi tiết sản phẩm lắp ráp",
+    "loadingDetails": "Đang tải chi tiết sản phẩm...",
+    "productNotFound": "Không tìm thấy sản phẩm.",
+    "close": "Đóng",
+    "productImageAlt": "Ảnh {index} của {name}",
+    "qtyLabel": "SL",
+    "keyboardSpecifications": "Thông số bàn phím",
+    "specLayout": "Layout",
+    "specMounting": "Mounting",
+    "specPcb": "PCB",
+    "specConnection": "Kết nối",
+    "specBattery": "Pin",
+    "statPrice": "Giá",
+    "statQuantity": "Số lượng",
+    "statShop": "Cửa hàng",
+    "statId": "ID",
+    "components": "Linh kiện ({count})",
+    "kitLabel": "Kit",
+    "soundTest": "Kiểm tra âm thanh",
+    "model3dLabel": "Mô hình 3D"
+  },
+  "CreateAssembledProductModal": {
+    "validationBaseKitRequired": "Base Kit ID là bắt buộc",
+    "validationComponentRequired": "Component ID là bắt buộc",
+    "validationQuantityRequired": "Số lượng là bắt buộc",
+    "validationProductNameRequired": "Tên sản phẩm là bắt buộc",
+    "validationProductNameMax": "Tối đa 200 ký tự",
+    "validationPriceRequired": "Giá là bắt buộc",
+    "validationDescriptionRequired": "Mô tả là bắt buộc",
+    "validationDescriptionMax": "Tối đa 2000 ký tự",
+    "validationAtLeastOneComponent": "Cần ít nhất một linh kiện",
+    "imageUploadFailed": "Tải ảnh lên thất bại, vui lòng thử lại",
+    "modelUploadFailed": "Tải mô hình 3D thất bại, vui lòng thử lại",
+    "createdSuccess": "Tạo sản phẩm lắp ráp thành công!",
+    "createFailed": "Không thể tạo sản phẩm lắp ráp",
+    "tabBasicInfo": "Thông tin cơ bản",
+    "tabSpecifications": "Thông số",
+    "tabComponents": "Linh kiện",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "title": "Tạo sản phẩm lắp ráp",
+    "subtitle": "Thêm sản phẩm bàn phím lắp ráp mới vào cửa hàng.",
+    "productName": "Tên sản phẩm",
+    "productNamePlaceholder": "vd: Bàn phím thủ công",
+    "price": "Giá (VND)",
+    "pricePlaceholder": "vd: 60000000",
+    "quantity": "Số lượng",
+    "quantityPlaceholder": "vd: 1",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "Mô tả sản phẩm lắp ráp này...",
+    "productImages": "Ảnh sản phẩm",
+    "image1": "Ảnh 1",
+    "image2": "Ảnh 2",
+    "image3": "Ảnh 3",
+    "uploading": "Đang tải lên...",
+    "clickToUpload": "Nhấn để tải lên",
+    "model3d": "Mô hình 3D (.glb)",
+    "modelUploaded": "Đã tải mô hình 3D",
+    "clickToUploadGlb": "Nhấn để tải lên .glb",
+    "keyboardSpecifications": "Thông số bàn phím",
+    "layout": "Layout",
+    "layoutPlaceholder": "vd: 85%, 75%, TKL",
+    "mounting": "Mounting",
+    "mountingPlaceholder": "vd: Gasket Mount",
+    "pcb": "PCB",
+    "pcbPlaceholder": "vd: 1.2mm Flex-cut, Hotswap",
+    "connection": "Kết nối",
+    "connectionPlaceholder": "vd: Tri-mode",
+    "battery": "Pin",
+    "batteryPlaceholder": "vd: 2250mAh x 2",
+    "componentDetails": "Chi tiết linh kiện ({count})",
+    "addComponent": "Thêm linh kiện",
+    "componentIndex": "Linh kiện #{index}",
+    "baseKit": "Base Kit",
+    "selectKit": "— Chọn một kit —",
+    "component": "Linh kiện",
+    "selectComponent": "— Chọn một linh kiện —",
+    "soundUrl": "URL âm thanh",
+    "soundUrlPlaceholder": "URL nhúng YouTube (tùy chọn)",
+    "cancel": "Hủy",
+    "creating": "Đang tạo...",
+    "createProduct": "Tạo sản phẩm"
+  },
+  "EditAssembledProductModal": {
+    "validationBaseKitRequired": "Base Kit ID là bắt buộc",
+    "validationComponentRequired": "Component ID là bắt buộc",
+    "validationQuantityRequired": "Số lượng là bắt buộc",
+    "validationProductNameRequired": "Tên sản phẩm là bắt buộc",
+    "validationProductNameMax": "Tối đa 200 ký tự",
+    "validationPriceRequired": "Giá là bắt buộc",
+    "validationDescriptionRequired": "Mô tả là bắt buộc",
+    "validationDescriptionMax": "Tối đa 2000 ký tự",
+    "validationAtLeastOneComponent": "Cần ít nhất một linh kiện",
+    "updatedSuccess": "Cập nhật sản phẩm lắp ráp thành công!",
+    "updateFailed": "Không thể cập nhật sản phẩm lắp ráp",
+    "tabBasicInfo": "Thông tin cơ bản",
+    "tabSpecifications": "Thông số",
+    "tabComponents": "Linh kiện",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "title": "Chỉnh sửa sản phẩm lắp ráp",
+    "subtitle": "Cập nhật thông tin sản phẩm lắp ráp.",
+    "productName": "Tên sản phẩm",
+    "productNamePlaceholder": "vd: Bàn phím thủ công",
+    "price": "Giá (VND)",
+    "quantity": "Số lượng",
+    "description": "Mô tả",
+    "imageUrls": "URL ảnh",
+    "image1": "Ảnh 1",
+    "image2": "Ảnh 2",
+    "image3": "Ảnh 3",
+    "urlPlaceholder": "https://...",
+    "model3dUrl": "URL mô hình 3D (.glb)",
+    "modelUrlPlaceholder": "https://...model.glb",
+    "keyboardSpecifications": "Thông số bàn phím",
+    "layout": "Layout",
+    "layoutPlaceholder": "vd: 85%, 75%, TKL",
+    "mounting": "Mounting",
+    "mountingPlaceholder": "vd: Gasket Mount",
+    "pcb": "PCB",
+    "pcbPlaceholder": "vd: 1.2mm Flex-cut, Hotswap",
+    "connection": "Kết nối",
+    "connectionPlaceholder": "vd: Tri-mode",
+    "battery": "Pin",
+    "batteryPlaceholder": "vd: 2250mAh x 2",
+    "componentDetails": "Chi tiết linh kiện ({count})",
+    "addComponent": "Thêm linh kiện",
+    "componentIndex": "Linh kiện #{index}",
+    "baseKit": "Base Kit",
+    "selectKit": "— Chọn một kit —",
+    "component": "Linh kiện",
+    "selectComponent": "— Chọn một linh kiện —",
+    "soundUrl": "URL âm thanh",
+    "soundUrlPlaceholder": "URL nhúng YouTube (tùy chọn)",
+    "cancel": "Hủy",
+    "updating": "Đang cập nhật...",
+    "updateProduct": "Cập nhật sản phẩm"
+  },
+  "DeleteAssembledProductModal": {
+    "deletedSuccess": "Xóa sản phẩm lắp ráp thành công!",
+    "deleteFailed": "Không thể xóa sản phẩm lắp ráp",
+    "title": "Xóa sản phẩm lắp ráp",
+    "subtitle": "Hành động này không thể hoàn tác",
+    "warningMessage": "Bạn sắp xóa vĩnh viễn sản phẩm lắp ráp:",
+    "layoutLabel": "Layout",
+    "na": "N/A",
+    "componentsLabel": "Linh kiện",
+    "confirmInputLabel": "Nhập {name} để xác nhận:",
+    "cancel": "Hủy",
+    "deleting": "Đang xóa...",
+    "deleteProduct": "Xóa sản phẩm"
+  },
+  "ShopOrdersPage": {
+    "errors": {
+      "fetchFailed": "Không thể tải đơn hàng của shop",
+      "fetchError": "Lỗi khi tải đơn hàng của shop"
+    },
+    "statusFilters": {
+      "all": "Tất cả",
+      "pending": "Chờ xử lý",
+      "processing": "Đang xử lý",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "shipped": "Đã giao"
+    },
+    "title": "Quản lý đơn hàng",
+    "subtitle": "Quản lý các đơn hàng khách đặt cho cửa hàng của bạn",
+    "searchPlaceholder": "Tìm theo mã đơn, số điện thoại hoặc tên...",
+    "loading": "Đang tải đơn hàng...",
+    "emptyTitle": "Không tìm thấy đơn hàng",
+    "emptyWithFilter": "Hãy thử điều chỉnh từ khóa tìm kiếm hoặc bộ lọc.",
+    "emptyNoOrders": "Bạn chưa có đơn hàng nào.",
+    "table": {
+      "orderId": "Mã đơn",
+      "customer": "Khách hàng",
+      "products": "Sản phẩm",
+      "totalAmount": "Tổng tiền",
+      "orderStatus": "Trạng thái đơn hàng",
+      "payment": "Thanh toán",
+      "action": "Thao tác"
+    },
+    "productAltFallback": "Sản phẩm",
+    "unknownProduct": "Sản phẩm không xác định",
+    "otherItems": "+ {count} sản phẩm khác",
+    "status": {
+      "pending": "Chờ xử lý",
+      "processing": "Đang xử lý",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "shipped": "Đã giao",
+      "paid": "Đã thanh toán",
+      "refunded": "Đã hoàn tiền",
+      "failed": "Thất bại"
+    },
+    "viewOrderDetails": "Xem chi tiết đơn hàng",
+    "page": "Trang"
+  },
+  "ShopVouchersPage": {
+    "loading": "Đang tải voucher...",
+    "title": "Quản lý voucher",
+    "subtitle": "Quản lý voucher và chương trình khuyến mãi của cửa hàng.",
+    "createVoucher": "Tạo voucher",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa voucher \"{code}\" không?",
+    "toast": {
+      "deletedSuccess": "Xóa voucher thành công",
+      "deleteFailed": "Không thể xóa voucher",
+      "statusUpdatedSuccess": "Cập nhật trạng thái voucher thành công",
+      "statusUpdateFailed": "Không thể cập nhật trạng thái"
+    },
+    "voucherType": {
+      "promotion": "Khuyến mãi",
+      "negotiation": "Thương lượng",
+      "compensation": "Bồi thường"
+    },
+    "status": {
+      "active": "Đang hoạt động",
+      "disabled": "Đã tắt",
+      "expired": "Hết hạn"
+    },
+    "discount": {
+      "max": "(Tối đa {amount})"
+    },
+    "table": {
+      "code": "Mã",
+      "nameDescription": "Tên và mô tả",
+      "type": "Loại",
+      "discount": "Giảm giá",
+      "minOrder": "Đơn tối thiểu",
+      "used": "Đã dùng",
+      "status": "Trạng thái",
+      "action": "Thao tác"
+    },
+    "actions": {
+      "copyCode": "Sao chép mã",
+      "viewDetails": "Xem chi tiết",
+      "edit": "Chỉnh sửa",
+      "disableVoucher": "Tắt voucher",
+      "enableVoucher": "Bật voucher",
+      "delete": "Xóa"
+    },
+    "empty": "Không tìm thấy voucher.",
+    "pagination": {
+      "page": "Trang",
+      "voucherCount": "{count} voucher",
+      "previous": "Trước",
+      "next": "Sau"
+    }
+  },
+  "CreatePromotionVoucherForm": {
+    "title": "Tạo voucher khuyến mãi",
+    "validation": {
+      "codeRequired": "Mã voucher không được để trống",
+      "codeMax": "Tối đa 30 ký tự",
+      "nameRequired": "Tên voucher không được để trống",
+      "descriptionRequired": "Mô tả không được để trống",
+      "discountTypeRequired": "Hãy chọn loại giảm giá",
+      "valueRequired": "Giá trị không được để trống",
+      "minOrderRequired": "Không được để trống",
+      "usageLimitRequired": "Không được để trống",
+      "startDateRequired": "Hãy chọn ngày bắt đầu",
+      "endDateRequired": "Hãy chọn ngày kết thúc",
+      "invalidValue": "Giá trị không hợp lệ (phần trăm tối đa 100%)",
+      "endDateAfterStartDate": "Ngày kết thúc phải sau ngày bắt đầu"
+    },
+    "toast": {
+      "createSuccess": "Tạo voucher thành công!",
+      "createFailed": "Không thể tạo voucher"
+    },
+    "labels": {
+      "voucherCode": "Mã voucher",
+      "voucherName": "Tên voucher",
+      "description": "Mô tả",
+      "discountType": "Loại giảm giá",
+      "value": "Giá trị",
+      "maxDiscount": "Giảm tối đa (VND)",
+      "minimumOrder": "Đơn tối thiểu (VND)",
+      "usageLimit": "Giới hạn sử dụng",
+      "maxUsesPerUser": "Tối đa mỗi người dùng",
+      "startDate": "Ngày bắt đầu",
+      "endDate": "Ngày kết thúc",
+      "allowStacking": "Cho phép cộng dồn với voucher khác"
+    },
+    "discountTypeOptions": {
+      "percentage": "Giảm theo phần trăm",
+      "fixedAmount": "Giảm số tiền cố định"
+    },
+    "units": {
+      "percentWrapped": "(%)",
+      "vndWrapped": "(VND)"
+    },
+    "placeholders": {
+      "code": "Ví dụ: SALE20",
+      "name": "Ví dụ: Giảm 20% dịp năm mới",
+      "description": "Mô tả ngắn về voucher...",
+      "value": "0",
+      "maxDiscount": "Ví dụ: 100000",
+      "minOrder": "0",
+      "usageLimit": "100",
+      "maxUsesPerUser": "Để trống nếu không giới hạn"
+    },
+    "actions": {
+      "createVoucher": "Tạo voucher",
+      "creating": "Đang tạo..."
+    }
+  },
+  "UpdateVoucherModal": {
+    "title": "Cập nhật voucher",
+    "validation": {
+      "nameRequired": "Tên voucher không được để trống",
+      "descriptionRequired": "Mô tả không được để trống",
+      "endDateRequired": "Hãy chọn ngày kết thúc",
+      "usageLimitRequired": "Không được để trống",
+      "statusRequired": "Hãy chọn trạng thái"
+    },
+    "toast": {
+      "updateSuccess": "Cập nhật voucher thành công!",
+      "updateFailed": "Không thể cập nhật voucher"
+    },
+    "voucherType": {
+      "promotion": "Khuyến mãi",
+      "negotiation": "Thương lượng",
+      "compensation": "Bồi thường"
+    },
+    "labels": {
+      "voucherName": "Tên voucher",
+      "description": "Mô tả",
+      "endDate": "Ngày kết thúc",
+      "usageLimit": "Giới hạn sử dụng",
+      "maxUsesPerUser": "Tối đa mỗi người dùng",
+      "status": "Trạng thái"
+    },
+    "placeholders": {
+      "unlimited": "Không giới hạn"
+    },
+    "status": {
+      "active": "Đang hoạt động",
+      "disabled": "Đã tắt"
+    },
+    "actions": {
+      "saveChanges": "Lưu thay đổi",
+      "saving": "Đang lưu..."
+    }
+  },
+  "VoucherDetailsModal": {
+    "title": "Chi tiết voucher",
+    "tabs": {
+      "generalInformation": "Thông tin chung",
+      "usageHistory": "Lịch sử sử dụng"
+    },
+    "loadingDetails": "Đang tải chi tiết...",
+    "notFound": "Không tìm thấy voucher",
+    "sections": {
+      "identification": "Định danh",
+      "valueConditions": "Giá trị và điều kiện",
+      "timeLimit": "Thời gian và giới hạn",
+      "stackingPolicy": "Chính sách cộng dồn"
+    },
+    "labels": {
+      "id": "ID",
+      "voucherCode": "Mã voucher",
+      "name": "Tên",
+      "type": "Loại",
+      "creator": "Người tạo",
+      "designatedRecipient": "Người nhận chỉ định",
+      "discountType": "Loại giảm giá",
+      "discount": "Mức giảm",
+      "maxDiscount": "Giảm tối đa",
+      "minimumOrder": "Đơn tối thiểu",
+      "startDate": "Ngày bắt đầu",
+      "endDate": "Ngày kết thúc",
+      "maxUsesPerUser": "Tối đa mỗi người dùng",
+      "status": "Trạng thái",
+      "usageProgress": "Tiến độ sử dụng",
+      "stackable": "Có thể cộng dồn",
+      "policy": "Chính sách"
+    },
+    "status": {
+      "active": "Đang hoạt động",
+      "disabled": "Đã tắt",
+      "expired": "Hết hạn",
+      "depleted": "Đã dùng hết"
+    },
+    "type": {
+      "promotion": "Khuyến mãi",
+      "negotiation": "Thương lượng",
+      "compensation": "Bồi thường"
+    },
+    "discountType": {
+      "percentage": "Phần trăm (%)",
+      "fixedAmount": "Số tiền cố định (₫)"
+    },
+    "stackingPolicy": {
+      "all": "Cộng dồn với mọi voucher",
+      "withCompensationOnly": "Chỉ cộng dồn với voucher bồi thường",
+      "none": "Không cộng dồn",
+      "allowStacking": "Cho phép cộng dồn"
+    },
+    "stacking": {
+      "yes": "Có",
+      "no": "Không"
+    },
+    "unlimited": "Không giới hạn",
+    "copy": "Sao chép",
+    "loadingUsage": "Đang tải...",
+    "noUsage": "Chưa có lượt sử dụng.",
+    "historyTable": {
+      "usedDate": "Ngày dùng",
+      "customer": "Khách hàng",
+      "orderCode": "Mã đơn hàng",
+      "orderValue": "Giá trị đơn hàng",
+      "discountApplied": "Giảm giá áp dụng"
+    },
+    "copyOrderCode": "Sao chép mã đơn hàng",
+    "pagination": {
+      "page": "Trang",
+      "previous": "Trước",
+      "next": "Sau"
+    }
+  },
+  "ShopTargetedRequestsPage": {
+    "status": {
+      "pendingTarget": "Chờ phản hồi",
+      "openPool": "Mở công khai",
+      "completed": "Hoàn thành",
+      "unknown": "Không xác định"
+    },
+    "errors": {
+      "rejectFailed": "Không thể từ chối yêu cầu"
+    },
+    "rejectModal": {
+      "title": "Xác nhận từ chối",
+      "description": "Bạn có chắc chắn muốn từ chối yêu cầu commission này không? Hành động này không thể hoàn tác.",
+      "rejecting": "Đang từ chối..."
+    },
+    "header": {
+      "title": "Yêu cầu chỉ định",
+      "subtitle": "Các yêu cầu báo giá mà khách hàng gửi trực tiếp đến cửa hàng của bạn"
+    },
+    "empty": {
+      "title": "Hiện chưa có yêu cầu chỉ định nào",
+      "description": "Khi khách hàng gửi yêu cầu báo giá đến cửa hàng của bạn, chúng sẽ hiển thị tại đây."
+    },
+    "qty": "SL: {count}",
+    "customerFallback": "Khách hàng",
+    "actions": {
+      "quote": "Báo giá",
+      "reject": "Từ chối"
+    }
+  },
+  "SubmitQuoteModal": {
+    "validation": {
+      "invalidQuotedPrice": "Giá báo không hợp lệ",
+      "estimatedDaysMin": "Số ngày dự kiến phải ít nhất là 1",
+      "notesMin": "Vui lòng nhập ghi chú chi tiết cho khách hàng"
+    },
+    "title": "Gửi báo giá",
+    "labels": {
+      "quotedPrice": "Giá báo",
+      "estimatedDays": "Số ngày dự kiến",
+      "notesForCustomer": "Ghi chú cho khách hàng"
+    },
+    "units": {
+      "vnd": "VND",
+      "days": "Ngày"
+    },
+    "placeholders": {
+      "quotedPrice": "1000000",
+      "estimatedDays": "7",
+      "notes": "Mô tả chi tiết báo giá, thời gian, vật liệu..."
+    },
+    "actions": {
+      "sending": "Đang gửi...",
+      "submitQuote": "Gửi báo giá"
+    }
+  },
+  "ShopQuotedCommissionsPage": {
+    "status": {
+      "pendingUserDecision": "Chờ duyệt",
+      "accepted": "Đã xác nhận",
+      "revoked": "Đã thu hồi",
+      "rejected": "Bị từ chối",
+      "unknown": "Không xác định"
+    },
+    "header": {
+      "title": "Lịch sử báo giá của tôi",
+      "subtitle": "Xem lại tất cả báo giá bạn đã gửi cho khách hàng"
+    },
+    "error": {
+      "title": "Không thể tải dữ liệu",
+      "retry": "Thử lại"
+    },
+    "empty": {
+      "title": "Bạn chưa gửi báo giá nào",
+      "description": "Hãy vào chợ yêu cầu commission để tìm và gửi báo giá cho khách hàng."
+    },
+    "completeIn": "Hoàn thành trong: {days} ngày",
+    "dates": {
+      "sent": "Đã gửi",
+      "expires": "Hết hạn"
+    },
+    "revoke": {
+      "buttonTitle": "Thu hồi báo giá",
+      "modalTitle": "Thu hồi báo giá này?",
+      "modalDescription": "Bạn có chắc chắn muốn thu hồi báo giá này không? Khách hàng sẽ không thể chấp nhận báo giá này nữa. Hành động này không thể hoàn tác.",
+      "confirm": "Có, thu hồi"
+    }
+  },
+  "ShopProfilePage": {
+    "imageUpload": {
+      "previewAlt": "Xem trước",
+      "bannerPrompt": "Kéo thả hoặc nhấn để tải ảnh bìa"
+    },
+    "toast": {
+      "updateSuccess": "Cập nhật hồ sơ cửa hàng thành công!",
+      "updateFailed": "Không thể cập nhật hồ sơ cửa hàng. Vui lòng thử lại.",
+      "shopClosed": "Cửa hàng đã được đóng tạm thời.",
+      "shopReopened": "Cửa hàng đã được mở lại.",
+      "actionFailed": "Thao tác thất bại. Vui lòng thử lại."
+    },
+    "status": {
+      "active": "Đang hoạt động",
+      "inactiveClosed": "Không hoạt động (Đã đóng)",
+      "pending": "Chờ duyệt",
+      "rejected": "Bị từ chối",
+      "banned": "Bị cấm",
+      "unknown": "Không xác định"
+    },
+    "loadingProfile": "Đang tải hồ sơ...",
+    "noShop": {
+      "title": "Không tìm thấy cửa hàng",
+      "description": "Bạn chưa đăng ký cửa hàng."
+    },
+    "confirmModal": {
+      "closeQuestion": "Đóng cửa hàng tạm thời?",
+      "reopenQuestion": "Mở lại cửa hàng?",
+      "closeDescription": "Cửa hàng của bạn sẽ bị ẩn. Khách hàng không thể xem hoặc mua sản phẩm cho đến khi bạn mở lại.",
+      "reopenDescription": "Cửa hàng của bạn sẽ hiển thị lại. Khách hàng có thể tiếp tục xem và mua sắm như bình thường."
+    },
+    "header": {
+      "title": "Hồ sơ cửa hàng",
+      "subtitle": "Cập nhật nhận diện và thông tin liên hệ của cửa hàng"
+    },
+    "reviewNote": "Ghi chú duyệt:",
+    "sections": {
+      "contactDetails": "Thông tin liên hệ",
+      "bankingDetails": "Thông tin ngân hàng",
+      "shopStatistics": "Thống kê cửa hàng"
+    },
+    "fields": {
+      "shopName": "Tên cửa hàng",
+      "bio": "Slogan / Giới thiệu",
+      "contactEmail": "Email liên hệ",
+      "phoneNumber": "Số điện thoại",
+      "address": "Địa chỉ đầy đủ",
+      "bankName": "Tên ngân hàng",
+      "bankAccountNumber": "Số tài khoản",
+      "bankAccountName": "Tên chủ tài khoản"
+    },
+    "placeholders": {
+      "shopName": "Nhập tên thương hiệu của bạn",
+      "bio": "Mô tả ngắn về cửa hàng",
+      "contactEmail": "contact@domain.com",
+      "phoneNumber": "09xxx...",
+      "address": "Số nhà, phường/xã, quận/huyện, tỉnh/thành phố"
+    },
+    "readOnly": "Chỉ đọc",
+    "stats": {
+      "rating": "Đánh giá",
+      "na": "N/A",
+      "totalOrders": "Tổng đơn hàng",
+      "totalRevenue": "Tổng doanh thu"
+    },
+    "actions": {
+      "deactivateStore": "Tạm ngừng cửa hàng",
+      "reactivateStore": "Mở lại cửa hàng",
+      "savingChanges": "Đang lưu thay đổi...",
+      "saveChanges": "Lưu thay đổi"
+    }
+  },
+  "ShopRegisterPage": {
+    "imageUpload": {
+      "previewAlt": "Xem trước",
+      "bannerPrompt": "Kéo thả hoặc nhấn để tải ảnh bìa"
+    },
+    "toast": {
+      "submitSuccess": "Đã gửi đăng ký cửa hàng thành công! Vui lòng chờ xét duyệt.",
+      "submitFailed": "Đăng ký thất bại. Vui lòng thử lại."
+    },
+    "header": {
+      "title": "Đăng ký nhà bán hàng",
+      "subtitle": "Hoàn tất hồ sơ để bắt đầu kinh doanh trên Ameko."
+    },
+    "sections": {
+      "contactDetails": "Thông tin liên hệ",
+      "bankingInformation": "Thông tin ngân hàng"
+    },
+    "fields": {
+      "shopName": "Tên cửa hàng",
+      "bio": "Slogan / Giới thiệu",
+      "contactEmail": "Email liên hệ",
+      "phoneNumber": "Số điện thoại",
+      "taxCode": "Mã số thuế",
+      "address": "Địa chỉ lấy hàng",
+      "citizenId": "CCCD",
+      "bankName": "Tên ngân hàng",
+      "bankAccountNumber": "Số tài khoản",
+      "bankAccountName": "Tên chủ tài khoản"
+    },
+    "placeholders": {
+      "shopName": "TÊN CỬA HÀNG...",
+      "bio": "Slogan hoặc mô tả ngắn...",
+      "contactEmail": "email@domain.com",
+      "phoneNumber": "09xxx...",
+      "taxCode": "MÃ SỐ THUẾ...",
+      "address": "Địa chỉ lấy hàng tại kho...",
+      "citizenId": "CCCD",
+      "bankName": "TÊN NGÂN HÀNG",
+      "bankAccountNumber": "SỐ TÀI KHOẢN",
+      "bankAccountName": "TÊN CHỦ TÀI KHOẢN"
+    },
+    "actions": {
+      "processing": "Đang xử lý...",
+      "submitApplication": "Gửi đơn đăng ký"
+    }
+  },
+  "ShopWarrantyRequestsPage": {
+    "header": {
+      "title": "Yêu cầu bảo hành",
+      "subtitle": "Quản lý các yêu cầu đổi trả và bảo hành từ khách hàng."
+    },
+    "empty": {
+      "title": "Chưa có yêu cầu nào",
+      "description": "Cửa hàng chưa nhận được yêu cầu bảo hành hoặc đổi trả nào từ khách hàng."
+    },
+    "status": {
+      "inProgress": "Đang chờ xử lý",
+      "awaitingReturn": "Chờ hoàn hàng",
+      "shopAccepted": "Đã chấp nhận",
+      "rejected": "Bị từ chối",
+      "adminReviewing": "Admin đang duyệt",
+      "completed": "Hoàn tất",
+      "autoCancelled": "Tự động hủy",
+      "returning": "Đang hoàn trả",
+      "returned": "Đã hoàn trả"
+    },
+    "types": {
+      "returnRequest": "Đổi trả / Hoàn tiền",
+      "cancelRequest": "Hủy đơn hàng"
+    },
+    "table": {
+      "customer": "Khách hàng",
+      "type": "Loại",
+      "reason": "Lý do",
+      "refundAmount": "Số tiền hoàn",
+      "createdDate": "Ngày tạo",
+      "status": "Trạng thái",
+      "action": "Thao tác",
+      "na": "N/A"
+    },
+    "actions": {
+      "viewProcess": "Xem và xử lý",
+      "waitReturn": "Chờ hoàn hàng",
+      "confirmReceipt": "Xác nhận nhận hàng",
+      "viewInfo": "Xem thông tin"
+    },
+    "pagination": {
+      "pageLabel": "Trang"
+    },
+    "confirmReceiptModal": {
+      "title": "Xác nhận đã nhận hàng",
+      "description": "Bạn có chắc chắn đã nhận lại sản phẩm trả về trong tình trạng tốt không? Hành động này sẽ đóng đơn và không thể hoàn tác.",
+      "cancel": "Hủy",
+      "confirm": "Xác nhận",
+      "confirming": "Đang xác nhận..."
+    }
+  },
+  "ShopReviewModal": {
+    "validation": {
+      "selectDecision": "Vui lòng chọn quyết định",
+      "responseMin": "Vui lòng nhập phản hồi cho khách hàng (ít nhất 5 ký tự)"
+    },
+    "toast": {
+      "processFailed": "Không thể xử lý yêu cầu bảo hành"
+    },
+    "header": {
+      "title": "Duyệt yêu cầu bảo hành"
+    },
+    "customerFallback": "Khách hàng",
+    "evidenceAlt": "Bằng chứng từ khách hàng",
+    "requestedRefundAmount": "Số tiền hoàn được yêu cầu",
+    "aiAnalysis": {
+      "assistantTitle": "Trợ lý Ameko",
+      "assistantDisclaimer": "(Trợ lý Ameko là AI và có thể mắc lỗi.)",
+      "unavailable": "Không có phân tích",
+      "labels": {
+        "category": "Danh mục",
+        "sentiment": "Cảm xúc",
+        "summary": "Tóm tắt",
+        "recommendation": "Khuyến nghị:",
+        "confidence": "Độ tin cậy:"
+      },
+      "errors": {
+        "unavailable": "Phân tích AI hiện không khả dụng.",
+        "processingFailed": "Xử lý AI thất bại.",
+        "unrecognizedFormat": "Định dạng phản hồi AI không được nhận diện.",
+        "parseFailed": "Không thể phân tích dữ liệu AI."
+      }
+    },
+    "timeline": {
+      "title": "Lịch sử xử lý"
+    },
+    "form": {
+      "decisionLabel": "Quyết định của cửa hàng",
+      "approve": "Chấp nhận",
+      "approveHint": "Đồng ý yêu cầu",
+      "reject": "Từ chối",
+      "rejectHint": "Từ chối yêu cầu",
+      "responseLabel": "Phản hồi cho khách hàng",
+      "responsePlaceholder": "Nhập hướng dẫn hoàn trả hoặc lý do từ chối..."
+    },
+    "actions": {
+      "cancel": "Hủy",
+      "confirmDecision": "Xác nhận quyết định",
+      "close": "Đóng"
+    },
+    "readonly": {
+      "responseTitle": "Phản hồi của cửa hàng",
+      "noResponse": "Chưa có phản hồi"
+    }
+  },
+  "UpdateWarrantyModal": {
+    "title": "Cập nhật yêu cầu bảo hành",
+    "requestType": "Loại yêu cầu",
+    "requestTypeOptions": {
+      "returnAndRefund": "Trả hàng & Hoàn tiền",
+      "returnAndRefundDescription": "Yêu cầu trả sản phẩm vật lý về Shop trước khi nhận hoàn tiền.",
+      "warrantyInstantRefund": "Bảo hành / Hoàn tiền nhanh",
+      "warrantyInstantRefundDescription": "Không cần trả hàng. Phù hợp cho bồi thường nhỏ hoặc thỏa thuận riêng."
+    },
+    "complaintReason": "Lý do khiếu nại",
+    "complaintReasonPlaceholder": "Ví dụ: Sản phẩm bị lỗi phím",
+    "detailedIssueDescription": "Mô tả chi tiết vấn đề",
+    "detailedIssueDescriptionPlaceholder": "Mô tả chi tiết vấn đề (ít nhất {min} ký tự)...",
+    "evidenceImage": "Ảnh bằng chứng",
+    "evidenceAlt": "Bằng chứng",
+    "uploading": "Đang tải lên...",
+    "clickToUploadImage": "Nhấn để tải ảnh lên",
+    "imageFormatHint": "PNG, JPG tối đa 5MB",
+    "actions": {
+      "cancel": "Hủy",
+      "update": "Cập nhật"
+    },
+    "toast": {
+      "uploadImageFailed": "Tải ảnh thất bại, vui lòng thử lại",
+      "updateFailed": "Cập nhật yêu cầu bảo hành thất bại"
+    },
+    "validation": {
+      "selectRequestType": "Vui lòng chọn loại yêu cầu",
+      "reasonRequired": "Vui lòng nhập lý do",
+      "descriptionMinLength": "Mô tả phải có ít nhất {min} ký tự",
+      "uploadEvidenceImage": "Vui lòng tải lên ảnh bằng chứng"
+    }
+  },
+  "WarrantyTimeline": {
+    "roles": {
+      "customer": "Khách hàng",
+      "shop": "Cửa hàng",
+      "admin": "Quản trị viên"
+    },
+    "actions": {
+      "create": "Tạo yêu cầu",
+      "shopApprove": "Cửa hàng chấp nhận",
+      "shopReject": "Cửa hàng từ chối",
+      "adminDecision": "Quản trị viên quyết định",
+      "userShippedReturn": "Khách hàng đã gửi hàng trả",
+      "shopReceivedReturn": "Cửa hàng đã nhận hàng trả",
+      "autoCancel": "Tự động hủy",
+      "completed": "Hoàn tất"
+    },
+    "empty": "Chưa có lịch sử thao tác"
+  },
+  "ShopAssemblyTemplatesPage": {
+    "toast": {
+      "loadFailed": "Không thể tải danh sách mẫu lắp ráp."
+    },
+    "header": {
+      "title": "Mẫu lắp ráp"
+    },
+    "actions": {
+      "createTemplate": "Tạo mẫu"
+    },
+    "empty": {
+      "noTemplates": "Không tìm thấy mẫu lắp ráp nào."
+    },
+    "table": {
+      "order": "Thứ tự",
+      "stepName": "Tên bước",
+      "required": "Bắt buộc",
+      "actions": "Thao tác"
+    },
+    "badges": {
+      "required": "Bắt buộc",
+      "optional": "Tùy chọn"
+    },
+    "tooltips": {
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa"
+    }
+  },
+  "AssemblyTemplateFormModal": {
+    "validation": {
+      "stepNameRequired": "Tên bước là bắt buộc",
+      "stepOrderMin": "Thứ tự bước phải ít nhất là {min}"
+    },
+    "toast": {
+      "updateSuccess": "Cập nhật mẫu thành công",
+      "updateFailed": "Không thể cập nhật mẫu",
+      "createSuccess": "Tạo mẫu thành công",
+      "createFailed": "Không thể tạo mẫu",
+      "unexpectedError": "Đã xảy ra lỗi"
+    },
+    "title": {
+      "edit": "Chỉnh sửa mẫu",
+      "create": "Tạo mẫu"
+    },
+    "labels": {
+      "stepName": "Tên bước",
+      "stepOrder": "Thứ tự bước",
+      "isRequired": "Bắt buộc?"
+    },
+    "placeholders": {
+      "stepName": "ví dụ: Lắp switch"
+    },
+    "actions": {
+      "cancel": "Hủy",
+      "save": "Lưu",
+      "create": "Tạo"
+    }
+  },
+  "DeleteTemplateModal": {
+    "toast": {
+      "deleteSuccess": "Xóa mẫu thành công",
+      "deleteFailed": "Không thể xóa mẫu",
+      "unexpectedError": "Đã xảy ra lỗi"
+    },
+    "title": "Xóa mẫu",
+    "descriptionPrefix": "Bạn có chắc chắn muốn xóa bước:",
+    "descriptionSuffix": "?",
+    "actions": {
+      "cancel": "Hủy",
+      "delete": "Xóa"
+    }
+  },
+  "ShopCancelRequestsPage": {
+    "toast": {
+      "fetchFailed": "Không thể tải danh sách vấn đề đơn hàng",
+      "fetchUnexpectedError": "Đã xảy ra lỗi khi tải danh sách vấn đề"
+    },
+    "header": {
+      "title": "Quản lý vấn đề đơn hàng"
+    },
+    "table": {
+      "orderId": "Mã đơn hàng",
+      "customer": "Khách hàng",
+      "amount": "Số tiền",
+      "reason": "Lý do",
+      "date": "Ngày",
+      "actions": "Thao tác"
+    },
+    "empty": {
+      "noPendingIssues": "Không có vấn đề đơn hàng đang chờ xử lý."
+    },
+    "actions": {
+      "viewDetails": "Xem chi tiết"
+    }
+  },
+  "OrderIssueDetailModal": {
+    "toast": {
+      "processSuccess": "Xử lý vấn đề thành công.",
+      "processFailed": "Không thể xử lý vấn đề.",
+      "unexpectedError": "Đã xảy ra lỗi."
+    },
+    "title": "Chi tiết vấn đề",
+    "fields": {
+      "orderId": "Mã đơn hàng",
+      "customerName": "Tên khách hàng",
+      "totalAmount": "Tổng tiền",
+      "reason": "Lý do",
+      "description": "Mô tả"
+    },
+    "aiAnalysis": {
+      "assistantTitle": "Trợ lý Ameko",
+      "assistantDisclaimer": "(Trợ lý Ameko là AI và có thể mắc lỗi.)",
+      "unavailable": "Không có phân tích",
+      "labels": {
+        "category": "Danh mục",
+        "sentiment": "Cảm xúc",
+        "summary": "Tóm tắt",
+        "recommendation": "Khuyến nghị:",
+        "confidence": "Độ tin cậy:"
+      },
+      "errors": {
+        "unavailable": "Phân tích AI hiện không khả dụng.",
+        "processingFailed": "Xử lý AI thất bại.",
+        "unrecognizedFormat": "Định dạng phản hồi AI không được nhận diện.",
+        "parseFailed": "Không thể phân tích dữ liệu AI."
+      }
+    },
+    "placeholders": {
+      "shopResponse": "Nhập phản hồi của bạn cho khách hàng..."
+    },
+    "actions": {
+      "reject": "Từ chối",
+      "approve": "Chấp nhận",
+      "close": "Đóng"
+    },
+    "error": {
+      "loadFailed": "Không thể tải chi tiết vấn đề."
+    }
+  },
+  "AdminDashboard": {
+    "title": "Tổng quan bảng điều khiển",
+    "loading": "Đang tải...",
+    "errorLoad": "Không thể tải dữ liệu bảng điều khiển.",
+    "cardNetRevenue": "Doanh thu thuần",
+    "cardGMV": "Tổng giá trị hàng hóa",
+    "cardOrders": "Tổng quan đơn hàng",
+    "cardEntities": "Thực thể đang hoạt động",
+    "subCompleted": "Hoàn thành: {n}",
+    "subCancelled": "Đã hủy: {n}",
+    "subBuyers": "Người mua: {n}",
+    "subShops": "Cửa hàng: {n}"
+  },
+  "PaymentHealth": {
+    "title": "Sức khỏe thanh toán",
+    "loading": "Đang tải...",
+    "errorLoad": "Không thể tải dữ liệu sức khỏe thanh toán.",
+    "cardVolume": "Khối lượng thanh toán",
+    "cardSuccessRate": "Tỷ lệ thành công",
+    "cardTotalPayments": "Tổng thanh toán",
+    "subSuccess": "Thành công: {n}",
+    "subFailed": "Thất bại: {n}",
+    "subRefund": "Hoàn tiền: {n}",
+    "metricsByMethod": "Thống kê theo phương thức",
+    "metricsByType": "Thống kê theo loại",
+    "noData": "Không có dữ liệu.",
+    "labelTotal": "Tổng:",
+    "labelSuccess": "Thành công:",
+    "labelFailed": "Thất bại:",
+    "labelCount": "Số lượng:",
+    "labelAmount": "Giá trị:",
+    "methodCOD": "COD",
+    "methodBanking": "Banking",
+    "methodEWallet": "E-Wallet",
+    "methodUnknown": "Không xác định",
+    "typeOrderPayment": "Thanh toán đơn hàng",
+    "typeSubscription": "Đăng ký / Đặt cọc",
+    "typeUnknown": "Không xác định"
+  },
+  "RiskOverview": {
+    "title": "Tổng quan rủi ro & tranh chấp",
+    "loading": "Đang tải...",
+    "errorLoad": "Không thể tải dữ liệu tổng quan rủi ro.",
+    "cardRiskRates": "Tỷ lệ rủi ro",
+    "cardActiveRequests": "Yêu cầu & vấn đề đang mở",
+    "cardOrderImpact": "Ảnh hưởng đơn hàng",
+    "subRefundRate": "Tỷ lệ hoàn tiền: {n}%",
+    "subIssueRate": "Tỷ lệ vấn đề: {n}%",
+    "subCancelReq": "Yêu cầu hủy: {n}",
+    "subRefundReq": "Yêu cầu hoàn tiền: {n}",
+    "subDisputes": "Tranh chấp: {n}",
+    "subRefunded": "Đã hoàn tiền: {n}",
+    "subTotalOrders": "Tổng đơn hàng: {n}"
+  },
+  "AdminUsersPage": {
+    "title": "Quản lý người dùng",
+    "subtitle": "Quản lý tất cả người dùng đã đăng ký trên nền tảng.",
+    "totalLabel": "Tổng:",
+    "usersLabel": "người dùng",
+    "createUser": "Tạo người dùng",
+    "loading": "Đang tải dữ liệu...",
+    "tableUser": "Người dùng",
+    "tableContact": "Liên hệ",
+    "tableRole": "Vai trò",
+    "tableEmailStatus": "Trạng thái email",
+    "tableStatus": "Trạng thái",
+    "tableCreatedAt": "Ngày tạo",
+    "tableActions": "Thao tác",
+    "avatarAlt": "ảnh đại diện",
+    "roleAdmin": "Quản trị viên",
+    "roleShop": "Cửa hàng",
+    "roleCustomer": "Khách hàng",
+    "emailVerified": "Đã xác minh",
+    "emailUnverified": "Chưa xác minh",
+    "statusActive": "Đang hoạt động",
+    "statusBanned": "Bị cấm",
+    "statusUnknown": "Không xác định",
+    "editUser": "Chỉnh sửa",
+    "editUserTitle": "Chỉnh sửa người dùng",
+    "emptyNoUsers": "Không tìm thấy người dùng.",
+    "pageLabel": "Trang",
+    "usersTotalLabel": "người dùng",
+    "prev": "Trước",
+    "next": "Tiếp"
+  },
+  "CreateUserModal": {
+    "validation": {
+      "usernameMin": "Tên đăng nhập phải có ít nhất 3 ký tự",
+      "usernameMax": "Tên đăng nhập tối đa 30 ký tự",
+      "usernamePattern": "Chỉ cho phép chữ cái, số và dấu gạch dưới",
+      "passwordMin": "Mật khẩu phải có ít nhất 6 ký tự",
+      "emailInvalid": "Địa chỉ email không hợp lệ",
+      "firstNameRequired": "Tên là bắt buộc",
+      "lastNameRequired": "Họ là bắt buộc",
+      "dobRequired": "Ngày sinh là bắt buộc",
+      "phoneMin": "Số điện thoại phải có ít nhất 9 chữ số",
+      "phoneMax": "Số điện thoại tối đa 15 chữ số",
+      "phonePattern": "Chỉ cho phép chữ số"
+    },
+    "toast": {
+      "createSuccess": "Tạo người dùng thành công!",
+      "createFailed": "Không thể tạo người dùng"
+    },
+    "title": "Tạo người dùng mới",
+    "close": "Đóng",
+    "firstName": "Tên",
+    "firstNamePlaceholder": "Nhập tên",
+    "lastName": "Họ",
+    "lastNamePlaceholder": "Nhập họ",
+    "username": "Tên đăng nhập",
+    "usernamePlaceholder": "ten_dang_nhap",
+    "email": "Email",
+    "emailPlaceholder": "user@example.com",
+    "password": "Mật khẩu",
+    "passwordPlaceholder": "Tối thiểu 6 ký tự",
+    "hidePassword": "Ẩn",
+    "showPassword": "Hiện",
+    "phoneNumber": "Số điện thoại",
+    "phoneNumberPlaceholder": "0909090000",
+    "role": "Vai trò",
+    "roleAdmin": "Quản trị viên",
+    "roleCustomer": "Khách hàng",
+    "roleShop": "Cửa hàng",
+    "status": "Trạng thái",
+    "statusActive": "Đang hoạt động",
+    "statusBanned": "Bị cấm",
+    "gender": "Giới tính",
+    "genderMale": "Nam",
+    "genderFemale": "Nữ",
+    "genderOther": "Khác",
+    "dateOfBirth": "Ngày sinh",
+    "cancel": "Hủy",
+    "creating": "Đang tạo...",
+    "createUser": "Tạo người dùng"
+  },
+  "EditUserModal": {
+    "validation": {
+      "firstNameRequired": "Tên là bắt buộc",
+      "lastNameRequired": "Họ là bắt buộc",
+      "emailInvalid": "Địa chỉ email không hợp lệ",
+      "dobRequired": "Ngày sinh là bắt buộc",
+      "phoneRequired": "Số điện thoại là bắt buộc"
+    },
+    "toast": {
+      "updateSuccess": "Cập nhật người dùng thành công!",
+      "updateFailed": "Không thể cập nhật người dùng"
+    },
+    "title": "Chỉnh sửa người dùng",
+    "close": "Đóng",
+    "firstName": "Tên",
+    "firstNamePlaceholder": "Nhập tên",
+    "lastName": "Họ",
+    "lastNamePlaceholder": "Nhập họ",
+    "email": "Email",
+    "emailPlaceholder": "user@example.com",
+    "phoneNumber": "Số điện thoại",
+    "phoneNumberPlaceholder": "0909090000",
+    "role": "Vai trò",
+    "roleAdmin": "Quản trị viên",
+    "roleCustomer": "Khách hàng",
+    "roleShop": "Cửa hàng",
+    "status": "Trạng thái",
+    "statusActive": "Đang hoạt động",
+    "statusBanned": "Bị cấm",
+    "gender": "Giới tính",
+    "genderMale": "Nam",
+    "genderFemale": "Nữ",
+    "genderOther": "Khác",
+    "dateOfBirth": "Ngày sinh",
+    "emailConfirmed": "Email đã xác nhận",
+    "phoneConfirmed": "Điện thoại đã xác nhận",
+    "cancel": "Hủy",
+    "saving": "Đang lưu...",
+    "saveChanges": "Lưu thay đổi"
+  },
+  "AdminShopRequestsPage": {
+    "title": "Quản lý cửa hàng",
+    "subtitle": "Xem xét và quản lý các yêu cầu mở cửa hàng từ người dùng.",
+    "totalLabel": "Tổng:",
+    "shopsLabel": "cửa hàng",
+    "loading": "Đang tải dữ liệu...",
+    "tableShopInfo": "Thông tin cửa hàng",
+    "tableContact": "Liên hệ",
+    "tableLegalBank": "Pháp lý & Ngân hàng",
+    "tableCreatedAt": "Ngày tạo",
+    "tableDetail": "Chi tiết",
+    "tableDecision": "Quyết định",
+    "logoAlt": "logo",
+    "notAvailable": "N/A",
+    "statusPending": "Đang chờ duyệt",
+    "statusActive": "Đang hoạt động",
+    "statusRejected": "Bị từ chối",
+    "statusInactive": "Không hoạt động",
+    "statusBanned": "Bị cấm",
+    "statusUnknown": "Không xác định",
+    "view": "Xem",
+    "viewDetailTitle": "Xem chi tiết hồ sơ",
+    "approve": "Duyệt",
+    "approveTitle": "Chấp thuận",
+    "reject": "Từ chối",
+    "rejectTitle": "Từ chối",
+    "ban": "Cấm",
+    "banTitle": "Cấm cửa hàng",
+    "unban": "Bỏ cấm",
+    "unbanTitle": "Bỏ cấm cửa hàng",
+    "done": "Hoàn tất",
+    "defaultNoteApprove": "Đủ điều kiện kinh doanh.",
+    "defaultNoteReject": "Thông tin chưa chính xác.",
+    "defaultNoteBan": "Vi phạm chính sách.",
+    "modalTitleApprove": "Phê duyệt cửa hàng",
+    "modalTitleReject": "Từ chối yêu cầu",
+    "modalTitleBan": "Cấm cửa hàng",
+    "modalTitleUnban": "Bỏ cấm cửa hàng",
+    "shopLabel": "Cửa hàng:",
+    "unbanWarning": "Sau khi bỏ cấm, chủ cửa hàng sẽ cần tự kích hoạt lại cửa hàng của họ. Bạn có chắc chắn muốn tiếp tục?",
+    "adminNoteLabel": "Ghi chú của Admin",
+    "cancel": "Hủy",
+    "processing": "Đang xử lý...",
+    "confirm": "Xác nhận",
+    "toastBanSuccess": "Cửa hàng \"{shopName}\" đã bị cấm!",
+    "toastUnbanSuccess": "Cửa hàng \"{shopName}\" đã được bỏ cấm!",
+    "toastApproveSuccess": "Đã duyệt cửa hàng thành công!",
+    "toastRejectSuccess": "Đã từ chối cửa hàng thành công!",
+    "toastDecisionFailed": "Xử lý quyết định của quản trị viên thất bại"
+  },
+  "ShopApplicationModal": {
+    "statusPending": "Đang chờ duyệt",
+    "statusActive": "Đang hoạt động",
+    "statusRejected": "Bị từ chối",
+    "statusUnknown": "Không xác định",
+    "title": "Chi tiết hồ sơ đăng ký cửa hàng",
+    "applicationIdLabel": "Mã hồ sơ:",
+    "close": "Đóng",
+    "bannerAlt": "Ảnh bìa",
+    "noBanner": "Chưa có ảnh bìa",
+    "logoAlt": "Logo",
+    "noLogo": "Chưa có logo",
+    "sectionGeneralInfo": "Thông tin chung",
+    "sectionLegalBanking": "Pháp lý & Ngân hàng",
+    "fieldShopName": "Tên cửa hàng",
+    "fieldContactEmail": "Email liên hệ",
+    "fieldPhoneNumber": "Số điện thoại",
+    "fieldCreatedAt": "Ngày tạo",
+    "fieldPickupAddress": "Địa chỉ lấy hàng",
+    "fieldBioDescription": "Giới thiệu / Mô tả",
+    "fieldCitizenId": "CCCD",
+    "fieldTaxCode": "Mã số thuế",
+    "fieldBankName": "Tên ngân hàng",
+    "fieldAccountHolder": "Tên chủ tài khoản",
+    "fieldBankAccountNumber": "Số tài khoản",
+    "notAvailable": "N/A"
+  },
+  "UpdateShopApplicationModal": {
+    "validationShopNameMin": "Tên cửa hàng phải có ít nhất 3 ký tự",
+    "validationAddressMin": "Địa chỉ quá ngắn",
+    "validationPhoneInvalid": "Số điện thoại không hợp lệ",
+    "validationEmailInvalid": "Email không hợp lệ",
+    "validationBankNameRequired": "Vui lòng nhập tên ngân hàng",
+    "validationBankAccountNumberRequired": "Vui lòng nhập số tài khoản",
+    "validationBankAccountNameRequired": "Vui lòng nhập tên chủ tài khoản",
+    "toastUpdateSuccess": "Cập nhật hồ sơ thành công! Vui lòng chờ duyệt.",
+    "toastUpdateFailed": "Cập nhật thất bại. Vui lòng thử lại.",
+    "title": "Cập nhật hồ sơ cửa hàng",
+    "subtitle": "Cập nhật thông tin và gửi lại để xét duyệt.",
+    "close": "Đóng",
+    "rejectionReason": "Lý do từ chối",
+    "previewAlt": "Xem trước",
+    "bannerPrompt": "Kéo ảnh bìa vào đây hoặc bấm để chọn",
+    "labelShopName": "Tên cửa hàng",
+    "placeholderShopName": "Tên cửa hàng...",
+    "labelSloganBio": "Slogan / Giới thiệu",
+    "placeholderSloganBio": "Slogan hoặc mô tả ngắn...",
+    "sectionContactDetails": "Thông tin liên hệ",
+    "labelContactEmail": "Email liên hệ",
+    "placeholderContactEmail": "email@domain.com",
+    "labelPhoneNumber": "Số điện thoại",
+    "placeholderPhoneNumber": "09xxx...",
+    "labelPickupAddress": "Địa chỉ lấy hàng",
+    "placeholderPickupAddress": "Địa chỉ lấy hàng tại kho...",
+    "sectionBankingInformation": "Thông tin ngân hàng",
+    "labelBankName": "Tên ngân hàng",
+    "placeholderBankName": "Tên ngân hàng",
+    "labelAccountHolderName": "Tên chủ tài khoản",
+    "placeholderAccountHolderName": "Tên chủ tài khoản",
+    "labelAccountNumber": "Số tài khoản",
+    "placeholderAccountNumber": "Số tài khoản",
+    "cancel": "Hủy",
+    "processing": "Đang xử lý...",
+    "resubmitApplication": "Gửi lại hồ sơ"
+  },
+  "AdminCategoriesPage": {
+    "title": "Quản lý danh mục",
+    "subtitle": "Quản lý các danh mục toàn cục có sẵn cho tất cả cửa hàng trên nền tảng.",
+    "addCategory": "Thêm danh mục",
+    "loading": "Đang tải danh mục...",
+    "empty": "Không tìm thấy danh mục nào.",
+    "typeGlobal": "Toàn cục",
+    "statSubCategoriesTitle": "Danh mục con",
+    "statPartsTitle": "Linh kiện",
+    "statusActive": "Đang hoạt động",
+    "statusInactive": "Không hoạt động",
+    "editCategoryTitle": "Chỉnh sửa danh mục",
+    "deleteCategoryTitle": "Xóa danh mục"
+  },
+  "AdminWalletPage": {
+    "tabAll": "Tất cả",
+    "tabPending": "Đang chờ",
+    "tabApproved": "Đã duyệt",
+    "tabRejected": "Đã từ chối",
+    "statusPending": "Đang chờ",
+    "statusApproved": "Đã duyệt",
+    "statusRejected": "Đã từ chối",
+    "statusUnknown": "Không xác định",
+    "title": "Quản lý rút tiền",
+    "subtitle": "Phê duyệt hoặc từ chối yêu cầu rút tiền từ các cửa hàng.",
+    "totalLabel": "Tổng:",
+    "requestsLabel": "yêu cầu",
+    "loading": "Đang tải dữ liệu...",
+    "tableShop": "Cửa hàng",
+    "tableAmount": "Số tiền",
+    "tableBank": "Ngân hàng",
+    "tableStatus": "Trạng thái",
+    "tableRequestedDate": "Ngày yêu cầu",
+    "tableEvidence": "Bằng chứng",
+    "tableAction": "Thao tác",
+    "viewEvidenceTitle": "Xem bằng chứng",
+    "view": "Xem",
+    "approveTitle": "Duyệt",
+    "approve": "Duyệt",
+    "rejectTitle": "Từ chối",
+    "reject": "Từ chối",
+    "empty": "Không tìm thấy yêu cầu rút tiền nào.",
+    "pageLabel": "Trang",
+    "prev": "Trước",
+    "next": "Tiếp",
+    "evidenceAlt": "Bằng chứng",
+    "close": "Đóng"
+  },
+  "ApproveWithdrawalModal": {
+    "validationReasonRequired": "Vui lòng nhập lý do",
+    "defaultReason": "Chuyển khoản thành công",
+    "toastUploadFailed": "Tải ảnh lên thất bại. Vui lòng thử lại.",
+    "toastEvidenceRequired": "Vui lòng tải lên ảnh bằng chứng chuyển khoản.",
+    "title": "Duyệt yêu cầu rút tiền",
+    "close": "Đóng",
+    "amountToTransfer": "Số tiền cần chuyển",
+    "approvalReason": "Lý do duyệt",
+    "reasonPlaceholder": "Nhập lý do...",
+    "transferEvidenceImage": "Ảnh bằng chứng chuyển khoản",
+    "clickToUploadImage": "Bấm để tải ảnh lên",
+    "uploadHint": "PNG, JPG tối đa 5MB",
+    "evidencePreviewAlt": "Xem trước bằng chứng",
+    "uploading": "Đang tải lên...",
+    "uploaded": "Đã tải lên",
+    "change": "Thay đổi",
+    "cancel": "Hủy",
+    "processing": "Đang xử lý...",
+    "confirmApproval": "Xác nhận duyệt"
+  },
+  "RejectWithdrawalModal": {
+    "validationReasonRequired": "Vui lòng nhập lý do từ chối",
+    "toastUploadFailed": "Tải ảnh lên thất bại. Vui lòng thử lại.",
+    "title": "Từ chối yêu cầu rút tiền",
+    "close": "Đóng",
+    "shopLabel": "Cửa hàng",
+    "amountLabel": "Số tiền",
+    "autoRefundTitle": "Hoàn tiền tự động",
+    "autoRefundDescription": "Việc từ chối yêu cầu này sẽ tự động hoàn tiền rút về ví của cửa hàng.",
+    "reasonForRejection": "Lý do từ chối",
+    "reasonPlaceholder": "Nhập lý do từ chối...",
+    "evidenceImage": "Ảnh bằng chứng",
+    "optional": "Tùy chọn",
+    "clickToUploadImage": "Bấm để tải ảnh lên",
+    "uploadHint": "PNG, JPG tối đa 5MB",
+    "evidencePreviewAlt": "Xem trước bằng chứng",
+    "uploading": "Đang tải lên...",
+    "uploaded": "Đã tải lên",
+    "change": "Thay đổi",
+    "cancel": "Hủy",
+    "processing": "Đang xử lý...",
+    "rejectAndRefund": "Từ chối & Hoàn tiền"
+  },
+  "AdminPendingWithdrawalsPage": {
+    "copySuccess": "Đã sao chép!",
+    "title": "Yêu cầu rút tiền đang chờ",
+    "subtitle": "Quản lý các yêu cầu rút tiền hiện đang chờ từ các cửa hàng.",
+    "totalLabel": "Tổng:",
+    "requestsLabel": "yêu cầu",
+    "loading": "Đang tải dữ liệu...",
+    "emptyTitle": "Không có yêu cầu",
+    "emptyDescription": "Hiện tại không có yêu cầu rút tiền nào đang chờ xử lý.",
+    "tableDate": "Ngày",
+    "tableAmount": "Số tiền",
+    "tableFee": "Phí",
+    "tableBank": "Ngân hàng",
+    "tableActions": "Thao tác",
+    "copyAccountNumberTitle": "Sao chép số tài khoản",
+    "copy": "Sao chép",
+    "noInformation": "Không có thông tin",
+    "approveTitle": "Duyệt",
+    "approve": "Duyệt",
+    "rejectTitle": "Từ chối",
+    "reject": "Từ chối",
+    "pageLabel": "Trang",
+    "prev": "Trước",
+    "next": "Tiếp"
+  },
+  "AdminTransactionsPage": {
+    "filterTypeAll": "Tất cả loại",
+    "filterTypeOrderPayment": "Thanh toán đơn hàng",
+    "filterTypeOrderRefund": "Hoàn tiền đơn hàng",
+    "filterTypeSalesRevenue": "Doanh thu bán hàng",
+    "filterTypeDeposit": "Nạp tiền",
+    "filterTypeWithdrawal": "Rút tiền",
+    "filterTypeSalesPending": "Doanh thu chờ xử lý",
+    "filterTypeManualAdjustment": "Điều chỉnh thủ công",
+    "filterStatusAll": "Tất cả trạng thái",
+    "filterStatusPaid": "Đã thanh toán",
+    "filterStatusPending": "Đang chờ",
+    "filterStatusFailed": "Thất bại",
+    "filterStatusCompleted": "Hoàn tất",
+    "filterStatusCancelled": "Đã hủy",
+    "badgeTypeWithdrawal": "Rút tiền",
+    "badgeTypePayment": "Thanh toán",
+    "badgeTypeAdjustment": "Điều chỉnh",
+    "badgeTypeRefund": "Hoàn tiền",
+    "badgeTypePendingRevenue": "Doanh thu chờ",
+    "badgeTypeRevenue": "Doanh thu",
+    "badgeTypeDeposit": "Nạp tiền",
+    "badgeStatusSuccess": "Thành công",
+    "badgeStatusFailed": "Thất bại",
+    "badgeStatusPending": "Đang chờ",
+    "badgeStatusCompleted": "Hoàn tất",
+    "badgeStatusCancelled": "Đã hủy",
+    "unknown": "Không xác định",
+    "title": "Lịch sử giao dịch",
+    "subtitle": "Xem tất cả giao dịch ví trong hệ thống.",
+    "totalLabel": "Tổng:",
+    "transactionsLabel": "giao dịch",
+    "toggleFiltersTitle": "Bật/tắt bộ lọc",
+    "filters": "Bộ lọc",
+    "filterTransactions": "Lọc giao dịch",
+    "clearAll": "Xóa tất cả",
+    "filterTypeLabel": "Loại",
+    "filterStatusLabel": "Trạng thái",
+    "filterFromDate": "Từ ngày",
+    "filterToDate": "Đến ngày",
+    "applyFilters": "Áp dụng bộ lọc",
+    "showingOnPage": "Hiển thị {filtered} trên {total} giao dịch của trang này",
+    "perPage": "Mỗi trang:",
+    "loading": "Đang tải dữ liệu...",
+    "tableId": "ID",
+    "tableDate": "Ngày",
+    "tableType": "Loại",
+    "tableAmount": "Số tiền",
+    "tableFee": "Phí",
+    "tableStatus": "Trạng thái",
+    "tableDetails": "Chi tiết",
+    "manualApproved": "Đã duyệt",
+    "manualRejected": "Đã từ chối",
+    "viewEvidenceTitle": "Xem bằng chứng",
+    "view": "Xem",
+    "emptyFiltered": "Không có giao dịch nào khớp với bộ lọc.",
+    "empty": "Không tìm thấy giao dịch nào.",
+    "pageLabel": "Trang",
+    "first": "Đầu",
+    "prev": "Trước",
+    "next": "Tiếp",
+    "last": "Cuối",
+    "evidenceAlt": "Bằng chứng",
+    "close": "Đóng"
+  },
+  "AdminVouchersPage": {
+    "typePromotion": "Khuyến mãi",
+    "typeNegotiation": "Thương lượng",
+    "typeCompensation": "Bồi thường",
+    "typeUnknown": "Không xác định",
+    "statusExpired": "Hết hạn",
+    "statusActive": "Đang hoạt động",
+    "statusDisabled": "Đã tắt",
+    "statusUnknown": "Không xác định",
+    "discountMax": "Tối đa {amount}",
+    "copySuccess": "Đã sao chép vào bộ nhớ tạm!",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa voucher \"{code}\" không?",
+    "toastDeleteSuccess": "Xóa voucher thành công",
+    "toastDeleteFailed": "Không thể xóa voucher",
+    "toastToggleSuccess": "Cập nhật trạng thái voucher thành công",
+    "toastToggleFailed": "Không thể cập nhật trạng thái",
+    "loading": "Đang tải voucher...",
+    "title": "Quản lý voucher",
+    "subtitle": "Quản lý voucher và chương trình khuyến mãi trên toàn nền tảng.",
+    "createVoucher": "Tạo voucher",
+    "tableCode": "Mã",
+    "tableNameDescription": "Tên & Mô tả",
+    "tableType": "Loại",
+    "tableDiscount": "Giảm giá",
+    "tableMinOrder": "Đơn tối thiểu",
+    "tableUsed": "Đã dùng",
+    "tableStatus": "Trạng thái",
+    "tableAction": "Thao tác",
+    "copyCodeTitle": "Sao chép mã",
+    "viewDetailsTitle": "Xem chi tiết",
+    "editTitle": "Chỉnh sửa",
+    "disableVoucherTitle": "Tắt voucher",
+    "enableVoucherTitle": "Bật voucher",
+    "deleteTitle": "Xóa",
+    "empty": "Không tìm thấy voucher nào.",
+    "pageLabel": "Trang",
+    "vouchersLabel": "voucher",
+    "previous": "Trước",
+    "next": "Tiếp"
+  },
+  "AdminWarrantyRequestsPage": {
+    "statusAll": "Tất cả",
+    "statusPending": "Đang chờ",
+    "statusInProgress": "Đang xử lý",
+    "statusShopAccepted": "Shop chấp nhận",
+    "statusRejected": "Đã từ chối",
+    "statusAutoCancelled": "Tự động hủy",
+    "statusAwaitingReturn": "Chờ hoàn hàng",
+    "statusReturning": "Đang hoàn trả",
+    "statusReturned": "Đã hoàn trả",
+    "statusCompleted": "Hoàn tất",
+    "statusUnknownCode": "Không xác định #{status}",
+    "title": "Yêu cầu bảo hành",
+    "subtitle": "Quản lý các yêu cầu bảo hành và trả hàng.",
+    "tableIdDate": "ID / Ngày",
+    "tableCustomer": "Khách hàng",
+    "tableTypeReason": "Loại & Lý do",
+    "tableAmount": "Số tiền",
+    "tableStatus": "Trạng thái",
+    "tableResponse": "Phản hồi",
+    "tableAction": "Thao tác",
+    "emptyTitle": "Không tìm thấy yêu cầu",
+    "emptyDescription": "Không có yêu cầu bảo hành hoặc trả hàng nào khớp với bộ lọc hiện tại.",
+    "customerAvatarAlt": "Ảnh đại diện khách hàng",
+    "notAvailable": "N/A",
+    "shopLabel": "Shop",
+    "adminLabel": "Admin",
+    "viewDetails": "Xem chi tiết",
+    "pageLabel": "Trang",
+    "prev": "Trước",
+    "next": "Tiếp"
+  },
+  "AdminDecisionModal": {
+    "validationSelectJudgment": "Vui lòng chọn phán quyết",
+    "validationAdminNoteMin": "Vui lòng nhập lý do/ghi chú cho phán quyết (ít nhất 5 ký tự)",
+    "toastDecisionFailed": "Xử lý quyết định của admin thất bại",
+    "title": "Phán quyết yêu cầu bảo hành",
+    "close": "Đóng",
+    "customerRequest": "Yêu cầu của khách hàng",
+    "customerEvidenceAlt": "Bằng chứng của khách hàng",
+    "shopResponse": "Phản hồi của shop",
+    "shopNoResponse": "Shop chưa phản hồi.",
+    "requestedRefundAmount": "Số tiền hoàn yêu cầu",
+    "actionHistory": "Lịch sử hành động",
+    "adminJudgment": "Phán quyết của admin",
+    "approveRequest": "Chấp nhận yêu cầu",
+    "approveCustomerRequest": "Chấp nhận yêu cầu của khách hàng",
+    "rejectProtectShop": "Từ chối, bảo vệ shop",
+    "rejectCustomerRequest": "Từ chối yêu cầu của khách hàng",
+    "judgmentNote": "Ghi chú phán quyết",
+    "judgmentNotePlaceholder": "Nhập lý do/ghi chú phán quyết của admin...",
+    "cancel": "Hủy",
+    "saving": "Đang lưu...",
+    "saveJudgment": "Lưu phán quyết",
+    "noJudgmentNote": "Không có ghi chú phán quyết"
+  },
+  "CancelOrderModal": {
+    "validationReasonMin": "Lý do phải có ít nhất 3 ký tự",
+    "toastSubmitSuccess": "Gửi yêu cầu thành công. Vui lòng chờ Shop phê duyệt.",
+    "toastSubmitFailed": "Không thể gửi yêu cầu hủy đơn",
+    "toastUnknownError": "Đã xảy ra lỗi",
+    "title": "Hủy đơn hàng",
+    "description": "Vui lòng cho chúng tôi biết lý do bạn muốn hủy đơn hàng này.",
+    "reasonPlaceholder": "Lý do hủy đơn...",
+    "detailsPlaceholder": "Thông tin bổ sung...",
+    "cancel": "Hủy",
+    "submitting": "Đang gửi...",
+    "submitRequest": "Gửi yêu cầu"
+  },
+  "ChatPage": {
+    "messages": "Tin nhắn",
+    "emptyTitle": "Tin nhắn của bạn",
+    "emptyDescription": "Chọn một cuộc trò chuyện từ thanh bên hoặc bắt đầu cuộc trò chuyện mới từ trang sản phẩm.",
+    "securedLabel": "Tin nhắn được bảo mật đầu cuối",
+    "chatSingular": "cuộc trò chuyện",
+    "chatPlural": "cuộc trò chuyện"
+  },
+  "ChatArea": {
+    "reaction": {
+      "buttonTitle": "Thả cảm xúc",
+      "changeTitle": "{reaction} - bấm để thay đổi",
+      "like": "Thích",
+      "love": "Yêu thích",
+      "haha": "Haha",
+      "wow": "Bất ngờ",
+      "sad": "Buồn",
+      "angry": "Tức giận"
+    },
+    "statusSending": "Đang gửi",
+    "statusFailed": "Thất bại",
+    "emptyThreadTitle": "Chưa có tin nhắn",
+    "emptyThreadSubtitle": "Hãy gửi lời chào 👋",
+    "toastInvalidAmount": "Vui lòng nhập số tiền hợp lệ",
+    "toastGiftVoucherError": "Tặng voucher thất bại",
+    "notAvailable": "N/A",
+    "voucherMessage": "🎉 Shop vừa tặng bạn Voucher giảm {discount} VND (Mã: {voucherCode}) cho đơn từ {minOrder} VND. Hãy vào giỏ hàng để sử dụng ngay nhé!",
+    "noConversationTitle": "Chọn một cuộc trò chuyện",
+    "noConversationSubtitle": "Chọn một cuộc trò chuyện từ danh sách",
+    "ariaBack": "Quay lại",
+    "directMessage": "Tin nhắn trực tiếp",
+    "giftVoucherTitle": "Tặng Voucher",
+    "messagePlaceholder": "Nhập tin nhắn...",
+    "sendMessageAria": "Gửi tin nhắn",
+    "sendHint": "Nhấn Enter để gửi · Shift+Enter để xuống dòng",
+    "voucherModalDiscountLabel": "Số tiền giảm (VND)",
+    "voucherModalDiscountPlaceholder": "VD: 50000",
+    "voucherModalMinOrderLabel": "Giá trị đơn tối thiểu (VND)",
+    "voucherModalMinOrderPlaceholder": "VD: 200000",
+    "cancel": "Hủy",
+    "gifting": "Đang tặng...",
+    "gift": "Tặng"
+  },
+  "ConversationList": {
+    "searchPlaceholder": "Tìm cuộc trò chuyện...",
+    "noResultsFound": "Không tìm thấy kết quả",
+    "noConversationsYet": "Chưa có cuộc trò chuyện nào",
+    "startChatHint": "Bắt đầu chat từ trang sản phẩm",
+    "noMessagesYet": "Chưa có tin nhắn"
+  },
+  "BuilderPage": {
+    "outOfStock": "Hết hàng",
+    "included": "Đã bao gồm",
+    "steps": "{n} bước",
+    "keyboardBuilder": "Trình tạo bàn phím",
+    "retry": "Thử lại",
+    "chooseYourKit": "Chọn bộ kit của bạn",
+    "chooseKitSubtitle": "Chọn một bộ kit cơ bản để bắt đầu tạo bàn phím tùy chỉnh",
+    "exitLab": "Thoát Lab",
+    "buildSummary": "Tổng quan cấu hình",
+    "viewTop": "Nhìn trên",
+    "viewSide": "Nhìn bên",
+    "viewAngled": "Nhìn nghiêng",
+    "customize": "Tùy chỉnh",
+    "editStep": "Chỉnh sửa {stepName}",
+    "configComplete": "🎉 Cấu hình cơ bản hoàn tất!",
+    "createHighlight": "Tạo điểm nhấn độc đáo",
+    "baseKit": "Bộ kit cơ bản",
+    "addOns": "Phụ kiện thêm",
+    "subtotal": "Tạm tính",
+    "back": "Quay lại",
+    "adding": "Đang thêm...",
+    "addToCart": "Thêm vào giỏ",
+    "selectComponent": "Chọn linh kiện",
+    "helpMeChoose": "Giúp tôi chọn",
+    "saving": "Đang lưu...",
+    "next": "Tiếp theo",
+    "selectComponentWarning": "Vui lòng chọn linh kiện trước khi tiếp tục.",
+    "resetConfirm": "Đặt lại toàn bộ cấu hình?",
+    "addToCartSuccess": "Đã thêm sản phẩm vào giỏ hàng!",
+    "addToCartError": "Thêm vào giỏ hàng thất bại",
+    "kitDisplayName": "Phiên bản Custom Lab"
   }
 }

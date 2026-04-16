@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { X, Loader2, Upload } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { updateCategory } from "@/src/store/slices/categoriesSlice";
 import { toast } from "react-toastify";
@@ -12,16 +13,17 @@ import { CategoryItem } from "@/src/types/category.types";
 import Image from "next/image";
 
 // --- ZOD SCHEMA ---
-const editCategorySchema = z.object({
-  name: z
-    .string()
-    .min(1, "Category name is required")
-    .max(100, "Max 100 characters"),
-  parentId: z.string().optional(),
-  isActive: z.boolean(),
-});
+const editCategorySchema = (t: (key: string) => string) =>
+  z.object({
+    name: z
+      .string()
+      .min(1, t("validationNameRequired"))
+      .max(100, t("validationNameMax")),
+    parentId: z.string().optional(),
+    isActive: z.boolean(),
+  });
 
-type EditCategoryFormValues = z.infer<typeof editCategorySchema>;
+type EditCategoryFormValues = z.infer<ReturnType<typeof editCategorySchema>>;
 
 interface EditCategoryModalProps {
   isOpen: boolean;
@@ -40,11 +42,13 @@ export default function EditCategoryModal({
   onSuccess,
   parentOptions,
 }: EditCategoryModalProps) {
+  const t = useTranslations("EditCategoryModal");
   const dispatch = useAppDispatch();
   const { updating } = useAppSelector((state) => state.categories);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const schema = useMemo(() => editCategorySchema(t), [t]);
 
   const {
     register,
@@ -52,7 +56,7 @@ export default function EditCategoryModal({
     reset,
     formState: { errors },
   } = useForm<EditCategoryFormValues>({
-    resolver: zodResolver(editCategorySchema),
+    resolver: zodResolver(schema),
   });
 
   // Pre-fill form when category changes
@@ -87,11 +91,11 @@ export default function EditCategoryModal({
           thumbnailImage: thumbnailFile,
         }),
       ).unwrap();
-      toast.success("Category updated successfully!");
+      toast.success(t("updatedSuccess"));
       onSuccess();
       onClose();
     } catch (err: unknown) {
-      toast.error((err as string) || "Failed to update category");
+      toast.error((err as string) || t("updateFailed"));
     }
   };
 
@@ -135,11 +139,11 @@ export default function EditCategoryModal({
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-amazon-border">
           <div>
-            <h2 className="text-lg font-bold text-amazon-text">Edit Category</h2>
+            <h2 className="text-lg font-bold text-amazon-text">{t("title")}</h2>
             <p className="text-[12px] text-amazon-textMuted mt-0.5">
               {category.categoryType === "global"
-                ? "Global category"
-                : "Private category"}{" "}
+                ? t("globalCategory")
+                : t("privateCategory")}{" "}
               &middot; {category.slug}
             </p>
           </div>
@@ -156,11 +160,11 @@ export default function EditCategoryModal({
         <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-5">
           {/* Name */}
           <div>
-            <label className={labelClass}>Category Name</label>
+            <label className={labelClass}>{t("categoryName")}</label>
             <input
               {...register("name")}
               className={inputClass}
-              placeholder="e.g. Keycap, Switch, Case..."
+              placeholder={t("namePlaceholder")}
             />
             {errors.name && <p className={errorClass}>{errors.name.message}</p>}
           </div>
@@ -168,11 +172,13 @@ export default function EditCategoryModal({
           {/* Parent Category */}
           <div>
             <label className={labelClass}>
-              Parent Category{" "}
-              <span className="font-normal text-amazon-textMuted">(optional)</span>
+              {t("parentCategory")}{" "}
+              <span className="font-normal text-amazon-textMuted">
+                ({t("optional")})
+              </span>
             </label>
             <select {...register("parentId")} className={inputClass}>
-              <option value="">— None (root category) —</option>
+              <option value="">{t("noneRootCategory")}</option>
               {rootParents.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
@@ -184,14 +190,16 @@ export default function EditCategoryModal({
           {/* Thumbnail Image */}
           <div>
             <label className={labelClass}>
-              Thumbnail Image{" "}
-              <span className="font-normal text-amazon-textMuted">(optional)</span>
+              {t("thumbnailImage")}{" "}
+              <span className="font-normal text-amazon-textMuted">
+                ({t("optional")})
+              </span>
             </label>
             {thumbnailPreview ? (
               <div className="relative w-full h-36 border border-amazon-border overflow-hidden bg-neutral-50 rounded-sm">
                 <Image
                   src={thumbnailPreview}
-                  alt="Thumbnail preview"
+                  alt={t("thumbnailPreviewAlt")}
                   fill
                   className="object-contain"
                   unoptimized
@@ -211,7 +219,9 @@ export default function EditCategoryModal({
                 className="w-full h-28 border border-dashed border-amazon-border rounded-sm flex flex-col items-center justify-center gap-2 text-amazon-textMuted hover:border-amazon-btnPrimary hover:text-amazon-btnPrimary hover:bg-neutral-50 transition"
               >
                 <Upload className="w-5 h-5" />
-                <span className="text-[12px] font-medium">Click to upload</span>
+                <span className="text-[12px] font-medium">
+                  {t("clickToUpload")}
+                </span>
               </button>
             )}
             <input
@@ -235,7 +245,7 @@ export default function EditCategoryModal({
               htmlFor="editIsActive"
               className="text-[13px] font-medium text-amazon-text mt-[1px]"
             >
-              Set as Active
+              {t("setAsActive")}
             </label>
           </div>
 
@@ -247,15 +257,17 @@ export default function EditCategoryModal({
               disabled={updating}
               className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               disabled={updating}
               className="px-5 py-2 text-[13px] font-medium text-amazon-text bg-amazon-btnPrimary border border-amazon-border rounded-sm hover:brightness-95 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
             >
-              {updating && <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />}
-              {updating ? "Saving..." : "Save Changes"}
+              {updating && (
+                <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />
+              )}
+              {updating ? t("saving") : t("saveChanges")}
             </button>
           </div>
         </form>

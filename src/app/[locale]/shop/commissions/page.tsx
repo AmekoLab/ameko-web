@@ -3,8 +3,12 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslations } from "next-intl";
 import { AppDispatch, RootState } from "@/src/store/index";
-import { fetchShopTargetedRequests, rejectCommissionRequest } from "@/src/store/slices/commissionSlice";
+import {
+  fetchShopTargetedRequests,
+  rejectCommissionRequest,
+} from "@/src/store/slices/commissionSlice";
 import {
   Inbox,
   FileEdit,
@@ -17,27 +21,21 @@ import {
 import { SubmitQuoteModal } from "@/src/components/Shop/SubmitQuoteModal";
 
 // ─── Constants ─────────────────────────────────────────────
-const STATUS_STYLES: Record<
-  string,
-  { bg: string; text: string; label: string }
-> = {
+const STATUS_STYLES: Record<string, { bg: string; text: string }> = {
   PendingTarget: {
     bg: "bg-amber-50 border border-amber-200",
     text: "text-amber-700",
-    label: "Waiting for response",
   },
-  OpenPool: { bg: "bg-blue-50 border border-blue-200", text: "text-blue-700", label: "Open" },
+  OpenPool: { bg: "bg-blue-50 border border-blue-200", text: "text-blue-700" },
   Completed: {
     bg: "bg-emerald-50 border border-emerald-200",
     text: "text-emerald-700",
-    label: "Completed",
   },
 };
 
 const DEFAULT_STATUS = {
   bg: "bg-neutral-50 border border-amazon-border",
   text: "text-amazon-textMuted",
-  label: "Unknown",
 };
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -76,6 +74,8 @@ const RowSkeleton = () => (
 
 // ─── Page ──────────────────────────────────────────────────
 export default function ShopTargetedRequestsPage() {
+  const t = useTranslations("ShopTargetedRequestsPage");
+  const tCommon = useTranslations("Common");
   const dispatch = useDispatch<AppDispatch>();
   const { targetedRequests, loadingTargetedRequests } = useSelector(
     (state: RootState) => state.commission,
@@ -97,6 +97,16 @@ export default function ShopTargetedRequestsPage() {
     dispatch(fetchShopTargetedRequests());
   }, [dispatch]);
 
+  const getStatusLabel = (status: string) => {
+    const statusMap: Record<string, string> = {
+      PendingTarget: t("status.pendingTarget"),
+      OpenPool: t("status.openPool"),
+      Completed: t("status.completed"),
+    };
+
+    return statusMap[status] ?? t("status.unknown");
+  };
+
   const handleRefresh = () => {
     dispatch(fetchShopTargetedRequests());
   };
@@ -113,7 +123,7 @@ export default function ShopTargetedRequestsPage() {
       setRejectModal({ isOpen: false, requestId: "" });
       handleRefresh(); // Refresh the list if needed
     } catch (error) {
-      console.error("Failed to reject request", error);
+      console.error(t("errors.rejectFailed"), error);
     } finally {
       setIsRejecting(false);
     }
@@ -133,19 +143,22 @@ export default function ShopTargetedRequestsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white border border-amazon-border w-full max-w-sm rounded-sm p-6 shadow-xl">
             <h2 className="text-lg font-bold text-amazon-text mb-2">
-              Confirm Rejection
+              {t("rejectModal.title")}
             </h2>
             <p className="text-[13px] font-medium text-amazon-textMuted mb-6">
-              Are you sure you want to reject this commission request? This action cannot be undone.
+              {t("rejectModal.description")}
             </p>
             <div className="flex items-center justify-end gap-3">
               <button
                 type="button"
-                onClick={() => !isRejecting && setRejectModal({ isOpen: false, requestId: "" })}
+                onClick={() =>
+                  !isRejecting &&
+                  setRejectModal({ isOpen: false, requestId: "" })
+                }
                 disabled={isRejecting}
                 className="px-4 py-2 bg-white hover:bg-neutral-50 border border-amazon-border text-amazon-textMuted font-medium text-[13px] rounded-sm transition-colors disabled:opacity-50"
               >
-                Cancel
+                {tCommon("cancel")}
               </button>
               <button
                 type="button"
@@ -153,8 +166,10 @@ export default function ShopTargetedRequestsPage() {
                 disabled={isRejecting}
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 border border-red-600 hover:bg-red-700 text-white font-medium text-[13px] rounded-sm transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {isRejecting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                Confirm
+                {isRejecting && (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                )}
+                {isRejecting ? t("rejectModal.rejecting") : tCommon("confirm")}
               </button>
             </div>
           </div>
@@ -162,9 +177,11 @@ export default function ShopTargetedRequestsPage() {
       )}
       {/* Page Header */}
       <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary">
-        <h1 className="text-2xl font-bold text-amazon-text flex items-center gap-3">Targeted Requests</h1>
+        <h1 className="text-2xl font-bold text-amazon-text flex items-center gap-3">
+          {t("header.title")}
+        </h1>
         <p className="text-[11px] text-amazon-textMuted mt-1">
-          Quotation requests sent by customers to your shop
+          {t("header.subtitle")}
         </p>
       </div>
 
@@ -184,11 +201,10 @@ export default function ShopTargetedRequestsPage() {
             <Inbox className="w-10 h-10 text-amazon-textMuted opacity-30" />
           </div>
           <h2 className="text-[14px] font-bold text-amazon-text mb-1">
-            There are currently no targeted requests
+            {t("empty.title")}
           </h2>
           <p className="text-[11px] font-medium text-amazon-textMuted max-w-sm">
-            When customers send quotation requests to your shop, they will
-            appear here.
+            {t("empty.description")}
           </p>
         </div>
       )}
@@ -198,6 +214,7 @@ export default function ShopTargetedRequestsPage() {
         <div className="space-y-4">
           {targetedRequests.map((req) => {
             const statusStyle = STATUS_STYLES[req.status] || DEFAULT_STATUS;
+            const statusLabel = getStatusLabel(req.status);
 
             return (
               <div
@@ -226,13 +243,13 @@ export default function ShopTargetedRequestsPage() {
                           {req.title}
                         </h3>
                         <p className="text-[13px] font-medium text-amazon-text mt-0.5">
-                          Qty: {req.quantity}
+                          {t("qty", { count: req.quantity })}
                         </p>
                       </div>
                       <span
                         className={`shrink-0 px-2 py-0.5 rounded-sm text-[12px] font-medium whitespace-nowrap ${statusStyle.bg} ${statusStyle.text}`}
                       >
-                        {statusStyle.label}
+                        {statusLabel}
                       </span>
                     </div>
 
@@ -241,7 +258,7 @@ export default function ShopTargetedRequestsPage() {
                       <div className="flex items-center gap-1.5">
                         <User className="w-3.5 h-3.5" />
                         <span className="text-amazon-text">
-                          {req.userName || "Customer"}
+                          {req.userName || t("customerFallback")}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
@@ -269,13 +286,13 @@ export default function ShopTargetedRequestsPage() {
                       }
                       className="flex items-center gap-1.5 px-5 py-2 bg-amazon-btnPrimary border border-amazon-border hover:brightness-95 text-amazon-text font-medium text-[13px] rounded-sm transition-colors shadow-sm"
                     >
-                      <FileEdit className="w-4 h-4" /> Quote
+                      <FileEdit className="w-4 h-4" /> {t("actions.quote")}
                     </button>
                     <button
                       onClick={() => handleRejectClick(req.commissionRequestId)}
                       className="flex items-center gap-1.5 px-5 py-2 bg-white hover:bg-red-50 text-red-500 font-medium text-[13px] rounded-sm transition-colors border border-amazon-border shadow-sm"
                     >
-                      <XCircle className="w-4 h-4" /> Reject
+                      <XCircle className="w-4 h-4" /> {t("actions.reject")}
                     </button>
                   </div>
                 </div>

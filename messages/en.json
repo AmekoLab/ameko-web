@@ -272,7 +272,8 @@
     "reactionsTitle": "Reactions",
     "deleteItemTitle": "Delete Item?",
     "deleteItemDesc": "Are you sure you want to permanently delete this? This action cannot be undone.",
-    "deleteBtn": "Delete"
+    "deleteBtn": "Delete",
+    "quantity": "Quantity:"
   },
   "FeedClient": {
     "errorLoad": "Failed to load posts. Please try again.",
@@ -641,7 +642,20 @@
     "assemblyProgress": "Assembly Progress",
     "shippingFee": "Shipping Fee:",
     "systemVoucher": "System Voucher:",
-    "finalTotal": "Final Total:"
+    "finalTotal": "Final Total:",
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "returned": "Returned",
+      "paid": "Paid",
+      "released": "Released",
+      "refunded": "Refunded",
+      "failed": "Failed",
+      "unpaid": "Unpaid"
+    }
   },
   "page": {
     "title": "Order History",
@@ -1014,5 +1028,1988 @@
         "line3": "Refunds will be processed to the original method of payment within 5-7 business days of receiving the returned item."
       }
     }
+  },
+  "ProfileView": {
+    "tabPosts": "Posts",
+    "tabShop": "Shop",
+    "tabShowcase": "Showcase",
+    "tabReviews": "Reviews",
+    "noProducts": "No products found.",
+    "showcaseUpdating": "Showcase is being updated...",
+    "noReviews": "No reviews yet.",
+    "inStock": "In Stock",
+    "soldOut": "Sold Out",
+    "contact": "Contact",
+    "untitledProduct": "Untitled Product",
+    "defaultCategory": "Keyboard"
+  },
+  "ProfileHeader": {
+    "verifiedShop": "Verified Shop",
+    "followers": "followers",
+    "following": "following",
+    "editShopProfile": "Edit Shop Profile",
+    "followingBtn": "Following",
+    "followBtn": "Follow",
+    "setCustomKey": "Set Custom Key",
+    "customizeConfiguration": "Customize Configuration",
+    "sendQuotationRequest": "Send Quotation Request",
+    "chat": "Chat",
+    "online": "Online",
+    "followersModalTitle": "Followers",
+    "followingModalTitle": "Following"
+  },
+  "ProfilePage": {
+    "shopNotFound": "Shop Not Found",
+    "shopProfileDescription": "Shop profile on AMEKO"
+  },
+  "ShopDashboardPage": {
+    "startDateLaterError": "Start date cannot be later than end date.",
+    "pageTitle": "Shop Dashboard",
+    "pageDesc": "Monitor your shop performance and customer insights.",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "granularity": "Granularity",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month",
+    "churnDays": "Churn Days",
+    "clear": "Clear"
+  },
+  "CustomerOverviewSection": {
+    "fetchFailed": "Failed to load data.",
+    "totalRevenue": "Total Revenue",
+    "averageOrderValue": "Average Order Value",
+    "customers": "Customers",
+    "newReturning": "New: {newCount}  ·  Returning: {returningCount}",
+    "retention": "Retention",
+    "repeatShort": "Repeat: {count}",
+    "orders": "Orders",
+    "freqShort": "Freq: {frequency}",
+    "dataRange": "Data from {from} to {to}",
+    "noData": "No data available."
+  },
+  "CustomerTrendChart": {
+    "title": "Trend Customers",
+    "noData": "No data",
+    "legendRevenue": "Revenue",
+    "legendOrders": "Orders"
+  },
+  "PurchaseFrequencyCards": {
+    "title": "Purchase Frequency",
+    "ordersPerCustomer": "Orders / Customer",
+    "avgRepurchaseCycle": "Avg Repurchase Cycle",
+    "avgRepurchaseCycleValue": "{days} days",
+    "customersWithOrders": "Customers With Orders",
+    "totalOrders": "Total Orders",
+    "noData": "No data."
+  },
+  "TopSpendersTable": {
+    "title": "Top VIP Customers",
+    "loading": "Loading...",
+    "colRank": "#",
+    "colCustomer": "Customer",
+    "colOrders": "Orders",
+    "colSpent": "Spent",
+    "colLastOrder": "Last Order",
+    "noData": "No data available.",
+    "page": "Page",
+    "prev": "Prev",
+    "next": "Next"
+  },
+  "ChurnRiskTable": {
+    "title": "Churn Risk Customers",
+    "subtitle": "Customers who haven't purchased recently",
+    "loading": "Loading...",
+    "colCustomer": "Customer",
+    "colInactive": "Inactive",
+    "colOrders": "Orders",
+    "colValue": "Value",
+    "colAction": "Action",
+    "noData": "No churn risk customers.",
+    "inactiveDays": "{days} days",
+    "remind": "Remind",
+    "page": "Page",
+    "prev": "Prev",
+    "next": "Next"
+  },
+  "ConversionSummarySection": {
+    "title": "Order Conversion",
+    "paidRate": "Paid Rate",
+    "completed": "Completed",
+    "cancelRate": "Cancel Rate",
+    "orderRatioShort": "{count}/{total} ord.",
+    "noData": "No data."
+  },
+  "ShopCategoriesPage": {
+    "pageTitle": "Category Management",
+    "pageDesc": "Manage your shop categories. Use global categories as parents for your private sub-categories.",
+    "addCategory": "Add Category",
+    "tabAll": "All",
+    "tabGlobal": "Global",
+    "tabMyShop": "My Shop",
+    "loadingCategories": "Loading categories...",
+    "noCategoriesFound": "No categories found.",
+    "typePrivate": "Private",
+    "typeGlobal": "Global",
+    "yours": "yours",
+    "subCategoriesTitle": "Sub-categories",
+    "partsTitle": "Parts",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "editCategory": "Edit category",
+    "deleteCategory": "Delete category"
+  },
+  "CreateCategoryModal": {
+    "validationNameRequired": "Category name is required",
+    "validationNameMax": "Max 100 characters",
+    "title": "Create Category",
+    "adminDescription": "This will be a global category available to all shops.",
+    "shopDescription": "This will be a private category for your shop.",
+    "createdSuccess": "Category created successfully!",
+    "createFailed": "Failed to create category",
+    "categoryName": "Category Name",
+    "namePlaceholder": "e.g. Keycap, Switch, Case...",
+    "parentCategory": "Parent Category",
+    "optional": "optional",
+    "noneRootCategory": "- None (root category) -",
+    "shopParentHint": "Select a global category to create a sub-category under it.",
+    "thumbnailImage": "Thumbnail Image",
+    "thumbnailPreviewAlt": "Thumbnail preview",
+    "clickToUpload": "Click to upload",
+    "setAsActive": "Set as Active",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "createCategory": "Create Category"
+  },
+  "EditCategoryModal": {
+    "validationNameRequired": "Category name is required",
+    "validationNameMax": "Max 100 characters",
+    "title": "Edit Category",
+    "updatedSuccess": "Category updated successfully!",
+    "updateFailed": "Failed to update category",
+    "globalCategory": "Global category",
+    "privateCategory": "Private category",
+    "categoryName": "Category Name",
+    "namePlaceholder": "e.g. Keycap, Switch, Case...",
+    "parentCategory": "Parent Category",
+    "optional": "optional",
+    "noneRootCategory": "- None (root category) -",
+    "thumbnailImage": "Thumbnail Image",
+    "thumbnailPreviewAlt": "Thumbnail preview",
+    "clickToUpload": "Click to upload",
+    "setAsActive": "Set as Active",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes"
+  },
+  "DeleteCategoryModal": {
+    "deletedSuccess": "Category deleted successfully!",
+    "deleteFailed": "Failed to delete category",
+    "title": "Delete Category",
+    "confirmDeleteTitle": "Are you sure you want to delete this category?",
+    "confirmDeleteBody": "This action will soft-delete \"{name}\" ({type}). This cannot be easily undone.",
+    "typeGlobal": "global",
+    "typePrivate": "private",
+    "fieldName": "Name",
+    "fieldType": "Type",
+    "fieldSlug": "Slug",
+    "cannotDeleteTitle": "Cannot delete \"{name}\"",
+    "hasSubCategories": "{count, plural, one {Has # sub-category} other {Has # sub-categories}}",
+    "hasPartsAssigned": "{count, plural, one {Has # part assigned} other {Has # parts assigned}}",
+    "removeDependenciesHint": "Remove all sub-categories and parts before deleting.",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "delete": "Delete"
+  },
+  "ShopPartsPage": {
+    "pageTitle": "Part Management",
+    "partsDescriptionPrefix": "Manage your shop's parts and components.",
+    "partsDescriptionSuffix": "parts total.",
+    "checkStock": "Check Stock",
+    "createPart": "Create Part",
+    "searchPlaceholder": "Search parts...",
+    "tabAll": "All",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "addonAll": "Addon: All",
+    "addonEligible": "Addon Eligible",
+    "addonNotAddon": "Not Addon",
+    "loadingParts": "Loading parts...",
+    "noPartsFound": "No parts found.",
+    "colPart": "Part",
+    "colType": "Type",
+    "colCategory": "Category",
+    "colPrice": "Price",
+    "colStock": "Stock",
+    "colStatus": "Status",
+    "colAddon": "Addon",
+    "colRecipe": "Recipe",
+    "colActions": "Actions",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "statusUnknown": "Unknown",
+    "addonLabel": "Addon",
+    "recipeSwitches": "switches",
+    "recipeStabs": "stabs",
+    "viewPart": "View part",
+    "editPart": "Edit part",
+    "deletePart": "Delete part"
+  },
+  "CreatePartModal": {
+    "validationPartNameRequired": "Part name is required",
+    "validationPartNameMax": "Max 200 characters",
+    "validationPartTypeRequired": "Part type is required",
+    "validationPriceRequired": "Price is required",
+    "validationStockRequired": "Stock is required",
+    "validationDescriptionRequired": "Description is required",
+    "validationCategoryRequired": "Category is required",
+    "workflowCaseTitle": "Select Case",
+    "workflowPlateTitle": "Select Plate",
+    "workflowSwitchTitle": "Select Switch",
+    "workflowStabilizerTitle": "Select Stabilizer",
+    "workflowKeycapTitle": "Select Keycap",
+    "createdSuccess": "Part created successfully!",
+    "createFailed": "Failed to create part",
+    "title": "Create Part",
+    "subtitle": "Add a new part to your shop inventory.",
+    "partName": "Part Name",
+    "partNamePlaceholder": "e.g. Kit 75 v2",
+    "partType": "Part Type",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "price": "Price (VND)",
+    "pricePlaceholder": "e.g. 20000",
+    "stockQuantity": "Stock Quantity",
+    "stockQuantityPlaceholder": "e.g. 100000",
+    "category": "Category",
+    "selectCategory": "— Select category —",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe this part...",
+    "kitRecipeConfiguration": "Kit Recipe Configuration",
+    "switchCount": "Switch Count",
+    "switchCountPlaceholder": "e.g. 82",
+    "stabilizerCount": "Stabilizer Count",
+    "stabilizerCountPlaceholder": "e.g. 5",
+    "specAutoGeneratedHint": "Specifications (recipe + workflow) will be auto-generated and sent as JSON.",
+    "isAddonEligible": "Is Addon Eligible",
+    "thumbnailImage": "Thumbnail Image",
+    "layerImage": "Layer Image",
+    "optional": "optional",
+    "thumbnailPreviewAlt": "Thumbnail preview",
+    "layerPreviewAlt": "Layer preview",
+    "thumbnail": "Thumbnail",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "createPart": "Create Part"
+  },
+  "EditPartModal": {
+    "validationPartNameRequired": "Part name is required",
+    "validationPartNameMax": "Max 200 characters",
+    "validationPartTypeRequired": "Part type is required",
+    "validationPriceRequired": "Price is required",
+    "validationStockRequired": "Stock is required",
+    "validationCategoryRequired": "Category is required",
+    "workflowCaseTitle": "Select Case",
+    "workflowPlateTitle": "Select Plate",
+    "workflowSwitchTitle": "Select Switch",
+    "workflowStabilizerTitle": "Select Stabilizer",
+    "workflowKeycapTitle": "Select Keycap",
+    "updatedSuccess": "Part updated successfully!",
+    "updateFailed": "Failed to update part",
+    "title": "Edit Part",
+    "subtitle": "Update part information.",
+    "partName": "Part Name",
+    "partNamePlaceholder": "e.g. Kit 75 v2",
+    "partType": "Part Type",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "price": "Price (VND)",
+    "pricePlaceholder": "e.g. 20000",
+    "stockQuantity": "Stock Quantity",
+    "stockQuantityPlaceholder": "e.g. 100000",
+    "category": "Category",
+    "selectCategory": "— Select category —",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe this part...",
+    "optional": "optional",
+    "kitRecipeConfiguration": "Kit Recipe Configuration",
+    "switchCount": "Switch Count",
+    "switchCountPlaceholder": "e.g. 82",
+    "stabilizerCount": "Stabilizer Count",
+    "stabilizerCountPlaceholder": "e.g. 5",
+    "specAutoGeneratedHint": "Specifications (recipe + workflow) will be auto-generated and sent as JSON.",
+    "isAddonEligible": "Is Addon Eligible",
+    "thumbnailImage": "Thumbnail Image",
+    "layerImage": "Layer Image",
+    "thumbnailPreviewAlt": "Thumbnail preview",
+    "layerPreviewAlt": "Layer preview",
+    "thumbnail": "Thumbnail",
+    "cancel": "Cancel",
+    "updating": "Updating...",
+    "updatePart": "Update Part"
+  },
+  "DeletePartModal": {
+    "deletedSuccess": "Part deleted successfully!",
+    "deleteFailed": "Failed to delete part",
+    "title": "Delete Part",
+    "subtitle": "This action cannot be undone",
+    "warningMessage": "You are about to permanently delete the part:",
+    "typeLabel": "Type",
+    "categoryLabel": "Category",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "confirmInputLabel": "Type {name} to confirm:",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "deletePart": "Delete Part"
+  },
+  "CheckStockModal": {
+    "title": "Check Stock",
+    "subtitle": "Search and verify part inventory",
+    "searchPlaceholder": "Type part name to search...",
+    "selectedParts": "{count, plural, one {# part selected} other {# parts selected}}",
+    "emptySearchPrompt": "Type a part name to start searching",
+    "noPartsMatch": "No parts match \"{query}\"",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "current": "Current",
+    "verified": "Verified",
+    "close": "Close",
+    "checking": "Checking...",
+    "checkStockWithCount": "Check Stock ({count})"
+  },
+  "PartDetailModal": {
+    "title": "Part Details",
+    "loadingDetails": "Loading part details...",
+    "partNotFound": "Part not found.",
+    "close": "Close",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "statusUnknown": "Unknown",
+    "layerAlt": "Layer",
+    "statPrice": "Price",
+    "statStock": "Stock",
+    "statShop": "Shop",
+    "statId": "ID",
+    "kitRecipe": "Kit Recipe",
+    "recipeSwitches": "Switches",
+    "recipeStabilizers": "Stabilizers",
+    "specificationsWorkflow": "Specifications (Workflow)"
+  },
+  "ShopAssembledProductsPage": {
+    "pageTitle": "Assembled Products",
+    "pageDescPrefix": "Manage your shop's assembled keyboard products.",
+    "pageDescSuffix": "products total.",
+    "createProduct": "Create Product",
+    "searchPlaceholder": "Search assembled products...",
+    "loadingProducts": "Loading assembled products...",
+    "noProductsFound": "No assembled products found.",
+    "colProduct": "Product",
+    "colLayout": "Layout",
+    "colPrice": "Price",
+    "colQty": "Qty",
+    "colSpecs": "Specs",
+    "colComponents": "Components",
+    "colActions": "Actions",
+    "viewProduct": "View product",
+    "editProduct": "Edit product",
+    "deleteProduct": "Delete product"
+  },
+  "AssembledProductDetailModal": {
+    "title": "Assembled Product Details",
+    "loadingDetails": "Loading product details...",
+    "productNotFound": "Product not found.",
+    "close": "Close",
+    "productImageAlt": "{name} image {index}",
+    "qtyLabel": "Qty",
+    "keyboardSpecifications": "Keyboard Specifications",
+    "specLayout": "Layout",
+    "specMounting": "Mounting",
+    "specPcb": "PCB",
+    "specConnection": "Connection",
+    "specBattery": "Battery",
+    "statPrice": "Price",
+    "statQuantity": "Quantity",
+    "statShop": "Shop",
+    "statId": "ID",
+    "components": "Components ({count})",
+    "kitLabel": "Kit",
+    "soundTest": "Sound test",
+    "model3dLabel": "3D Model"
+  },
+  "CreateAssembledProductModal": {
+    "validationBaseKitRequired": "Base Kit ID is required",
+    "validationComponentRequired": "Component ID is required",
+    "validationQuantityRequired": "Quantity is required",
+    "validationProductNameRequired": "Product name is required",
+    "validationProductNameMax": "Max 200 characters",
+    "validationPriceRequired": "Price is required",
+    "validationDescriptionRequired": "Description is required",
+    "validationDescriptionMax": "Max 2000 characters",
+    "validationAtLeastOneComponent": "At least one component is required",
+    "imageUploadFailed": "Image upload failed, please try again",
+    "modelUploadFailed": "3D model upload failed, please try again",
+    "createdSuccess": "Assembled product created successfully!",
+    "createFailed": "Failed to create assembled product",
+    "tabBasicInfo": "Basic Info",
+    "tabSpecifications": "Specifications",
+    "tabComponents": "Components",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "title": "Create Assembled Product",
+    "subtitle": "Add a new assembled keyboard product to your shop.",
+    "productName": "Product Name",
+    "productNamePlaceholder": "e.g. Handcrafted keyboard",
+    "price": "Price (VND)",
+    "pricePlaceholder": "e.g. 60000000",
+    "quantity": "Quantity",
+    "quantityPlaceholder": "e.g. 1",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe this assembled product...",
+    "productImages": "Product Images",
+    "image1": "Image 1",
+    "image2": "Image 2",
+    "image3": "Image 3",
+    "uploading": "Uploading...",
+    "clickToUpload": "Click to upload",
+    "model3d": "3D Model (.glb)",
+    "modelUploaded": "3D Model Uploaded",
+    "clickToUploadGlb": "Click to upload .glb",
+    "keyboardSpecifications": "Keyboard Specifications",
+    "layout": "Layout",
+    "layoutPlaceholder": "e.g. 85%, 75%, TKL",
+    "mounting": "Mounting",
+    "mountingPlaceholder": "e.g. Gasket Mount",
+    "pcb": "PCB",
+    "pcbPlaceholder": "e.g. 1.2mm Flex-cut, Hotswap",
+    "connection": "Connection",
+    "connectionPlaceholder": "e.g. Tri-mode",
+    "battery": "Battery",
+    "batteryPlaceholder": "e.g. 2250mAh x 2",
+    "componentDetails": "Component Details ({count})",
+    "addComponent": "Add Component",
+    "componentIndex": "Component #{index}",
+    "baseKit": "Base Kit",
+    "selectKit": "— Select a kit —",
+    "component": "Component",
+    "selectComponent": "— Select a component —",
+    "soundUrl": "Sound URL",
+    "soundUrlPlaceholder": "YouTube embed URL (optional)",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "createProduct": "Create Product"
+  },
+  "EditAssembledProductModal": {
+    "validationBaseKitRequired": "Base Kit ID is required",
+    "validationComponentRequired": "Component ID is required",
+    "validationQuantityRequired": "Quantity is required",
+    "validationProductNameRequired": "Product name is required",
+    "validationProductNameMax": "Max 200 characters",
+    "validationPriceRequired": "Price is required",
+    "validationDescriptionRequired": "Description is required",
+    "validationDescriptionMax": "Max 2000 characters",
+    "validationAtLeastOneComponent": "At least one component is required",
+    "updatedSuccess": "Assembled product updated successfully!",
+    "updateFailed": "Failed to update assembled product",
+    "tabBasicInfo": "Basic Info",
+    "tabSpecifications": "Specifications",
+    "tabComponents": "Components",
+    "typeKit": "Kit",
+    "typeComponent": "Component",
+    "typeAccessory": "Accessory",
+    "title": "Edit Assembled Product",
+    "subtitle": "Update the assembled product details.",
+    "productName": "Product Name",
+    "productNamePlaceholder": "e.g. Handcrafted keyboard",
+    "price": "Price (VND)",
+    "quantity": "Quantity",
+    "description": "Description",
+    "imageUrls": "Image URLs",
+    "image1": "Image 1",
+    "image2": "Image 2",
+    "image3": "Image 3",
+    "urlPlaceholder": "https://...",
+    "model3dUrl": "3D Model URL (.glb)",
+    "modelUrlPlaceholder": "https://...model.glb",
+    "keyboardSpecifications": "Keyboard Specifications",
+    "layout": "Layout",
+    "layoutPlaceholder": "e.g. 85%, 75%, TKL",
+    "mounting": "Mounting",
+    "mountingPlaceholder": "e.g. Gasket Mount",
+    "pcb": "PCB",
+    "pcbPlaceholder": "e.g. 1.2mm Flex-cut, Hotswap",
+    "connection": "Connection",
+    "connectionPlaceholder": "e.g. Tri-mode",
+    "battery": "Battery",
+    "batteryPlaceholder": "e.g. 2250mAh x 2",
+    "componentDetails": "Component Details ({count})",
+    "addComponent": "Add Component",
+    "componentIndex": "Component #{index}",
+    "baseKit": "Base Kit",
+    "selectKit": "— Select a kit —",
+    "component": "Component",
+    "selectComponent": "— Select a component —",
+    "soundUrl": "Sound URL",
+    "soundUrlPlaceholder": "YouTube embed URL (optional)",
+    "cancel": "Cancel",
+    "updating": "Updating...",
+    "updateProduct": "Update Product"
+  },
+  "DeleteAssembledProductModal": {
+    "deletedSuccess": "Assembled product deleted successfully!",
+    "deleteFailed": "Failed to delete assembled product",
+    "title": "Delete Assembled Product",
+    "subtitle": "This action cannot be undone",
+    "warningMessage": "You are about to permanently delete the assembled product:",
+    "layoutLabel": "Layout",
+    "na": "N/A",
+    "componentsLabel": "Components",
+    "confirmInputLabel": "Type {name} to confirm:",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "deleteProduct": "Delete Product"
+  },
+  "ShopOrdersPage": {
+    "errors": {
+      "fetchFailed": "Failed to fetch shop orders",
+      "fetchError": "Error fetching shop orders"
+    },
+    "statusFilters": {
+      "all": "All",
+      "pending": "Pending",
+      "processing": "Processing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "shipped": "Shipped"
+    },
+    "title": "Order Management",
+    "subtitle": "Manage your shop's incoming orders from customers",
+    "searchPlaceholder": "Search by order ID, phone, or name...",
+    "loading": "Fetching orders...",
+    "emptyTitle": "No Orders Found",
+    "emptyWithFilter": "Try adjusting your search or filters.",
+    "emptyNoOrders": "You don't have any incoming orders yet.",
+    "table": {
+      "orderId": "Order ID",
+      "customer": "Customer",
+      "products": "Products",
+      "totalAmount": "Total Amount",
+      "orderStatus": "Order Status",
+      "payment": "Payment",
+      "action": "Action"
+    },
+    "productAltFallback": "Product",
+    "unknownProduct": "Unknown Product",
+    "otherItems": "+ {count} other item(s)",
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "shipped": "Shipped",
+      "paid": "Paid",
+      "refunded": "Refunded",
+      "failed": "Failed"
+    },
+    "viewOrderDetails": "View order details",
+    "page": "Page"
+  },
+  "ShopVouchersPage": {
+    "loading": "Loading vouchers...",
+    "title": "Voucher Management",
+    "subtitle": "Manage your shop's vouchers and promotions.",
+    "createVoucher": "Create Voucher",
+    "confirmDelete": "Are you sure you want to delete the voucher \"{code}\"?",
+    "toast": {
+      "deletedSuccess": "Voucher deleted successfully",
+      "deleteFailed": "Failed to delete voucher",
+      "statusUpdatedSuccess": "Voucher status updated successfully",
+      "statusUpdateFailed": "Failed to update status"
+    },
+    "voucherType": {
+      "promotion": "Promotion",
+      "negotiation": "Negotiation",
+      "compensation": "Compensation"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled",
+      "expired": "Expired"
+    },
+    "discount": {
+      "max": "(Max {amount})"
+    },
+    "table": {
+      "code": "Code",
+      "nameDescription": "Name & Description",
+      "type": "Type",
+      "discount": "Discount",
+      "minOrder": "Min Order",
+      "used": "Used",
+      "status": "Status",
+      "action": "Action"
+    },
+    "actions": {
+      "copyCode": "Copy code",
+      "viewDetails": "View details",
+      "edit": "Edit",
+      "disableVoucher": "Disable voucher",
+      "enableVoucher": "Enable voucher",
+      "delete": "Delete"
+    },
+    "empty": "No vouchers found.",
+    "pagination": {
+      "page": "Page",
+      "voucherCount": "{count} voucher(s)",
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "CreatePromotionVoucherForm": {
+    "title": "Create Promotion Voucher",
+    "validation": {
+      "codeRequired": "Voucher code cannot be empty",
+      "codeMax": "Maximum 30 characters",
+      "nameRequired": "Voucher name cannot be empty",
+      "descriptionRequired": "Description cannot be empty",
+      "discountTypeRequired": "Select discount type",
+      "valueRequired": "Value cannot be empty",
+      "minOrderRequired": "Cannot be empty",
+      "usageLimitRequired": "Cannot be empty",
+      "startDateRequired": "Select start date",
+      "endDateRequired": "Select end date",
+      "invalidValue": "Invalid value (percentage max 100%)",
+      "endDateAfterStartDate": "End date must be after start date"
+    },
+    "toast": {
+      "createSuccess": "Voucher created successfully!",
+      "createFailed": "Failed to create voucher"
+    },
+    "labels": {
+      "voucherCode": "Voucher Code",
+      "voucherName": "Voucher Name",
+      "description": "Description",
+      "discountType": "Discount Type",
+      "value": "Value",
+      "maxDiscount": "Max Discount (VND)",
+      "minimumOrder": "Minimum Order (VND)",
+      "usageLimit": "Usage Limit",
+      "maxUsesPerUser": "Max Uses / User",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "allowStacking": "Allow stacking with other vouchers"
+    },
+    "discountTypeOptions": {
+      "percentage": "Percentage Discount",
+      "fixedAmount": "Fixed Amount Discount"
+    },
+    "units": {
+      "percentWrapped": "(%)",
+      "vndWrapped": "(VND)"
+    },
+    "placeholders": {
+      "code": "Eg: SALE20",
+      "name": "Eg: 20% Off for New Year",
+      "description": "Brief description about the voucher...",
+      "value": "0",
+      "maxDiscount": "Eg: 100000",
+      "minOrder": "0",
+      "usageLimit": "100",
+      "maxUsesPerUser": "Unlimited if empty"
+    },
+    "actions": {
+      "createVoucher": "Create Voucher",
+      "creating": "Creating..."
+    }
+  },
+  "UpdateVoucherModal": {
+    "title": "Update Voucher",
+    "validation": {
+      "nameRequired": "Voucher name cannot be empty",
+      "descriptionRequired": "Description cannot be empty",
+      "endDateRequired": "Select end date",
+      "usageLimitRequired": "Cannot be empty",
+      "statusRequired": "Select status"
+    },
+    "toast": {
+      "updateSuccess": "Voucher updated successfully!",
+      "updateFailed": "Failed to update voucher"
+    },
+    "voucherType": {
+      "promotion": "Promotion",
+      "negotiation": "Negotiation",
+      "compensation": "Compensation"
+    },
+    "labels": {
+      "voucherName": "Voucher Name",
+      "description": "Description",
+      "endDate": "End Date",
+      "usageLimit": "Usage Limit",
+      "maxUsesPerUser": "Max Uses / User",
+      "status": "Status"
+    },
+    "placeholders": {
+      "unlimited": "Unlimited"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled"
+    },
+    "actions": {
+      "saveChanges": "Save Changes",
+      "saving": "Saving..."
+    }
+  },
+  "VoucherDetailsModal": {
+    "title": "Voucher Details",
+    "tabs": {
+      "generalInformation": "General Information",
+      "usageHistory": "Usage History"
+    },
+    "loadingDetails": "Loading details...",
+    "notFound": "Voucher not found",
+    "sections": {
+      "identification": "Identification",
+      "valueConditions": "Value & Conditions",
+      "timeLimit": "Time & Limit",
+      "stackingPolicy": "Stacking Policy"
+    },
+    "labels": {
+      "id": "ID",
+      "voucherCode": "Voucher Code",
+      "name": "Name",
+      "type": "Type",
+      "creator": "Creator",
+      "designatedRecipient": "Designated Recipient",
+      "discountType": "Discount Type",
+      "discount": "Discount",
+      "maxDiscount": "Max Discount",
+      "minimumOrder": "Minimum Order",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "maxUsesPerUser": "Max Uses / User",
+      "status": "Status",
+      "usageProgress": "Usage Progress",
+      "stackable": "Stackable",
+      "policy": "Policy"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled",
+      "expired": "Expired",
+      "depleted": "Depleted"
+    },
+    "type": {
+      "promotion": "Promotion",
+      "negotiation": "Negotiation",
+      "compensation": "Compensation"
+    },
+    "discountType": {
+      "percentage": "Percentage (%)",
+      "fixedAmount": "Fixed Amount (₫)"
+    },
+    "stackingPolicy": {
+      "all": "All vouchers",
+      "withCompensationOnly": "With compensation vouchers only",
+      "none": "No stacking",
+      "allowStacking": "Allow stacking"
+    },
+    "stacking": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "unlimited": "Unlimited",
+    "copy": "Copy",
+    "loadingUsage": "Loading...",
+    "noUsage": "No usage yet.",
+    "historyTable": {
+      "usedDate": "Used Date",
+      "customer": "Customer",
+      "orderCode": "Order Code",
+      "orderValue": "Order Value",
+      "discountApplied": "Discount Applied"
+    },
+    "copyOrderCode": "Copy order code",
+    "pagination": {
+      "page": "Page",
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "ShopTargetedRequestsPage": {
+    "status": {
+      "pendingTarget": "Waiting for response",
+      "openPool": "Open",
+      "completed": "Completed",
+      "unknown": "Unknown"
+    },
+    "errors": {
+      "rejectFailed": "Failed to reject request"
+    },
+    "rejectModal": {
+      "title": "Confirm Rejection",
+      "description": "Are you sure you want to reject this commission request? This action cannot be undone.",
+      "rejecting": "Rejecting..."
+    },
+    "header": {
+      "title": "Targeted Requests",
+      "subtitle": "Quotation requests sent by customers to your shop"
+    },
+    "empty": {
+      "title": "There are currently no targeted requests",
+      "description": "When customers send quotation requests to your shop, they will appear here."
+    },
+    "qty": "Qty: {count}",
+    "customerFallback": "Customer",
+    "actions": {
+      "quote": "Quote",
+      "reject": "Reject"
+    }
+  },
+  "SubmitQuoteModal": {
+    "validation": {
+      "invalidQuotedPrice": "Invalid quoted price",
+      "estimatedDaysMin": "Estimated days must be at least 1",
+      "notesMin": "Please enter detailed notes for the customer"
+    },
+    "title": "Submit Quote",
+    "labels": {
+      "quotedPrice": "Quoted Price",
+      "estimatedDays": "Estimated Days",
+      "notesForCustomer": "Notes for Customer"
+    },
+    "units": {
+      "vnd": "VND",
+      "days": "Days"
+    },
+    "placeholders": {
+      "quotedPrice": "1000000",
+      "estimatedDays": "7",
+      "notes": "Describe quote details, time, materials..."
+    },
+    "actions": {
+      "sending": "Sending...",
+      "submitQuote": "Submit Quote"
+    }
+  },
+  "ShopQuotedCommissionsPage": {
+    "status": {
+      "pendingUserDecision": "Pending approval",
+      "accepted": "Confirmed",
+      "revoked": "Revoked",
+      "rejected": "Rejected",
+      "unknown": "Unknown"
+    },
+    "header": {
+      "title": "My Quotation History",
+      "subtitle": "Review all quotes you have sent to customers"
+    },
+    "error": {
+      "title": "Unable to load data",
+      "retry": "Retry"
+    },
+    "empty": {
+      "title": "You haven't sent any quotes",
+      "description": "Visit the Custom Request Market to find and send quotes to customers."
+    },
+    "completeIn": "Complete in: {days} days",
+    "dates": {
+      "sent": "Sent",
+      "expires": "Expires"
+    },
+    "revoke": {
+      "buttonTitle": "Revoke Quote",
+      "modalTitle": "Revoke this quote?",
+      "modalDescription": "Are you sure you want to withdraw this quote? The customer will no longer be able to accept it. This action cannot be undone.",
+      "confirm": "Yes, Revoke"
+    }
+  },
+  "ShopProfilePage": {
+    "imageUpload": {
+      "previewAlt": "Preview",
+      "bannerPrompt": "Drag or click to upload banner"
+    },
+    "toast": {
+      "updateSuccess": "Shop profile updated successfully!",
+      "updateFailed": "Failed to update shop profile. Please try again.",
+      "shopClosed": "Shop has been temporarily closed.",
+      "shopReopened": "Shop has been reopened.",
+      "actionFailed": "Action failed. Please try again."
+    },
+    "status": {
+      "active": "Active",
+      "inactiveClosed": "Inactive (Closed)",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "banned": "Banned",
+      "unknown": "Unknown"
+    },
+    "loadingProfile": "Loading profile...",
+    "noShop": {
+      "title": "No Shop Found",
+      "description": "You haven't registered a shop yet."
+    },
+    "confirmModal": {
+      "closeQuestion": "Close shop temporarily?",
+      "reopenQuestion": "Reopen shop?",
+      "closeDescription": "Your shop will be hidden. Customers cannot view or purchase products until you reopen.",
+      "reopenDescription": "Your shop will be visible again. Customers can continue to view and shop as usual."
+    },
+    "header": {
+      "title": "Shop Profile",
+      "subtitle": "Update your shop's identity and contact details"
+    },
+    "reviewNote": "Review Note:",
+    "sections": {
+      "contactDetails": "Contact Details",
+      "bankingDetails": "Banking Details",
+      "shopStatistics": "Shop Statistics"
+    },
+    "fields": {
+      "shopName": "Shop Name",
+      "bio": "Slogan / Bio",
+      "contactEmail": "Contact Email",
+      "phoneNumber": "Phone Number",
+      "address": "Full Address",
+      "bankName": "Bank Name",
+      "bankAccountNumber": "Account Number",
+      "bankAccountName": "Account Holder Name"
+    },
+    "placeholders": {
+      "shopName": "Enter your brand name",
+      "bio": "A short description of your shop",
+      "contactEmail": "contact@domain.com",
+      "phoneNumber": "09xxx...",
+      "address": "Street, Ward, District, City"
+    },
+    "readOnly": "Read Only",
+    "stats": {
+      "rating": "Rating",
+      "na": "N/A",
+      "totalOrders": "Total Orders",
+      "totalRevenue": "Total Revenue"
+    },
+    "actions": {
+      "deactivateStore": "Deactivate Store",
+      "reactivateStore": "Reactivate Store",
+      "savingChanges": "Saving Changes...",
+      "saveChanges": "Save Changes"
+    }
+  },
+  "ShopRegisterPage": {
+    "imageUpload": {
+      "previewAlt": "Preview",
+      "bannerPrompt": "Drag or click to upload banner"
+    },
+    "toast": {
+      "submitSuccess": "Shop registration submitted successfully! Please wait for approval.",
+      "submitFailed": "Registration failed. Please try again."
+    },
+    "header": {
+      "title": "Merchant Registration",
+      "subtitle": "Complete the application to start doing business on Ameko."
+    },
+    "sections": {
+      "contactDetails": "Contact Details",
+      "bankingInformation": "Banking Information"
+    },
+    "fields": {
+      "shopName": "Shop Name",
+      "bio": "Slogan / Bio",
+      "contactEmail": "Contact Email",
+      "phoneNumber": "Phone Number",
+      "taxCode": "Tax Code",
+      "address": "Pickup Address",
+      "citizenId": "Citizen ID (CCCD)",
+      "bankName": "Bank Name",
+      "bankAccountNumber": "Account Number",
+      "bankAccountName": "Account Holder Name"
+    },
+    "placeholders": {
+      "shopName": "SHOP NAME...",
+      "bio": "Short slogan or description...",
+      "contactEmail": "email@domain.com",
+      "phoneNumber": "09xxx...",
+      "taxCode": "TAX CODE...",
+      "address": "Warehouse pickup address...",
+      "citizenId": "CITIZEN ID",
+      "bankName": "BANK NAME",
+      "bankAccountNumber": "ACCOUNT NUMBER",
+      "bankAccountName": "ACCOUNT HOLDER NAME"
+    },
+    "actions": {
+      "processing": "Processing...",
+      "submitApplication": "Submit Application"
+    }
+  },
+  "ShopWarrantyRequestsPage": {
+    "header": {
+      "title": "Warranty Requests",
+      "subtitle": "Manage return & warranty requests from customers."
+    },
+    "empty": {
+      "title": "No requests yet",
+      "description": "The shop has not received any warranty or return requests from customers."
+    },
+    "status": {
+      "inProgress": "Pending",
+      "awaitingReturn": "Awaiting Return",
+      "shopAccepted": "Accepted",
+      "rejected": "Rejected",
+      "adminReviewing": "Admin Reviewing",
+      "completed": "Completed",
+      "autoCancelled": "Auto Cancelled",
+      "returning": "Returning",
+      "returned": "Returned"
+    },
+    "types": {
+      "returnRequest": "Return / Refund",
+      "cancelRequest": "Order Cancellation"
+    },
+    "table": {
+      "customer": "Customer",
+      "type": "Type",
+      "reason": "Reason",
+      "refundAmount": "Refund Amount",
+      "createdDate": "Created Date",
+      "status": "Status",
+      "action": "Action",
+      "na": "N/A"
+    },
+    "actions": {
+      "viewProcess": "View & Process",
+      "waitReturn": "Wait Return",
+      "confirmReceipt": "Confirm Rcpt",
+      "viewInfo": "View Info"
+    },
+    "pagination": {
+      "pageLabel": "Page"
+    },
+    "confirmReceiptModal": {
+      "title": "Confirm receipt",
+      "description": "Are you sure you have received the returned item in good condition? This action will close the order and cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "confirming": "Confirming..."
+    }
+  },
+  "ShopReviewModal": {
+    "validation": {
+      "selectDecision": "Please select a decision",
+      "responseMin": "Please enter a response for the customer (at least 5 characters)"
+    },
+    "toast": {
+      "processFailed": "Failed to process warranty request"
+    },
+    "header": {
+      "title": "Review warranty request"
+    },
+    "customerFallback": "Customer",
+    "evidenceAlt": "Evidence from customer",
+    "requestedRefundAmount": "Requested refund amount",
+    "aiAnalysis": {
+      "assistantTitle": "Ameko Assistant",
+      "assistantDisclaimer": "(Ameko Assistant is AI and can make mistakes.)",
+      "unavailable": "Analysis Unavailable",
+      "labels": {
+        "category": "Category",
+        "sentiment": "Sentiment",
+        "summary": "Summary",
+        "recommendation": "Recommendation:",
+        "confidence": "Confidence:"
+      },
+      "errors": {
+        "unavailable": "AI analysis is currently unavailable.",
+        "processingFailed": "AI processing failed.",
+        "unrecognizedFormat": "AI response format is unrecognized.",
+        "parseFailed": "Could not parse AI analysis data."
+      }
+    },
+    "timeline": {
+      "title": "Action history"
+    },
+    "form": {
+      "decisionLabel": "Shop decision",
+      "approve": "Approve",
+      "approveHint": "Accept request",
+      "reject": "Reject",
+      "rejectHint": "Reject request",
+      "responseLabel": "Response to customer",
+      "responsePlaceholder": "Enter return instructions or reason for rejection..."
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "confirmDecision": "Confirm decision",
+      "close": "Close"
+    },
+    "readonly": {
+      "responseTitle": "Shop response",
+      "noResponse": "No response"
+    }
+  },
+  "UpdateWarrantyModal": {
+    "title": "Update warranty request",
+    "requestType": "Request type",
+    "requestTypeOptions": {
+      "returnAndRefund": "Return & Refund",
+      "returnAndRefundDescription": "Request to return the physical product to the Shop before receiving a refund.",
+      "warrantyInstantRefund": "Warranty / Instant Refund",
+      "warrantyInstantRefundDescription": "No return required. Suitable for minor compensation or private agreement."
+    },
+    "complaintReason": "Complaint reason",
+    "complaintReasonPlaceholder": "E.g.: Product has key defect",
+    "detailedIssueDescription": "Detailed issue description",
+    "detailedIssueDescriptionPlaceholder": "Describe the issue in detail (at least {min} characters)...",
+    "evidenceImage": "Evidence image",
+    "evidenceAlt": "Evidence",
+    "uploading": "Uploading...",
+    "clickToUploadImage": "Click to upload image",
+    "imageFormatHint": "PNG, JPG up to 5MB",
+    "actions": {
+      "cancel": "Cancel",
+      "update": "Update"
+    },
+    "toast": {
+      "uploadImageFailed": "Upload image failed, please try again",
+      "updateFailed": "Update warranty request failed"
+    },
+    "validation": {
+      "selectRequestType": "Please select request type",
+      "reasonRequired": "Please enter a reason",
+      "descriptionMinLength": "Description must be at least {min} characters",
+      "uploadEvidenceImage": "Please upload evidence image"
+    }
+  },
+  "WarrantyTimeline": {
+    "roles": {
+      "customer": "Customer",
+      "shop": "Shop",
+      "admin": "Admin"
+    },
+    "actions": {
+      "create": "Request created",
+      "shopApprove": "Shop approved",
+      "shopReject": "Shop rejected",
+      "adminDecision": "Admin decision",
+      "userShippedReturn": "Customer shipped return",
+      "shopReceivedReturn": "Shop received return",
+      "autoCancel": "Auto canceled",
+      "completed": "Completed"
+    },
+    "empty": "No action history yet"
+  },
+  "ShopAssemblyTemplatesPage": {
+    "toast": {
+      "loadFailed": "Failed to load assembly templates."
+    },
+    "header": {
+      "title": "Assembly Templates"
+    },
+    "actions": {
+      "createTemplate": "Create Template"
+    },
+    "empty": {
+      "noTemplates": "No assembly templates found."
+    },
+    "table": {
+      "order": "Order",
+      "stepName": "Step Name",
+      "required": "Required",
+      "actions": "Actions"
+    },
+    "badges": {
+      "required": "Required",
+      "optional": "Optional"
+    },
+    "tooltips": {
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "AssemblyTemplateFormModal": {
+    "validation": {
+      "stepNameRequired": "Step name is required",
+      "stepOrderMin": "Step order must be at least {min}"
+    },
+    "toast": {
+      "updateSuccess": "Template updated successfully",
+      "updateFailed": "Failed to update template",
+      "createSuccess": "Template created successfully",
+      "createFailed": "Failed to create template",
+      "unexpectedError": "An error occurred"
+    },
+    "title": {
+      "edit": "Edit Template",
+      "create": "Create Template"
+    },
+    "labels": {
+      "stepName": "Step Name",
+      "stepOrder": "Step Order",
+      "isRequired": "Is Required?"
+    },
+    "placeholders": {
+      "stepName": "e.g., Install switch"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "create": "Create"
+    }
+  },
+  "DeleteTemplateModal": {
+    "toast": {
+      "deleteSuccess": "Template deleted successfully",
+      "deleteFailed": "Failed to delete template",
+      "unexpectedError": "An error occurred"
+    },
+    "title": "Delete Template",
+    "descriptionPrefix": "Are you sure you want to delete the step:",
+    "descriptionSuffix": "?",
+    "actions": {
+      "cancel": "Cancel",
+      "delete": "Delete"
+    }
+  },
+  "ShopCancelRequestsPage": {
+    "toast": {
+      "fetchFailed": "Failed to fetch order issues",
+      "fetchUnexpectedError": "An error occurred while fetching issues"
+    },
+    "header": {
+      "title": "Order Issues Management"
+    },
+    "table": {
+      "orderId": "Order ID",
+      "customer": "Customer",
+      "amount": "Amount",
+      "reason": "Reason",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "empty": {
+      "noPendingIssues": "No pending order issues found."
+    },
+    "actions": {
+      "viewDetails": "View Details"
+    }
+  },
+  "OrderIssueDetailModal": {
+    "toast": {
+      "processSuccess": "Issue processed successfully.",
+      "processFailed": "Failed to process issue.",
+      "unexpectedError": "An error occurred."
+    },
+    "title": "Issue Details",
+    "fields": {
+      "orderId": "Order ID",
+      "customerName": "Customer Name",
+      "totalAmount": "Total Amount",
+      "reason": "Reason",
+      "description": "Description"
+    },
+    "aiAnalysis": {
+      "assistantTitle": "Ameko Assistant",
+      "assistantDisclaimer": "(Ameko Assistant is AI and can make mistakes.)",
+      "unavailable": "Analysis Unavailable",
+      "labels": {
+        "category": "Category",
+        "sentiment": "Sentiment",
+        "summary": "Summary",
+        "recommendation": "Recommendation:",
+        "confidence": "Confidence:"
+      },
+      "errors": {
+        "unavailable": "AI analysis is currently unavailable.",
+        "processingFailed": "AI processing failed.",
+        "unrecognizedFormat": "AI response format is unrecognized.",
+        "parseFailed": "Could not parse AI analysis data."
+      }
+    },
+    "placeholders": {
+      "shopResponse": "Type your response to the customer..."
+    },
+    "actions": {
+      "reject": "Reject",
+      "approve": "Approve",
+      "close": "Close"
+    },
+    "error": {
+      "loadFailed": "Failed to load issue details."
+    }
+  },
+  "AdminDashboard": {
+    "title": "Dashboard Overview",
+    "loading": "Loading...",
+    "errorLoad": "Failed to load dashboard data.",
+    "cardNetRevenue": "Net Revenue",
+    "cardGMV": "Gross Merchandise Value",
+    "cardOrders": "Orders Overview",
+    "cardEntities": "Active Entities",
+    "subCompleted": "Completed: {n}",
+    "subCancelled": "Cancelled: {n}",
+    "subBuyers": "Buyers: {n}",
+    "subShops": "Shops: {n}"
+  },
+  "PaymentHealth": {
+    "title": "Payment Health",
+    "loading": "Loading...",
+    "errorLoad": "Failed to load payment health data.",
+    "cardVolume": "Payment Volume",
+    "cardSuccessRate": "Success Rate",
+    "cardTotalPayments": "Total Payments",
+    "subSuccess": "Success: {n}",
+    "subFailed": "Failed: {n}",
+    "subRefund": "Refund: {n}",
+    "metricsByMethod": "Metrics by Method",
+    "metricsByType": "Metrics by Type",
+    "noData": "No data available.",
+    "labelTotal": "Total:",
+    "labelSuccess": "Success:",
+    "labelFailed": "Failed:",
+    "labelCount": "Count:",
+    "labelAmount": "Amount:",
+    "methodCOD": "COD",
+    "methodBanking": "Banking",
+    "methodEWallet": "E-Wallet",
+    "methodUnknown": "Unknown",
+    "typeOrderPayment": "Order Payment",
+    "typeSubscription": "Subscription/Deposit",
+    "typeUnknown": "Unknown"
+  },
+  "RiskOverview": {
+    "title": "Risk & Dispute Overview",
+    "loading": "Loading...",
+    "errorLoad": "Failed to load risk overview data.",
+    "cardRiskRates": "Risk Rates",
+    "cardActiveRequests": "Active Requests & Issues",
+    "cardOrderImpact": "Order Impact",
+    "subRefundRate": "Refund Rate: {n}%",
+    "subIssueRate": "Issue Rate: {n}%",
+    "subCancelReq": "Cancel Req: {n}",
+    "subRefundReq": "Refund Req: {n}",
+    "subDisputes": "Disputes: {n}",
+    "subRefunded": "Refunded: {n}",
+    "subTotalOrders": "Total Orders: {n}"
+  },
+  "AdminUsersPage": {
+    "title": "User Management",
+    "subtitle": "Manage all registered users on the platform.",
+    "totalLabel": "Total:",
+    "usersLabel": "users",
+    "createUser": "Create User",
+    "loading": "Loading data...",
+    "tableUser": "User",
+    "tableContact": "Contact",
+    "tableRole": "Role",
+    "tableEmailStatus": "Email Status",
+    "tableStatus": "Status",
+    "tableCreatedAt": "Created At",
+    "tableActions": "Actions",
+    "avatarAlt": "avatar",
+    "roleAdmin": "Admin",
+    "roleShop": "Shop",
+    "roleCustomer": "Customer",
+    "emailVerified": "Verified",
+    "emailUnverified": "Unverified",
+    "statusActive": "Active",
+    "statusBanned": "Banned",
+    "statusUnknown": "Unknown",
+    "editUser": "Edit",
+    "editUserTitle": "Edit user",
+    "emptyNoUsers": "No users found.",
+    "pageLabel": "Page",
+    "usersTotalLabel": "users total",
+    "prev": "Prev",
+    "next": "Next"
+  },
+  "CreateUserModal": {
+    "validation": {
+      "usernameMin": "Username must be at least 3 characters",
+      "usernameMax": "Username must be at most 30 characters",
+      "usernamePattern": "Only letters, numbers and underscores",
+      "passwordMin": "Password must be at least 6 characters",
+      "emailInvalid": "Invalid email address",
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "dobRequired": "Date of birth is required",
+      "phoneMin": "Phone number must be at least 9 digits",
+      "phoneMax": "Phone number must be at most 15 digits",
+      "phonePattern": "Only digits allowed"
+    },
+    "toast": {
+      "createSuccess": "User created successfully!",
+      "createFailed": "Failed to create user"
+    },
+    "title": "Create New User",
+    "close": "Close",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "First name",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Last name",
+    "username": "Username",
+    "usernamePlaceholder": "username",
+    "email": "Email",
+    "emailPlaceholder": "user@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "Min 6 characters",
+    "hidePassword": "Hide",
+    "showPassword": "Show",
+    "phoneNumber": "Phone Number",
+    "phoneNumberPlaceholder": "0909090000",
+    "role": "Role",
+    "roleAdmin": "Admin",
+    "roleCustomer": "Customer",
+    "roleShop": "Shop",
+    "status": "Status",
+    "statusActive": "Active",
+    "statusBanned": "Banned",
+    "gender": "Gender",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderOther": "Other",
+    "dateOfBirth": "Date of Birth",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "createUser": "Create User"
+  },
+  "EditUserModal": {
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "emailInvalid": "Invalid email address",
+      "dobRequired": "Date of birth is required",
+      "phoneRequired": "Phone number is required"
+    },
+    "toast": {
+      "updateSuccess": "User updated successfully!",
+      "updateFailed": "Failed to update user"
+    },
+    "title": "Edit User",
+    "close": "Close",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "First name",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Last name",
+    "email": "Email",
+    "emailPlaceholder": "user@example.com",
+    "phoneNumber": "Phone Number",
+    "phoneNumberPlaceholder": "0909090000",
+    "role": "Role",
+    "roleAdmin": "Admin",
+    "roleCustomer": "Customer",
+    "roleShop": "Shop",
+    "status": "Status",
+    "statusActive": "Active",
+    "statusBanned": "Banned",
+    "gender": "Gender",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderOther": "Other",
+    "dateOfBirth": "Date of Birth",
+    "emailConfirmed": "Email Confirmed",
+    "phoneConfirmed": "Phone Confirmed",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes"
+  },
+  "AdminShopRequestsPage": {
+    "title": "Shop Management",
+    "subtitle": "Review and manage shop applications from users.",
+    "totalLabel": "Total:",
+    "shopsLabel": "shops",
+    "loading": "Loading data...",
+    "tableShopInfo": "Shop Info",
+    "tableContact": "Contact",
+    "tableLegalBank": "Legal & Bank",
+    "tableCreatedAt": "Created At",
+    "tableDetail": "Detail",
+    "tableDecision": "Decision",
+    "logoAlt": "logo",
+    "notAvailable": "N/A",
+    "statusPending": "Pending",
+    "statusActive": "Active",
+    "statusRejected": "Rejected",
+    "statusInactive": "Inactive",
+    "statusBanned": "Banned",
+    "statusUnknown": "Unknown",
+    "view": "View",
+    "viewDetailTitle": "View application details",
+    "approve": "Approve",
+    "approveTitle": "Approve",
+    "reject": "Reject",
+    "rejectTitle": "Reject",
+    "ban": "Ban",
+    "banTitle": "Ban shop",
+    "unban": "Unban",
+    "unbanTitle": "Unban shop",
+    "done": "Done",
+    "defaultNoteApprove": "Eligible to do business.",
+    "defaultNoteReject": "Information is not accurate.",
+    "defaultNoteBan": "Policy violation.",
+    "modalTitleApprove": "Approve shop",
+    "modalTitleReject": "Reject request",
+    "modalTitleBan": "Ban shop",
+    "modalTitleUnban": "Unban shop",
+    "shopLabel": "Shop:",
+    "unbanWarning": "After unbanning, the shop owner will need to manually reactivate their shop. Are you sure you want to proceed?",
+    "adminNoteLabel": "Admin note",
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "confirm": "Confirm",
+    "toastBanSuccess": "Shop \"{shopName}\" has been banned!",
+    "toastUnbanSuccess": "Shop \"{shopName}\" has been unbanned!",
+    "toastApproveSuccess": "Shop approved successfully!",
+    "toastRejectSuccess": "Shop rejected successfully!",
+    "toastDecisionFailed": "Handle admin decision failed"
+  },
+  "ShopApplicationModal": {
+    "statusPending": "Pending",
+    "statusActive": "Active",
+    "statusRejected": "Rejected",
+    "statusUnknown": "Unknown",
+    "title": "Shop Application Details",
+    "applicationIdLabel": "Application ID:",
+    "close": "Close",
+    "bannerAlt": "Banner",
+    "noBanner": "No Banner",
+    "logoAlt": "Logo",
+    "noLogo": "No Logo",
+    "sectionGeneralInfo": "General Information",
+    "sectionLegalBanking": "Legal & Banking",
+    "fieldShopName": "Shop Name",
+    "fieldContactEmail": "Contact Email",
+    "fieldPhoneNumber": "Phone Number",
+    "fieldCreatedAt": "Created At",
+    "fieldPickupAddress": "Pickup Address",
+    "fieldBioDescription": "Bio / Description",
+    "fieldCitizenId": "Citizen ID (CCCD)",
+    "fieldTaxCode": "Tax Code",
+    "fieldBankName": "Bank Name",
+    "fieldAccountHolder": "Account Holder",
+    "fieldBankAccountNumber": "Bank Account Number",
+    "notAvailable": "N/A"
+  },
+  "UpdateShopApplicationModal": {
+    "validationShopNameMin": "Shop name must be at least 3 characters",
+    "validationAddressMin": "Address is too short",
+    "validationPhoneInvalid": "Invalid phone number",
+    "validationEmailInvalid": "Invalid email address",
+    "validationBankNameRequired": "Please enter bank name",
+    "validationBankAccountNumberRequired": "Please enter account number",
+    "validationBankAccountNameRequired": "Please enter account holder name",
+    "toastUpdateSuccess": "Application updated successfully! Please wait for approval.",
+    "toastUpdateFailed": "Update failed. Please try again.",
+    "title": "Update Shop Application",
+    "subtitle": "Update your information and resubmit for approval.",
+    "close": "Close",
+    "rejectionReason": "Rejection Reason",
+    "previewAlt": "Preview",
+    "bannerPrompt": "Drag Banner Here or Click",
+    "labelShopName": "Shop Name",
+    "placeholderShopName": "Shop Name...",
+    "labelSloganBio": "Slogan / Bio",
+    "placeholderSloganBio": "Short slogan or description...",
+    "sectionContactDetails": "Contact Details",
+    "labelContactEmail": "Contact Email",
+    "placeholderContactEmail": "email@domain.com",
+    "labelPhoneNumber": "Phone Number",
+    "placeholderPhoneNumber": "09xxx...",
+    "labelPickupAddress": "Pickup Address",
+    "placeholderPickupAddress": "Warehouse pickup address...",
+    "sectionBankingInformation": "Banking Information",
+    "labelBankName": "Bank Name",
+    "placeholderBankName": "Bank Name",
+    "labelAccountHolderName": "Account Holder Name",
+    "placeholderAccountHolderName": "Account Holder Name",
+    "labelAccountNumber": "Account Number",
+    "placeholderAccountNumber": "Account Number",
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "resubmitApplication": "Resubmit Application"
+  },
+  "AdminCategoriesPage": {
+    "title": "Category Management",
+    "subtitle": "Manage global categories available to all shops on the platform.",
+    "addCategory": "Add Category",
+    "loading": "Loading categories...",
+    "empty": "No categories found.",
+    "typeGlobal": "Global",
+    "statSubCategoriesTitle": "Sub-categories",
+    "statPartsTitle": "Parts",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "editCategoryTitle": "Edit category",
+    "deleteCategoryTitle": "Delete category"
+  },
+  "AdminWalletPage": {
+    "tabAll": "All",
+    "tabPending": "Pending",
+    "tabApproved": "Approved",
+    "tabRejected": "Rejected",
+    "statusPending": "Pending",
+    "statusApproved": "Approved",
+    "statusRejected": "Rejected",
+    "statusUnknown": "Unknown",
+    "title": "Withdrawal Management",
+    "subtitle": "Approve or reject withdrawal requests from Shops.",
+    "totalLabel": "Total:",
+    "requestsLabel": "requests",
+    "loading": "Loading data...",
+    "tableShop": "Shop",
+    "tableAmount": "Amount",
+    "tableBank": "Bank",
+    "tableStatus": "Status",
+    "tableRequestedDate": "Requested Date",
+    "tableEvidence": "Evidence",
+    "tableAction": "Action",
+    "viewEvidenceTitle": "View evidence",
+    "view": "View",
+    "approveTitle": "Approve",
+    "approve": "Approve",
+    "rejectTitle": "Reject",
+    "reject": "Reject",
+    "empty": "No withdrawal requests found.",
+    "pageLabel": "Page",
+    "prev": "Prev",
+    "next": "Next",
+    "evidenceAlt": "Evidence",
+    "close": "Close"
+  },
+  "ApproveWithdrawalModal": {
+    "validationReasonRequired": "Please enter a reason",
+    "defaultReason": "Transfer successful",
+    "toastUploadFailed": "Upload image failed. Please try again.",
+    "toastEvidenceRequired": "Please upload transfer evidence image.",
+    "title": "Approve Withdrawal",
+    "close": "Close",
+    "amountToTransfer": "Amount to transfer",
+    "approvalReason": "Approval reason",
+    "reasonPlaceholder": "Enter reason...",
+    "transferEvidenceImage": "Transfer evidence image",
+    "clickToUploadImage": "Click to upload image",
+    "uploadHint": "PNG, JPG up to 5MB",
+    "evidencePreviewAlt": "Evidence preview",
+    "uploading": "Uploading...",
+    "uploaded": "Uploaded",
+    "change": "Change",
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "confirmApproval": "Confirm Approval"
+  },
+  "RejectWithdrawalModal": {
+    "validationReasonRequired": "Please enter a reason for rejection",
+    "toastUploadFailed": "Upload image failed. Please try again.",
+    "title": "Reject Withdrawal",
+    "close": "Close",
+    "shopLabel": "Shop",
+    "amountLabel": "Amount",
+    "autoRefundTitle": "Auto refund",
+    "autoRefundDescription": "Rejecting this request will automatically refund the withdrawal amount to the Shop's wallet.",
+    "reasonForRejection": "Reason for rejection",
+    "reasonPlaceholder": "Enter reason for rejection...",
+    "evidenceImage": "Evidence image",
+    "optional": "Optional",
+    "clickToUploadImage": "Click to upload image",
+    "uploadHint": "PNG, JPG up to 5MB",
+    "evidencePreviewAlt": "Evidence preview",
+    "uploading": "Uploading...",
+    "uploaded": "Uploaded",
+    "change": "Change",
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "rejectAndRefund": "Reject & Refund"
+  },
+  "AdminPendingWithdrawalsPage": {
+    "copySuccess": "Copied!",
+    "title": "Pending Withdrawal Requests",
+    "subtitle": "Manage withdrawal requests currently pending from Shops.",
+    "totalLabel": "Total:",
+    "requestsLabel": "requests",
+    "loading": "Loading data...",
+    "emptyTitle": "No requests",
+    "emptyDescription": "There are currently no withdrawal requests pending.",
+    "tableDate": "Date",
+    "tableAmount": "Amount",
+    "tableFee": "Fee",
+    "tableBank": "Bank",
+    "tableActions": "Actions",
+    "copyAccountNumberTitle": "Copy Account Number",
+    "copy": "Copy",
+    "noInformation": "No information",
+    "approveTitle": "Approve",
+    "approve": "Approve",
+    "rejectTitle": "Reject",
+    "reject": "Reject",
+    "pageLabel": "Page",
+    "prev": "Prev",
+    "next": "Next"
+  },
+  "AdminTransactionsPage": {
+    "filterTypeAll": "All Types",
+    "filterTypeOrderPayment": "Order Payment",
+    "filterTypeOrderRefund": "Order Refund",
+    "filterTypeSalesRevenue": "Sales Revenue",
+    "filterTypeDeposit": "Deposit",
+    "filterTypeWithdrawal": "Withdrawal",
+    "filterTypeSalesPending": "Sales Pending",
+    "filterTypeManualAdjustment": "Manual Adjustment",
+    "filterStatusAll": "All Statuses",
+    "filterStatusPaid": "Paid",
+    "filterStatusPending": "Pending",
+    "filterStatusFailed": "Failed",
+    "filterStatusCompleted": "Completed",
+    "filterStatusCancelled": "Cancelled",
+    "badgeTypeWithdrawal": "Withdrawal",
+    "badgeTypePayment": "Payment",
+    "badgeTypeAdjustment": "Adjustment",
+    "badgeTypeRefund": "Refund",
+    "badgeTypePendingRevenue": "Pending Revenue",
+    "badgeTypeRevenue": "Revenue",
+    "badgeTypeDeposit": "Deposit",
+    "badgeStatusSuccess": "Success",
+    "badgeStatusFailed": "Failed",
+    "badgeStatusPending": "Pending",
+    "badgeStatusCompleted": "Completed",
+    "badgeStatusCancelled": "Cancelled",
+    "unknown": "Unknown",
+    "title": "Transaction History",
+    "subtitle": "View all wallet transactions in the system.",
+    "totalLabel": "Total:",
+    "transactionsLabel": "transactions",
+    "toggleFiltersTitle": "Toggle filters",
+    "filters": "Filters",
+    "filterTransactions": "Filter Transactions",
+    "clearAll": "Clear all",
+    "filterTypeLabel": "Type",
+    "filterStatusLabel": "Status",
+    "filterFromDate": "From Date",
+    "filterToDate": "To Date",
+    "applyFilters": "Apply Filters",
+    "showingOnPage": "Showing {filtered} of {total} on this page",
+    "perPage": "Per page:",
+    "loading": "Loading data...",
+    "tableId": "ID",
+    "tableDate": "Date",
+    "tableType": "Type",
+    "tableAmount": "Amount",
+    "tableFee": "Fee",
+    "tableStatus": "Status",
+    "tableDetails": "Details",
+    "manualApproved": "Approved",
+    "manualRejected": "Rejected",
+    "viewEvidenceTitle": "View evidence",
+    "view": "View",
+    "emptyFiltered": "No transactions match your filters.",
+    "empty": "No transactions found.",
+    "pageLabel": "Page",
+    "first": "First",
+    "prev": "Prev",
+    "next": "Next",
+    "last": "Last",
+    "evidenceAlt": "Evidence",
+    "close": "Close"
+  },
+  "AdminVouchersPage": {
+    "typePromotion": "Promotion",
+    "typeNegotiation": "Negotiation",
+    "typeCompensation": "Compensation",
+    "typeUnknown": "Unknown",
+    "statusExpired": "Expired",
+    "statusActive": "Active",
+    "statusDisabled": "Disabled",
+    "statusUnknown": "Unknown",
+    "discountMax": "Max {amount}",
+    "copySuccess": "Copied to clipboard!",
+    "confirmDelete": "Are you sure you want to delete the voucher \"{code}\"?",
+    "toastDeleteSuccess": "Voucher deleted successfully",
+    "toastDeleteFailed": "Failed to delete voucher",
+    "toastToggleSuccess": "Voucher status updated successfully",
+    "toastToggleFailed": "Failed to update status",
+    "loading": "Loading vouchers...",
+    "title": "Voucher Management",
+    "subtitle": "Manage vouchers and promotions across the platform.",
+    "createVoucher": "Create Voucher",
+    "tableCode": "Code",
+    "tableNameDescription": "Name & Description",
+    "tableType": "Type",
+    "tableDiscount": "Discount",
+    "tableMinOrder": "Min Order",
+    "tableUsed": "Used",
+    "tableStatus": "Status",
+    "tableAction": "Action",
+    "copyCodeTitle": "Copy code",
+    "viewDetailsTitle": "View details",
+    "editTitle": "Edit",
+    "disableVoucherTitle": "Disable voucher",
+    "enableVoucherTitle": "Enable voucher",
+    "deleteTitle": "Delete",
+    "empty": "No vouchers found.",
+    "pageLabel": "Page",
+    "vouchersLabel": "voucher(s)",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "AdminWarrantyRequestsPage": {
+    "statusAll": "All",
+    "statusPending": "Pending",
+    "statusInProgress": "In Progress",
+    "statusShopAccepted": "Shop Accepted",
+    "statusRejected": "Rejected",
+    "statusAutoCancelled": "Auto Cancelled",
+    "statusAwaitingReturn": "Awaiting Return",
+    "statusReturning": "Returning",
+    "statusReturned": "Returned",
+    "statusCompleted": "Completed",
+    "statusUnknownCode": "Unknown #{status}",
+    "title": "Warranty Requests",
+    "subtitle": "Manage warranty and return requests.",
+    "tableIdDate": "ID / Date",
+    "tableCustomer": "Customer",
+    "tableTypeReason": "Type & Reason",
+    "tableAmount": "Amount",
+    "tableStatus": "Status",
+    "tableResponse": "Response",
+    "tableAction": "Action",
+    "emptyTitle": "No requests found",
+    "emptyDescription": "No warranty or return requests match the current filter.",
+    "customerAvatarAlt": "Customer avatar",
+    "notAvailable": "N/A",
+    "shopLabel": "Shop",
+    "adminLabel": "Admin",
+    "viewDetails": "View details",
+    "pageLabel": "Page",
+    "prev": "Prev",
+    "next": "Next"
+  },
+  "AdminDecisionModal": {
+    "validationSelectJudgment": "Please select a judgment",
+    "validationAdminNoteMin": "Please enter a reason/note for the judgment (at least 5 characters)",
+    "toastDecisionFailed": "Handle admin decision failed",
+    "title": "Judge Warranty Request",
+    "close": "Close",
+    "customerRequest": "Customer Request",
+    "customerEvidenceAlt": "Customer evidence",
+    "shopResponse": "Shop's Response",
+    "shopNoResponse": "Shop has not responded yet.",
+    "requestedRefundAmount": "Requested refund amount",
+    "actionHistory": "Action History",
+    "adminJudgment": "Admin's Judgment",
+    "approveRequest": "Approve Request",
+    "approveCustomerRequest": "Approve customer's request",
+    "rejectProtectShop": "Reject, protect Shop",
+    "rejectCustomerRequest": "Reject customer's request",
+    "judgmentNote": "Judgment Note",
+    "judgmentNotePlaceholder": "Enter Admin's reason/note for judgment...",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "saveJudgment": "Save Judgment",
+    "noJudgmentNote": "No judgment note"
+  },
+  "CancelOrderModal": {
+    "validationReasonMin": "Reason must be at least 3 characters",
+    "toastSubmitSuccess": "Request submitted successfully. Please wait for Shop approval.",
+    "toastSubmitFailed": "Failed to submit cancel request",
+    "toastUnknownError": "An error occurred",
+    "title": "Cancel Order",
+    "description": "Please tell us why you want to cancel this order.",
+    "reasonPlaceholder": "Reason for cancellation...",
+    "detailsPlaceholder": "Additional details...",
+    "cancel": "Cancel",
+    "submitting": "Submitting...",
+    "submitRequest": "Submit Request"
+  },
+  "ChatPage": {
+    "messages": "Messages",
+    "emptyTitle": "Your Messages",
+    "emptyDescription": "Select a conversation from the sidebar, or start a new chat from a product page.",
+    "securedLabel": "Messages are end-to-end secured",
+    "chatSingular": "chat",
+    "chatPlural": "chats"
+  },
+  "ChatArea": {
+    "reaction": {
+      "buttonTitle": "React",
+      "changeTitle": "{reaction} - click to change",
+      "like": "Like",
+      "love": "Love",
+      "haha": "Haha",
+      "wow": "Wow",
+      "sad": "Sad",
+      "angry": "Angry"
+    },
+    "statusSending": "Sending",
+    "statusFailed": "Failed",
+    "emptyThreadTitle": "No messages yet",
+    "emptyThreadSubtitle": "Say hello 👋",
+    "toastInvalidAmount": "Please enter a valid amount",
+    "toastGiftVoucherError": "Failed to gift voucher",
+    "notAvailable": "N/A",
+    "voucherMessage": "🎉 Shop just gifted you a voucher worth {discount} VND (Code: {voucherCode}) for orders from {minOrder} VND. Open your cart to use it now!",
+    "noConversationTitle": "Select a conversation",
+    "noConversationSubtitle": "Choose one from the list",
+    "ariaBack": "Back",
+    "directMessage": "Direct message",
+    "giftVoucherTitle": "Gift a Voucher",
+    "messagePlaceholder": "Type a message...",
+    "sendMessageAria": "Send message",
+    "sendHint": "Enter to send · Shift+Enter for new line",
+    "voucherModalDiscountLabel": "Discount Amount (VND)",
+    "voucherModalDiscountPlaceholder": "E.g. 50000",
+    "voucherModalMinOrderLabel": "Minimum Order Value (VND)",
+    "voucherModalMinOrderPlaceholder": "E.g. 200000",
+    "cancel": "Cancel",
+    "gifting": "Gifting...",
+    "gift": "Gift"
+  },
+  "ConversationList": {
+    "searchPlaceholder": "Search conversations...",
+    "noResultsFound": "No results found",
+    "noConversationsYet": "No conversations yet",
+    "startChatHint": "Start a chat from a product page",
+    "noMessagesYet": "No messages yet"
+  },
+  "BuilderPage": {
+    "outOfStock": "Out of stock",
+    "included": "Included",
+    "steps": "{n} steps",
+    "keyboardBuilder": "Keyboard Builder",
+    "retry": "Retry",
+    "chooseYourKit": "Choose Your Kit",
+    "chooseKitSubtitle": "Select a base kit to start building your custom keyboard",
+    "exitLab": "Exit Lab",
+    "buildSummary": "Build Summary",
+    "viewTop": "Top View",
+    "viewSide": "Side View",
+    "viewAngled": "Angled View",
+    "customize": "Customize",
+    "editStep": "Edit {stepName}",
+    "configComplete": "🎉 Basic configuration complete!",
+    "createHighlight": "Create unique highlight",
+    "baseKit": "Base Kit",
+    "addOns": "Add-ons",
+    "subtotal": "Subtotal",
+    "back": "Back",
+    "adding": "Adding...",
+    "addToCart": "Add to Cart",
+    "selectComponent": "Select Component",
+    "helpMeChoose": "Help me choose",
+    "saving": "Saving...",
+    "next": "Next",
+    "selectComponentWarning": "Please select a component before proceeding.",
+    "resetConfirm": "Reset all configuration?",
+    "addToCartSuccess": "Item added to cart successfully!",
+    "addToCartError": "Failed to add to cart",
+    "kitDisplayName": "Custom Lab Edition"
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { AdminDashboardOverview } from "@/src/types/admin.types";
 import { adminService } from "@/src/services/admin.service";
 import PaymentHealthSection from "@/src/components/Admin/PaymentHealthSection";
@@ -25,6 +26,7 @@ function formatDate(iso: string): string {
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const t = useTranslations("AdminDashboard");
   const [data, setData] = useState<AdminDashboardOverview | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -48,7 +50,9 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-amazon-bgSecondary">
-        <p className="text-amazon-textMuted text-sm font-medium">Loading...</p>
+        <p className="text-amazon-textMuted text-sm font-medium">
+          {t("loading")}
+        </p>
       </div>
     );
   }
@@ -56,7 +60,7 @@ export default function DashboardPage() {
   if (!data) {
     return (
       <div className="flex h-screen items-center justify-center bg-amazon-bgSecondary">
-        <p className="text-amazon-textMuted text-sm">Failed to load dashboard data.</p>
+        <p className="text-amazon-textMuted text-sm">{t("errorLoad")}</p>
       </div>
     );
   }
@@ -66,27 +70,34 @@ export default function DashboardPage() {
   const cards = [
     {
       id: "net-revenue",
-      label: "Net Revenue",
+      label: t("cardNetRevenue"),
       value: formatVND(data.netRevenue),
       sub: null,
     },
     {
       id: "gross-merchandise-value",
-      label: "Gross Merchandise Value",
+      label: t("cardGMV"),
       value: formatVND(data.grossMerchandiseValue),
       sub: null,
     },
     {
       id: "orders",
-      label: "Orders Overview",
+      label: t("cardOrders"),
       value: data.totalOrders,
-      sub: `Completed: ${data.completedOrders} | Cancelled: ${data.cancelledOrders}`,
+      sub: `${t("subCompleted", { n: data.completedOrders })} | ${t(
+        "subCancelled",
+        {
+          n: data.cancelledOrders,
+        },
+      )}`,
     },
     {
       id: "entities",
-      label: "Active Entities",
+      label: t("cardEntities"),
       value: data.activeBuyers + data.activeShops,
-      sub: `Buyers: ${data.activeBuyers} | Shops: ${data.activeShops}`,
+      sub: `${t("subBuyers", { n: data.activeBuyers })} | ${t("subShops", {
+        n: data.activeShops,
+      })}`,
     },
   ];
 
@@ -97,9 +108,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="shrink-0 flex items-end justify-between ">
         <div>
-          <h1 className="text-2xl font-bold text-amazon-text">
-            Dashboard Overview
-          </h1>
+          <h1 className="text-2xl font-bold text-amazon-text">{t("title")}</h1>
           <p className="text-[11px] text-amazon-textMuted">
             {formatDate(data.fromUtc)} – {formatDate(data.toUtc)}
           </p>
@@ -121,7 +130,9 @@ export default function DashboardPage() {
                 {card.value}
               </p>
               {card.sub && (
-                <span className="text-[10px] text-amazon-textMuted mt-0.5">{card.sub}</span>
+                <span className="text-[10px] text-amazon-textMuted mt-0.5">
+                  {card.sub}
+                </span>
               )}
             </div>
           );
@@ -130,7 +141,7 @@ export default function DashboardPage() {
 
       {/* Render sequentially, full width */}
       <PaymentHealthSection />
-      <RiskOverviewSection  />
+      <RiskOverviewSection />
     </div>
   );
 }

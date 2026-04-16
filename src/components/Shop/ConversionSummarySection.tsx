@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { shopDashboardService } from "@/src/services/shopDashboard.service";
 import type {
   ConversionSummaryData,
@@ -60,7 +61,9 @@ function RateRow({ label, rate, detail, accentColor }: RateRowProps) {
       {/* Horizontal Right Box (Text) */}
       <div className="flex flex-col items-end justify-center">
         <span className="text-xs font-bold text-amazon-text">{label}</span>
-        <span className="text-[11px] font-medium text-amazon-textMuted">{detail}</span>
+        <span className="text-[11px] font-medium text-amazon-textMuted">
+          {detail}
+        </span>
       </div>
     </div>
   );
@@ -75,6 +78,7 @@ interface ConversionSummarySectionProps {
 export default function ConversionSummarySection({
   filters,
 }: ConversionSummarySectionProps) {
+  const t = useTranslations("ConversionSummarySection");
   const [data, setData] = useState<ConversionSummaryData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -84,8 +88,7 @@ export default function ConversionSummarySection({
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const result =
-          await shopDashboardService.getConversionSummary(filters);
+        const result = await shopDashboardService.getConversionSummary(filters);
         if (!cancelled) setData(result);
       } catch (error) {
         console.error("Conversion summary fetch failed:", error);
@@ -104,31 +107,40 @@ export default function ConversionSummarySection({
     if (!data) return [];
     return [
       {
-        label: "Paid Rate",
+        label: t("paidRate"),
         rate: data.paidRate,
-        detail: `${data.paidOrders}/${data.totalOrders} ord.`, // Rút gọn chữ orders
+        detail: t("orderRatioShort", {
+          count: data.paidOrders,
+          total: data.totalOrders,
+        }), // Rút gọn chữ orders
         accentColor: "#22c55e",
       },
       {
-        label: "Completed", // Rút gọn tiêu đề
+        label: t("completed"), // Rút gọn tiêu đề
         rate: data.completionRate,
-        detail: `${data.completedOrders}/${data.totalOrders} ord.`,
+        detail: t("orderRatioShort", {
+          count: data.completedOrders,
+          total: data.totalOrders,
+        }),
         accentColor: "#3b82f6",
       },
       {
-        label: "Cancel Rate",
+        label: t("cancelRate"),
         rate: data.cancelRate,
-        detail: `${data.cancelledOrders}/${data.totalOrders} ord.`,
+        detail: t("orderRatioShort", {
+          count: data.cancelledOrders,
+          total: data.totalOrders,
+        }),
         accentColor: "#ef4444",
       },
     ];
-  }, [data]);
+  }, [data, t]);
 
   return (
     <div className="h-full w-full bg-white border border-amazon-border shadow-sm rounded-md flex flex-col overflow-hidden">
       {/* Header */}
       <div className="px-4 py-3 border-b border-amazon-border bg-neutral-50 shrink-0">
-        <h3 className="text-sm font-bold text-amazon-text">Order Conversion</h3>
+        <h3 className="text-sm font-bold text-amazon-text">{t("title")}</h3>
       </div>
 
       {/* Cards Box */}
@@ -155,7 +167,7 @@ export default function ConversionSummarySection({
         </div>
       ) : (
         <div className="flex-1 flex items-center justify-center text-amazon-textMuted">
-          <p className="text-xs font-medium">No data.</p>
+          <p className="text-xs font-medium">{t("noData")}</p>
         </div>
       )}
     </div>

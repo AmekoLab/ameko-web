@@ -2,7 +2,7 @@
 
 import { FC, useMemo, useState } from "react";
 import Image from "next/image";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { X, Loader2, Keyboard, ImagePlus } from "lucide-react";
@@ -66,7 +66,6 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
     handleSubmit,
     control,
     setValue,
-    watch,
     reset,
     formState: { errors },
   } = useForm<WarrantyFormValues>({
@@ -80,10 +79,10 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
     },
   });
 
-  const selectedItemIds = watch("orderItemIds");
+  const selectedItemIds = useWatch({ control, name: "orderItemIds" }) || [];
 
   const toggleItem = (id: string) => {
-    const current = selectedItemIds || [];
+    const current = selectedItemIds;
     const next = current.includes(id)
       ? current.filter((i) => i !== id)
       : [...current, id];
@@ -124,8 +123,13 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
       setPreviewUrl(null);
       onClose();
     } catch (err: unknown) {
-      const error = err as string;
-      toast.error(error || t("submitWarrantyRequestFailed"));
+      let errorMessage = t("submitWarrantyRequestFailed");
+      if (typeof err === "string" && err) {
+        errorMessage = err;
+      } else if (err instanceof Error && err.message) {
+        errorMessage = err.message;
+      }
+      toast.error(errorMessage);
     }
   };
 

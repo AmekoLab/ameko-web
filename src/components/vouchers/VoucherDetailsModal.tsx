@@ -12,6 +12,7 @@ import {
   Copy,
   Check,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAppSelector, useAppDispatch } from "@/src/store/hook";
 import { getVoucherUsageHistoryThunk } from "@/src/store/slices/voucherSlice";
 
@@ -26,8 +27,9 @@ function fmtVND(n: number): string {
 const CopiableField: FC<{
   label: string;
   value: string;
+  copyTitle: string;
   mono?: boolean;
-}> = ({ label, value, mono }) => {
+}> = ({ label, value, copyTitle, mono }) => {
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
     navigator.clipboard.writeText(value);
@@ -49,7 +51,7 @@ const CopiableField: FC<{
           type="button"
           onClick={handleCopy}
           className="shrink-0 p-1 rounded-sm hover:bg-neutral-100 text-amazon-textMuted transition"
-          title="Copy"
+          title={copyTitle}
         >
           {copied ? (
             <Check className="w-3.5 h-3.5 text-green-600" />
@@ -129,6 +131,8 @@ const VoucherDetailsModal: FC<VoucherDetailsModalProps> = ({
 const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
   onClose,
 }) => {
+  const t = useTranslations("VoucherDetailsModal");
+  const tCommon = useTranslations("Common");
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<"details" | "history">("details");
   const voucher = useAppSelector(
@@ -202,6 +206,55 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
       ? Math.min((voucher.usedCount / voucher.usageLimit) * 100, 100)
       : 0;
 
+  const getStatusLabel = useCallback(
+    (status: string) => {
+      const map: Record<string, string> = {
+        Active: t("status.active"),
+        Disabled: t("status.disabled"),
+        Expired: t("status.expired"),
+        Depleted: t("status.depleted"),
+      };
+      return map[status] ?? status;
+    },
+    [t],
+  );
+
+  const getTypeLabel = useCallback(
+    (type: string) => {
+      const map: Record<string, string> = {
+        Promotion: t("type.promotion"),
+        Negotiation: t("type.negotiation"),
+        Compensation: t("type.compensation"),
+      };
+      return map[type] ?? type;
+    },
+    [t],
+  );
+
+  const getDiscountTypeLabel = useCallback(
+    (discountType: string) => {
+      const map: Record<string, string> = {
+        Percentage: t("discountType.percentage"),
+        FixedAmount: t("discountType.fixedAmount"),
+      };
+      return map[discountType] ?? discountType;
+    },
+    [t],
+  );
+
+  const getStackingPolicyLabel = useCallback(
+    (policy: string) => {
+      const map: Record<string, string> = {
+        All: t("stackingPolicy.all"),
+        WithCompensationOnly: t("stackingPolicy.withCompensationOnly"),
+        None: t("stackingPolicy.none"),
+        AllowStacking: t("stackingPolicy.allowStacking"),
+      };
+      return map[policy] ?? policy;
+    },
+    [t],
+  );
+
   return (
     <div
       ref={overlayRef}
@@ -214,13 +267,13 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
           <div className="flex items-center gap-2">
             <Ticket className="w-5 h-5 text-amazon-textMuted" />
             <h3 className="font-bold text-[15px] text-amazon-text">
-              Voucher Details
+              {t("title")}
             </h3>
           </div>
           <button
             onClick={onClose}
             className="p-1.5 hover:bg-neutral-50 rounded-sm transition-colors"
-            aria-label="Close"
+            aria-label={tCommon("close")}
           >
             <X className="w-5 h-5 text-amazon-textMuted" />
           </button>
@@ -239,7 +292,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
               }`}
             >
               <Info className="w-4 h-4" />
-              General Information
+              {t("tabs.generalInformation")}
             </button>
             <button
               type="button"
@@ -251,7 +304,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
               }`}
             >
               <History className="w-4 h-4" />
-              Usage History
+              {t("tabs.usageHistory")}
             </button>
           </div>
         )}
@@ -261,48 +314,56 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16 text-amazon-textMuted">
               <Loader2 className="w-8 h-8 animate-spin mb-3" />
-              <p className="text-sm font-medium">Loading details...</p>
+              <p className="text-sm font-medium">{t("loadingDetails")}</p>
             </div>
           ) : !voucher ? (
             <div className="flex flex-col items-center justify-center py-16 text-amazon-textMuted">
               <Ticket className="w-10 h-10 opacity-20 mb-3" />
-              <p className="text-sm font-medium">Voucher not found</p>
+              <p className="text-sm font-medium">{t("notFound")}</p>
             </div>
           ) : (
             <>
               {/* ── Details Tab ── */}
               {activeTab === "details" && (
                 <div className="space-y-5 animate-in fade-in duration-300">
-                  {/* Section A: Định danh */}
                   <div className="bg-neutral-50 rounded-sm p-4 border border-amazon-border">
                     <h4 className="text-[11px] font-medium text-amazon-textMuted mb-3">
-                      Identification
+                      {t("sections.identification")}
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                       <div className="sm:col-span-2">
-                        <CopiableField label="ID" value={voucher.id} mono />
+                        <CopiableField
+                          label={t("labels.id")}
+                          value={voucher.id}
+                          copyTitle={t("copy")}
+                          mono
+                        />
                       </div>
                       <CopiableField
-                        label="Voucher Code"
+                        label={t("labels.voucherCode")}
                         value={voucher.code}
+                        copyTitle={t("copy")}
                         mono
                       />
-                      <DetailRow label="Name">{voucher.name}</DetailRow>
-                      <DetailRow label="Type">
+                      <DetailRow label={t("labels.name")}>
+                        {voucher.name}
+                      </DetailRow>
+                      <DetailRow label={t("labels.type")}>
                         <span
                           className={`inline-block rounded-sm px-2 py-0.5 text-[10px] font-medium ${typeColor(voucher.type)}`}
                         >
-                          {voucher.type}
+                          {getTypeLabel(voucher.type)}
                         </span>
                       </DetailRow>
-                      <DetailRow label="Creator">
+                      <DetailRow label={t("labels.creator")}>
                         {voucher.creatorName}
                       </DetailRow>
                       {voucher.targetUserId && (
                         <div className="sm:col-span-2">
                           <CopiableField
-                            label="Designated Recipient"
+                            label={t("labels.designatedRecipient")}
                             value={voucher.targetUserId}
+                            copyTitle={t("copy")}
                             mono
                           />
                         </div>
@@ -310,10 +371,9 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                     </div>
                   </div>
 
-                  {/* Section B: Giá trị & Điều kiện */}
                   <div className="bg-neutral-50 rounded-sm p-4 border border-amazon-border">
                     <h4 className="text-[11px] font-medium text-amazon-textMuted mb-3">
-                      Value & Conditions
+                      {t("sections.valueConditions")}
                     </h4>
                     {voucher.description && (
                       <p className="text-[13px] text-amazon-text leading-relaxed mb-3">
@@ -321,12 +381,10 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                       </p>
                     )}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
-                      <DetailRow label="Discount Type">
-                        {voucher.discountType === "Percentage"
-                          ? "Percentage (%)"
-                          : "Fixed Amount (₫)"}
+                      <DetailRow label={t("labels.discountType")}>
+                        {getDiscountTypeLabel(voucher.discountType)}
                       </DetailRow>
-                      <DetailRow label="Discount">
+                      <DetailRow label={t("labels.discount")}>
                         {voucher.discountType === "Percentage" ? (
                           <span className="text-base font-bold text-amazon-text">
                             {voucher.value}%
@@ -338,42 +396,47 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                         )}
                       </DetailRow>
                       {voucher.maxDiscountAmount != null && (
-                        <DetailRow label="Max Discount">
+                        <DetailRow label={t("labels.maxDiscount")}>
                           {fmtVND(voucher.maxDiscountAmount)}
                         </DetailRow>
                       )}
-                      <DetailRow label="Minimum Order">
+                      <DetailRow label={t("labels.minimumOrder")}>
                         {fmtVND(voucher.minOrderValue)}
                       </DetailRow>
                     </div>
                   </div>
 
-                  {/* Section C: Thời gian & Giới hạn */}
                   <div className="bg-neutral-50 rounded-sm p-4 border border-amazon-border">
                     <h4 className="text-[11px] font-medium text-amazon-textMuted mb-3">
-                      Time & Limit
+                      {t("sections.timeLimit")}
                     </h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
-                      <DetailRow label="Start Date">
+                      <DetailRow label={t("labels.startDate")}>
                         {fmtDate(voucher.startDate)}
                       </DetailRow>
-                      <DetailRow label="End Date">
+                      <DetailRow label={t("labels.endDate")}>
                         {fmtDate(voucher.endDate)}
                       </DetailRow>
-                      <DetailRow label="Max Uses / User">
-                        {voucher.maxUsesPerUser ? voucher.maxUsesPerUser : <span className="text-amazon-textMuted italic">Unlimited</span>}
+                      <DetailRow label={t("labels.maxUsesPerUser")}>
+                        {voucher.maxUsesPerUser ? (
+                          voucher.maxUsesPerUser
+                        ) : (
+                          <span className="text-amazon-textMuted italic">
+                            {t("unlimited")}
+                          </span>
+                        )}
                       </DetailRow>
-                      <DetailRow label="Status">
+                      <DetailRow label={t("labels.status")}>
                         <span
                           className={`inline-block rounded-sm px-2 py-0.5 text-[10px] font-medium ${statusColor(voucher.status)}`}
                         >
-                          {voucher.status}
+                          {getStatusLabel(voucher.status)}
                         </span>
                       </DetailRow>
                     </div>
                     <div className="mt-4">
                       <p className="text-[11px] text-amazon-textMuted mb-2">
-                        Usage Progress
+                        {t("labels.usageProgress")}
                       </p>
                       <div className="flex items-center gap-3">
                         <div className="flex-1 h-2 bg-neutral-200 rounded-full overflow-hidden">
@@ -389,23 +452,24 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                     </div>
                   </div>
 
-                  {/* Section D: Chính sách cộng dồn */}
                   <div className="bg-neutral-50 rounded-sm p-4 border border-amazon-border">
                     <h4 className="text-[11px] font-medium text-amazon-textMuted mb-3">
-                      Stacking Policy
+                      {t("sections.stackingPolicy")}
                     </h4>
                     <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                      <DetailRow label="Stackable">
+                      <DetailRow label={t("labels.stackable")}>
                         {voucher.isStackable ? (
                           <span className="text-amazon-text font-medium">
-                            Yes
+                            {t("stacking.yes")}
                           </span>
                         ) : (
-                          <span className="text-amazon-textMuted font-medium">No</span>
+                          <span className="text-amazon-textMuted font-medium">
+                            {t("stacking.no")}
+                          </span>
                         )}
                       </DetailRow>
-                      <DetailRow label="Policy">
-                        {voucher.stackingPolicy}
+                      <DetailRow label={t("labels.policy")}>
+                        {getStackingPolicyLabel(voucher.stackingPolicy)}
                       </DetailRow>
                     </div>
                   </div>
@@ -418,11 +482,13 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                   {isFetchingUsage ? (
                     <div className="flex items-center justify-center py-8 text-amazon-textMuted">
                       <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                      <span className="text-sm font-medium">Loading...</span>
+                      <span className="text-sm font-medium">
+                        {t("loadingUsage")}
+                      </span>
                     </div>
                   ) : usageHistory.length === 0 ? (
                     <p className="text-[13px] text-amazon-textMuted text-center py-6 font-medium">
-                      No usage yet.
+                      {t("noUsage")}
                     </p>
                   ) : (
                     <>
@@ -431,15 +497,19 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                           <thead className="bg-neutral-50 text-[11px] font-medium text-amazon-textMuted">
                             <tr>
                               <th className="px-4 py-3 w-[170px]">
-                                Used Date
+                                {t("historyTable.usedDate")}
                               </th>
-                              <th className="px-4 py-3">Customer</th>
-                              <th className="px-4 py-3">Order Code</th>
-                              <th className="px-4 py-3 text-right">
-                                Order Value
+                              <th className="px-4 py-3">
+                                {t("historyTable.customer")}
+                              </th>
+                              <th className="px-4 py-3">
+                                {t("historyTable.orderCode")}
                               </th>
                               <th className="px-4 py-3 text-right">
-                                Discount Applied
+                                {t("historyTable.orderValue")}
+                              </th>
+                              <th className="px-4 py-3 text-right">
+                                {t("historyTable.discountApplied")}
                               </th>
                             </tr>
                           </thead>
@@ -470,7 +540,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                                         )
                                       }
                                       className="shrink-0 p-0.5 rounded-sm hover:bg-neutral-200 text-amazon-textMuted hover:text-amazon-text transition"
-                                      title="Copy order code"
+                                      title={t("copyOrderCode")}
                                     >
                                       <Copy className="w-3 h-3" />
                                     </button>
@@ -492,8 +562,11 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                       {usagePagination && usagePagination.totalPages > 1 && (
                         <div className="flex items-center justify-between mt-4 text-[11px] font-medium text-amazon-textMuted">
                           <span>
-                            Page <strong className="text-amazon-text">{usagePagination.currentPage}</strong> /{" "}
-                            {usagePagination.totalPages}
+                            {t("pagination.page")}{" "}
+                            <strong className="text-amazon-text">
+                              {usagePagination.currentPage}
+                            </strong>{" "}
+                            / {usagePagination.totalPages}
                           </span>
                           <div className="flex gap-2">
                             <button
@@ -506,7 +579,8 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                               }
                               className="inline-flex items-center gap-1 rounded-sm border border-amazon-border bg-white px-3 py-1.5 transition hover:bg-neutral-50 hover:text-amazon-text disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                              <ChevronLeft className="h-3 w-3" /> Previous
+                              <ChevronLeft className="h-3 w-3" />{" "}
+                              {t("pagination.previous")}
                             </button>
                             <button
                               type="button"
@@ -518,7 +592,8 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
                               }
                               className="inline-flex items-center gap-1 rounded-sm border border-amazon-border bg-white px-3 py-1.5 transition hover:bg-neutral-50 hover:text-amazon-text disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                              Next <ChevronRight className="h-3 w-3" />
+                              {t("pagination.next")}{" "}
+                              <ChevronRight className="h-3 w-3" />
                             </button>
                           </div>
                         </div>
@@ -537,7 +612,7 @@ const VoucherDetailsModalContent: FC<{ onClose: () => void }> = ({
             onClick={onClose}
             className="px-5 py-2 text-[13px] font-medium rounded-sm border border-amazon-border text-amazon-textMuted hover:bg-neutral-50 hover:text-amazon-text transition-colors"
           >
-            Close
+            {tCommon("close")}
           </button>
         </div>
       </div>

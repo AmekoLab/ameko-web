@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,13 +9,15 @@ import { rejectShopWithdrawal } from "@/src/store/slices/adminWalletSlice";
 import { uploadImage } from "@/src/utils/uploadImage";
 import { toast } from "react-toastify";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 
 // ─── Zod Schema ──────────────────────────────────────────
-const rejectSchema = z.object({
-  reason: z.string().min(1, "Please enter a reason for rejection"),
-});
+const createRejectSchema = (t: (key: string) => string) =>
+  z.object({
+    reason: z.string().min(1, t("validationReasonRequired")),
+  });
 
-type RejectFormData = z.infer<typeof rejectSchema>;
+type RejectFormData = z.infer<ReturnType<typeof createRejectSchema>>;
 
 // ─── Component ───────────────────────────────────────────
 interface RejectWithdrawalModalProps {
@@ -35,8 +37,13 @@ export default function RejectWithdrawalModal({
   onClose,
   onSuccess,
 }: RejectWithdrawalModalProps) {
+  const t = useTranslations("RejectWithdrawalModal");
+  const locale = useLocale();
+  const numberLocale = locale === "vi" ? "vi-VN" : "en-US";
+
   const dispatch = useAppDispatch();
   const { rejectLoading } = useAppSelector((state) => state.adminWallet);
+  const rejectSchema = useMemo(() => createRejectSchema(t), [t]);
 
   const [, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -69,7 +76,7 @@ export default function RejectWithdrawalModal({
       const url = await uploadImage(file);
       setUploadedUrl(url);
     } catch {
-      toast.error("Upload image failed. Please try again.");
+      toast.error(t("toastUploadFailed"));
       setImageFile(null);
       setImagePreview(null);
     } finally {
@@ -118,15 +125,13 @@ export default function RejectWithdrawalModal({
       <div className="relative bg-white rounded-md shadow-xl w-full max-w-lg border border-amazon-border overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-amazon-border bg-white">
-          <h2 className="text-lg font-bold text-amazon-text">
-            Reject Withdrawal
-          </h2>
+          <h2 className="text-lg font-bold text-amazon-text">{t("title")}</h2>
           <button
             type="button"
             onClick={handleClose}
             className="px-2 py-1 text-[11px] font-medium text-amazon-textMuted rounded-sm hover:bg-neutral-50 border border-transparent hover:border-amazon-border transition-colors"
           >
-            Close
+            {t("close")}
           </button>
         </div>
 
@@ -136,13 +141,19 @@ export default function RejectWithdrawalModal({
           <div className="bg-neutral-50 rounded-sm p-3 border border-amazon-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] text-amazon-textMuted">Shop</p>
-                <p className="text-[11px] font-bold text-amazon-text">{shopName}</p>
+                <p className="text-[10px] text-amazon-textMuted">
+                  {t("shopLabel")}
+                </p>
+                <p className="text-[11px] font-bold text-amazon-text">
+                  {shopName}
+                </p>
               </div>
               <div className="text-right">
-                <p className="text-[10px] text-amazon-textMuted">Amount</p>
+                <p className="text-[10px] text-amazon-textMuted">
+                  {t("amountLabel")}
+                </p>
                 <p className="text-lg font-bold text-red-600">
-                  {amount.toLocaleString("vi-VN")}₫
+                  {amount.toLocaleString(numberLocale)}₫
                 </p>
               </div>
             </div>
@@ -151,21 +162,21 @@ export default function RejectWithdrawalModal({
           {/* Auto-refund Warning Banner */}
           <div className="flex flex-col gap-0.5 bg-yellow-50 border border-yellow-200 rounded-sm p-3">
             <p className="text-[11px] font-bold text-yellow-800">
-              Auto refund
+              {t("autoRefundTitle")}
             </p>
             <p className="text-[10px] text-yellow-700">
-              Rejecting this request will automatically refund the withdrawal amount to the Shop's wallet.
+              {t("autoRefundDescription")}
             </p>
           </div>
 
           {/* Reason */}
           <div className="space-y-1">
             <label className="block text-[11px] font-medium text-amazon-text">
-              Reason for rejection <span className="text-red-500">*</span>
+              {t("reasonForRejection")} <span className="text-red-500">*</span>
             </label>
             <textarea
               rows={2}
-              placeholder="Enter reason for rejection..."
+              placeholder={t("reasonPlaceholder")}
               className={`w-full border rounded-sm p-2 outline-none transition-colors resize-none text-[11px] text-amazon-text ${
                 errors.reason
                   ? "border-red-400 focus:border-red-500"
@@ -184,9 +195,11 @@ export default function RejectWithdrawalModal({
           <div className="space-y-1">
             <div className="flex items-center justify-between">
               <label className="block text-[11px] font-medium text-amazon-text">
-                Evidence image
+                {t("evidenceImage")}
               </label>
-              <span className="text-[10px] text-amazon-textMuted">Optional</span>
+              <span className="text-[10px] text-amazon-textMuted">
+                {t("optional")}
+              </span>
             </div>
 
             {!imagePreview ? (
@@ -196,17 +209,17 @@ export default function RejectWithdrawalModal({
                 className="w-full border border-dashed border-amazon-border rounded-sm py-6 flex flex-col items-center justify-center gap-1 hover:bg-neutral-50 transition-colors bg-white"
               >
                 <p className="text-[11px] font-medium text-blue-600">
-                  Click to upload image
+                  {t("clickToUploadImage")}
                 </p>
                 <p className="text-[10px] text-amazon-textMuted">
-                  PNG, JPG up to 5MB
+                  {t("uploadHint")}
                 </p>
               </button>
             ) : (
               <div className="relative rounded-sm border border-amazon-border overflow-hidden bg-neutral-100 mt-2">
                 <Image
                   src={imagePreview}
-                  alt="Evidence preview"
+                  alt={t("evidencePreviewAlt")}
                   width={500}
                   height={300}
                   className="w-full h-40 object-contain"
@@ -216,14 +229,14 @@ export default function RejectWithdrawalModal({
                 {uploading && (
                   <div className="absolute inset-0 bg-neutral-900/40 flex items-center justify-center">
                     <span className="text-white text-[11px] font-medium">
-                      Uploading...
+                      {t("uploading")}
                     </span>
                   </div>
                 )}
 
                 {uploadedUrl && !uploading && (
                   <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full px-2 py-0.5 text-[10px] font-bold">
-                    Uploaded
+                    {t("uploaded")}
                   </div>
                 )}
 
@@ -234,7 +247,7 @@ export default function RejectWithdrawalModal({
                   disabled={uploading}
                   className="absolute bottom-2 right-2 rounded-sm bg-white border border-amazon-border px-2 py-1 text-[10px] font-medium text-amazon-text hover:bg-neutral-50 transition-colors shadow-sm disabled:opacity-50"
                 >
-                  Change
+                  {t("change")}
                 </button>
               </div>
             )}
@@ -255,14 +268,14 @@ export default function RejectWithdrawalModal({
               onClick={handleClose}
               className="px-4 py-1.5 text-[11px] font-medium border border-amazon-border rounded-sm hover:bg-neutral-50 text-amazon-text transition-colors"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               disabled={isProcessing}
               className="px-4 py-1.5 rounded-sm bg-red-600 border border-red-700 text-[11px] font-medium text-white transition-colors hover:bg-red-700 hover:border-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {rejectLoading ? "Processing..." : "Reject & Refund"}
+              {rejectLoading ? t("processing") : t("rejectAndRefund")}
             </button>
           </div>
         </form>

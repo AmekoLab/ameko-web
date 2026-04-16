@@ -70,7 +70,8 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const currentUserStr = typeof window !== 'undefined' ? localStorage.getItem("user") : null;
+  const currentUserStr =
+    typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
   const isOwner = currentUser?.id === post.userId;
   const isAdmin = currentUser?.role === "Admin";
@@ -91,7 +92,6 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
       return post.createdAt;
     }
   };
-
 
   const handleOpenReactions = async () => {
     setIsReactionsModalOpen(true);
@@ -150,8 +150,6 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
     }
   };
 
-
-
   const handleUpdatePost = async () => {
     if (!editTitle.trim()) return;
     setIsUpdating(true);
@@ -193,7 +191,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
   const postDisplayName = (() => {
     if (post.role === "Admin") return "Admin";
     if (isShop) {
-      return (post as any).shopName  || post.username || post.userId;
+      return (post as any).shopName || post.username || post.userId;
     }
     return post.fullName || post.username || post.userId;
   })();
@@ -283,54 +281,54 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
 
           {/* Menu Option */}
           {canManage && (
-          <div className="relative">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-amazon-textMuted hover:text-amazon-text focus:outline-none"
-            >
-              <MoreHorizontal className="w-5 h-5" />
-            </button>
-            <AnimatePresence>
-              {isMenuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.1 }}
-                  className="absolute right-0 mt-2 w-48 bg-white border border-amazon-border rounded-md shadow-xl z-[99]"
-                >
-                  {isOwner && (
+            <div className="relative">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-amazon-textMuted hover:text-amazon-text focus:outline-none"
+              >
+                <MoreHorizontal className="w-5 h-5" />
+              </button>
+              <AnimatePresence>
+                {isMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.1 }}
+                    className="absolute right-0 mt-2 w-48 bg-white border border-amazon-border rounded-md shadow-xl z-[99]"
+                  >
+                    {isOwner && (
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          setIsEditing(true);
+                          setEditTitle(currentPost.title);
+                        }}
+                        className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 first:rounded-t-md transition-colors"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                        {t("editPost")}
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         setIsMenuOpen(false);
-                        setIsEditing(true);
-                        setEditTitle(currentPost.title);
+                        setShowDeleteConfirm(true);
                       }}
-                      className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-50 first:rounded-t-md transition-colors"
+                      disabled={isDeleting}
+                      className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 last:rounded-b-md transition-colors disabled:opacity-50"
                     >
-                      <Edit2 className="w-4 h-4" />
-                      {t("editPost")}
+                      {isDeleting ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                      {t("deletePost")}
                     </button>
-                  )}
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      setShowDeleteConfirm(true);
-                    }}
-                    disabled={isDeleting}
-                    className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 last:rounded-b-md transition-colors disabled:opacity-50"
-                  >
-                    {isDeleting ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="w-4 h-4" />
-                    )}
-                    {t("deletePost")}
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           )}
         </div>
 
@@ -378,11 +376,15 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                 {post.product.name}
               </p>
               <p>
-                <span className="font-bold text-amazon-link">{t("switch")}</span>{" "}
+                <span className="font-bold text-amazon-link">
+                  {t("switch")}
+                </span>{" "}
                 {post.product.price}
               </p>
               <p>
-                <span className="font-bold text-amazon-link">{t("keycaps")}</span>{" "}
+                <span className="font-bold text-amazon-link">
+                  {t("quantity")}
+                </span>{" "}
                 {post.product.quantity}
               </p>
               <div className="pt-2">
@@ -443,7 +445,6 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
               >
                 {t("commentCount", { count: commentCount })}
               </button>
-            
             </div>
           </div>
 
@@ -513,7 +514,6 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
               <MessageCircle className="w-4 h-4" />
               {t("commentCount", { count: commentCount })}
             </button>
-
           </div>
         </div>
 
@@ -522,7 +522,9 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
             postId={post.id}
             initialCount={post.commentCount}
             onCommentAdded={() => setCommentCount((prev) => prev + 1)}
-            onCommentDeleted={() => setCommentCount(prev => Math.max(0, prev - 1))}
+            onCommentDeleted={() =>
+              setCommentCount((prev) => Math.max(0, prev - 1))
+            }
           />
         )}
       </motion.div>
@@ -531,7 +533,9 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
         <div className="fixed inset-0 z-[999] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white border border-amazon-border rounded-2xl w-full max-w-sm max-h-[70vh] flex flex-col">
             <div className="flex justify-between items-center p-4 border-b border-amazon-border">
-              <h2 className="text-amazon-text font-bold">{t("reactionsTitle")}</h2>
+              <h2 className="text-amazon-text font-bold">
+                {t("reactionsTitle")}
+              </h2>
               <button
                 onClick={() => setIsReactionsModalOpen(false)}
                 className="text-amazon-textMuted hover:text-amazon-text"

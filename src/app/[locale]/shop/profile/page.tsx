@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useForm } from "react-hook-form";
+import {
+  useForm,
+  type UseFormRegister,
+  type UseFormSetValue,
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
   fetchCurrentShop,
@@ -31,8 +36,8 @@ import {
 // ==================== IMAGE UPLOAD COMPONENT ====================
 interface ImageUploadProps {
   name: "logoImage" | "bannerImage";
-  register: any;
-  setValue: any;
+  register: UseFormRegister<UpdateShopSchemaType>;
+  setValue: UseFormSetValue<UpdateShopSchemaType>;
   preview: string | null;
   setPreview: (url: string | null) => void;
   error?: string;
@@ -48,6 +53,7 @@ const ImageUpload = ({
   error,
   type,
 }: ImageUploadProps) => {
+  const t = useTranslations("ShopProfilePage");
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDrop = useCallback(
@@ -96,7 +102,12 @@ const ImageUpload = ({
         />
 
         {preview ? (
-          <Image src={preview} alt="Preview" fill className="object-cover" />
+          <Image
+            src={preview}
+            alt={t("imageUpload.previewAlt")}
+            fill
+            className="object-cover"
+          />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-neutral-400 z-10">
             <Camera
@@ -104,7 +115,7 @@ const ImageUpload = ({
             />
             {type === "banner" && (
               <span className="text-sm font-medium text-center px-4">
-                Drag or click to upload banner
+                {t("imageUpload.bannerPrompt")}
               </span>
             )}
           </div>
@@ -137,16 +148,14 @@ const InputLabel = ({
     <label className="text-sm font-medium text-neutral-700">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
-    {error && (
-      <span className="text-red-500 text-xs font-medium">
-        {error}
-      </span>
-    )}
+    {error && <span className="text-red-500 text-xs font-medium">{error}</span>}
   </div>
 );
 
 // ==================== MAIN PAGE ====================
 export default function ShopProfilePage() {
+  const t = useTranslations("ShopProfilePage");
+  const tCommon = useTranslations("Common");
   const dispatch = useAppDispatch();
   const { currentShop, loading } = useAppSelector((state) => state.shop);
 
@@ -198,11 +207,13 @@ export default function ShopProfilePage() {
     setIsSubmitting(true);
     try {
       await dispatch(patchShopProfile(data)).unwrap();
-      toast.success("Shop profile updated successfully!");
-    } catch (error: any) {
-      toast.error(
-        error?.message || "Failed to update shop profile. Please try again.",
-      );
+      toast.success(t("toast.updateSuccess"));
+    } catch (error: unknown) {
+      const message =
+        typeof error === "string"
+          ? error
+          : (error as { message?: string })?.message;
+      toast.error(message || t("toast.updateFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -219,19 +230,43 @@ export default function ShopProfilePage() {
     try {
       if (isCurrentlyActive) {
         await dispatch(deactivateShop()).unwrap();
-        toast.success("Shop has been temporarily closed.");
+        toast.success(t("toast.shopClosed"));
       } else {
         await dispatch(reactivateShop()).unwrap();
-        toast.success("Shop has been reopened.");
+        toast.success(t("toast.shopReopened"));
       }
       // Reload shop info to get latest isActive
       dispatch(fetchCurrentShop());
       setIsConfirmModalOpen(false); // Close modal on success
-    } catch (error: any) {
-      toast.error(error || "Action failed. Please try again.");
+    } catch (error: unknown) {
+      const message =
+        typeof error === "string"
+          ? error
+          : (error as { message?: string })?.message;
+      toast.error(message || t("toast.actionFailed"));
     } finally {
       setIsToggling(false);
     }
+  };
+
+  const getShopStatusLabel = () => {
+    if (!currentShop) return t("status.unknown");
+    if (currentShop.status === 1 && currentShop.isActive) {
+      return t("status.active");
+    }
+    if (currentShop.status === 1 && !currentShop.isActive) {
+      return t("status.inactiveClosed");
+    }
+    if (currentShop.status === 0) {
+      return t("status.pending");
+    }
+    if (currentShop.status === 3) {
+      return t("status.rejected");
+    }
+    if (currentShop.status === 4) {
+      return t("status.banned");
+    }
+    return t("status.unknown");
   };
 
   // Loading state (Toàn trang)
@@ -240,7 +275,9 @@ export default function ShopProfilePage() {
       <div className="min-h-[60vh] flex items-center justify-center bg-neutral-50">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-10 h-10 animate-spin text-neutral-400" />
-          <p className="text-neutral-500 text-sm font-medium">Loading profile...</p>
+          <p className="text-neutral-500 text-sm font-medium">
+            {t("loadingProfile")}
+          </p>
         </div>
       </div>
     );
@@ -253,11 +290,9 @@ export default function ShopProfilePage() {
         <div className="text-center">
           <Store className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-neutral-800 mb-2">
-            No Shop Found
+            {t("noShop.title")}
           </h2>
-          <p className="text-sm text-neutral-500">
-            You haven&apos;t registered a shop yet.
-          </p>
+          <p className="text-sm text-neutral-500">{t("noShop.description")}</p>
         </div>
       </div>
     );
@@ -287,13 +322,13 @@ export default function ShopProfilePage() {
             {/* Tiêu đề & Nội dung */}
             <h3 className="text-lg font-semibold text-neutral-900 mb-2">
               {currentShop?.isActive
-                ? "Close shop temporarily?"
-                : "Reopen shop?"}
+                ? t("confirmModal.closeQuestion")
+                : t("confirmModal.reopenQuestion")}
             </h3>
             <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
               {currentShop?.isActive
-                ? "Your shop will be hidden. Customers cannot view or purchase products until you reopen."
-                : "Your shop will be visible again. Customers can continue to view and shop as usual."}
+                ? t("confirmModal.closeDescription")
+                : t("confirmModal.reopenDescription")}
             </p>
 
             {/* Cụm Nút Hành Động */}
@@ -304,7 +339,7 @@ export default function ShopProfilePage() {
                 disabled={isToggling}
                 className="flex-1 py-2.5 bg-white border border-neutral-300 hover:bg-neutral-50 text-neutral-700 text-sm font-medium rounded-lg transition-colors disabled:opacity-70"
               >
-                Cancel
+                {tCommon("cancel")}
               </button>
               <button
                 type="button"
@@ -319,7 +354,7 @@ export default function ShopProfilePage() {
                 {isToggling ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  "Confirm"
+                  tCommon("confirm")
                 )}
               </button>
             </div>
@@ -332,10 +367,10 @@ export default function ShopProfilePage() {
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-neutral-900">
-              Shop Profile
+              {t("header.title")}
             </h1>
             <p className="text-neutral-500 text-sm mt-1">
-              Update your shop&apos;s identity and contact details
+              {t("header.subtitle")}
             </p>
           </div>
 
@@ -357,17 +392,7 @@ export default function ShopProfilePage() {
                             : "bg-neutral-100 text-neutral-600 border-neutral-200"
                 }`}
               >
-                {currentShop.status === 1 && currentShop.isActive
-                  ? "Active"
-                  : currentShop.status === 1 && !currentShop.isActive
-                    ? "Inactive (Closed)"
-                    : currentShop.status === 0
-                      ? "Pending"
-                      : currentShop.status === 3
-                        ? "Rejected"
-                        : currentShop.status === 4
-                          ? "Banned"
-                          : "Unknown"}
+                {getShopStatusLabel()}
               </span>
             )}
 
@@ -388,7 +413,9 @@ export default function ShopProfilePage() {
                 ) : (
                   <Power className="w-4 h-4" />
                 )}
-                {currentShop.isActive ? "Deactivate Store" : "Reactivate Store"}
+                {currentShop.isActive
+                  ? t("actions.deactivateStore")
+                  : t("actions.reactivateStore")}
               </button>
             )}
           </div>
@@ -398,7 +425,7 @@ export default function ShopProfilePage() {
         {currentShop?.adminNote && currentShop.status === 3 && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-5">
             <div className="flex items-start gap-3 text-red-700">
-              <div className="font-semibold text-sm">Review Note:</div>
+              <div className="font-semibold text-sm">{t("reviewNote")}</div>
               <p className="text-sm flex-1">{currentShop.adminNote}</p>
             </div>
           </div>
@@ -436,22 +463,22 @@ export default function ShopProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <InputLabel
-                    label="Shop Name"
+                    label={t("fields.shopName")}
                     error={errors.shopName?.message}
                     required
                   />
                   <input
                     {...register("shopName")}
                     className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-all text-sm"
-                    placeholder="Enter your brand name"
+                    placeholder={t("placeholders.shopName")}
                   />
                 </div>
                 <div>
-                  <InputLabel label="Slogan / Bio" />
+                  <InputLabel label={t("fields.bio")} />
                   <input
                     {...register("bio")}
                     className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-all text-sm"
-                    placeholder="A short description of your shop"
+                    placeholder={t("placeholders.bio")}
                   />
                 </div>
               </div>
@@ -465,45 +492,45 @@ export default function ShopProfilePage() {
                 <User className="text-blue-600 w-5 h-5" />
               </div>
               <h3 className="text-lg font-semibold text-neutral-900">
-                Contact Details
+                {t("sections.contactDetails")}
               </h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <InputLabel
-                  label="Contact Email"
+                  label={t("fields.contactEmail")}
                   error={errors.contactEmail?.message}
                   required
                 />
                 <input
                   {...register("contactEmail")}
                   className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-all text-sm"
-                  placeholder="contact@domain.com"
+                  placeholder={t("placeholders.contactEmail")}
                 />
               </div>
               <div>
                 <InputLabel
-                  label="Phone Number"
+                  label={t("fields.phoneNumber")}
                   error={errors.phoneNumber?.message}
                   required
                 />
                 <input
                   {...register("phoneNumber")}
                   className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-all text-sm"
-                  placeholder="09xxx..."
+                  placeholder={t("placeholders.phoneNumber")}
                 />
               </div>
               <div className="md:col-span-2">
                 <InputLabel
-                  label="Full Address"
+                  label={t("fields.address")}
                   error={errors.address?.message}
                   required
                 />
                 <input
                   {...register("address")}
                   className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-all text-sm"
-                  placeholder="Street, Ward, District, City"
+                  placeholder={t("placeholders.address")}
                 />
               </div>
             </div>
@@ -516,16 +543,16 @@ export default function ShopProfilePage() {
                 <CreditCard className="text-emerald-600 w-5 h-5" />
               </div>
               <h3 className="text-lg font-semibold text-neutral-900 flex-1">
-                Banking Details
+                {t("sections.bankingDetails")}
               </h3>
               <span className="text-[11px] font-medium text-neutral-500 bg-neutral-100 px-2.5 py-1 rounded-md">
-                Read Only
+                {t("readOnly")}
               </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <InputLabel label="Bank Name" />
+                <InputLabel label={t("fields.bankName")} />
                 <input
                   {...register("bankName")}
                   className="w-full px-4 py-2.5 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-500 transition-all text-sm"
@@ -533,7 +560,7 @@ export default function ShopProfilePage() {
                 />
               </div>
               <div>
-                <InputLabel label="Account Number" />
+                <InputLabel label={t("fields.bankAccountNumber")} />
                 <input
                   {...register("bankAccountNumber")}
                   className="w-full px-4 py-2.5 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-500 transition-all font-mono text-sm"
@@ -541,7 +568,7 @@ export default function ShopProfilePage() {
                 />
               </div>
               <div className="md:col-span-2">
-                <InputLabel label="Account Holder Name" />
+                <InputLabel label={t("fields.bankAccountName")} />
                 <input
                   {...register("bankAccountName")}
                   className="w-full px-4 py-2.5 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-500 transition-all text-sm"
@@ -559,24 +586,30 @@ export default function ShopProfilePage() {
                   <Store className="text-violet-600 w-5 h-5" />
                 </div>
                 <h3 className="text-lg font-semibold text-neutral-900">
-                  Shop Statistics
+                  {t("sections.shopStatistics")}
                 </h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-neutral-50 rounded-xl p-5 border border-neutral-100 flex flex-col justify-center items-center">
-                  <p className="text-sm text-neutral-500 mb-1">Rating</p>
+                  <p className="text-sm text-neutral-500 mb-1">
+                    {t("stats.rating")}
+                  </p>
                   <p className="text-2xl font-bold text-neutral-900">
-                    {currentShop.rating?.toFixed(1) || "N/A"}
+                    {currentShop.rating?.toFixed(1) || t("stats.na")}
                   </p>
                 </div>
                 <div className="bg-neutral-50 rounded-xl p-5 border border-neutral-100 flex flex-col justify-center items-center">
-                  <p className="text-sm text-neutral-500 mb-1">Total Orders</p>
+                  <p className="text-sm text-neutral-500 mb-1">
+                    {t("stats.totalOrders")}
+                  </p>
                   <p className="text-2xl font-bold text-neutral-900">
                     {currentShop.totalSales ?? 0}
                   </p>
                 </div>
                 <div className="bg-neutral-50 rounded-xl p-5 border border-neutral-100 flex flex-col justify-center items-center">
-                  <p className="text-sm text-neutral-500 mb-1">Total Revenue</p>
+                  <p className="text-sm text-neutral-500 mb-1">
+                    {t("stats.totalRevenue")}
+                  </p>
                   <p className="text-2xl font-bold text-green-600">
                     {currentShop.totalRevenue?.toLocaleString() ?? 0}₫
                   </p>
@@ -595,12 +628,12 @@ export default function ShopProfilePage() {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Saving Changes...
+                  {t("actions.savingChanges")}
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4" />
-                  Save Changes
+                  {t("actions.saveChanges")}
                 </>
               )}
             </button>

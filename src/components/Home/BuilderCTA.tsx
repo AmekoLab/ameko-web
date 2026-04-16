@@ -66,7 +66,7 @@ export const BuilderCTA: FC = () => {
             {/* CTA Button */}
             <div className="pt-4">
               <Link
-                href="/builder"
+                href="/custom-build"
                 className="inline-flex items-center justify-center bg-amazon-btnPrimary text-amazon-text px-10 py-4 text-sm font-bold uppercase tracking-widest hover:brightness-95 transition-all duration-300 rounded-md shadow-sm"
               >
                 {t("ctaText")}

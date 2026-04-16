@@ -21,12 +21,14 @@ export default function WalletPage() {
   const dispatch = useAppDispatch();
   const pathname = usePathname();
   const { details, loading, hasPin } = useAppSelector((state) => state.wallet);
+  const { user } = useAppSelector((state) => state.auth);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [isResetPinOpen, setIsResetPinOpen] = useState(false);
   const [isChangePinOpen, setIsChangePinOpen] = useState(false);
   const [isHeldOpen, setIsHeldOpen] = useState(false);
 
-  const isCustomer = !pathname?.startsWith("/shop");
+  // Code mới đã fix
+  const isCustomer = user?.role !== "Shop";
 
   useEffect(() => {
     dispatch(fetchWalletDetails());
@@ -42,7 +44,7 @@ export default function WalletPage() {
         <div className="bg-white rounded-2xl shadow-xl border border-neutral-100 p-10 max-w-md w-full text-center relative overflow-hidden">
           {/* Decorative background element */}
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-          
+
           {/* Icon */}
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-neutral-50 border border-neutral-100 relative z-10 shadow-sm">
             <Wallet className="h-10 w-10 text-neutral-400" />
@@ -90,7 +92,9 @@ export default function WalletPage() {
           </div>
           {t("pageTitle")}
         </h1>
-        <p className="mt-2 text-sm text-neutral-500 font-medium">{t("pageDesc")}</p>
+        <p className="mt-2 text-sm text-neutral-500 font-medium">
+          {t("pageDesc")}
+        </p>
       </div>
 
       {/* ─── PIN Security Alert (Shop only) ──────────────────────── */}
@@ -98,14 +102,14 @@ export default function WalletPage() {
         <div className="flex items-start gap-4 rounded-2xl bg-yellow-50/80 border border-yellow-200 p-5 mb-8 shadow-sm relative overflow-hidden group">
           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-yellow-400"></div>
           <div className="bg-yellow-100 p-2 rounded-lg shrink-0 border border-yellow-200 group-hover:scale-105 transition-transform">
-             <ShieldAlert className="h-5 w-5 text-yellow-600" />
+            <ShieldAlert className="h-5 w-5 text-yellow-600" />
           </div>
           <div className="flex-1">
             <p className="text-sm font-semibold text-yellow-900 leading-snug mb-1.5">
               {t("securityIncomplete")}
             </p>
             <p className="text-sm text-yellow-800/80 mb-3">
-               {t("securityIncompleteDesc")}
+              {t("securityIncompleteDesc")}
             </p>
             <Link
               href="/shop/wallet/pin/setup"
@@ -135,23 +139,29 @@ export default function WalletPage() {
                 <p className="text-4xl font-bold tracking-tight text-amazon-price">
                   {details?.balance?.toLocaleString("vi-VN") ?? 0}
                 </p>
-                <span className="text-xl font-bold text-amazon-price/80">₫</span>
+                <span className="text-xl font-bold text-amazon-price/80">
+                  ₫
+                </span>
               </div>
             </div>
           </div>
         </div>
-        
+
         {/* Pending Balance Strip */}
         <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-100 flex items-center justify-between mb-8 relative z-10">
-            <span className="text-sm font-semibold text-neutral-600">{t("pendingEscrowBalance")}</span>
-            <button
-               type="button"
-               onClick={() => setIsHeldOpen(true)}
-               className="text-base font-bold text-neutral-900 bg-white px-4 py-1.5 rounded-lg border border-neutral-200 shadow-sm hover:border-neutral-300 hover:shadow transition-all group-content"
-             >
-               {details?.heldBalance?.toLocaleString("vi-VN") ?? 0} ₫
-               <span className="ml-2 text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">{t("viewDetails")}</span>
-             </button>
+          <span className="text-sm font-semibold text-neutral-600">
+            {t("pendingEscrowBalance")}
+          </span>
+          <button
+            type="button"
+            onClick={() => setIsHeldOpen(true)}
+            className="text-base font-bold text-neutral-900 bg-white px-4 py-1.5 rounded-lg border border-neutral-200 shadow-sm hover:border-neutral-300 hover:shadow transition-all group-content"
+          >
+            {details?.heldBalance?.toLocaleString("vi-VN") ?? 0} ₫
+            <span className="ml-2 text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+              {t("viewDetails")}
+            </span>
+          </button>
         </div>
 
         {/* Action Buttons (Shop only) */}
@@ -170,7 +180,8 @@ export default function WalletPage() {
                 onClick={() => setIsChangePinOpen(true)}
                 className="w-full sm:w-auto rounded-xl bg-white border border-neutral-200 px-6 py-3.5 text-sm font-semibold text-neutral-700 transition-all hover:bg-neutral-50 hover:border-neutral-300 active:scale-[0.98] shadow-sm flex items-center justify-center gap-2"
               >
-                <Settings className="w-4 h-4 text-neutral-400 group-hover:rotate-45 transition-transform" /> {t("changePin")}
+                <Settings className="w-4 h-4 text-neutral-400 group-hover:rotate-45 transition-transform" />{" "}
+                {t("changePin")}
               </button>
             )}
           </div>

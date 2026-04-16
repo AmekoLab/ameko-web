@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
   fetchParts,
@@ -17,9 +18,6 @@ import {
   Keyboard,
   Box,
   Layers,
-  ToggleLeft,
-  CircleDot,
-  Grip,
   Plus,
   Eye,
   Pencil,
@@ -36,35 +34,31 @@ import CheckStockModal from "@/src/components/Shop/CheckStockModal";
 const PART_TYPE_CONFIG: Record<
   PartType,
   {
-    label: string;
     color: string;
     bgColor: string;
     icon: React.ComponentType<{ className?: string }>;
   }
 > = {
   kit: {
-    label: "Kit",
     color: "text-purple-700",
     bgColor: "bg-purple-50 border border-purple-200",
     icon: Keyboard,
   },
   component: {
-    label: "Component",
     color: "text-blue-700",
     bgColor: "bg-blue-50 border border-blue-200",
     icon: Box,
   },
   accessory: {
-    label: "Accessory",
     color: "text-emerald-700",
     bgColor: "bg-emerald-50 border border-emerald-200",
     icon: Layers,
   },
 };
 
-const STATUS_MAP: Record<number, { label: string; cls: string }> = {
-  1: { label: "Active", cls: "bg-neutral-100 text-amazon-text border border-amazon-border" },
-  0: { label: "Inactive", cls: "bg-red-50 text-red-600 border border-red-200" },
+const STATUS_MAP: Record<number, { cls: string }> = {
+  1: { cls: "bg-neutral-100 text-amazon-text border border-amazon-border" },
+  0: { cls: "bg-red-50 text-red-600 border border-red-200" },
 };
 
 function formatPrice(price: number) {
@@ -75,6 +69,7 @@ function formatPrice(price: number) {
 }
 
 export default function ShopPartsPage() {
+  const t = useTranslations("ShopPartsPage");
   const dispatch = useAppDispatch();
   const { parts, total, loading } = useAppSelector((state) => state.parts);
   const { currentShop } = useAppSelector((state) => state.shop);
@@ -196,6 +191,12 @@ export default function ShopPartsPage() {
     "accessory",
   ];
 
+  const getPartTypeLabel = (type: PartType) => {
+    if (type === "kit") return t("typeKit");
+    if (type === "component") return t("typeComponent");
+    return t("typeAccessory");
+  };
+
   return (
     <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary min-h-screen">
       <div className="max-w-[1440px] w-full mx-auto">
@@ -204,12 +205,12 @@ export default function ShopPartsPage() {
           <div>
             <h1 className="text-2xl font-bold text-amazon-text mb-1 flex items-center gap-2">
               {/* <Package className="w-7 h-7 text-amazon-textMuted" /> */}
-              Part Management
+              {t("pageTitle")}
             </h1>
             <p className="text-[13px] font-medium text-amazon-textMuted">
-              Manage your shop&apos;s parts and components.{" "}
-              <span className="font-bold text-amazon-text">{total}</span> parts
-              total.
+              {t("partsDescriptionPrefix")}{" "}
+              <span className="font-bold text-amazon-text">{total}</span>{" "}
+              {t("partsDescriptionSuffix")}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -218,14 +219,14 @@ export default function ShopPartsPage() {
               className="px-5 py-2 bg-white border border-amazon-border text-amazon-textMuted text-[13px] font-medium rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition flex items-center gap-2 shadow-sm"
             >
               <ClipboardCheck className="w-4 h-4" />
-              Check Stock
+              {t("checkStock")}
             </button>
             <button
               onClick={() => setIsCreateOpen(true)}
               className="px-5 py-2 bg-amazon-btnPrimary border border-amazon-border text-amazon-text text-[13px] font-medium rounded-sm hover:brightness-95 transition flex items-center gap-2 shadow-sm"
             >
               <Plus className="w-4 h-4" />
-              Create Part
+              {t("createPart")}
             </button>
           </div>
         </div>
@@ -272,7 +273,7 @@ export default function ShopPartsPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amazon-textMuted" />
             <input
               type="text"
-              placeholder="Search parts..."
+              placeholder={t("searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-3 py-2 border border-amazon-border rounded-sm text-[13px] font-medium bg-white text-amazon-text focus:outline-none focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary transition placeholder:text-neutral-400"
@@ -295,8 +296,10 @@ export default function ShopPartsPage() {
                         : "bg-white text-amazon-textMuted border-amazon-border hover:bg-neutral-50 hover:text-amazon-text"
                     }`}
                   >
-                    All
-                    <span className="ml-1 bg-white/40 border border-amazon-border/20 px-1 py-0.5 text-[11px] rounded-sm">{count}</span>
+                    {t("tabAll")}
+                    <span className="ml-1 bg-white/40 border border-amazon-border/20 px-1 py-0.5 text-[11px] rounded-sm">
+                      {count}
+                    </span>
                   </button>
                 );
               }
@@ -312,8 +315,10 @@ export default function ShopPartsPage() {
                   }`}
                 >
                   <cfg.icon className="w-3.5 h-3.5" />
-                  {cfg.label}
-                  <span className="bg-white/40 border border-amazon-border/20 px-1 py-0.5 text-[11px] rounded-sm">{count}</span>
+                  {getPartTypeLabel(type)}
+                  <span className="bg-white/40 border border-amazon-border/20 px-1 py-0.5 text-[11px] rounded-sm">
+                    {count}
+                  </span>
                 </button>
               );
             })}
@@ -322,12 +327,14 @@ export default function ShopPartsPage() {
           {/* Addon filter */}
           <select
             value={addonFilter}
-            onChange={(e) => setAddonFilter(e.target.value as "all" | "yes" | "no")}
+            onChange={(e) =>
+              setAddonFilter(e.target.value as "all" | "yes" | "no")
+            }
             className="px-3 py-2 text-[13px] font-medium border border-amazon-border rounded-sm bg-white text-amazon-text focus:outline-none focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary transition"
           >
-            <option value="all">Addon: All</option>
-            <option value="yes">Addon Eligible</option>
-            <option value="no">Not Addon</option>
+            <option value="all">{t("addonAll")}</option>
+            <option value="yes">{t("addonEligible")}</option>
+            <option value="no">{t("addonNotAddon")}</option>
           </select>
         </div>
 
@@ -335,26 +342,26 @@ export default function ShopPartsPage() {
         <div className="bg-white rounded-sm border border-amazon-border overflow-hidden shadow-sm">
           {loading ? (
             <div className="p-12 text-center text-[13px] font-medium text-amazon-textMuted">
-              Loading parts...
+              {t("loadingParts")}
             </div>
           ) : filteredParts.length === 0 ? (
             <div className="p-12 text-center text-[13px] font-medium text-amazon-textMuted">
-              No parts found.
+              {t("noPartsFound")}
             </div>
           ) : (
             <div className="min-w-full overflow-x-auto">
               <table className="w-full text-[13px] font-medium text-left">
                 <thead className="bg-neutral-50 text-[11px] font-medium text-amazon-textMuted border-b border-amazon-border">
                   <tr>
-                    <th className="px-3 py-3">Part</th>
-                    <th className="px-2 py-2">Type</th>
-                    <th className="px-2 py-2">Category</th>
-                    <th className="px-3 py-3 text-right">Price</th>
-                    <th className="px-3 py-3 text-right">Stock</th>
-                    <th className="px-2 py-2 text-center">Status</th>
-                    <th className="px-2 py-2 text-center">Addon</th>
-                    <th className="px-2 py-2">Recipe</th>
-                    <th className="px-2 py-2 text-center">Actions</th>
+                    <th className="px-3 py-3">{t("colPart")}</th>
+                    <th className="px-2 py-2">{t("colType")}</th>
+                    <th className="px-2 py-2">{t("colCategory")}</th>
+                    <th className="px-3 py-3 text-right">{t("colPrice")}</th>
+                    <th className="px-3 py-3 text-right">{t("colStock")}</th>
+                    <th className="px-2 py-2 text-center">{t("colStatus")}</th>
+                    <th className="px-2 py-2 text-center">{t("colAddon")}</th>
+                    <th className="px-2 py-2">{t("colRecipe")}</th>
+                    <th className="px-2 py-2 text-center">{t("colActions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-amazon-border text-[13px]">
@@ -389,17 +396,30 @@ function PartRow({
   onEdit: (slug: string) => void;
   onDelete: (part: PartItem) => void;
 }) {
+  const t = useTranslations("ShopPartsPage");
   const typeCfg = PART_TYPE_CONFIG[part.partType] ?? {
-    label: part.partType,
     color: "text-neutral-700",
     bgColor: "bg-neutral-100 border border-amazon-border",
     icon: Package,
   };
+  const typeLabel =
+    part.partType === "kit"
+      ? t("typeKit")
+      : part.partType === "component"
+        ? t("typeComponent")
+        : part.partType === "accessory"
+          ? t("typeAccessory")
+          : part.partType;
   const TypeIcon = typeCfg.icon;
   const statusInfo = STATUS_MAP[part.status] || {
-    label: "Unknown",
     cls: "bg-neutral-100 text-neutral-600 border border-amazon-border",
   };
+  const statusLabel =
+    part.status === 1
+      ? t("statusActive")
+      : part.status === 0
+        ? t("statusInactive")
+        : t("statusUnknown");
 
   const hasRecipe =
     part.recipeSwitchCount > 0 || part.recipeStabilizerCount > 0;
@@ -425,8 +445,12 @@ function PartRow({
             )}
           </div>
           <div className="min-w-0 max-w-[120px] lg:max-w-[200px]">
-            <p className="font-medium text-amazon-text text-[13px] truncate">{part.name}</p>
-            <p className="text-[12px] text-amazon-textMuted truncate">{part.slug}</p>
+            <p className="font-medium text-amazon-text text-[13px] truncate">
+              {part.name}
+            </p>
+            <p className="text-[12px] text-amazon-textMuted truncate">
+              {part.slug}
+            </p>
           </div>
         </div>
       </td>
@@ -437,7 +461,7 @@ function PartRow({
           className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-sm ${typeCfg.bgColor} ${typeCfg.color}`}
         >
           <TypeIcon className="w-2.5 h-2.5" />
-          {typeCfg.label}
+          {typeLabel}
         </span>
       </td>
 
@@ -475,7 +499,7 @@ function PartRow({
         <span
           className={`text-[11px] px-2 py-0.5 rounded-sm font-medium ${statusInfo.cls}`}
         >
-          {statusInfo.label}
+          {statusLabel}
         </span>
       </td>
 
@@ -484,7 +508,7 @@ function PartRow({
         {part.isAddonEligible ? (
           <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-sm bg-orange-50 text-orange-700 border border-orange-200">
             <Puzzle className="w-2.5 h-2.5" />
-            Addon
+            {t("addonLabel")}
           </span>
         ) : (
           <span className="text-neutral-300 font-medium">—</span>
@@ -496,11 +520,11 @@ function PartRow({
         {hasRecipe ? (
           <div className="text-[11px] font-medium text-amazon-textMuted space-y-0.5">
             {part.recipeSwitchCount > 0 && (
-               <p>
+              <p>
                 <span className="text-amazon-text font-medium border border-amazon-border px-1 py-[1px] bg-white rounded-[2px] shadow-sm">
                   {part.recipeSwitchCount}
                 </span>{" "}
-                switches
+                {t("recipeSwitches")}
               </p>
             )}
             {part.recipeStabilizerCount > 0 && (
@@ -508,7 +532,7 @@ function PartRow({
                 <span className="text-amazon-text font-medium border border-amazon-border px-1 py-[1px] bg-white rounded-[2px] shadow-sm">
                   {part.recipeStabilizerCount}
                 </span>{" "}
-                stabs
+                {t("recipeStabs")}
               </p>
             )}
           </div>
@@ -523,21 +547,21 @@ function PartRow({
           <button
             onClick={() => onView(part.slug)}
             className="p-1 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 hover:border-amazon-btnPrimary text-amazon-textMuted hover:text-amazon-text transition shrink-0"
-            title="View part"
+            title={t("viewPart")}
           >
             <Eye className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onEdit(part.slug)}
             className="p-1 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 hover:border-blue-500 text-amazon-textMuted hover:text-blue-500 transition shrink-0"
-            title="Edit part"
+            title={t("editPart")}
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onDelete(part)}
             className="p-1 rounded-sm border border-amazon-border bg-white hover:bg-red-50 hover:border-red-500 text-amazon-textMuted hover:text-red-500 transition shrink-0"
-            title="Delete part"
+            title={t("deletePart")}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>

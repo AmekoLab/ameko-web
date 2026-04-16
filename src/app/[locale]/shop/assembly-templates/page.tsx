@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
-  ListOrdered,
   Plus,
   Pencil,
   Trash2,
@@ -11,39 +10,41 @@ import {
   XCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 import { assemblyService } from "@/src/services/assembly.service";
 import { AssemblyTemplate } from "@/src/types/assembly.types";
 import AssemblyTemplateFormModal from "./AssemblyTemplateFormModal";
 import DeleteTemplateModal from "./DeleteTemplateModal";
 
 export default function AssemblyTemplatesPage() {
+  const t = useTranslations("ShopAssemblyTemplatesPage");
   const [templates, setTemplates] = useState<AssemblyTemplate[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<AssemblyTemplate | null>(null);
+  const [editingTemplate, setEditingTemplate] =
+    useState<AssemblyTemplate | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [deletingTemplate, setDeletingTemplate] = useState<AssemblyTemplate | null>(null);
+  const [deletingTemplate, setDeletingTemplate] =
+    useState<AssemblyTemplate | null>(null);
 
-  const fetchTemplates = async () => {
+  const fetchTemplates = useCallback(async () => {
     try {
       const res = await assemblyService.getShopTemplates();
       if (res.success && res.data) {
-        const sorted = [...res.data].sort(
-          (a, b) => a.stepOrder - b.stepOrder,
-        );
+        const sorted = [...res.data].sort((a, b) => a.stepOrder - b.stepOrder);
         setTemplates(sorted);
       }
     } catch {
-      toast.error("Failed to load assembly templates.");
+      toast.error(t("toast.loadFailed"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
-    fetchTemplates();
-  }, []);
+    void fetchTemplates();
+  }, [fetchTemplates]);
 
   return (
     <div className="max-w-[1440px] w-full mx-auto">
@@ -51,9 +52,8 @@ export default function AssemblyTemplatesPage() {
         {/* ── Header ── */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            {/* <ListOrdered className="w-8 h-8 text-amazon-link" /> */}
             <h1 className="text-2xl font-bold text-amazon-text flex items-center gap-3">
-              Assembly Templates
+              {t("header.title")}
             </h1>
           </div>
 
@@ -66,7 +66,7 @@ export default function AssemblyTemplatesPage() {
             className="flex items-center gap-2 bg-amazon-btnPrimary text-amazon-text font-medium text-sm px-4 py-2.5 rounded-md hover:brightness-95 transition-all duration-150 shadow-sm"
           >
             <Plus size={16} />
-            Create Template
+            {t("actions.createTemplate")}
           </button>
         </div>
 
@@ -74,15 +74,12 @@ export default function AssemblyTemplatesPage() {
         <div className="bg-white border border-amazon-border rounded-md shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2
-                size={32}
-                className="animate-spin text-amazon-link"
-              />
+              <Loader2 size={32} className="animate-spin text-amazon-link" />
             </div>
           ) : templates.length === 0 ? (
             <div className="flex items-center justify-center py-20">
               <p className="text-amazon-textMuted text-sm font-medium">
-                No assembly templates found.
+                {t("empty.noTemplates")}
               </p>
             </div>
           ) : (
@@ -90,21 +87,21 @@ export default function AssemblyTemplatesPage() {
               <thead>
                 <tr className="border-b border-amazon-border bg-neutral-50">
                   <th className="text-left px-6 py-4 text-xs font-semibold text-amazon-textMuted">
-                    Order
+                    {t("table.order")}
                   </th>
                   <th className="text-left px-6 py-4 text-xs font-semibold text-amazon-textMuted">
-                    Step Name
+                    {t("table.stepName")}
                   </th>
                   <th className="text-left px-6 py-4 text-xs font-semibold text-amazon-textMuted">
-                    Required
+                    {t("table.required")}
                   </th>
                   <th className="text-right px-6 py-4 text-xs font-semibold text-amazon-textMuted">
-                    Actions
+                    {t("table.actions")}
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {templates.map((template, idx) => (
+                {templates.map((template) => (
                   <tr
                     key={template.templateId}
                     className="bg-white border-b border-amazon-border last:border-0 hover:bg-neutral-50 transition-colors duration-100"
@@ -128,12 +125,12 @@ export default function AssemblyTemplatesPage() {
                       {template.isRequired ? (
                         <span className="inline-flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-700 px-2.5 py-1 rounded-md text-xs font-semibold">
                           <CheckCircle size={14} />
-                          Required
+                          {t("badges.required")}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-600 px-2.5 py-1 rounded-md text-xs font-semibold">
                           <XCircle size={14} />
-                          Optional
+                          {t("badges.optional")}
                         </span>
                       )}
                     </td>
@@ -147,7 +144,7 @@ export default function AssemblyTemplatesPage() {
                             setIsFormOpen(true);
                           }}
                           className="p-2 rounded-md text-amazon-textMuted hover:text-amazon-text hover:bg-neutral-100 transition-all duration-150"
-                          title="Edit"
+                          title={t("tooltips.edit")}
                         >
                           <Pencil size={16} />
                         </button>
@@ -157,7 +154,7 @@ export default function AssemblyTemplatesPage() {
                             setIsDeleteOpen(true);
                           }}
                           className="p-2 rounded-md text-amazon-textMuted hover:text-red-600 hover:bg-red-50 transition-all duration-150"
-                          title="Delete"
+                          title={t("tooltips.delete")}
                         >
                           <Trash2 size={16} />
                         </button>

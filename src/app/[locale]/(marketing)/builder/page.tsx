@@ -31,6 +31,7 @@ import { partService } from "@/src/services/part.service";
 import { orderService } from "@/src/services/order.service";
 import { toast } from "react-toastify";
 import { Logo } from "@/src/components/Header/Logo";
+import { useTranslations } from "next-intl";
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 const getZIndex = (categorySlug?: string) => {
@@ -50,7 +51,7 @@ const formatKeycapPosition = (rawName: string) => {
     /\(Position:\s*R(\d+)-([^-]+)-\d+\)/g,
     (_, rowNum, keyName) => {
       return `(Position: ${keyName} - Row ${rowNum})`;
-    }
+    },
   );
 };
 
@@ -164,9 +165,7 @@ const Visualizer = memo(
         {/* Empty-state: show nothing when no layers — Corsair style */}
         {!hasAnySelection && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div
-              className="w-64 h-40 rounded-sm border border-amazon-border bg-neutral-100 shadow-sm"
-            />
+            <div className="w-64 h-40 rounded-sm border border-amazon-border bg-neutral-100 shadow-sm" />
           </div>
         )}
       </div>
@@ -189,63 +188,74 @@ const ProductItem = memo(
     isOutOfStock: boolean;
     onClick: (p: BuilderProduct) => void;
     onHover?: (p: BuilderProduct) => void;
-  }) => (
-    <div
-      onClick={() => !isOutOfStock && onClick(product)}
-      onMouseEnter={() => !isOutOfStock && onHover?.(product)}
-      className={`group flex flex-col items-center gap-2.5 select-none transition-all ${
-        isOutOfStock ? "opacity-40 cursor-not-allowed grayscale" : "cursor-pointer"
-      }`}
-    >
-      {/* Circle */}
-      <div
-        className={`
-          w-24 h-24 rounded-full relative overflow-hidden flex-shrink-0
-          transition-all duration-150 ease-out flex items-center justify-center bg-white
-          ${
-            isSelected
-              ? "border-[2.5px] border-amazon-focus shadow-md ring-1 ring-amazon-focus/20"
-              : "border border-amazon-border hover:border-neutral-400 shadow-sm"
-          }
-        `}
-      >
-        <Image
-          src={product.thumbnailUrl}
-          alt={product.name}
-          fill
-          className="object-contain p-2.5 group-hover:scale-105 transition-transform duration-200"
-          sizes="96px"
-          loading="lazy"
-        />
-      </div>
+  }) => {
+    const t = useTranslations("BuilderPage");
 
-      {/* Label */}
-      <div className="text-center w-full px-0.5">
-        <p
-          className={`text-[11px] font-black uppercase tracking-wide leading-tight transition-colors ${
-            isSelected ? "text-amazon-text" : "text-amazon-textMuted group-hover:text-amazon-text"
-          }`}
+    return (
+      <div
+        onClick={() => !isOutOfStock && onClick(product)}
+        onMouseEnter={() => !isOutOfStock && onHover?.(product)}
+        className={`group flex flex-col items-center gap-2.5 select-none transition-all ${
+          isOutOfStock
+            ? "opacity-40 cursor-not-allowed grayscale"
+            : "cursor-pointer"
+        }`}
+      >
+        {/* Circle */}
+        <div
+          className={`
+            w-24 h-24 rounded-full relative overflow-hidden flex-shrink-0
+            transition-all duration-150 ease-out flex items-center justify-center bg-white
+            ${
+              isSelected
+                ? "border-[2.5px] border-amazon-focus shadow-md ring-1 ring-amazon-focus/20"
+                : "border border-amazon-border hover:border-neutral-400 shadow-sm"
+            }
+          `}
         >
-          {product.name}
-        </p>
-        {isOutOfStock ? (
-          <p className="text-[11px] text-red-500 font-black mt-0.5 uppercase tracking-widest">Out of stock</p>
-        ) : (
-          <p className="text-[11px] text-amazon-price font-bold mt-0.5">
-            {product.price > 0
-              ? `+${product.price.toLocaleString()}₫`
-              : "Included"}
+          <Image
+            src={product.thumbnailUrl}
+            alt={product.name}
+            fill
+            className="object-contain p-2.5 group-hover:scale-105 transition-transform duration-200"
+            sizes="96px"
+            loading="lazy"
+          />
+        </div>
+
+        {/* Label */}
+        <div className="text-center w-full px-0.5">
+          <p
+            className={`text-[11px] font-black uppercase tracking-wide leading-tight transition-colors ${
+              isSelected
+                ? "text-amazon-text"
+                : "text-amazon-textMuted group-hover:text-amazon-text"
+            }`}
+          >
+            {product.name}
           </p>
-        )}
+          {isOutOfStock ? (
+            <p className="text-[11px] text-red-500 font-black mt-0.5 uppercase tracking-widest">
+              {t("outOfStock")}
+            </p>
+          ) : (
+            <p className="text-[11px] text-amazon-price font-bold mt-0.5">
+              {product.price > 0
+                ? `+${product.price.toLocaleString()}₫`
+                : t("included")}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
-  ),
+    );
+  },
 );
 ProductItem.displayName = "ProductItem";
 
 // ─── KIT CARD ───────────────────────────────────────────────────────────────
 const KitCard = memo(
   ({ kit, onClick }: { kit: PartItem; onClick: (kit: PartItem) => void }) => {
+    const t = useTranslations("BuilderPage");
     const specs = kit.specifications ? JSON.parse(kit.specifications) : null;
 
     return (
@@ -253,9 +263,7 @@ const KitCard = memo(
         onClick={() => onClick(kit)}
         className="group cursor-pointer border border-amazon-border bg-white rounded-sm p-5 hover:border-amazon-focus transition-all duration-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 shadow-sm"
       >
-        <div
-          className="relative w-full aspect-[4/3] rounded-sm overflow-hidden mb-5 border border-amazon-border bg-neutral-100"
-        >
+        <div className="relative w-full aspect-[4/3] rounded-sm overflow-hidden mb-5 border border-amazon-border bg-neutral-100">
           {kit.thumbnailUrl ? (
             <Image
               src={kit.thumbnailUrl}
@@ -280,17 +288,13 @@ const KitCard = memo(
             {kit.description}
           </p>
         )}
-        <div
-          className="flex items-center justify-between mt-4 pt-3 border-t border-amazon-border"
-        >
+        <div className="flex items-center justify-between mt-4 pt-3 border-t border-amazon-border">
           <span className="text-amazon-price font-black text-xl tracking-tight">
             {kit.price.toLocaleString()}₫
           </span>
           {specs?.workflow && (
-            <span
-              className="text-[10px] text-amazon-textMuted bg-neutral-100 uppercase font-bold px-2 py-1 rounded-sm border border-amazon-border"
-            >
-              {specs.workflow.length} steps
+            <span className="text-[10px] text-amazon-textMuted bg-neutral-100 uppercase font-bold px-2 py-1 rounded-sm border border-amazon-border">
+              {t("steps", { n: specs.workflow.length })}
             </span>
           )}
         </div>
@@ -302,6 +306,7 @@ KitCard.displayName = "KitCard";
 
 // ─── MAIN BUILDER CONTENT ───────────────────────────────────────────────────
 function BuilderContent() {
+  const t = useTranslations("BuilderPage");
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -311,7 +316,6 @@ function BuilderContent() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
   const [stockMap, setStockMap] = useState<Record<string, number>>({});
-
 
   const {
     loadingKits,
@@ -328,10 +332,16 @@ function BuilderContent() {
   } = useAppSelector((state) => state.builder);
 
   const shopId = searchParams.get("shopId");
-// ─── TÍNH TOÁN GIÁ TIỀN (Có khiên bảo vệ session) ───
-  const baseKitPrice = session ? baseKits.find((k) => k.id === session.kitId)?.price ?? 0 : 0;
+  // ─── TÍNH TOÁN GIÁ TIỀN (Có khiên bảo vệ session) ───
+  const baseKitPrice = session
+    ? (baseKits.find((k) => k.id === session.kitId)?.price ?? 0)
+    : 0;
   const addOnsTotal = session ? session.totalPrice - baseKitPrice : 0;
-const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !workflowSteps.includes(step)) : false;
+  const hasArtisanAddons = session
+    ? Object.keys(session.selection).some(
+        (step) => !workflowSteps.includes(step),
+      )
+    : false;
   // State 0: Fetch kits on mount when no session exists
   useEffect(() => {
     if (!session && shopId) {
@@ -382,7 +392,7 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
   }, [currentProducts]);
 
   // ─── Post-Task Upsell Sequence ────────────────────────────────────────────
- useEffect(() => {
+  useEffect(() => {
     // Sửa điều kiện: Chỉ hiện marketing khi ở summary VÀ CHƯA mua Artisan
     if (currentStepName === "summary" && !hasArtisanAddons) {
       setShowSuccess(true);
@@ -465,24 +475,24 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
         builderSessionId: session.id,
       });
       if (res.success) {
-        toast.success(res.message || "Item added to cart successfully!");
+        toast.success(res.message || t("addToCartSuccess"));
         router.push("/cart");
       } else {
-        toast.error(res.message || "Failed to add to cart");
+        toast.error(res.message || t("addToCartError"));
       }
     } catch (error: unknown) {
       const err = error as { message?: string };
-      toast.error(err.message || "Failed to add to cart");
+      toast.error(err.message || t("addToCartError"));
     } finally {
       setAddingToCart(false);
     }
-  }, [session, addingToCart, router]);
+  }, [session, addingToCart, router, t]);
 
   const handleReset = useCallback(() => {
-    if (confirm("Reset toàn bộ cấu hình?")) {
+    if (confirm(t("resetConfirm"))) {
       dispatch(resetBuilder());
     }
-  }, [dispatch]);
+  }, [dispatch, t]);
 
   const handleLogoClick = useCallback(() => {
     window.location.href = "/";
@@ -533,7 +543,7 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
 
     // Virtual Summary step — appears at the end of the nav bar
     steps.push({
-      name: "Build Summary",
+      name: t("buildSummary"),
       slug: "summary",
       index: workflowSteps.length + 1,
       isActive: currentStepName === "summary",
@@ -541,7 +551,7 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
     });
 
     return steps;
-  }, [workflowSteps, currentStepName, session]);
+  }, [workflowSteps, currentStepName, session, t]);
 
   const currentStepIndex = workflowSteps.findIndex(
     (s) => s === currentStepName,
@@ -556,7 +566,7 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
     }
 
     if (!session.selection[currentStepName || ""]) {
-      toast.warning("Please select a component before proceeding.");
+      toast.warning(t("selectComponentWarning"));
       return;
     }
 
@@ -566,7 +576,15 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
     } else {
       dispatch(setActiveStep("summary"));
     }
-  }, [session, processing, currentStepName, workflowSteps, dispatch, handleAddToCart]);
+  }, [
+    session,
+    processing,
+    currentStepName,
+    workflowSteps,
+    dispatch,
+    handleAddToCart,
+    t,
+  ]);
 
   // BACK: go to previous step or reset to kit selection
   const handleBackStep = useCallback(() => {
@@ -582,7 +600,14 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
     } else {
       dispatch(setActiveStep(workflowSteps[idx - 1]));
     }
-  }, [session, processing, currentStepName, workflowSteps, dispatch, handleReset]);
+  }, [
+    session,
+    processing,
+    currentStepName,
+    workflowSteps,
+    dispatch,
+    handleReset,
+  ]);
 
   // =============================================
   // STATE 0: Kit Selection (no session)
@@ -591,25 +616,26 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
     return (
       <div className="min-h-screen flex flex-col text-amazon-text bg-amazon-bgSecondary">
         {/* HEADER */}
-        <div
-          className="h-16 flex items-center justify-between px-6 lg:px-10 z-50 shrink-0 bg-white border-b border-amazon-border shadow-sm"
-        >
+        <div className="h-16 flex items-center justify-between px-6 lg:px-10 z-50 shrink-0 bg-white border-b border-amazon-border shadow-sm">
           <div
             onClick={handleLogoClick}
             className="flex flex-col cursor-pointer select-none"
           >
-              <div className="brightness-0 invert-0">
-                  <Logo />
-              </div>
+            <div className="brightness-0 invert-0">
+              <Logo />
+            </div>
           </div>
           <h1 className="text-xs font-black uppercase tracking-[0.2em] text-amazon-textMuted">
-            Keyboard Builder
+            {t("keyboardBuilder")}
           </h1>
           <div />
         </div>
 
         {/* KIT GRID */}
-        <div className="flex-1 overflow-y-auto p-8 lg:p-4" style={GRID_BG_STYLE}>
+        <div
+          className="flex-1 overflow-y-auto p-8 lg:p-4"
+          style={GRID_BG_STYLE}
+        >
           {loadingKits ? (
             <div className="flex items-center justify-center h-[50vh]">
               <div className="animate-spin w-10 h-10 border-4 border-amazon-border border-t-amazon-btnSecondary rounded-full" />
@@ -621,7 +647,7 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                 onClick={() => shopId && dispatch(fetchBaseKits(shopId))}
                 className="px-6 py-2 bg-amazon-btnPrimary text-amazon-text font-black uppercase tracking-widest shadow-sm rounded-sm hover:brightness-95 transition-all text-sm"
               >
-                Retry
+                {t("retry")}
               </button>
             </div>
           ) : (
@@ -631,10 +657,10 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                   Ameko Custom Lab
                 </p>
                 <h2 className="text-4xl lg:text-5xl font-black text-amazon-text uppercase tracking-tight">
-                  Choose Your Kit
+                  {t("chooseYourKit")}
                 </h2>
                 <p className="text-amazon-textMuted font-bold mt-4 text-sm max-w-md mx-auto leading-relaxed">
-                  Select a base kit to start building your custom keyboard
+                  {t("chooseKitSubtitle")}
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -654,7 +680,7 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
   // =============================================
 
   // Kit display name for sidebar header
-  const kitDisplayName = "Custom Lab Edition";
+  const kitDisplayName = t("kitDisplayName");
 
   // Pricing breakdown for summary
   // const baseKitPrice = baseKits.find((k) => k.id === session.kitId)?.price ?? 0;
@@ -662,28 +688,33 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
 
   return (
     <div className="h-screen flex flex-col overflow-hidden text-amazon-text bg-amazon-bgSecondary">
-
       {/* ═══════════════════════════════════════
           HEADER — Corsair style
       ═══════════════════════════════════════ */}
-      <div
-        className="h-16 flex items-center z-50 shrink-0 px-4 gap-0 bg-white border-b border-amazon-border shadow-sm"
-      >
-       
+      <div className="h-16 flex items-center z-50 shrink-0 px-4 gap-0 bg-white border-b border-amazon-border shadow-sm">
         <button
           onClick={handleLogoClick}
           className="flex items-center gap-1.5 text-amazon-link text-[11px] font-black uppercase tracking-widest hover:underline transition-colors shrink-0 mr-6"
         >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-3.5 h-3.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2.5"
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
-          Exit Lab
+          {t("exitLab")}
         </button>
 
-      
         <div className="flex flex-col shrink-0 mr-8 select-none">
           <div className="brightness-0 invert-0">
-              <Logo />
+            <Logo />
           </div>
         </div>
 
@@ -712,7 +743,7 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                   }
                 `}
               >
-                {isSummary ? "Build Summary" : `${step.index}. ${step.name}`}
+                {isSummary ? step.name : `${step.index}. ${step.name}`}
               </button>
             );
           })}
@@ -723,40 +754,41 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
           MAIN CONTENT
       ═══════════════════════════════════════ */}
       <div className="flex-1 flex overflow-hidden">
-
         {/* ── LEFT: VISUALIZER ── */}
         <div
           className="flex-[62] relative flex flex-col items-center justify-center overflow-hidden"
           style={GRID_BG_STYLE}
         >
           {/* Radial vignette removed for light theme since we just want clean minimal white grid */}
-            <div
+          <div
             className="absolute inset-0 pointer-events-none z-0"
             style={{
               background:
                 "radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.65) 100%)",
-                backgroundImage:
-              "url('https://res.cloudinary.com/doezwafgz/image/upload/v1766677524/background_teui0y.png')",
+              backgroundImage:
+                "url('https://res.cloudinary.com/doezwafgz/image/upload/v1766677524/background_teui0y.png')",
               backgroundColor: "#1a1a1a",
-            backgroundSize: "cover",
+              backgroundSize: "cover",
             }}
           />
-          
+
           {/* Keyboard layers + Keymap Overlay */}
           <div className="relative z-50 w-full h-full flex items-center justify-center">
             <div className="relative w-full max-w-5xl aspect-[16/9] flex items-center justify-center">
               <Visualizer selection={session.selection} viewMode={viewMode} />
-              {viewMode === "top" && session.selection["keycap"] && isCustomizeMode && (
-                <KeymapOverlay
-                  onAddonSelected={handleAddonSelected}
-                  onAddonRemoved={handleAddonRemoved}
-                  selectedAddons={session.selection}
-                  availableAddons={availableAddons}
-                  isLoadingAddons={loadingAddons}
-                  fetchAddons={handleFetchAddons}
-                  isProcessing={processing}
-                />
-              )}
+              {viewMode === "top" &&
+                session.selection["keycap"] &&
+                isCustomizeMode && (
+                  <KeymapOverlay
+                    onAddonSelected={handleAddonSelected}
+                    onAddonRemoved={handleAddonRemoved}
+                    selectedAddons={session.selection}
+                    availableAddons={availableAddons}
+                    isLoadingAddons={loadingAddons}
+                    fetchAddons={handleFetchAddons}
+                    isProcessing={processing}
+                  />
+                )}
             </div>
           </div>
 
@@ -771,13 +803,20 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                 }}
                 className={`
                   px-4 py-2 font-black shadow-sm uppercase text-[10px] tracking-widest transition-all rounded-sm border
-                  ${viewMode === mode
-                    ? "bg-amazon-btnSecondary text-amazon-text border-amazon-border"
-                    : "bg-white text-amazon-textMuted hover:text-amazon-text border-amazon-border hover:bg-neutral-50"
+                  ${
+                    viewMode === mode
+                      ? "bg-amazon-btnSecondary text-amazon-text border-amazon-border"
+                      : "bg-white text-amazon-textMuted hover:text-amazon-text border-amazon-border hover:bg-neutral-50"
                   }
                 `}
               >
-                {mode} View
+                {
+                  {
+                    top: t("viewTop"),
+                    side: t("viewSide"),
+                    angled: t("viewAngled"),
+                  }[mode]
+                }
               </button>
             ))}
 
@@ -787,39 +826,46 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                 onClick={() => setIsCustomizeMode((prev) => !prev)}
                 className={`
                   px-4 py-2 font-black shadow-sm uppercase text-[10px] tracking-widest transition-all rounded-sm border flex items-center gap-1.5
-                  ${isCustomizeMode
-                    ? "bg-orange-400 text-white border-orange-500 shadow-md"
-                    : "bg-white text-amazon-textMuted hover:text-amazon-text border-amazon-border hover:bg-neutral-50"
+                  ${
+                    isCustomizeMode
+                      ? "bg-orange-400 text-white border-orange-500 shadow-md"
+                      : "bg-white text-amazon-textMuted hover:text-amazon-text border-amazon-border hover:bg-neutral-50"
                   }
                 `}
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
-                Customize
+                {t("customize")}
               </button>
             )}
           </div>
         </div>
 
         {/* ── RIGHT: CONFIGURATOR / SUMMARY ── */}
-        <div
-          className="hidden lg:flex flex-[38] flex-col z-10 bg-white border-l border-amazon-border shadow-2xl"
-        >
+        <div className="hidden lg:flex flex-[38] flex-col z-10 bg-white border-l border-amazon-border shadow-2xl">
           {currentStepName === "summary" ? (
             /* ─────────────────────────────────────
                SUMMARY VIEW
             ───────────────────────────────────── */
             <>
               {/* Header */}
-              <div
-                className="px-7 pt-4 pb-2 shrink-0 border-b border-amazon-border"
-              >
+              <div className="px-7 pt-4 pb-2 shrink-0 border-b border-amazon-border">
                 <p className="text-[9px] text-amazon-textMuted uppercase font-bold tracking-[0.3em] mb-1">
                   {kitDisplayName}
                 </p>
                 <h2 className="text-2xl font-black uppercase text-amazon-btnSecondary tracking-tight">
-                  Build Summary
+                  {t("buildSummary")}
                 </h2>
               </div>
 
@@ -831,11 +877,9 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                       key={stepName}
                       className="flex items-center gap-3 p-3 cursor-pointer transition-all group/bom"
                       onClick={() => handleStepClick(stepName)}
-                      title={`Edit ${stepName}`}
+                      title={t("editStep", { stepName })}
                     >
-                      <div
-                        className="w-14 h-14 relative shrink-0 overflow-hidden bg-neutral-100 rounded border border-amazon-border"
-                      >
+                      <div className="w-14 h-14 relative shrink-0 overflow-hidden bg-neutral-100 rounded border border-amazon-border">
                         <Image
                           src={part.thumbnailUrl}
                           alt={part.name}
@@ -852,10 +896,12 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                           {formatKeycapPosition(part.name)}
                         </h4>
                         <div className="text-amazon-price text-[11px] font-bold">
-                          <span className="text-amazon-textMuted mr-1">×{part.quantity} —</span>
+                          <span className="text-amazon-textMuted mr-1">
+                            ×{part.quantity} —
+                          </span>
                           {part.price > 0
                             ? `+${(part.price * part.quantity).toLocaleString()}₫`
-                            : "Included"}
+                            : t("included")}
                         </div>
                       </div>
                       <svg
@@ -878,21 +924,37 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                 {/* ── Post-Task Upsell Block ── */}
                 <div className="mt-4 flex flex-col items-center">
                   {/* Step 1: Success Message */}
-                  <div className={`transition-all duration-700 ease-out overflow-hidden ${showSuccess ? 'max-h-20 opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
+                  <div
+                    className={`transition-all duration-700 ease-out overflow-hidden ${showSuccess ? "max-h-20 opacity-100 mb-4" : "max-h-0 opacity-0"}`}
+                  >
                     <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-widest flex items-center gap-2 shadow-sm">
-                      <span>🎉</span> Basic configuration complete!
+                      {t("configComplete")}
                     </div>
                   </div>
 
                   {/* Step 2: The Upsell Button with Animated Arrow */}
-                  <div className={`transition-all duration-700 ease-out flex flex-col items-center w-full ${showUpsell ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+                  <div
+                    className={`transition-all duration-700 ease-out flex flex-col items-center w-full ${showUpsell ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}
+                  >
                     {/* Bouncing Arrow Pointing Down */}
                     <div className="animate-bounce text-orange-500 mb-1">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2.5"
+                          d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                        />
+                      </svg>
                     </div>
-                    
+
                     {/* The Button */}
-                    <button 
+                    <button
                       onClick={() => {
                         setViewMode("top");
                         setIsCustomizeMode(true);
@@ -900,8 +962,20 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                       className="w-full relative overflow-hidden group bg-gradient-to-r from-orange-500 to-orange-400 text-white font-black text-[12px] tracking-widest py-3.5 rounded-sm shadow-[0_4px_15px_rgba(249,115,22,0.4)] hover:shadow-[0_6px_20px_rgba(249,115,22,0.6)] transition-all active:scale-[0.98]"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-2">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
-                        Create unique highlight
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                          />
+                        </svg>
+                        {t("createHighlight")}
                       </span>
                     </button>
                   </div>
@@ -909,25 +983,31 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
               </div>
 
               {/* Footer — Subtotal breakdown + BACK / ADD TO CART */}
-              <div
-                className="shrink-0 px-7 py-6 bg-white border-t border-amazon-border"
-              >
+              <div className="shrink-0 px-7 py-6 bg-white border-t border-amazon-border">
                 {/* Breakdown */}
                 <div className="space-y-1 mb-4">
                   <div className="flex justify-between text-xs text-amazon-text font-bold">
-                    <span className="uppercase tracking-wider text-amazon-textMuted">Base Kit</span>
-                    <span>{baseKitPrice > 0 ? `${baseKitPrice.toLocaleString()}₫` : "Included"}</span>
+                    <span className="uppercase tracking-wider text-amazon-textMuted">
+                      {t("baseKit")}
+                    </span>
+                    <span>
+                      {baseKitPrice > 0
+                        ? `${baseKitPrice.toLocaleString()}₫`
+                        : t("included")}
+                    </span>
                   </div>
                   <div className="flex justify-between text-xs text-amazon-text font-bold">
-                    <span className="uppercase tracking-wider text-amazon-textMuted">Add-ons</span>
-                    <span>+{addOnsTotal > 0 ? addOnsTotal.toLocaleString() : "0"}₫</span>
+                    <span className="uppercase tracking-wider text-amazon-textMuted">
+                      {t("addOns")}
+                    </span>
+                    <span>
+                      +{addOnsTotal > 0 ? addOnsTotal.toLocaleString() : "0"}₫
+                    </span>
                   </div>
-                  <div
-                    className="my-2 border-t border-amazon-border"
-                  />
+                  <div className="my-2 border-t border-amazon-border" />
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase font-black tracking-[0.25em] text-amazon-textMuted">
-                      Subtotal
+                      {t("subtotal")}
                     </span>
                     <span className="text-amazon-price font-black text-2xl tracking-tight">
                       {session.totalPrice.toLocaleString()}₫
@@ -938,10 +1018,12 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                 {/* BACK + ADD TO CART */}
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleStepClick(workflowSteps[workflowSteps.length - 1])}
+                    onClick={() =>
+                      handleStepClick(workflowSteps[workflowSteps.length - 1])
+                    }
                     className="flex-1 py-3 font-black uppercase tracking-widest text-[11px] text-amazon-text bg-white border border-amazon-border transition-all hover:bg-neutral-50 shadow-sm rounded-sm active:scale-[0.98]"
                   >
-                    Back
+                    {t("back")}
                   </button>
                   <button
                     onClick={handleAddToCart}
@@ -951,10 +1033,10 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                     {addingToCart ? (
                       <>
                         <div className="w-4 h-4 border-2 border-amazon-text/30 border-t-amazon-text rounded-full animate-spin" />
-                        Adding...
+                        {t("adding")}
                       </>
                     ) : (
-                      "Add to Cart"
+                      t("addToCart")
                     )}
                   </button>
                 </div>
@@ -966,25 +1048,30 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
             ───────────────────────────────────── */
             <>
               {/* Step Header */}
-              <div
-                className="px-7 pt-7 pb-5 shrink-0 border-b border-amazon-border"
-              >
+              <div className="px-7 pt-7 pb-5 shrink-0 border-b border-amazon-border">
                 <p className="text-[9px] text-amazon-textMuted uppercase font-bold tracking-[0.3em] mb-1">
                   {kitDisplayName}
                 </p>
                 <h2 className="text-4xl font-black uppercase text-amazon-link tracking-tight">
-                  {currentStepName || "Select Component"}
+                  {currentStepName || t("selectComponent")}
                 </h2>
 
                 {/* Help me choose */}
-                <button
-                  className="mt-3 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-amazon-link px-4 py-1.5 rounded-sm transition-all hover:bg-neutral-50 border border-amazon-border shadow-sm"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <button className="mt-3 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-amazon-link px-4 py-1.5 rounded-sm transition-all hover:bg-neutral-50 border border-amazon-border shadow-sm">
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
-                  Help me choose
+                  {t("helpMeChoose")}
                 </button>
               </div>
 
@@ -995,7 +1082,9 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                   className="grid grid-cols-3 gap-x-4 gap-y-7 animate-fadeIn"
                 >
                   {currentProducts.map((product) => {
-                    const isOutOfStock = stockMap[product.partId] !== undefined && stockMap[product.partId] <= 0;
+                    const isOutOfStock =
+                      stockMap[product.partId] !== undefined &&
+                      stockMap[product.partId] <= 0;
                     return (
                       <ProductItem
                         key={product.optionId}
@@ -1014,12 +1103,10 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
               </div>
 
               {/* Footer — Subtotal + BACK / NEXT */}
-              <div
-                className="shrink-0 px-7 py-5 bg-white border-t border-amazon-border"
-              >
+              <div className="shrink-0 px-7 py-5 bg-white border-t border-amazon-border">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-[10px] uppercase font-black tracking-[0.25em] text-amazon-textMuted">
-                    Subtotal
+                    {t("subtotal")}
                   </span>
                   <span className="text-amazon-price font-black text-2xl tracking-tight">
                     {session.totalPrice.toLocaleString()}₫
@@ -1033,20 +1120,22 @@ const hasArtisanAddons = session ? Object.keys(session.selection).some(step => !
                     disabled={processing}
                     className="flex-1 py-3 font-black uppercase tracking-widest text-[11px] text-amazon-text bg-white border border-amazon-border transition-all hover:bg-neutral-50 shadow-sm rounded-sm active:scale-[0.98] disabled:opacity-40"
                   >
-                    Back
+                    {t("back")}
                   </button>
                   <button
                     onClick={handleNextStep}
-                    disabled={processing || !session.selection[currentStepName || ""]}
+                    disabled={
+                      processing || !session.selection[currentStepName || ""]
+                    }
                     className="flex-1 py-3 bg-amazon-btnPrimary text-amazon-text font-black rounded-sm shadow-sm uppercase tracking-widest text-[11px] hover:brightness-95 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {processing ? (
                       <>
                         <div className="w-4 h-4 border-2 border-amazon-text/30 border-t-amazon-text rounded-full animate-spin" />
-                        Saving...
+                        {t("saving")}
                       </>
                     ) : (
-                      "Next"
+                      t("next")
                     )}
                   </button>
                 </div>
@@ -1064,9 +1153,7 @@ export default function BuilderPage() {
   return (
     <Suspense
       fallback={
-        <div
-          className="min-h-screen flex items-center justify-center bg-amazon-bgSecondary text-amazon-text"
-        >
+        <div className="min-h-screen flex items-center justify-center bg-amazon-bgSecondary text-amazon-text">
           <div className="animate-spin w-10 h-10 border-4 border-amazon-border border-t-amazon-btnSecondary rounded-full" />
         </div>
       }

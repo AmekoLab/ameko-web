@@ -2,6 +2,7 @@
 
 import { FC, useEffect, useCallback, useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import {
   ShieldCheck,
   ChevronLeft,
@@ -10,7 +11,6 @@ import {
   User,
   CheckCircle,
   FileText,
-  AlertTriangle,
   Loader2,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
@@ -25,24 +25,16 @@ import ShopReviewModal from "@/src/components/Warranty/ShopReviewModal";
 // ─── Constants ─────────────────────────────────────────────
 const PAGE_SIZE = 10;
 
-const STATUS_STYLES: Record<string, { bg: string; label: string }> = {
-  InProgress: { bg: "bg-yellow-50 text-yellow-700 border border-yellow-200", label: "Pending" },
-  AwaitingReturn: { bg: "bg-yellow-50 text-yellow-700 border border-yellow-200", label: "Awaiting Return" },
-  ShopAccepted: { bg: "bg-green-50 text-green-700 border border-green-200", label: "Accepted" },
-  Rejected: { bg: "bg-red-50 text-red-700 border border-red-200", label: "Rejected" },
-  AdminReviewing: {
-    bg: "bg-blue-50 text-blue-700 border border-blue-200",
-    label: "Admin Reviewing",
-  },
-  Completed: { bg: "bg-green-50 text-green-700 border border-green-200", label: "Completed" },
-  AutoCancelled: { bg: "bg-red-50 text-red-700 border border-red-200", label: "Auto Cancelled" },
-  Returning: { bg: "bg-blue-50 text-blue-700 border border-blue-200", label: "Returning" },
-  Returned: { bg: "bg-blue-50 text-blue-700 border border-blue-200", label: "Returned" },
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  ReturnRequest: "Return / Refund",
-  CancelRequest: "Order Cancellation",
+const STATUS_STYLES: Record<string, string> = {
+  InProgress: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+  AwaitingReturn: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+  ShopAccepted: "bg-green-50 text-green-700 border border-green-200",
+  Rejected: "bg-red-50 text-red-700 border border-red-200",
+  AdminReviewing: "bg-blue-50 text-blue-700 border border-blue-200",
+  Completed: "bg-green-50 text-green-700 border border-green-200",
+  AutoCancelled: "bg-red-50 text-red-700 border border-red-200",
+  Returning: "bg-blue-50 text-blue-700 border border-blue-200",
+  Returned: "bg-blue-50 text-blue-700 border border-blue-200",
 };
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -60,14 +52,9 @@ const formatDate = (dateStr: string): string => {
   }
 };
 
-const getStatus = (statusName: string): { bg: string; label: string } =>
-  STATUS_STYLES[statusName] || {
-    bg: "bg-neutral-50 text-neutral-700 border border-neutral-200",
-    label: statusName,
-  };
-
-const getTypeLabel = (typeName: string): string =>
-  TYPE_LABELS[typeName] || typeName;
+const getStatusStyle = (statusName: string): string =>
+  STATUS_STYLES[statusName] ||
+  "bg-neutral-50 text-neutral-700 border border-neutral-200";
 
 // ─── Table Skeleton ────────────────────────────────────────
 const TableSkeleton: FC = () => (
@@ -103,19 +90,23 @@ const TableSkeleton: FC = () => (
 );
 
 // ─── Empty State ───────────────────────────────────────────
-const EmptyState: FC = () => (
-  <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-md shadow-sm border border-amazon-border">
-    <div className="w-16 h-16 rounded-full bg-neutral-50 border border-amazon-border flex items-center justify-center mb-5">
-      <ShieldCheck className="w-8 h-8 text-neutral-400" />
+const EmptyState: FC = () => {
+  const t = useTranslations("ShopWarrantyRequestsPage");
+
+  return (
+    <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-md shadow-sm border border-amazon-border">
+      <div className="w-16 h-16 rounded-full bg-neutral-50 border border-amazon-border flex items-center justify-center mb-5">
+        <ShieldCheck className="w-8 h-8 text-neutral-400" />
+      </div>
+      <h2 className="text-[14px] font-medium text-amazon-text mb-2">
+        {t("empty.title")}
+      </h2>
+      <p className="text-[13px] text-amazon-textMuted max-w-sm">
+        {t("empty.description")}
+      </p>
     </div>
-    <h2 className="text-[14px] font-medium text-amazon-text mb-2">
-      No requests yet
-    </h2>
-    <p className="text-[13px] text-amazon-textMuted max-w-sm">
-      The shop has not received any warranty or return requests from customers.
-    </p>
-  </div>
-);
+  );
+};
 
 // ─── Table Row ─────────────────────────────────────────────
 interface RowProps {
@@ -131,7 +122,28 @@ const TableRow: FC<RowProps> = ({
   onConfirmReceive,
   isConfirmingReceipt,
 }) => {
-  const status = getStatus(request.statusName);
+  const t = useTranslations("ShopWarrantyRequestsPage");
+
+  const statusLabels: Record<string, string> = {
+    InProgress: t("status.inProgress"),
+    AwaitingReturn: t("status.awaitingReturn"),
+    ShopAccepted: t("status.shopAccepted"),
+    Rejected: t("status.rejected"),
+    AdminReviewing: t("status.adminReviewing"),
+    Completed: t("status.completed"),
+    AutoCancelled: t("status.autoCancelled"),
+    Returning: t("status.returning"),
+    Returned: t("status.returned"),
+  };
+
+  const typeLabels: Record<string, string> = {
+    ReturnRequest: t("types.returnRequest"),
+    CancelRequest: t("types.cancelRequest"),
+  };
+
+  const statusLabel = statusLabels[request.statusName] || request.statusName;
+  const typeLabel = typeLabels[request.typeName] || request.typeName;
+  const statusStyle = getStatusStyle(request.statusName);
 
   return (
     <tr className="border-b border-amazon-border hover:bg-neutral-50 transition-colors">
@@ -152,15 +164,13 @@ const TableRow: FC<RowProps> = ({
             </div>
           )}
           <span className="text-sm font-medium text-amazon-text truncate max-w-[120px]">
-            {request.customerName || "N/A"}
+            {request.customerName || t("table.na")}
           </span>
         </div>
       </td>
       {/* Type */}
       <td className="px-5 py-3.5">
-        <span className="text-sm text-amazon-text">
-          {getTypeLabel(request.typeName)}
-        </span>
+        <span className="text-sm text-amazon-text">{typeLabel}</span>
       </td>
       {/* Reason */}
       <td className="px-5 py-3.5">
@@ -183,9 +193,9 @@ const TableRow: FC<RowProps> = ({
       {/* Status */}
       <td className="px-5 py-3.5">
         <span
-          className={`inline-block text-xs font-medium px-2.5 py-1 rounded-sm whitespace-nowrap ${status.bg}`}
+          className={`inline-block text-xs font-medium px-2.5 py-1 rounded-sm whitespace-nowrap ${statusStyle}`}
         >
-          {status.label}
+          {statusLabel}
         </span>
       </td>
       {/* Actions */}
@@ -196,11 +206,11 @@ const TableRow: FC<RowProps> = ({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-amazon-text bg-amazon-btnPrimary px-4 py-2 rounded-sm hover:brightness-95 transition-colors whitespace-nowrap shadow-sm"
           >
             <Eye className="w-3.5 h-3.5 text-amazon-text" />
-            View & Process
+            {t("actions.viewProcess")}
           </button>
         ) : request.status === 5 ? (
           <span className="text-amazon-textMuted text-sm font-medium">
-            Wait Return
+            {t("actions.waitReturn")}
           </span>
         ) : request.status === 6 ? (
           <button
@@ -209,7 +219,7 @@ const TableRow: FC<RowProps> = ({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-green-600 px-4 py-2 rounded-sm hover:bg-green-700 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             <CheckCircle className="w-3.5 h-3.5" />
-            Confirm Rcpt
+            {t("actions.confirmReceipt")}
           </button>
         ) : (
           <button
@@ -217,7 +227,7 @@ const TableRow: FC<RowProps> = ({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-amazon-textMuted bg-white border border-amazon-border px-4 py-2 rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition-colors whitespace-nowrap shadow-sm"
           >
             <FileText className="w-3.5 h-3.5" />
-            View Info
+            {t("actions.viewInfo")}
           </button>
         )}
       </td>
@@ -233,12 +243,15 @@ interface PaginationProps {
 }
 
 const Pagination: FC<PaginationProps> = ({ current, total, onChange }) => {
+  const t = useTranslations("ShopWarrantyRequestsPage");
+
   if (total <= 1) return null;
 
   return (
     <div className="flex items-center justify-between py-5 text-sm font-medium text-amazon-textMuted border-t border-amazon-border">
       <span className="text-amazon-textMuted">
-        Page <span className="text-amazon-text font-bold">{current}</span> / {total}
+        {t("pagination.pageLabel")}{" "}
+        <span className="text-amazon-text font-bold">{current}</span> / {total}
       </span>
       <div className="flex items-center gap-2">
         <button
@@ -274,6 +287,8 @@ const ConfirmReceiptModal = ({
   onCancel,
   isLoading,
 }: ConfirmReceiptModalProps) => {
+  const t = useTranslations("ShopWarrantyRequestsPage");
+
   if (!isOpen) return null;
   return (
     <div
@@ -288,17 +303,17 @@ const ConfirmReceiptModal = ({
           <CheckCircle className="w-6 h-6 text-green-600" />
         </div>
         <h3 className="text-lg font-bold text-neutral-900 mb-2">
-         Confirm receipt
+          {t("confirmReceiptModal.title")}
         </h3>
         <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
-          Are you sure you have received the returned item in good condition? This action will close the order and cannot be undone.
+          {t("confirmReceiptModal.description")}
         </p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
             className="flex-1 py-3 bg-white hover:bg-neutral-50 text-neutral-700 font-semibold text-sm rounded-xl transition-colors border border-neutral-200"
           >
-            Hủy
+            {t("confirmReceiptModal.cancel")}
           </button>
           <button
             onClick={onConfirm}
@@ -306,9 +321,12 @@ const ConfirmReceiptModal = ({
             className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
           >
             {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {t("confirmReceiptModal.confirming")}
+              </>
             ) : (
-              "Confirm"
+              t("confirmReceiptModal.confirm")
             )}
           </button>
         </div>
@@ -319,6 +337,7 @@ const ConfirmReceiptModal = ({
 
 // ─── Main Page ─────────────────────────────────────────────
 const ShopWarrantyDashboard: FC = () => {
+  const t = useTranslations("ShopWarrantyRequestsPage");
   const dispatch = useAppDispatch();
   const {
     shopWarrantyList,
@@ -377,10 +396,10 @@ const ShopWarrantyDashboard: FC = () => {
           <div>
             <h1 className="text-2xl font-bold text-amazon-text mb-2 flex items-center gap-3">
               {/* <ShieldCheck className="w-8 h-8 text-neutral-400" /> */}
-              Warranty Requests
+              {t("header.title")}
             </h1>
             <p className="text-[11px] text-amazon-textMuted">
-              Manage return & warranty requests from customers.
+              {t("header.subtitle")}
             </p>
           </div>
         </div>
@@ -393,13 +412,17 @@ const ShopWarrantyDashboard: FC = () => {
               <table className="w-full text-left text-sm text-amazon-text">
                 <thead>
                   <tr className="bg-neutral-50 border-b border-amazon-border font-medium text-amazon-text">
-                    <th className="px-5 py-4">Customer</th>
-                    <th className="px-5 py-4">Type</th>
-                    <th className="px-5 py-4 max-w-[200px]">Reason</th>
-                    <th className="px-5 py-4">Refund Amount</th>
-                    <th className="px-5 py-4">Created Date</th>
-                    <th className="px-5 py-4">Status</th>
-                    <th className="px-5 py-4 text-center">Action</th>
+                    <th className="px-5 py-4">{t("table.customer")}</th>
+                    <th className="px-5 py-4">{t("table.type")}</th>
+                    <th className="px-5 py-4 max-w-[200px]">
+                      {t("table.reason")}
+                    </th>
+                    <th className="px-5 py-4">{t("table.refundAmount")}</th>
+                    <th className="px-5 py-4">{t("table.createdDate")}</th>
+                    <th className="px-5 py-4">{t("table.status")}</th>
+                    <th className="px-5 py-4 text-center">
+                      {t("table.action")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#1e2126]">
@@ -409,7 +432,9 @@ const ShopWarrantyDashboard: FC = () => {
                       request={req}
                       onReviewClick={handleReviewClick}
                       onConfirmReceive={handleConfirmReceiveClick}
-                      isConfirmingReceipt={isConfirmingReceipt && receiptConfirmId === req.id}
+                      isConfirmingReceipt={
+                        isConfirmingReceipt && receiptConfirmId === req.id
+                      }
                     />
                   ))}
                 </tbody>
@@ -431,7 +456,7 @@ const ShopWarrantyDashboard: FC = () => {
           issue={selectedIssue}
           onSuccess={handleReviewSuccess}
         />
-        
+
         <ConfirmReceiptModal
           isOpen={!!receiptConfirmId}
           onConfirm={handleExecuteConfirmReceive}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { fetchAdminTransactions } from "@/src/store/slices/adminWalletSlice";
 import { TransactionItem } from "@/src/services/wallet.service";
@@ -11,83 +12,83 @@ import {
 import Image from "next/image";
 
 // ─── Filter constants ────────────────────────────────────
-const TRANSACTION_TYPES: { label: string; value: string }[] = [
-  { label: "All Types", value: "" },
-  { label: "OrderPayment", value: "OrderPayment" },
-  { label: "OrderRefund", value: "OrderRefund" },
-  { label: "SalesRevenue", value: "SalesRevenue" },
-  { label: "Deposit", value: "Deposit" },
-  { label: "Withdrawal", value: "Withdrawal" },
-  { label: "SalesPending", value: "SalesPending" },
-  { label: "ManualAdjustment", value: "ManualAdjustment" },
+const TRANSACTION_TYPES: { labelKey: string; value: string }[] = [
+  { labelKey: "filterTypeAll", value: "" },
+  { labelKey: "filterTypeOrderPayment", value: "OrderPayment" },
+  { labelKey: "filterTypeOrderRefund", value: "OrderRefund" },
+  { labelKey: "filterTypeSalesRevenue", value: "SalesRevenue" },
+  { labelKey: "filterTypeDeposit", value: "Deposit" },
+  { labelKey: "filterTypeWithdrawal", value: "Withdrawal" },
+  { labelKey: "filterTypeSalesPending", value: "SalesPending" },
+  { labelKey: "filterTypeManualAdjustment", value: "ManualAdjustment" },
 ];
 
-const TRANSACTION_STATUSES: { label: string; value: string }[] = [
-  { label: "All Statuses", value: "" },
-  { label: "Paid", value: "Paid" },
-  { label: "Pending", value: "Pending" },
-  { label: "Failed", value: "Failed" },
-  { label: "Completed", value: "Completed" },
-  { label: "Cancelled", value: "Cancelled" },
+const TRANSACTION_STATUSES: { labelKey: string; value: string }[] = [
+  { labelKey: "filterStatusAll", value: "" },
+  { labelKey: "filterStatusPaid", value: "Paid" },
+  { labelKey: "filterStatusPending", value: "Pending" },
+  { labelKey: "filterStatusFailed", value: "Failed" },
+  { labelKey: "filterStatusCompleted", value: "Completed" },
+  { labelKey: "filterStatusCancelled", value: "Cancelled" },
 ];
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 // ─── Type badge config ───────────────────────────────────
-const TYPE_BADGE: Record<string, { label: string; className: string }> = {
+const TYPE_BADGE: Record<string, { labelKey: string; className: string }> = {
   Withdrawal: {
-    label: "Withdrawal",
+    labelKey: "badgeTypeWithdrawal",
     className: "bg-blue-50 text-blue-700 border-blue-200",
   },
   OrderPayment: {
-    label: "Payment",
+    labelKey: "badgeTypePayment",
     className: "bg-green-50 text-green-700 border-green-200",
   },
   ManualAdjustment: {
-    label: "Adjustment",
+    labelKey: "badgeTypeAdjustment",
     className: "bg-orange-50 text-orange-700 border-orange-200",
   },
   RefundToWallet: {
-    label: "Refund",
+    labelKey: "badgeTypeRefund",
     className: "bg-purple-50 text-purple-700 border-purple-200",
   },
   OrderRefund: {
-    label: "Refund",
+    labelKey: "badgeTypeRefund",
     className: "bg-purple-50 text-purple-700 border-purple-200",
   },
   SalesPending: {
-    label: "Pending Revenue",
+    labelKey: "badgeTypePendingRevenue",
     className: "bg-yellow-50 text-yellow-700 border-yellow-200",
   },
   SalesRevenue: {
-    label: "Revenue",
+    labelKey: "badgeTypeRevenue",
     className: "bg-emerald-50 text-emerald-700 border-emerald-200",
   },
   Deposit: {
-    label: "Deposit",
+    labelKey: "badgeTypeDeposit",
     className: "bg-cyan-50 text-cyan-700 border-cyan-200",
   },
 };
 
-const STATUS_BADGE: Record<string, { label: string; className: string }> = {
+const STATUS_BADGE: Record<string, { labelKey: string; className: string }> = {
   Paid: {
-    label: "Success",
+    labelKey: "badgeStatusSuccess",
     className: "bg-green-50 text-green-700 border-green-200",
   },
   Failed: {
-    label: "Failed",
+    labelKey: "badgeStatusFailed",
     className: "bg-red-50 text-red-700 border-red-200",
   },
   Pending: {
-    label: "Pending",
+    labelKey: "badgeStatusPending",
     className: "bg-yellow-50 text-yellow-700 border-yellow-200",
   },
   Completed: {
-    label: "Completed",
+    labelKey: "badgeStatusCompleted",
     className: "bg-green-50 text-green-700 border-green-200",
   },
   Cancelled: {
-    label: "Cancelled",
+    labelKey: "badgeStatusCancelled",
     className: "bg-neutral-100 text-neutral-600 border-neutral-300",
   },
 };
@@ -98,11 +99,17 @@ function truncateText(text: string, max = 30) {
   return text.slice(0, max) + "…";
 }
 
-function DescriptionCell({ parsed }: { parsed: ParsedTransactionInfo }) {
+function DescriptionCell({
+  parsed,
+  approvedLabel,
+  rejectedLabel,
+}: {
+  parsed: ParsedTransactionInfo;
+  approvedLabel: string;
+  rejectedLabel: string;
+}) {
   if (!parsed.rawDescription) {
-    return (
-      <span className="text-[10px] text-amazon-textMuted">—</span>
-    );
+    return <span className="text-[10px] text-amazon-textMuted">—</span>;
   }
 
   if (!parsed.isManualAction) {
@@ -125,7 +132,7 @@ function DescriptionCell({ parsed }: { parsed: ParsedTransactionInfo }) {
             : "bg-red-50 text-red-700 border-red-200"
         }`}
       >
-        {parsed.action === "APPROVED" ? "Approved" : "Rejected"}
+        {parsed.action === "APPROVED" ? approvedLabel : rejectedLabel}
       </span>
       {parsed.note && (
         <span
@@ -141,6 +148,11 @@ function DescriptionCell({ parsed }: { parsed: ParsedTransactionInfo }) {
 
 // ─── Main Page ───────────────────────────────────────────
 export default function AdminTransactionsPage() {
+  const t = useTranslations("AdminTransactionsPage");
+  const locale = useLocale();
+  const numberLocale = locale === "vi" ? "vi-VN" : "en-US";
+  const dateLocale = locale === "vi" ? "vi-VN" : "en-US";
+
   const dispatch = useAppDispatch();
   const { transactions, loadingTransactions, transactionsPagination } =
     useAppSelector((state) => state.adminWallet);
@@ -227,7 +239,7 @@ export default function AdminTransactionsPage() {
 
   // ── Rendering helpers ───────────────────────────────────
   const formatCurrency = (amount: number) => {
-    const formatted = Math.abs(amount).toLocaleString("vi-VN");
+    const formatted = Math.abs(amount).toLocaleString(numberLocale);
     return `${amount < 0 ? "-" : "+"}${formatted}₫`;
   };
 
@@ -236,7 +248,7 @@ export default function AdminTransactionsPage() {
     if (!config) {
       return (
         <span className="text-[10px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200 px-1.5 py-0.5 rounded-sm">
-          {type}
+          {type || t("unknown")}
         </span>
       );
     }
@@ -244,7 +256,7 @@ export default function AdminTransactionsPage() {
       <span
         className={`text-[10px] font-medium px-1.5 py-0.5 rounded-sm whitespace-nowrap border ${config.className}`}
       >
-        {config.label}
+        {t(config.labelKey)}
       </span>
     );
   };
@@ -254,7 +266,7 @@ export default function AdminTransactionsPage() {
     if (!config) {
       return (
         <span className="text-[10px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200 px-1.5 py-0.5 rounded-sm">
-          {status}
+          {status || t("unknown")}
         </span>
       );
     }
@@ -262,12 +274,11 @@ export default function AdminTransactionsPage() {
       <span
         className={`text-[10px] font-medium px-1.5 py-0.5 rounded-sm whitespace-nowrap border ${config.className}`}
       >
-        {config.label}
+        {t(config.labelKey)}
       </span>
     );
   };
 
-  const totalPages = transactionsPagination?.totalPages ?? 1;
   const totalCount = transactionsPagination?.totalCount ?? 0;
 
   return (
@@ -277,17 +288,19 @@ export default function AdminTransactionsPage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-2">
           <div>
             <h1 className="text-2xl font-bold text-amazon-text leading-tight">
-              Transaction History
+              {t("title")}
             </h1>
             <p className="text-[11px] text-amazon-textMuted mt-0.5">
-              View all wallet transactions in the system.
+              {t("subtitle")}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-[10px] text-amazon-textMuted">
-              Total:{" "}
-              <strong className="text-amazon-text mx-1">{totalCount}</strong>{" "}
-              transactions
+              {t("totalLabel")}
+              <strong className="text-amazon-text mx-1">
+                {totalCount}
+              </strong>{" "}
+              {t("transactionsLabel")}
             </span>
             <button
               onClick={() => setShowFilters((prev) => !prev)}
@@ -296,9 +309,9 @@ export default function AdminTransactionsPage() {
                   ? "bg-amazon-btnPrimary text-amazon-text border-amazon-btnPrimary shadow-sm"
                   : "bg-white text-amazon-textMuted border-amazon-border hover:bg-neutral-50 hover:text-amazon-text"
               }`}
-              title="Toggle filters"
+              title={t("toggleFiltersTitle")}
             >
-              Filters
+              {t("filters")}
             </button>
           </div>
         </div>
@@ -308,14 +321,14 @@ export default function AdminTransactionsPage() {
           <div className="mb-4 rounded-md border border-amazon-border bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-[11px] font-bold text-amazon-text">
-                Filter Transactions
+                {t("filterTransactions")}
               </h2>
               {hasActiveFilters && (
                 <button
                   onClick={handleClearFilters}
                   className="text-[10px] font-medium text-blue-600 hover:text-blue-800 transition-colors"
                 >
-                  Clear all
+                  {t("clearAll")}
                 </button>
               )}
             </div>
@@ -324,7 +337,7 @@ export default function AdminTransactionsPage() {
               {/* Type filter */}
               <div>
                 <label className="block text-[10px] font-medium text-amazon-textMuted mb-1">
-                  Type
+                  {t("filterTypeLabel")}
                 </label>
                 <select
                   id="admin-filter-type"
@@ -332,9 +345,9 @@ export default function AdminTransactionsPage() {
                   onChange={(e) => setFilterType(e.target.value)}
                   className="w-full rounded-sm border border-amazon-border bg-white px-2 py-1.5 text-[11px] font-medium text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary"
                 >
-                  {TRANSACTION_TYPES.map((t) => (
-                    <option key={t.value} value={t.value}>
-                      {t.label}
+                  {TRANSACTION_TYPES.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {t(option.labelKey)}
                     </option>
                   ))}
                 </select>
@@ -343,7 +356,7 @@ export default function AdminTransactionsPage() {
               {/* Status filter */}
               <div>
                 <label className="block text-[10px] font-medium text-amazon-textMuted mb-1">
-                  Status
+                  {t("filterStatusLabel")}
                 </label>
                 <select
                   id="admin-filter-status"
@@ -351,9 +364,9 @@ export default function AdminTransactionsPage() {
                   onChange={(e) => setFilterStatus(e.target.value)}
                   className="w-full rounded-sm border border-amazon-border bg-white px-2 py-1.5 text-[11px] font-medium text-amazon-text outline-none transition-colors focus:border-amazon-btnPrimary"
                 >
-                  {TRANSACTION_STATUSES.map((s) => (
-                    <option key={s.value} value={s.value}>
-                      {s.label}
+                  {TRANSACTION_STATUSES.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {t(option.labelKey)}
                     </option>
                   ))}
                 </select>
@@ -362,7 +375,7 @@ export default function AdminTransactionsPage() {
               {/* From date */}
               <div>
                 <label className="block text-[10px] font-medium text-amazon-textMuted mb-1">
-                  From Date
+                  {t("filterFromDate")}
                 </label>
                 <input
                   id="admin-filter-from-date"
@@ -376,7 +389,7 @@ export default function AdminTransactionsPage() {
               {/* To date */}
               <div>
                 <label className="block text-[10px] font-medium text-amazon-textMuted mb-1">
-                  To Date
+                  {t("filterToDate")}
                 </label>
                 <input
                   id="admin-filter-to-date"
@@ -394,11 +407,14 @@ export default function AdminTransactionsPage() {
                 onClick={handleApplyFilters}
                 className="rounded-sm bg-amazon-btnPrimary border border-amazon-btnPrimary px-4 py-1.5 text-[11px] font-medium text-amazon-text transition-colors hover:brightness-95 shadow-sm"
               >
-                Apply Filters
+                {t("applyFilters")}
               </button>
               {hasActiveFilters && (
                 <span className="text-[10px] text-amazon-textMuted">
-                  Showing {filteredTransactions.length} of {transactions.length} on this page
+                  {t("showingOnPage", {
+                    filtered: filteredTransactions.length,
+                    total: transactions.length,
+                  })}
                 </span>
               )}
             </div>
@@ -408,7 +424,7 @@ export default function AdminTransactionsPage() {
         {/* ── Page Size Control ─────────────────────────── */}
         <div className="mb-3 flex items-center justify-end gap-2">
           <label className="text-[10px] font-medium text-amazon-textMuted">
-            Per page:
+            {t("perPage")}
           </label>
           <select
             id="admin-page-size"
@@ -428,20 +444,26 @@ export default function AdminTransactionsPage() {
         <div className="bg-white rounded-md border border-amazon-border flex flex-col shadow-sm">
           {loadingTransactions && transactions.length === 0 ? (
             <div className="p-12 text-center text-[11px] font-medium text-amazon-textMuted">
-              Loading data...
+              {t("loading")}
             </div>
           ) : (
             <div className="w-full overflow-x-auto">
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead className="bg-neutral-50 border-b border-amazon-border">
                   <tr className="text-left text-[10px] text-amazon-textMuted">
-                    <th className="px-4 py-2 font-medium">ID</th>
-                    <th className="px-4 py-2 font-medium">Date</th>
-                    <th className="px-4 py-2 font-medium">Type</th>
-                    <th className="px-4 py-2 font-medium">Amount</th>
-                    <th className="px-4 py-2 font-medium">Fee</th>
-                    <th className="px-4 py-2 font-medium">Status</th>
-                    <th className="px-4 py-2 font-medium">Details</th>
+                    <th className="px-4 py-2 font-medium">{t("tableId")}</th>
+                    <th className="px-4 py-2 font-medium">{t("tableDate")}</th>
+                    <th className="px-4 py-2 font-medium">{t("tableType")}</th>
+                    <th className="px-4 py-2 font-medium">
+                      {t("tableAmount")}
+                    </th>
+                    <th className="px-4 py-2 font-medium">{t("tableFee")}</th>
+                    <th className="px-4 py-2 font-medium">
+                      {t("tableStatus")}
+                    </th>
+                    <th className="px-4 py-2 font-medium">
+                      {t("tableDetails")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-amazon-border">
@@ -468,7 +490,7 @@ export default function AdminTransactionsPage() {
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="text-[11px] text-amazon-text">
                             {new Date(item.createdAt).toLocaleDateString(
-                              "en-US",
+                              dateLocale,
                               {
                                 day: "2-digit",
                                 month: "short",
@@ -477,7 +499,7 @@ export default function AdminTransactionsPage() {
                             )}
                             <span className="ml-1.5 text-amazon-textMuted text-[10px]">
                               {new Date(item.createdAt).toLocaleTimeString(
-                                "en-US",
+                                dateLocale,
                                 {
                                   hour: "2-digit",
                                   minute: "2-digit",
@@ -488,7 +510,9 @@ export default function AdminTransactionsPage() {
                         </td>
 
                         {/* Type */}
-                        <td className="px-4 py-3 whitespace-nowrap">{renderTypeBadge(item.type)}</td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          {renderTypeBadge(item.type)}
+                        </td>
 
                         {/* Amount */}
                         <td className="px-4 py-3 whitespace-nowrap">
@@ -507,7 +531,7 @@ export default function AdminTransactionsPage() {
                         <td className="px-4 py-3 whitespace-nowrap">
                           <span className="text-[11px] text-amazon-textMuted">
                             {item.feeAmount > 0
-                              ? `${item.feeAmount.toLocaleString("vi-VN")}₫`
+                              ? `${item.feeAmount.toLocaleString(numberLocale)}₫`
                               : "—"}
                           </span>
                         </td>
@@ -520,16 +544,20 @@ export default function AdminTransactionsPage() {
                         {/* Description */}
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <DescriptionCell parsed={parsed} />
+                            <DescriptionCell
+                              parsed={parsed}
+                              approvedLabel={t("manualApproved")}
+                              rejectedLabel={t("manualRejected")}
+                            />
                             {parsed.proofUrl && (
                               <button
                                 onClick={() =>
                                   setPreviewImage(parsed.proofUrl!)
                                 }
                                 className="px-2 py-0.5 rounded border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:border-blue-300 text-[10px] font-medium flex-shrink-0 transition-colors"
-                                title="View evidence"
+                                title={t("viewEvidenceTitle")}
                               >
-                                View
+                                {t("view")}
                               </button>
                             )}
                           </div>
@@ -538,18 +566,17 @@ export default function AdminTransactionsPage() {
                     );
                   })}
 
-                  {filteredTransactions.length === 0 && !loadingTransactions && (
-                    <tr>
-                      <td
-                        colSpan={7}
-                        className="p-12 text-center text-[10px] text-amazon-textMuted"
-                      >
-                        {hasActiveFilters
-                          ? "No transactions match your filters."
-                          : "No transactions found."}
-                      </td>
-                    </tr>
-                  )}
+                  {filteredTransactions.length === 0 &&
+                    !loadingTransactions && (
+                      <tr>
+                        <td
+                          colSpan={7}
+                          className="p-12 text-center text-[10px] text-amazon-textMuted"
+                        >
+                          {hasActiveFilters ? t("emptyFiltered") : t("empty")}
+                        </td>
+                      </tr>
+                    )}
                 </tbody>
               </table>
             </div>
@@ -559,12 +586,12 @@ export default function AdminTransactionsPage() {
           {transactionsPagination && transactionsPagination.totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between p-3 border-t border-amazon-border bg-neutral-50/50 gap-3">
               <p className="text-[10px] text-amazon-textMuted">
-                Page{" "}
+                {t("pageLabel")}
                 <strong className="text-amazon-text mx-0.5">
                   {transactionsPagination.currentPage} /{" "}
                   {transactionsPagination.totalPages}
                 </strong>{" "}
-                — {transactionsPagination.totalCount} transactions
+                — {transactionsPagination.totalCount} {t("transactionsLabel")}
               </p>
 
               <div className="flex items-center gap-1">
@@ -575,7 +602,7 @@ export default function AdminTransactionsPage() {
                   disabled={!transactionsPagination.hasPreviousPage}
                   className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 text-amazon-text transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  First
+                  {t("first")}
                 </button>
                 {/* Prev */}
                 <button
@@ -586,7 +613,7 @@ export default function AdminTransactionsPage() {
                   disabled={!transactionsPagination.hasPreviousPage}
                   className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 text-amazon-text transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Prev
+                  {t("prev")}
                 </button>
 
                 {/* Page numbers */}
@@ -594,10 +621,7 @@ export default function AdminTransactionsPage() {
                   const maxVisible = 5;
                   const current = transactionsPagination.currentPage;
                   const total = transactionsPagination.totalPages;
-                  let start = Math.max(
-                    1,
-                    current - Math.floor(maxVisible / 2),
-                  );
+                  let start = Math.max(1, current - Math.floor(maxVisible / 2));
                   const end = Math.min(total, start + maxVisible - 1);
                   if (end - start + 1 < maxVisible) {
                     start = Math.max(1, end - maxVisible + 1);
@@ -632,7 +656,7 @@ export default function AdminTransactionsPage() {
                   disabled={!transactionsPagination.hasNextPage}
                   className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 text-amazon-text transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Next
+                  {t("next")}
                 </button>
                 {/* Last */}
                 <button
@@ -643,7 +667,7 @@ export default function AdminTransactionsPage() {
                   disabled={!transactionsPagination.hasNextPage}
                   className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 text-amazon-text transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Last
+                  {t("last")}
                 </button>
               </div>
             </div>
@@ -661,7 +685,7 @@ export default function AdminTransactionsPage() {
           <div className="relative max-w-2xl w-full mx-auto animate-in zoom-in-95 duration-200">
             <Image
               src={previewImage}
-              alt="Evidence"
+              alt={t("evidenceAlt")}
               width={800}
               height={600}
               className="w-full h-auto rounded-md shadow-xl object-contain border border-amazon-border bg-white"
@@ -670,7 +694,7 @@ export default function AdminTransactionsPage() {
               onClick={() => setPreviewImage(null)}
               className="absolute -top-3 -right-3 bg-white border border-amazon-border rounded-full px-2 py-1 text-[11px] font-medium text-amazon-text hover:bg-neutral-50 transition shadow-sm"
             >
-              Close
+              {t("close")}
             </button>
           </div>
         </div>

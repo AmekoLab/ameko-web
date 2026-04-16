@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { FilterX } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import type { CustomerOverviewParams } from "@/src/types/shop-dashboard.types";
 
@@ -19,6 +20,7 @@ const inputClass =
   "bg-white text-amazon-text border border-amazon-border rounded-md px-2 py-1 text-xs placeholder-gray-400 focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus outline-none transition-colors";
 
 export default function DashboardPage() {
+  const t = useTranslations("ShopDashboardPage");
   // ── Shared filter state ──
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -32,7 +34,7 @@ export default function DashboardPage() {
   const currentFilters: CustomerOverviewParams = useMemo(() => {
     // JS validation – prevent invalid date range from reaching children
     if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-      toast.error("Start date cannot be later than end date.");
+      toast.error(t("startDateLaterError"));
       return {};
     }
 
@@ -42,7 +44,7 @@ export default function DashboardPage() {
       Granularity: granularity,
       ChurnDays: churnDays,
     };
-  }, [startDate, endDate, granularity, churnDays]);
+  }, [startDate, endDate, granularity, churnDays, t]);
 
   // ── Clear filters ──
   const handleClearFilters = useCallback(() => {
@@ -58,10 +60,10 @@ export default function DashboardPage() {
       <div className="shrink-0 flex flex-col xl:flex-row xl:items-end justify-between gap-1">
         <div>
           <h1 className="text-2xl font-bold text-amazon-text tracking-tight">
-            Shop Dashboard
+            {t("pageTitle")}
           </h1>
           <p className="text-[11px] text-amazon-textMuted mt-1">
-            Monitor your shop performance and customer insights.
+            {t("pageDesc")}
           </p>
         </div>
 
@@ -70,7 +72,7 @@ export default function DashboardPage() {
           {/* Start Date */}
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-amazon-textMuted">
-              Start Date
+              {t("startDate")}
             </label>
             <input
               type="date"
@@ -84,7 +86,7 @@ export default function DashboardPage() {
           {/* End Date */}
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-amazon-textMuted">
-              End Date
+              {t("endDate")}
             </label>
             <input
               type="date"
@@ -99,23 +101,23 @@ export default function DashboardPage() {
           {/* Granularity */}
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-amazon-textMuted">
-              Granularity
+              {t("granularity")}
             </label>
             <select
               value={granularity}
               onChange={(e) => setGranularity(e.target.value)}
               className={inputClass}
             >
-              <option value="Day">Day</option>
-              <option value="Week">Week</option>
-              <option value="Month">Month</option>
+              <option value="Day">{t("day")}</option>
+              <option value="Week">{t("week")}</option>
+              <option value="Month">{t("month")}</option>
             </select>
           </div>
 
           {/* Churn Days */}
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-amazon-textMuted">
-              Churn Days
+              {t("churnDays")}
             </label>
             <input
               type="number"
@@ -133,11 +135,10 @@ export default function DashboardPage() {
               className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-amazon-link hover:underline transition-colors"
             >
               <FilterX className="w-3.5 h-3.5" />
-              Clear
+              {t("clear")}
             </button>
           )}
         </div>
-
       </div>
 
       {/* Row 2: High-Level Metrics */}

@@ -1,19 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 import { assemblyService } from "@/src/services/assembly.service";
-import { AssemblyTemplate, AssemblyTemplatePayload } from "@/src/types/assembly.types";
+import {
+  AssemblyTemplate,
+  AssemblyTemplatePayload,
+} from "@/src/types/assembly.types";
 
-const formSchema = z.object({
-  stepName: z.string().min(1, "Step name is required"),
-  stepOrder: z.number().min(1, "Step order must be at least 1"),
-  isRequired: z.boolean(),
-});
+const createFormSchema = (t: ReturnType<typeof useTranslations>) =>
+  z.object({
+    stepName: z.string().min(1, t("validation.stepNameRequired")),
+    stepOrder: z.number().min(1, t("validation.stepOrderMin", { min: 1 })),
+    isRequired: z.boolean(),
+  });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<ReturnType<typeof createFormSchema>>;
 
 interface Props {
   isOpen: boolean;
@@ -30,7 +35,9 @@ export default function AssemblyTemplateFormModal({
   templateToEdit,
   nextOrder,
 }: Props) {
+  const t = useTranslations("AssemblyTemplateFormModal");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const formSchema = useMemo(() => createFormSchema(t), [t]);
 
   const {
     register,
@@ -78,27 +85,31 @@ export default function AssemblyTemplateFormModal({
       if (templateToEdit) {
         const res = await assemblyService.updateTemplate(
           templateToEdit.templateId,
-          payload
+          payload,
         );
         if (res.success) {
-          toast.success("Template updated successfully");
+          toast.success(t("toast.updateSuccess"));
           onSuccess();
           onClose();
         } else {
-          toast.error(res.message || "Failed to update template");
+          toast.error(res.message || t("toast.updateFailed"));
         }
       } else {
         const res = await assemblyService.createTemplate(payload);
         if (res.success) {
-          toast.success("Template created successfully");
+          toast.success(t("toast.createSuccess"));
           onSuccess();
           onClose();
         } else {
-          toast.error(res.message || "Failed to create template");
+          toast.error(res.message || t("toast.createFailed"));
         }
       }
-    } catch {
-      toast.error("An error occurred");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : t("toast.unexpectedError");
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -109,29 +120,35 @@ export default function AssemblyTemplateFormModal({
       <div className="bg-white w-full max-w-md border border-amazon-border rounded-md shadow-xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
         <div className="px-6 py-4 border-b border-amazon-border">
           <h2 className="text-lg font-bold text-amazon-text">
-            {templateToEdit ? "Edit Template" : "Create Template"}
+            {templateToEdit ? t("title.edit") : t("title.create")}
           </h2>
         </div>
 
         <div className="p-6">
-          <form id="template-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            id="template-form"
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-4"
+          >
             <div>
               <label className="block text-sm font-medium text-amazon-text mb-1.5">
-                Step Name
+                {t("labels.stepName")}
               </label>
               <input
                 {...register("stepName")}
                 className="w-full border border-amazon-border bg-white rounded-md px-4 py-2.5 text-amazon-text placeholder-gray-400 focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus transition-all text-sm font-medium"
-                placeholder="e.g., Lắp switch"
+                placeholder={t("placeholders.stepName")}
               />
               {errors.stepName && (
-                <p className="mt-1 text-xs font-medium text-red-600">{errors.stepName.message}</p>
+                <p className="mt-1 text-xs font-medium text-red-600">
+                  {errors.stepName.message}
+                </p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-amazon-text mb-1.5">
-                Step Order
+                {t("labels.stepOrder")}
               </label>
               <input
                 type="number"
@@ -139,7 +156,9 @@ export default function AssemblyTemplateFormModal({
                 className="w-full border border-amazon-border bg-white rounded-md px-4 py-2.5 text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus transition-all text-sm font-medium"
               />
               {errors.stepOrder && (
-                <p className="mt-1 text-xs font-medium text-red-600">{errors.stepOrder.message}</p>
+                <p className="mt-1 text-xs font-medium text-red-600">
+                  {errors.stepOrder.message}
+                </p>
               )}
             </div>
 
@@ -150,8 +169,11 @@ export default function AssemblyTemplateFormModal({
                 {...register("isRequired")}
                 className="w-4 h-4 text-amazon-focus border-amazon-border rounded focus:ring-amazon-focus cursor-pointer"
               />
-              <label htmlFor="isRequired" className="text-sm font-medium text-amazon-text cursor-pointer">
-                Is Required?
+              <label
+                htmlFor="isRequired"
+                className="text-sm font-medium text-amazon-text cursor-pointer"
+              >
+                {t("labels.isRequired")}
               </label>
             </div>
           </form>
@@ -164,7 +186,7 @@ export default function AssemblyTemplateFormModal({
             disabled={isSubmitting}
             className="px-4 py-2.5 text-sm font-medium text-amazon-text bg-white border border-amazon-border rounded-md hover:bg-neutral-50 transition-colors disabled:opacity-70"
           >
-            Cancel
+            {t("actions.cancel")}
           </button>
           <button
             type="submit"
@@ -175,9 +197,9 @@ export default function AssemblyTemplateFormModal({
             {isSubmitting ? (
               <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />
             ) : templateToEdit ? (
-              "Save"
+              t("actions.save")
             ) : (
-              "Create"
+              t("actions.create")
             )}
           </button>
         </div>

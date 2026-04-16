@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { fetchCategories } from "@/src/store/slices/categoriesSlice";
 import { fetchCurrentShop } from "@/src/store/slices/shopSlice";
 import { CategoryItem } from "@/src/types/category.types";
 import {
-  FolderTree,
   ChevronRight,
   ChevronDown,
   Globe,
@@ -23,6 +23,7 @@ import EditCategoryModal from "@/src/components/Admin/EditCategoryModal";
 import DeleteCategoryModal from "@/src/components/Admin/DeleteCategoryModal";
 
 export default function ShopCategoriesPage() {
+  const t = useTranslations("ShopCategoriesPage");
   const dispatch = useAppDispatch();
   const { categories, loading } = useAppSelector((state) => state.categories);
   const { currentShop } = useAppSelector((state) => state.shop);
@@ -92,9 +93,9 @@ export default function ShopCategoriesPage() {
   ).length;
 
   const tabs = [
-    { key: "all" as const, label: "All", count: categories.length },
-    { key: "global" as const, label: "Global", count: globalCount },
-    { key: "private" as const, label: "My Shop", count: privateCount },
+    { key: "all" as const, label: t("tabAll"), count: categories.length },
+    { key: "global" as const, label: t("tabGlobal"), count: globalCount },
+    { key: "private" as const, label: t("tabMyShop"), count: privateCount },
   ];
 
   return (
@@ -104,12 +105,10 @@ export default function ShopCategoriesPage() {
         <div className="flex justify-between items-end mb-5 border-b border-amazon-border pb-4">
           <div>
             <h1 className="text-2xl font-bold text-amazon-text mb-1 flex items-center gap-2">
-         
-              Category Management
+              {t("pageTitle")}
             </h1>
             <p className="text-[13px] text-amazon-textMuted font-medium">
-              Manage your shop categories. Use global categories as parents for
-              your private sub-categories.
+              {t("pageDesc")}
             </p>
           </div>
           <button
@@ -117,7 +116,7 @@ export default function ShopCategoriesPage() {
             className="flex items-center justify-center gap-2 px-5 py-2 bg-amazon-btnPrimary text-amazon-text text-[13px] font-medium rounded-sm border border-amazon-border hover:brightness-95 transition shrink-0 shadow-sm"
           >
             <Plus className="w-4 h-4" />
-            Add Category
+            {t("addCategory")}
           </button>
         </div>
 
@@ -134,7 +133,9 @@ export default function ShopCategoriesPage() {
               }`}
             >
               {tab.label}
-              <span className="ml-2 text-[11px] bg-white/40 px-1.5 py-0.5 rounded-sm border border-amazon-border/20">{tab.count}</span>
+              <span className="ml-2 text-[11px] bg-white/40 px-1.5 py-0.5 rounded-sm border border-amazon-border/20">
+                {tab.count}
+              </span>
             </button>
           ))}
         </div>
@@ -143,11 +144,11 @@ export default function ShopCategoriesPage() {
         <div className="bg-white rounded-sm border border-amazon-border overflow-hidden shadow-sm">
           {loading ? (
             <div className="p-12 text-center text-[13px] font-medium text-amazon-textMuted">
-              Loading categories...
+              {t("loadingCategories")}
             </div>
           ) : categoryTree.roots.length === 0 ? (
             <div className="p-12 text-center text-[13px] font-medium text-amazon-textMuted">
-              No categories found.
+              {t("noCategoriesFound")}
             </div>
           ) : (
             <div className="divide-y divide-amazon-border">
@@ -231,6 +232,7 @@ function CategoryRow({
   onEdit: (cat: CategoryItem) => void;
   onDelete: (cat: CategoryItem) => void;
 }) {
+  const t = useTranslations("ShopCategoriesPage");
   const [expanded, setExpanded] = useState(false);
   const children = childMap.get(category.id) || [];
   const hasChildren = children.length > 0 || category.subCategoryCount > 0;
@@ -280,33 +282,42 @@ function CategoryRow({
 
         {/* Name + Slug */}
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-[13px] text-amazon-text truncate">{category.name}</p>
-          <p className="text-[12px] text-amazon-textMuted truncate">{category.slug}</p>
+          <p className="font-medium text-[13px] text-amazon-text truncate">
+            {category.name}
+          </p>
+          <p className="text-[12px] text-amazon-textMuted truncate">
+            {category.slug}
+          </p>
         </div>
 
         {/* Type badge */}
         {isPrivate ? (
           <span className="flex items-center gap-1 text-[11px] font-medium bg-yellow-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-sm shrink-0">
             <Lock className="w-3 h-3" />
-            Private
+            {t("typePrivate")}
             {isOwn && (
-              <span className="ml-1 text-[10px] opacity-70">(yours)</span>
+              <span className="ml-1 text-[10px] opacity-70">
+                ({t("yours")})
+              </span>
             )}
           </span>
         ) : (
           <span className="flex items-center gap-1 text-[11px] font-medium bg-neutral-100 text-amazon-textMuted border border-amazon-border px-2 py-0.5 rounded-sm shrink-0">
             <Globe className="w-3 h-3" />
-            Global
+            {t("typeGlobal")}
           </span>
         )}
 
         {/* Stats */}
         <div className="flex items-center gap-4 text-[13px] font-medium text-amazon-textMuted shrink-0">
-          <span className="flex items-center gap-1" title="Sub-categories">
+          <span
+            className="flex items-center gap-1"
+            title={t("subCategoriesTitle")}
+          >
             <Layers className="w-3.5 h-3.5" />
             {category.subCategoryCount}
           </span>
-          <span className="flex items-center gap-1" title="Parts">
+          <span className="flex items-center gap-1" title={t("partsTitle")}>
             <Package className="w-3.5 h-3.5" />
             {category.partCount}
           </span>
@@ -320,7 +331,7 @@ function CategoryRow({
               : "bg-red-50 text-red-600 border-red-200"
           }`}
         >
-          {category.isActive ? "Active" : "Inactive"}
+          {category.isActive ? t("statusActive") : t("statusInactive")}
         </span>
 
         {/* Edit button — only for own private or if shop can edit */}
@@ -328,7 +339,7 @@ function CategoryRow({
           <button
             onClick={() => onEdit(category)}
             className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 hover:border-amazon-btnPrimary text-amazon-textMuted hover:text-amazon-text transition shrink-0"
-            title="Edit category"
+            title={t("editCategory")}
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
@@ -339,7 +350,7 @@ function CategoryRow({
           <button
             onClick={() => onDelete(category)}
             className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-red-50 hover:border-red-500 text-amazon-textMuted hover:text-red-500 transition shrink-0"
-            title="Delete category"
+            title={t("deleteCategory")}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>

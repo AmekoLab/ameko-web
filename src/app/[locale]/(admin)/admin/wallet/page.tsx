@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { fetchPendingWithdrawals } from "@/src/store/slices/adminWalletSlice";
 import ApproveWithdrawalModal from "@/src/components/Admin/ApproveWithdrawalModal";
@@ -10,13 +11,18 @@ import Image from "next/image";
 
 // ─── Status filter tabs ──────────────────────────────────
 const STATUS_TABS = [
-  { label: "All", value: "" },
-  { label: "Pending", value: "Pending" },
-  { label: "Approved", value: "Paid" },
-  { label: "Rejected", value: "Rejected" },
+  { labelKey: "tabAll", value: "" },
+  { labelKey: "tabPending", value: "Pending" },
+  { labelKey: "tabApproved", value: "Paid" },
+  { labelKey: "tabRejected", value: "Rejected" },
 ];
 
 export default function AdminWalletPage() {
+  const t = useTranslations("AdminWalletPage");
+  const locale = useLocale();
+  const dateLocale = locale === "vi" ? "vi-VN" : "en-US";
+  const numberLocale = locale === "vi" ? "vi-VN" : "en-US";
+
   const dispatch = useAppDispatch();
   const { withdrawals, loading, pagination } = useAppSelector(
     (state) => state.adminWallet,
@@ -65,7 +71,7 @@ export default function AdminWalletPage() {
           <span
             className={`${baseClasses} bg-yellow-50 text-yellow-700 border-yellow-200`}
           >
-            Pending
+            {t("statusPending")}
           </span>
         );
       case "Paid":
@@ -73,7 +79,7 @@ export default function AdminWalletPage() {
           <span
             className={`${baseClasses} bg-green-50 text-green-700 border-green-200`}
           >
-            Approved
+            {t("statusApproved")}
           </span>
         );
       case "Rejected":
@@ -81,7 +87,7 @@ export default function AdminWalletPage() {
           <span
             className={`${baseClasses} bg-red-50 text-red-700 border-red-200`}
           >
-            Rejected
+            {t("statusRejected")}
           </span>
         );
       default:
@@ -89,7 +95,7 @@ export default function AdminWalletPage() {
           <span
             className={`${baseClasses} bg-neutral-50 text-neutral-600 border-neutral-200`}
           >
-            {status}
+            {status || t("statusUnknown")}
           </span>
         );
     }
@@ -102,18 +108,18 @@ export default function AdminWalletPage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-2">
           <div>
             <h1 className="text-2xl font-bold text-amazon-text leading-tight">
-              Withdrawal Management
+              {t("title")}
             </h1>
             <p className="text-[11px] text-amazon-textMuted mt-0.5">
-              Approve or reject withdrawal requests from Shops.
+              {t("subtitle")}
             </p>
           </div>
           <span className="text-[10px] text-amazon-textMuted">
-            Total:{" "}
+            {t("totalLabel")}
             <strong className="text-amazon-text mx-1">
               {pagination?.totalCount || 0}
             </strong>{" "}
-            requests
+            {t("requestsLabel")}
           </span>
         </div>
 
@@ -132,7 +138,7 @@ export default function AdminWalletPage() {
                   : "bg-white text-amazon-textMuted border-amazon-border hover:bg-neutral-50 hover:text-amazon-text"
               }`}
             >
-              {tab.label}
+              {t(tab.labelKey)}
             </button>
           ))}
         </div>
@@ -141,21 +147,29 @@ export default function AdminWalletPage() {
         <div className="bg-white rounded-md border border-amazon-border overflow-hidden shadow-sm flex flex-col">
           {loading && withdrawals.length === 0 ? (
             <div className="p-12 text-center text-[11px] font-medium text-amazon-textMuted">
-              Loading data...
+              {t("loading")}
             </div>
           ) : (
             <div className="overflow-x-auto w-full">
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead className="bg-neutral-50 border-b border-amazon-border">
                   <tr className="text-left text-[10px] text-amazon-textMuted">
-                    <th className="px-4 py-2 font-medium">Shop</th>
-                    <th className="px-4 py-2 font-medium">Amount</th>
-                    <th className="px-4 py-2 font-medium">Bank</th>
-                    <th className="px-4 py-2 font-medium">Status</th>
-                    <th className="px-4 py-2 font-medium">Requested Date</th>
-                    <th className="px-4 py-2 font-medium">Evidence</th>
+                    <th className="px-4 py-2 font-medium">{t("tableShop")}</th>
+                    <th className="px-4 py-2 font-medium">
+                      {t("tableAmount")}
+                    </th>
+                    <th className="px-4 py-2 font-medium">{t("tableBank")}</th>
+                    <th className="px-4 py-2 font-medium">
+                      {t("tableStatus")}
+                    </th>
+                    <th className="px-4 py-2 font-medium">
+                      {t("tableRequestedDate")}
+                    </th>
+                    <th className="px-4 py-2 font-medium">
+                      {t("tableEvidence")}
+                    </th>
                     <th className="px-4 py-2 font-medium text-center">
-                      Action
+                      {t("tableAction")}
                     </th>
                   </tr>
                 </thead>
@@ -175,7 +189,7 @@ export default function AdminWalletPage() {
                       {/* Amount */}
                       <td className="px-4 py-3">
                         <span className="font-bold text-amazon-text text-[11px]">
-                          {item.amount.toLocaleString("en-US")}₫
+                          {item.amount.toLocaleString(numberLocale)}₫
                         </span>
                       </td>
 
@@ -198,7 +212,7 @@ export default function AdminWalletPage() {
                       <td className="px-4 py-3">
                         <span className="text-[10px] text-amazon-textMuted">
                           {new Date(item.requestedAt).toLocaleDateString(
-                            "vi-VN",
+                            dateLocale,
                             {
                               day: "2-digit",
                               month: "2-digit",
@@ -218,9 +232,9 @@ export default function AdminWalletPage() {
                               setPreviewImage(item.evidenceImageUrl!)
                             }
                             className="text-[10px] font-medium text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-2 py-0.5 rounded border border-blue-200 hover:bg-blue-100"
-                            title="View evidence"
+                            title={t("viewEvidenceTitle")}
                           >
-                            View
+                            {t("view")}
                           </button>
                         ) : (
                           <span className="text-[10px] text-amazon-textMuted">
@@ -236,16 +250,16 @@ export default function AdminWalletPage() {
                             <button
                               onClick={() => setApproveTarget(item)}
                               className="text-[10px] font-medium text-green-700 hover:text-green-800 transition-colors bg-green-50 px-2 py-1 rounded border border-green-200 hover:bg-green-100"
-                              title="Approve"
+                              title={t("approveTitle")}
                             >
-                              Approve
+                              {t("approve")}
                             </button>
                             <button
                               onClick={() => setRejectTarget(item)}
                               className="text-[10px] font-medium text-red-600 hover:text-red-800 transition-colors bg-red-50 px-2 py-1 rounded border border-red-200 hover:bg-red-100"
-                              title="Reject"
+                              title={t("rejectTitle")}
                             >
-                              Reject
+                              {t("reject")}
                             </button>
                           </div>
                         ) : (
@@ -263,7 +277,7 @@ export default function AdminWalletPage() {
                         colSpan={7}
                         className="p-12 text-center text-[10px] text-amazon-textMuted"
                       >
-                        No withdrawal requests found.
+                        {t("empty")}
                       </td>
                     </tr>
                   )}
@@ -276,11 +290,11 @@ export default function AdminWalletPage() {
           {pagination && pagination.totalPages > 1 && (
             <div className="flex items-center justify-between px-4 py-3 border-t border-amazon-border bg-neutral-50/50">
               <p className="text-[10px] text-amazon-textMuted">
-                Page{" "}
+                {t("pageLabel")}{" "}
                 <strong className="text-amazon-text mx-0.5">
                   {pagination.currentPage} / {pagination.totalPages}
                 </strong>{" "}
-                — {pagination.totalCount} requests
+                — {pagination.totalCount} {t("requestsLabel")}
               </p>
               <div className="flex items-center gap-1">
                 <button
@@ -290,7 +304,7 @@ export default function AdminWalletPage() {
                   disabled={!pagination.hasPreviousPage}
                   className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white text-amazon-text hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Prev
+                  {t("prev")}
                 </button>
                 <button
                   onClick={() =>
@@ -301,7 +315,7 @@ export default function AdminWalletPage() {
                   disabled={!pagination.hasNextPage}
                   className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white text-amazon-text hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Next
+                  {t("next")}
                 </button>
               </div>
             </div>
@@ -342,7 +356,7 @@ export default function AdminWalletPage() {
           <div className="relative max-w-2xl w-full mx-auto animate-in zoom-in-95 duration-200">
             <Image
               src={previewImage}
-              alt="Evidence"
+              alt={t("evidenceAlt")}
               width={800}
               height={600}
               className="w-full h-auto rounded-md shadow-xl object-contain border border-amazon-border bg-white"
@@ -351,7 +365,7 @@ export default function AdminWalletPage() {
               onClick={() => setPreviewImage(null)}
               className="absolute -top-3 -right-3 bg-white border border-amazon-border rounded-full px-2 py-1 text-[11px] font-medium text-amazon-text hover:bg-neutral-50 transition shadow-sm"
             >
-              Close
+              {t("close")}
             </button>
           </div>
         </div>

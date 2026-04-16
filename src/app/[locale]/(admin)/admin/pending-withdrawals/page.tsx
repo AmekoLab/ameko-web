@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { fetchPendingWithdrawalTxns } from "@/src/store/slices/adminWalletSlice";
 import { TransactionItem } from "@/src/services/wallet.service";
@@ -31,6 +32,11 @@ function parseBankDetails(description: string | null): BankDetails | null {
 
 // ─── Main Page ───────────────────────────────────────────
 export default function PendingWithdrawalsPage() {
+  const t = useTranslations("AdminPendingWithdrawalsPage");
+  const locale = useLocale();
+  const dateLocale = locale === "vi" ? "vi-VN" : "en-US";
+  const numberLocale = locale === "vi" ? "vi-VN" : "en-US";
+
   const dispatch = useAppDispatch();
   const { pendingWithdrawals, loadingPending, pendingPagination } =
     useAppSelector((state) => state.adminWallet);
@@ -60,7 +66,7 @@ export default function PendingWithdrawalsPage() {
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Đã sao chép!");
+    toast.success(t("copySuccess"));
   };
 
   const handleOpenApproveModal = (txId: string, amount: number) => {
@@ -78,18 +84,18 @@ export default function PendingWithdrawalsPage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-2">
           <div>
             <h1 className="text-2xl font-bold text-amazon-text leading-tight">
-              Pending Withdrawal Requests
+              {t("title")}
             </h1>
             <p className="text-[11px] text-amazon-textMuted mt-0.5">
-              Manage withdrawal requests currently pending from Shops.
+              {t("subtitle")}
             </p>
           </div>
           <span className="text-[10px] text-amazon-textMuted">
-            Total:{" "}
+            {t("totalLabel")}
             <strong className="text-amazon-text mx-1">
               {pendingPagination?.totalCount || 0}
             </strong>{" "}
-            requests
+            {t("requestsLabel")}
           </span>
         </div>
 
@@ -97,16 +103,16 @@ export default function PendingWithdrawalsPage() {
         <div className="bg-white rounded-md border border-amazon-border overflow-hidden flex flex-col shadow-sm">
           {loadingPending && pendingWithdrawals.length === 0 ? (
             <div className="p-12 text-center text-[11px] text-amazon-textMuted">
-              Loading data...
+              {t("loading")}
             </div>
           ) : pendingWithdrawals.length === 0 && !loadingPending ? (
             /* ─── Empty State ─────────────────────────── */
             <div className="p-16 flex flex-col items-center justify-center text-center">
               <h3 className="text-[13px] font-bold text-amazon-text mb-1">
-                No requests
+                {t("emptyTitle")}
               </h3>
               <p className="text-[11px] text-amazon-textMuted max-w-xs">
-                There are currently no withdrawal requests pending.
+                {t("emptyDescription")}
               </p>
             </div>
           ) : (
@@ -114,11 +120,13 @@ export default function PendingWithdrawalsPage() {
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead className="bg-neutral-50 border-b border-amazon-border">
                   <tr className="text-left text-[10px] font-medium text-amazon-textMuted">
-                    <th className="px-4 py-2">Date</th>
-                    <th className="px-4 py-2">Amount</th>
-                    <th className="px-4 py-2">Fee</th>
-                    <th className="px-4 py-2">Bank</th>
-                    <th className="px-4 py-2 text-center">Actions</th>
+                    <th className="px-4 py-2">{t("tableDate")}</th>
+                    <th className="px-4 py-2">{t("tableAmount")}</th>
+                    <th className="px-4 py-2">{t("tableFee")}</th>
+                    <th className="px-4 py-2">{t("tableBank")}</th>
+                    <th className="px-4 py-2 text-center">
+                      {t("tableActions")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-amazon-border">
@@ -131,19 +139,22 @@ export default function PendingWithdrawalsPage() {
                       >
                         {/* Date */}
                         <td className="px-4 py-3 text-[10px] text-amazon-textMuted">
-                          {new Date(tx.createdAt).toLocaleDateString("en-US", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {new Date(tx.createdAt).toLocaleDateString(
+                            dateLocale,
+                            {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
                         </td>
 
                         {/* Amount */}
                         <td className="px-4 py-3">
                           <span className="font-bold text-[11px] text-amazon-text">
-                            {tx.amount.toLocaleString("en-US")}₫
+                            {tx.amount.toLocaleString(numberLocale)}₫
                           </span>
                         </td>
 
@@ -151,7 +162,7 @@ export default function PendingWithdrawalsPage() {
                         <td className="px-4 py-3">
                           <span className="text-[11px] text-amazon-textMuted">
                             {tx.feeAmount > 0
-                              ? `${tx.feeAmount.toLocaleString("en-US")}₫`
+                              ? `${tx.feeAmount.toLocaleString(numberLocale)}₫`
                               : "—"}
                           </span>
                         </td>
@@ -168,9 +179,9 @@ export default function PendingWithdrawalsPage() {
                                 <button
                                   onClick={() => handleCopy(bank.accountNumber)}
                                   className="text-blue-600 hover:text-blue-800 transition-colors px-1 border border-transparent hover:border-blue-200 bg-transparent hover:bg-blue-50 rounded"
-                                  title="Copy Account Number"
+                                  title={t("copyAccountNumberTitle")}
                                 >
-                                  Copy
+                                  {t("copy")}
                                 </button>
                               </div>
                               <p className="text-[10px] text-amazon-textMuted">
@@ -179,7 +190,7 @@ export default function PendingWithdrawalsPage() {
                             </div>
                           ) : (
                             <span className="text-[10px] text-amazon-textMuted">
-                              No information
+                              {t("noInformation")}
                             </span>
                           )}
                         </td>
@@ -192,18 +203,18 @@ export default function PendingWithdrawalsPage() {
                                 handleOpenApproveModal(tx.id, tx.amount)
                               }
                               className="px-2 py-1 bg-green-50 text-green-700 border border-green-200 text-[10px] font-medium rounded hover:bg-green-100 transition-colors"
-                              title="Approve"
+                              title={t("approveTitle")}
                             >
-                              Approve
+                              {t("approve")}
                             </button>
                             <button
                               onClick={() =>
                                 handleOpenRejectModal(tx.id, tx.amount)
                               }
                               className="px-2 py-1 bg-red-50 text-red-600 border border-red-200 text-[10px] font-medium rounded hover:bg-red-100 transition-colors"
-                              title="Reject"
+                              title={t("rejectTitle")}
                             >
-                              Reject
+                              {t("reject")}
                             </button>
                           </div>
                         </td>
@@ -219,12 +230,12 @@ export default function PendingWithdrawalsPage() {
           {pendingPagination && pendingPagination.totalPages > 1 && (
             <div className="flex items-center justify-between px-4 py-3 border-t border-amazon-border bg-neutral-50/50">
               <p className="text-[10px] text-amazon-textMuted">
-                Page{" "}
+                {t("pageLabel")}
                 <strong className="text-amazon-text mx-0.5">
                   {pendingPagination.currentPage} /{" "}
                   {pendingPagination.totalPages}
                 </strong>{" "}
-                — {pendingPagination.totalCount} requests
+                — {pendingPagination.totalCount} {t("requestsLabel")}
               </p>
               <div className="flex items-center gap-1">
                 <button
@@ -232,7 +243,7 @@ export default function PendingWithdrawalsPage() {
                   disabled={!pendingPagination.hasPreviousPage}
                   className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white text-amazon-text hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Prev
+                  {t("prev")}
                 </button>
                 <button
                   onClick={() =>
@@ -243,7 +254,7 @@ export default function PendingWithdrawalsPage() {
                   disabled={!pendingPagination.hasNextPage}
                   className="px-2 py-1 text-[10px] font-medium rounded-sm border border-amazon-border bg-white text-amazon-text hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Next
+                  {t("next")}
                 </button>
               </div>
             </div>

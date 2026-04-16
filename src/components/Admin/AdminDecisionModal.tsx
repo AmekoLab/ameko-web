@@ -1,10 +1,11 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import Image from "next/image";
-import { useForm, Controller, useWatch } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useLocale, useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { processAdminWarrantyDecision } from "@/src/store/slices/adminWarrantySlice";
 import { WarrantyRequest } from "@/src/services/warranty.service";
@@ -12,17 +13,17 @@ import { toast } from "react-toastify";
 import WarrantyTimeline from "@/src/components/Warranty/WarrantyTimeline";
 
 // ─── Zod Schema ────────────────────────────────────────────
-const adminDecisionSchema = z.object({
-  approve: z.boolean({ message: "Please select a judgment" }),
-  adminNote: z
-    .string()
-    .min(
-      5,
-      "Please enter a reason/note for the judgment (at least 5 characters)",
-    ),
-});
+type Translator = (key: string) => string;
 
-type AdminDecisionFormValues = z.infer<typeof adminDecisionSchema>;
+const createAdminDecisionSchema = (t: Translator) =>
+  z.object({
+    approve: z.boolean({ message: t("validationSelectJudgment") }),
+    adminNote: z.string().min(5, t("validationAdminNoteMin")),
+  });
+
+type AdminDecisionFormValues = z.infer<
+  ReturnType<typeof createAdminDecisionSchema>
+>;
 
 // ─── Props ─────────────────────────────────────────────────
 interface AdminDecisionModalProps {
@@ -33,8 +34,8 @@ interface AdminDecisionModalProps {
 }
 
 // ─── Helpers ───────────────────────────────────────────────
-const formatCurrency = (amount: number): string =>
-  new Intl.NumberFormat("vi-VN", {
+const formatCurrency = (amount: number, localeCode: string): string =>
+  new Intl.NumberFormat(localeCode, {
     style: "currency",
     currency: "VND",
   }).format(amount);
@@ -46,10 +47,15 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
   issue,
   onSuccess,
 }) => {
+  const t = useTranslations("AdminDecisionModal");
+  const locale = useLocale();
+  const numberLocale = locale === "vi" ? "vi-VN" : "en-US";
+
   const dispatch = useAppDispatch();
   const { isProcessingAdminDecision } = useAppSelector(
     (state) => state.adminWarranty,
   );
+  const adminDecisionSchema = useMemo(() => createAdminDecisionSchema(t), [t]);
 
   const {
     register,
@@ -64,8 +70,6 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
       adminNote: "",
     },
   });
-
-  const approveValue = useWatch({ control, name: "approve" });
 
   const onSubmit = async (data: AdminDecisionFormValues) => {
     if (!issue) return;
@@ -82,7 +86,7 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
       onSuccess();
     } catch (err: unknown) {
       const error = err as string;
-      toast.error(error || "Handle admin decision failed");
+      toast.error(error || t("toastDecisionFailed"));
     }
   };
 
@@ -114,13 +118,13 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
         {/* Header */}
         <div className="flex-shrink-0 border-b border-amazon-border px-4 py-3 flex items-center justify-between bg-neutral-50/50">
           <h2 className="text-[14px] font-bold text-amazon-text tracking-tight">
-            Judge Warranty Request
+            {t("title")}
           </h2>
           <button
             onClick={handleClose}
             className="text-[11px] font-medium text-amazon-textMuted hover:text-amazon-text transition-colors"
           >
-            Close
+            {t("close")}
           </button>
         </div>
 
@@ -130,16 +134,20 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
             {/* Customer's Claim */}
             <div>
               <h3 className="text-[11px] font-bold text-amazon-text mb-1.5 uppercase tracking-wide">
-                Customer Request
+                {t("customerRequest")}
               </h3>
               <div className="bg-neutral-50 border border-amazon-border rounded-sm p-3 flex flex-col gap-1.5">
-                <p className="text-[11px] font-bold text-amazon-text">{issue.reason}</p>
-                <p className="text-[11px] text-amazon-textMuted">{issue.description}</p>
+                <p className="text-[11px] font-bold text-amazon-text">
+                  {issue.reason}
+                </p>
+                <p className="text-[11px] text-amazon-textMuted">
+                  {issue.description}
+                </p>
                 {issue.evidenceUrl && (
                   <div className="relative w-full h-40 max-w-sm rounded-[2px] overflow-hidden border border-amazon-border bg-white mt-1 border-dashed">
                     <Image
                       src={issue.evidenceUrl}
-                      alt="Minh chứng từ khách hàng"
+                      alt={t("customerEvidenceAlt")}
                       fill
                       className="object-contain"
                     />
@@ -151,14 +159,16 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
             {/* Shop's Defense */}
             <div>
               <h3 className="text-[11px] font-bold text-amazon-text mb-1.5 uppercase tracking-wide">
-                Shop's Response
+                {t("shopResponse")}
               </h3>
               <div className="bg-neutral-50 border border-amazon-border rounded-sm p-3">
                 {issue.shopResponse ? (
-                  <p className="text-[11px] text-amazon-text">{issue.shopResponse}</p>
+                  <p className="text-[11px] text-amazon-text">
+                    {issue.shopResponse}
+                  </p>
                 ) : (
                   <p className="text-[11px] text-amazon-textMuted italic">
-                    Shop has not responded yet.
+                    {t("shopNoResponse")}
                   </p>
                 )}
               </div>
@@ -168,22 +178,24 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
             {issue.refundAmount > 0 && (
               <div className="flex items-center justify-between p-2.5 rounded-sm bg-neutral-50 border border-amazon-border">
                 <span className="text-[11px] font-bold text-amazon-text">
-                  Requested refund amount
+                  {t("requestedRefundAmount")}
                 </span>
                 <span className="text-[13px] font-bold text-amazon-text">
-                  {formatCurrency(issue.refundAmount)}
+                  {formatCurrency(issue.refundAmount, numberLocale)}
                 </span>
               </div>
             )}
 
             {/* Expected Action */}
-            <p className="text-[10px] text-amazon-textMuted italic">{issue.expectedAction}</p>
+            <p className="text-[10px] text-amazon-textMuted italic">
+              {issue.expectedAction}
+            </p>
           </div>
 
           {/* Timeline Section */}
           <div className="px-4 py-4 border-b border-amazon-border bg-neutral-50/30">
             <h3 className="text-[11px] font-bold text-amazon-text mb-2.5 uppercase tracking-wide">
-              Action History
+              {t("actionHistory")}
             </h3>
             <div className="text-[10px] scale-90 origin-top-left -mb-6">
               <WarrantyTimeline issueId={issue.id} />
@@ -198,7 +210,7 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
             >
               {/* Decision Radio */}
               <div>
-                <label className={labelClass}>Admin's Judgment</label>
+                <label className={labelClass}>{t("adminJudgment")}</label>
                 <Controller
                   name="approve"
                   control={control}
@@ -221,10 +233,10 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
                               : "text-amazon-text"
                           }`}
                         >
-                          Approve Request
+                          {t("approveRequest")}
                         </p>
                         <p className="text-[10px] text-amazon-textMuted">
-                          Approve customer's request
+                          {t("approveCustomerRequest")}
                         </p>
                       </button>
 
@@ -245,10 +257,10 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
                               : "text-amazon-text"
                           }`}
                         >
-                          Reject, protect Shop
+                          {t("rejectProtectShop")}
                         </p>
                         <p className="text-[10px] text-amazon-textMuted">
-                          Reject customer's request
+                          {t("rejectCustomerRequest")}
                         </p>
                       </button>
                     </div>
@@ -262,17 +274,15 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
               {/* Admin Note */}
               <div>
                 <label htmlFor="adminNote" className={labelClass}>
-                  Judgment Note
+                  {t("judgmentNote")}
                 </label>
                 <textarea
                   id="adminNote"
                   rows={4}
                   {...register("adminNote")}
-                  placeholder="Enter Admin's reason/note for judgment..."
+                  placeholder={t("judgmentNotePlaceholder")}
                   className={`w-full rounded-sm border px-3 py-2 text-[11px] font-medium text-amazon-text placeholder:text-amazon-textMuted focus:outline-none focus:border-amazon-btnPrimary transition-colors resize-none ${
-                    errors.adminNote
-                      ? "border-red-400"
-                      : "border-amazon-border"
+                    errors.adminNote ? "border-red-400" : "border-amazon-border"
                   }`}
                 />
                 {errors.adminNote && (
@@ -288,31 +298,31 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
                   disabled={isProcessingAdminDecision}
                   className="px-4 py-1.5 text-[11px] font-medium text-amazon-text bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 transition-colors disabled:opacity-50 shadow-sm"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={isProcessingAdminDecision}
                   className="px-4 py-1.5 text-[11px] font-medium text-amazon-text bg-amazon-btnPrimary border border-amazon-btnPrimary shadow-sm rounded-sm hover:brightness-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isProcessingAdminDecision ? "Saving..." : "Save Judgment"}
+                  {isProcessingAdminDecision ? t("saving") : t("saveJudgment")}
                 </button>
               </div>
             </form>
           ) : (
             <div className="px-4 py-4">
               <h3 className="text-[11px] font-bold text-amazon-text mb-1.5 uppercase tracking-wide">
-                Admin's Judgment
+                {t("adminJudgment")}
               </h3>
               <div className="bg-neutral-50 border border-amazon-border rounded-sm p-3 text-[11px] text-amazon-text whitespace-pre-wrap">
-                {issue.adminNote || "No judgment note"}
+                {issue.adminNote || t("noJudgmentNote")}
               </div>
               <div className="flex justify-end mt-4 pt-4 border-t border-amazon-border">
                 <button
                   onClick={handleClose}
                   className="px-4 py-1.5 text-[11px] font-medium text-amazon-text bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 transition-colors shadow-sm"
                 >
-                  Close
+                  {t("close")}
                 </button>
               </div>
             </div>

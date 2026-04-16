@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,10 +13,9 @@ import { toast } from "react-toastify";
 import WarrantyTimeline from "@/src/components/Warranty/WarrantyTimeline";
 
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
 
 // ─── Zod Schema ────────────────────────────────────────────
-const getCustomerShipSchema = (t: any) =>
+const getCustomerShipSchema = (t: ReturnType<typeof useTranslations>) =>
   z.object({
     evidenceUrl: z.string().url(t("valEvidence")),
     comment: z.string().min(1, t("valComment")),
@@ -90,8 +89,13 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
       onClose();
       onSuccess();
     } catch (err: unknown) {
-      const error = err as string;
-      toast.error(error || t("submitFailed"));
+      let errorMessage = t("submitFailed");
+      if (typeof err === "string" && err) {
+        errorMessage = err;
+      } else if (err instanceof Error && err.message) {
+        errorMessage = err.message;
+      }
+      toast.error(errorMessage);
     }
   };
 
@@ -135,9 +139,7 @@ const CustomerShipModal: FC<CustomerShipModalProps> = ({
 
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 space-y-5">
           {/* Subtext */}
-          <p className="text-sm text-amazon-textMuted">
-            {t("modalSubtitle")}
-          </p>
+          <p className="text-sm text-amazon-textMuted">{t("modalSubtitle")}</p>
 
           {/* Timeline Section */}
           <div className="border border-amazon-border rounded-lg p-4">

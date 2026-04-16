@@ -95,6 +95,29 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
     );
   }, [order, assemblyCompletionMap]);
 
+  const getStatusLabel = useCallback(
+    (status: string) => {
+      const statusKeyMap: Record<string, string> = {
+        pending: "status.pending",
+        processing: "status.processing",
+        shipped: "status.shipped",
+        completed: "status.completed",
+        cancelled: "status.cancelled",
+        canceled: "status.cancelled",
+        returned: "status.returned",
+        paid: "status.paid",
+        released: "status.released",
+        refunded: "status.refunded",
+        failed: "status.failed",
+        unpaid: "status.unpaid",
+      };
+
+      const key = statusKeyMap[status.toLowerCase()];
+      return key ? t(key) : status;
+    },
+    [t],
+  );
+
   const fetchOrderDetail = useCallback(async () => {
     if (!orderId) return;
     setLoading(true);
@@ -266,7 +289,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                 {/* Left: Status & Date */}
                 <div>
                   <p className="text-lg font-medium text-amazon-text flex items-center gap-2">
-                    {tCommon("status")}: {order.orderStatus}
+                    {tCommon("status")}: {getStatusLabel(order.orderStatus)}
                   </p>
                   <p className="text-xs text-amazon-textMuted mt-1">
                     {t("placedOn", { date: formatDate(order.createdAt) })}
@@ -509,7 +532,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                         <CreditCard className="w-4 h-4" /> {tCommon("payment")}
                       </span>
                       <span className="text-sm font-medium text-amazon-text">
-                        {order.paymentStatus}
+                        {getStatusLabel(order.paymentStatus)}
                       </span>
                     </div>
                     {order.note && (

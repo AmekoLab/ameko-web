@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
   fetchMyAssembledProducts,
@@ -24,6 +25,7 @@ function formatPrice(price: number) {
 }
 
 export default function AssembledProductsPage() {
+  const t = useTranslations("ShopAssembledProductsPage");
   const dispatch = useAppDispatch();
   const { assembledProducts, total, loading } = useAppSelector(
     (state) => state.assembledProducts,
@@ -119,12 +121,12 @@ export default function AssembledProductsPage() {
           <div>
             <h1 className="text-2xl font-bold text-amazon-text mb-2 flex items-center gap-3">
               {/* <Puzzle className="w-8 h-8 text-amazon-text" /> */}
-              Assembled Products
+              {t("pageTitle")}
             </h1>
             <p className="text-[14px] text-amazon-textMuted">
-              Manage your shop&apos;s assembled keyboard products.{" "}
+              {t("pageDescPrefix")}{" "}
               <span className="font-bold text-amazon-text">{total}</span>{" "}
-              products total.
+              {t("pageDescSuffix")}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -133,7 +135,7 @@ export default function AssembledProductsPage() {
               className="px-5 py-2 bg-amazon-btnPrimary border border-amazon-border text-[13px] font-medium text-amazon-text rounded-sm hover:brightness-95 transition flex items-center gap-2 shadow-sm"
             >
               <Plus className="w-4 h-4 text-amazon-text" />
-              Create Product
+              {t("createProduct")}
             </button>
           </div>
         </div>
@@ -170,7 +172,7 @@ export default function AssembledProductsPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amazon-textMuted" />
             <input
               type="text"
-              placeholder="Search assembled products..."
+              placeholder={t("searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-3 py-2 border border-amazon-border rounded-sm text-[13px] font-medium bg-white text-amazon-text focus:outline-none focus:border-amazon-btnPrimary focus:ring-1 focus:ring-amazon-btnPrimary transition placeholder:text-neutral-400"
@@ -182,11 +184,11 @@ export default function AssembledProductsPage() {
         <div className="bg-white rounded-sm border border-amazon-border overflow-hidden shadow-sm">
           {loading ? (
             <div className="p-12 text-center text-[14px] font-medium text-amazon-textMuted">
-              Loading assembled products...
+              {t("loadingProducts")}
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="p-12 text-center text-[14px] font-medium text-amazon-textMuted">
-              No assembled products found.
+              {t("noProductsFound")}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -194,25 +196,25 @@ export default function AssembledProductsPage() {
                 <thead>
                   <tr className="bg-neutral-50/50 border-b border-amazon-border text-left">
                     <th className="px-4 py-3 font-medium text-amazon-textMuted text-[12px]">
-                      Product
+                      {t("colProduct")}
                     </th>
                     <th className="px-4 py-3 font-medium text-amazon-textMuted text-[12px]">
-                      Layout
+                      {t("colLayout")}
                     </th>
                     <th className="px-4 py-3 font-medium text-amazon-textMuted text-[12px] text-right">
-                      Price
+                      {t("colPrice")}
                     </th>
                     <th className="px-4 py-3 font-medium text-amazon-textMuted text-[12px] text-right">
-                      Qty
+                      {t("colQty")}
                     </th>
                     <th className="px-4 py-3 font-medium text-amazon-textMuted text-[12px]">
-                      Specs
+                      {t("colSpecs")}
                     </th>
                     <th className="px-4 py-3 font-medium text-amazon-textMuted text-[12px] text-center">
-                      Components
+                      {t("colComponents")}
                     </th>
                     <th className="px-4 py-3 font-medium text-amazon-textMuted text-[12px] text-center">
-                      Actions
+                      {t("colActions")}
                     </th>
                   </tr>
                 </thead>
@@ -248,6 +250,8 @@ function ProductRow({
   onEdit: (product: AssembledProductItem) => void;
   onDelete: (product: AssembledProductItem) => void;
 }) {
+  const t = useTranslations("ShopAssembledProductsPage");
+
   return (
     <tr className="hover:bg-neutral-50 transition-colors">
       {/* Product info */}
@@ -316,9 +320,7 @@ function ProductRow({
         <div className="text-[13px] font-medium space-y-0.5 max-w-[180px]">
           {product.mounting && (
             <p>
-              <span className="text-amazon-textMuted">
-                {product.mounting}
-              </span>
+              <span className="text-amazon-textMuted">{product.mounting}</span>
             </p>
           )}
           {product.connection && (
@@ -348,21 +350,21 @@ function ProductRow({
           <button
             onClick={() => onView(product.id)}
             className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 hover:border-amazon-btnPrimary text-amazon-textMuted hover:text-amazon-btnPrimary transition shrink-0 shadow-sm"
-            title="View product"
+            title={t("viewProduct")}
           >
             <Eye className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onEdit(product)}
             className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 hover:border-amazon-btnPrimary text-amazon-textMuted hover:text-amazon-btnPrimary transition shrink-0 shadow-sm"
-            title="Edit product"
+            title={t("editProduct")}
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onDelete(product)}
             className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-red-50 hover:border-red-500 text-amazon-textMuted hover:text-red-500 transition shrink-0 shadow-sm"
-            title="Delete product"
+            title={t("deleteProduct")}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>

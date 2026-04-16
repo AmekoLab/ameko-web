@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { fetchCategories } from "@/src/store/slices/categoriesSlice";
 import { CategoryItem } from "@/src/types/category.types";
@@ -20,13 +21,18 @@ import EditCategoryModal from "@/src/components/Admin/EditCategoryModal";
 import DeleteCategoryModal from "@/src/components/Admin/DeleteCategoryModal";
 
 export default function AdminCategoriesPage() {
+  const t = useTranslations("AdminCategoriesPage");
   const dispatch = useAppDispatch();
   const { categories, loading } = useAppSelector((state) => state.categories);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null);
+  const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(
+    null,
+  );
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deletingCategory, setDeletingCategory] = useState<CategoryItem | null>(null);
+  const [deletingCategory, setDeletingCategory] = useState<CategoryItem | null>(
+    null,
+  );
 
   useEffect(() => {
     // Admin: no shopId → only returns global categories
@@ -58,10 +64,10 @@ export default function AdminCategoriesPage() {
         <div className="flex justify-between items-end mb-5 border-b border-amazon-border pb-4">
           <div>
             <h1 className="text-2xl font-bold text-amazon-text mb-1 flex items-center gap-2">
-              Category Management
+              {t("title")}
             </h1>
             <p className="text-[13px] text-amazon-textMuted font-medium">
-              Manage global categories available to all shops on the platform.
+              {t("subtitle")}
             </p>
           </div>
           <button
@@ -69,7 +75,7 @@ export default function AdminCategoriesPage() {
             className="flex items-center justify-center gap-2 px-5 py-2 bg-amazon-btnPrimary text-amazon-text text-[13px] font-medium rounded-sm border border-amazon-border hover:brightness-95 transition shrink-0 shadow-sm"
           >
             <Plus className="w-4 h-4" />
-            Add Category
+            {t("addCategory")}
           </button>
         </div>
 
@@ -77,17 +83,18 @@ export default function AdminCategoriesPage() {
         <div className="bg-white rounded-sm border border-amazon-border overflow-hidden shadow-sm">
           {loading ? (
             <div className="p-12 text-center text-[13px] font-medium text-amazon-textMuted">
-              Loading categories...
+              {t("loading")}
             </div>
           ) : categoryTree.roots.length === 0 ? (
             <div className="p-12 text-center text-[13px] font-medium text-amazon-textMuted">
-              No categories found.
+              {t("empty")}
             </div>
           ) : (
             <div className="divide-y divide-amazon-border">
               {categoryTree.roots.map((root) => (
                 <CategoryRow
                   key={root.id}
+                  t={t}
                   category={root}
                   childMap={categoryTree.childMap}
                   depth={0}
@@ -144,12 +151,14 @@ export default function AdminCategoriesPage() {
 
 // --- Recursive Category Row ---
 function CategoryRow({
+  t,
   category,
   childMap,
   depth,
   onEdit,
   onDelete,
 }: {
+  t: (key: string) => string;
   category: CategoryItem;
   childMap: Map<string, CategoryItem[]>;
   depth: number;
@@ -195,23 +204,30 @@ function CategoryRow({
 
         {/* Name + Slug */}
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-[13px] text-amazon-text truncate">{category.name}</p>
-          <p className="text-[12px] text-amazon-textMuted truncate">{category.slug}</p>
+          <p className="font-medium text-[13px] text-amazon-text truncate">
+            {category.name}
+          </p>
+          <p className="text-[12px] text-amazon-textMuted truncate">
+            {category.slug}
+          </p>
         </div>
 
         {/* Type badge */}
         <span className="flex items-center gap-1 text-[11px] font-medium bg-neutral-100 text-amazon-textMuted border border-amazon-border px-2 py-0.5 rounded-sm shrink-0">
           <Globe className="w-3 h-3" />
-          Global
+          {t("typeGlobal")}
         </span>
 
         {/* Stats */}
         <div className="flex items-center gap-4 text-[13px] font-medium text-amazon-textMuted shrink-0">
-          <span className="flex items-center gap-1" title="Sub-categories">
+          <span
+            className="flex items-center gap-1"
+            title={t("statSubCategoriesTitle")}
+          >
             <Layers className="w-3.5 h-3.5" />
             {category.subCategoryCount}
           </span>
-          <span className="flex items-center gap-1" title="Parts">
+          <span className="flex items-center gap-1" title={t("statPartsTitle")}>
             <Package className="w-3.5 h-3.5" />
             {category.partCount}
           </span>
@@ -225,14 +241,14 @@ function CategoryRow({
               : "bg-red-50 text-red-600 border-red-200"
           }`}
         >
-          {category.isActive ? "Active" : "Inactive"}
+          {category.isActive ? t("statusActive") : t("statusInactive")}
         </span>
 
         {/* Edit button */}
         <button
           onClick={() => onEdit(category)}
           className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 hover:border-amazon-btnPrimary text-amazon-textMuted hover:text-amazon-text transition shrink-0"
-          title="Edit category"
+          title={t("editCategoryTitle")}
         >
           <Pencil className="w-3.5 h-3.5" />
         </button>
@@ -241,7 +257,7 @@ function CategoryRow({
         <button
           onClick={() => onDelete(category)}
           className="p-1.5 rounded-sm border border-amazon-border bg-white hover:bg-red-50 hover:border-red-500 text-amazon-textMuted hover:text-red-500 transition shrink-0"
-          title="Delete category"
+          title={t("deleteCategoryTitle")}
         >
           <Trash2 className="w-3.5 h-3.5" />
         </button>
@@ -252,6 +268,7 @@ function CategoryRow({
         children.map((child) => (
           <CategoryRow
             key={child.id}
+            t={t}
             category={child}
             childMap={childMap}
             depth={depth + 1}

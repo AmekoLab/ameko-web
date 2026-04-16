@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ProfileHeader } from "@/src/components/Profile/ProfileHeader";
 import { ProfileView } from "@/src/components/Profile/ProfileView";
 import { shopService } from "@/src/services/shopService";
@@ -14,23 +15,24 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id } = await params;
+  const t = await getTranslations("ProfilePage");
 
   try {
     const response = await shopService.getShopById(id);
     const shop = response.data;
 
-    if (!response.success || !shop) return { title: "Shop Not Found" };
+    if (!response.success || !shop) return { title: t("shopNotFound") };
 
     return {
       title: "AMEKO - " + shop.shopName,
-      description: shop.bio || "Shop profile on AMEKO",
+      description: shop.bio || t("shopProfileDescription"),
       openGraph: {
         images: shop.bannerUrl ? [shop.bannerUrl] : [],
       },
     };
   } catch (error) {
     console.error(error);
-    return { title: "Shop Not Found" };
+    return { title: t("shopNotFound") };
   }
 }
 

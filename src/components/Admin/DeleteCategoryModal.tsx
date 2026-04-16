@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertTriangle, Loader2, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { deleteCategory } from "@/src/store/slices/categoriesSlice";
 import { toast } from "react-toastify";
@@ -19,6 +20,7 @@ export default function DeleteCategoryModal({
   onClose,
   onSuccess,
 }: DeleteCategoryModalProps) {
+  const t = useTranslations("DeleteCategoryModal");
   const dispatch = useAppDispatch();
   const { deleting } = useAppSelector((state) => state.categories);
 
@@ -29,11 +31,11 @@ export default function DeleteCategoryModal({
     if (!category) return;
     try {
       await dispatch(deleteCategory(category.id)).unwrap();
-      toast.success("Category deleted successfully!");
+      toast.success(t("deletedSuccess"));
       onSuccess();
       onClose();
     } catch (err: unknown) {
-      toast.error((err as string) || "Failed to delete category");
+      toast.error((err as string) || t("deleteFailed"));
     }
   };
 
@@ -50,7 +52,7 @@ export default function DeleteCategoryModal({
       <div className="bg-white rounded-sm shadow-xl w-full max-w-md mx-4">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-amazon-border">
-          <h2 className="text-lg font-bold text-amazon-text">Delete Category</h2>
+          <h2 className="text-lg font-bold text-amazon-text">{t("title")}</h2>
           <button
             onClick={handleClose}
             className="p-1 rounded-sm hover:bg-neutral-50 transition"
@@ -68,12 +70,16 @@ export default function DeleteCategoryModal({
                 <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                 <div className="text-sm text-red-700">
                   <p className="font-bold mb-1 text-[13px]">
-                    Are you sure you want to delete this category?
+                    {t("confirmDeleteTitle")}
                   </p>
                   <p className="text-red-600 text-xs">
-                    This action will soft-delete{" "}
-                    <strong>&quot;{category.name}&quot;</strong> (
-                    {category.categoryType}). This cannot be easily undone.
+                    {t("confirmDeleteBody", {
+                      name: category.name,
+                      type:
+                        category.categoryType === "global"
+                          ? t("typeGlobal")
+                          : t("typePrivate"),
+                    })}
                   </p>
                 </div>
               </div>
@@ -81,13 +87,17 @@ export default function DeleteCategoryModal({
               {/* Category info summary */}
               <div className="bg-neutral-50 border border-amazon-border rounded-sm p-3 text-[13px] font-medium space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-amazon-textMuted">Name</span>
+                  <span className="text-amazon-textMuted">
+                    {t("fieldName")}
+                  </span>
                   <span className="font-medium text-amazon-text">
                     {category.name}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-amazon-textMuted">Type</span>
+                  <span className="text-amazon-textMuted">
+                    {t("fieldType")}
+                  </span>
                   <span
                     className={`font-medium text-[12px] ${
                       category.categoryType === "global"
@@ -95,11 +105,15 @@ export default function DeleteCategoryModal({
                         : "text-amber-600"
                     }`}
                   >
-                    {category.categoryType}
+                    {category.categoryType === "global"
+                      ? t("typeGlobal")
+                      : t("typePrivate")}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-amazon-textMuted">Slug</span>
+                  <span className="text-amazon-textMuted">
+                    {t("fieldSlug")}
+                  </span>
                   <span className="text-amazon-text">{category.slug}</span>
                 </div>
               </div>
@@ -109,24 +123,24 @@ export default function DeleteCategoryModal({
               <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
               <div className="text-sm text-amber-700">
                 <p className="font-bold mb-1 text-[13px]">
-                  Cannot delete "{category.name}"
+                  {t("cannotDeleteTitle", { name: category.name })}
                 </p>
                 <ul className="list-disc list-inside text-amber-600 space-y-0.5 text-[12px] font-medium">
                   {category.subCategoryCount > 0 && (
                     <li>
-                      Has {category.subCategoryCount} sub-categor
-                      {category.subCategoryCount === 1 ? "y" : "ies"}
+                      {t("hasSubCategories", {
+                        count: category.subCategoryCount,
+                      })}
                     </li>
                   )}
                   {category.partCount > 0 && (
                     <li>
-                      Has {category.partCount} part
-                      {category.partCount === 1 ? "" : "s"} assigned
+                      {t("hasPartsAssigned", { count: category.partCount })}
                     </li>
                   )}
                 </ul>
                 <p className="mt-2 text-[11px] font-medium text-amber-600">
-                  Remove all sub-categories and parts before deleting.
+                  {t("removeDependenciesHint")}
                 </p>
               </div>
             </div>
@@ -141,7 +155,7 @@ export default function DeleteCategoryModal({
             disabled={deleting}
             className="px-4 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50"
           >
-            Cancel
+            {t("cancel")}
           </button>
           {canDelete && (
             <button
@@ -151,7 +165,7 @@ export default function DeleteCategoryModal({
               className="px-5 py-2 text-[13px] font-medium text-white bg-red-600 border border-red-600 rounded-sm hover:bg-red-700 hover:border-red-700 transition disabled:opacity-50 flex items-center gap-2"
             >
               {deleting && <Loader2 className="w-4 h-4 animate-spin" />}
-              {deleting ? "Deleting..." : "Delete"}
+              {deleting ? t("deleting") : t("delete")}
             </button>
           )}
         </div>

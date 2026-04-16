@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { X, Loader2, Upload, ImageIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { updatePart } from "@/src/store/slices/partsSlice";
 import { toast } from "react-toastify";
@@ -12,39 +13,45 @@ import { CategoryItem } from "@/src/types/category.types";
 import { PartItem, PartType, PartSpecifications } from "@/src/types/part.types";
 
 // --- ZOD SCHEMA ---
-const editPartSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Part name is required")
-    .max(200, "Max 200 characters"),
-  partType: z.string().min(1, "Part type is required"),
-  price: z.string().min(1, "Price is required"),
-  stockQuantity: z.string().min(1, "Stock is required"),
-  description: z.string().optional(),
-  categoryId: z.string().min(1, "Category is required"),
-  recipeSwitchCount: z.string().optional(),
-  recipeStabilizerCount: z.string().optional(),
-});
+const editPartSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z
+      .string()
+      .min(1, t("validationPartNameRequired"))
+      .max(200, t("validationPartNameMax")),
+    partType: z.string().min(1, t("validationPartTypeRequired")),
+    price: z.string().min(1, t("validationPriceRequired")),
+    stockQuantity: z.string().min(1, t("validationStockRequired")),
+    description: z.string().optional(),
+    categoryId: z.string().min(1, t("validationCategoryRequired")),
+    recipeSwitchCount: z.string().optional(),
+    recipeStabilizerCount: z.string().optional(),
+  });
 
-type EditPartFormValues = z.infer<typeof editPartSchema>;
+type EditPartFormValues = z.infer<ReturnType<typeof editPartSchema>>;
 
 // --- Build kit specifications ---
 function buildKitSpecifications(
+  t: (key: string) => string,
   switchCount: number,
   stabilizerCount: number,
 ): PartSpecifications {
   return {
     recipe: { switch: switchCount, stabilizer: stabilizerCount },
     workflow: [
-      { step: "case", title: "Select Case", quantity: 1 },
-      { step: "plate", title: "Select Plate", quantity: 1 },
-      { step: "switch", title: "Select Switch", quantity: switchCount },
+      { step: "case", title: t("workflowCaseTitle"), quantity: 1 },
+      { step: "plate", title: t("workflowPlateTitle"), quantity: 1 },
+      {
+        step: "switch",
+        title: t("workflowSwitchTitle"),
+        quantity: switchCount,
+      },
       {
         step: "stabilizer",
-        title: "Select Stabilizer",
+        title: t("workflowStabilizerTitle"),
         quantity: stabilizerCount,
       },
-      { step: "keycap", title: "Select Keycap", quantity: 1 },
+      { step: "keycap", title: t("workflowKeycapTitle"), quantity: 1 },
     ],
   };
 }
@@ -64,8 +71,10 @@ export default function EditPartModal({
   categories,
   part,
 }: EditPartModalProps) {
+  const t = useTranslations("EditPartModal");
   const dispatch = useAppDispatch();
   const { updating } = useAppSelector((state) => state.parts);
+  const schema = useMemo(() => editPartSchema(t), [t]);
 
   // Thumbnail
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -87,7 +96,7 @@ export default function EditPartModal({
     reset,
     formState: { errors },
   } = useForm<EditPartFormValues>({
-    resolver: zodResolver(editPartSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       name: "",
       partType: "kit",
@@ -142,7 +151,7 @@ export default function EditPartModal({
 
       let specifications: PartSpecifications | null = null;
       if (isKit && switchCount > 0 && stabCount > 0) {
-        specifications = buildKitSpecifications(switchCount, stabCount);
+        specifications = buildKitSpecifications(t, switchCount, stabCount);
       }
 
       await dispatch(
@@ -162,11 +171,11 @@ export default function EditPartModal({
           isAddonEligible,
         }),
       ).unwrap();
-      toast.success("Part updated successfully!");
+      toast.success(t("updatedSuccess"));
       onSuccess();
       onClose();
     } catch (err: unknown) {
-      toast.error((err as string) || "Failed to update part");
+      toast.error((err as string) || t("updateFailed"));
     }
   };
 
@@ -215,9 +224,9 @@ export default function EditPartModal({
   const errorClass = "text-[11px] font-medium text-red-500 mt-1";
 
   const PART_TYPES: { value: PartType; label: string }[] = [
-    { value: "kit", label: "Kit" },
-    { value: "component", label: "Component" },
-    { value: "accessory", label: "Accessory" },
+    { value: "kit", label: t("typeKit") },
+    { value: "component", label: t("typeComponent") },
+    { value: "accessory", label: t("typeAccessory") },
   ];
 
   return (
@@ -226,9 +235,9 @@ export default function EditPartModal({
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-amazon-border">
           <div>
-            <h2 className="text-lg font-bold text-amazon-text">Edit Part</h2>
+            <h2 className="text-lg font-bold text-amazon-text">{t("title")}</h2>
             <p className="text-[12px] text-amazon-textMuted mt-0.5">
-              Update part information.{" "}
+              {t("subtitle")}{" "}
               {part && <span className="opacity-70">({part.slug})</span>}
             </p>
           </div>
@@ -246,18 +255,18 @@ export default function EditPartModal({
           {/* Row: Name + Part Type */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>Part Name</label>
+              <label className={labelClass}>{t("partName")}</label>
               <input
                 {...register("name")}
                 className={inputClass}
-                placeholder="e.g. Kit 75 v2"
+                placeholder={t("partNamePlaceholder")}
               />
               {errors.name && (
                 <p className={errorClass}>{errors.name.message}</p>
               )}
             </div>
             <div>
-              <label className={labelClass}>Part Type</label>
+              <label className={labelClass}>{t("partType")}</label>
               <select {...register("partType")} className={inputClass}>
                 {PART_TYPES.map((pt) => (
                   <option key={pt.value} value={pt.value}>
@@ -274,12 +283,12 @@ export default function EditPartModal({
           {/* Row: Price + Stock */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>Price (VND)</label>
+              <label className={labelClass}>{t("price")}</label>
               <input
                 type="number"
                 {...register("price")}
                 className={inputClass}
-                placeholder="e.g. 20000"
+                placeholder={t("pricePlaceholder")}
                 min={0}
               />
               {errors.price && (
@@ -287,12 +296,12 @@ export default function EditPartModal({
               )}
             </div>
             <div>
-              <label className={labelClass}>Stock Quantity</label>
+              <label className={labelClass}>{t("stockQuantity")}</label>
               <input
                 type="number"
                 {...register("stockQuantity")}
                 className={inputClass}
-                placeholder="e.g. 100000"
+                placeholder={t("stockQuantityPlaceholder")}
                 min={0}
               />
               {errors.stockQuantity && (
@@ -303,9 +312,9 @@ export default function EditPartModal({
 
           {/* Category */}
           <div>
-            <label className={labelClass}>Category</label>
+            <label className={labelClass}>{t("category")}</label>
             <select {...register("categoryId")} className={inputClass}>
-              <option value="">— Select category —</option>
+              <option value="">{t("selectCategory")}</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
@@ -320,14 +329,16 @@ export default function EditPartModal({
           {/* Description */}
           <div>
             <label className={labelClass}>
-              Description{" "}
-              <span className="font-normal text-amazon-textMuted">(optional)</span>
+              {t("description")}{" "}
+              <span className="font-normal text-amazon-textMuted">
+                ({t("optional")})
+              </span>
             </label>
             <textarea
               {...register("description")}
               className={`${inputClass} resize-none`}
               rows={3}
-              placeholder="Describe this part..."
+              placeholder={t("descriptionPlaceholder")}
             />
           </div>
 
@@ -335,33 +346,32 @@ export default function EditPartModal({
           {isKit && (
             <div className="p-5 bg-purple-50 border border-purple-200 rounded-sm space-y-4">
               <p className="text-[13px] font-bold text-purple-800">
-                Kit Recipe Configuration
+                {t("kitRecipeConfiguration")}
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Switch Count</label>
+                  <label className={labelClass}>{t("switchCount")}</label>
                   <input
                     type="number"
                     {...register("recipeSwitchCount")}
                     className={inputClass}
-                    placeholder="e.g. 82"
+                    placeholder={t("switchCountPlaceholder")}
                     min={0}
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Stabilizer Count</label>
+                  <label className={labelClass}>{t("stabilizerCount")}</label>
                   <input
                     type="number"
                     {...register("recipeStabilizerCount")}
                     className={inputClass}
-                    placeholder="e.g. 5"
+                    placeholder={t("stabilizerCountPlaceholder")}
                     min={0}
                   />
                 </div>
               </div>
               <p className="text-[11px] font-medium text-purple-600 mt-2">
-                Specifications (recipe + workflow) will be auto-generated and
-                sent as JSON.
+                {t("specAutoGeneratedHint")}
               </p>
             </div>
           )}
@@ -375,8 +385,11 @@ export default function EditPartModal({
               onChange={(e) => setIsAddonEligible(e.target.checked)}
               className="w-4 h-4 accent-orange-500 rounded-sm border-amazon-border cursor-pointer"
             />
-            <label htmlFor="edit-isAddonEligible" className="text-[13px] font-medium text-amazon-text cursor-pointer select-none">
-              Is Addon Eligible
+            <label
+              htmlFor="edit-isAddonEligible"
+              className="text-[13px] font-medium text-amazon-text cursor-pointer select-none"
+            >
+              {t("isAddonEligible")}
             </label>
           </div>
 
@@ -385,15 +398,17 @@ export default function EditPartModal({
             {/* Thumbnail */}
             <div>
               <label className={labelClass}>
-                Thumbnail Image{" "}
-                <span className="font-normal text-amazon-textMuted">(optional)</span>
+                {t("thumbnailImage")}{" "}
+                <span className="font-normal text-amazon-textMuted">
+                  ({t("optional")})
+                </span>
               </label>
               {thumbnailPreview ? (
                 <div className="relative w-full h-36 rounded-sm border border-amazon-border overflow-hidden bg-neutral-50 shadow-sm">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={thumbnailPreview}
-                    alt="Thumbnail preview"
+                    alt={t("thumbnailPreviewAlt")}
                     className="w-full h-full object-contain"
                   />
                   <button
@@ -411,7 +426,9 @@ export default function EditPartModal({
                   className="w-full h-28 border border-dashed border-amazon-border rounded-sm flex flex-col items-center justify-center gap-2 text-amazon-textMuted hover:border-amazon-btnPrimary hover:text-amazon-btnPrimary hover:bg-neutral-50 transition"
                 >
                   <Upload className="w-5 h-5" />
-                  <span className="text-[12px] font-medium">Thumbnail</span>
+                  <span className="text-[12px] font-medium">
+                    {t("thumbnail")}
+                  </span>
                 </button>
               )}
               <input
@@ -426,15 +443,17 @@ export default function EditPartModal({
             {/* Layer Image */}
             <div>
               <label className={labelClass}>
-                Layer Image{" "}
-                <span className="font-normal text-amazon-textMuted">(optional)</span>
+                {t("layerImage")}{" "}
+                <span className="font-normal text-amazon-textMuted">
+                  ({t("optional")})
+                </span>
               </label>
               {layerPreview ? (
                 <div className="relative w-full h-36 rounded-sm border border-amazon-border overflow-hidden bg-neutral-50 shadow-sm">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={layerPreview}
-                    alt="Layer preview"
+                    alt={t("layerPreviewAlt")}
                     className="w-full h-full object-contain"
                   />
                   <button
@@ -452,7 +471,9 @@ export default function EditPartModal({
                   className="w-full h-28 border border-dashed border-amazon-border rounded-sm flex flex-col items-center justify-center gap-2 text-amazon-textMuted hover:border-amazon-btnPrimary hover:text-amazon-btnPrimary hover:bg-neutral-50 transition"
                 >
                   <ImageIcon className="w-5 h-5" />
-                  <span className="text-[12px] font-medium">Layer Image</span>
+                  <span className="text-[12px] font-medium">
+                    {t("layerImage")}
+                  </span>
                 </button>
               )}
               <input
@@ -473,15 +494,17 @@ export default function EditPartModal({
               disabled={updating}
               className="px-5 py-2 text-[13px] font-medium text-amazon-textMuted bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 hover:text-amazon-text transition disabled:opacity-50 shadow-sm"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               disabled={updating}
               className="px-5 py-2 text-[13px] font-medium text-amazon-text bg-amazon-btnPrimary border border-amazon-border rounded-sm hover:brightness-95 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
             >
-              {updating && <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />}
-              {updating ? "Updating..." : "Update Part"}
+              {updating && (
+                <Loader2 className="w-4 h-4 animate-spin text-amazon-text" />
+              )}
+              {updating ? t("updating") : t("updatePart")}
             </button>
           </div>
         </form>

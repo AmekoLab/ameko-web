@@ -7,6 +7,7 @@ import { useAppSelector, useAppDispatch } from "@/src/store/hook";
 import { setActiveConversation } from "@/src/store/slices/chatSlice";
 import ConversationList from "@/src/components/chat/ConversationList";
 import ChatArea from "@/src/components/chat/ChatArea";
+import { useTranslations } from "next-intl";
 
 // ─── Skeleton loader (while conversations fetch on reload) ────────────────────
 
@@ -30,18 +31,22 @@ function ConversationSkeleton() {
 // ─── Desktop empty state ──────────────────────────────────
 
 function NoConversationSelected() {
+  const t = useTranslations("ChatPage");
+
   return (
     <div className="flex flex-col items-center justify-center h-full text-center px-10 bg-amazon-bgSecondary">
       <div className="w-16 h-16 rounded-sm bg-white border border-amazon-border flex items-center justify-center mb-5 shadow-sm">
         <MessageSquareDashed className="w-8 h-8 text-amazon-textMuted" />
       </div>
-      <h2 className="text-base font-black text-amazon-text mb-2">Your Messages</h2>
+      <h2 className="text-base font-black text-amazon-text mb-2">
+        {t("emptyTitle")}
+      </h2>
       <p className="text-xs text-amazon-textMuted max-w-xs leading-relaxed font-bold">
-        Select a conversation from the sidebar, or start a new chat from a product page.
+        {t("emptyDescription")}
       </p>
       <div className="mt-5 flex items-center gap-2 text-[10px] text-amazon-textMuted font-bold">
         <div className="w-8 h-px bg-amazon-border" />
-        <span>Messages are end-to-end secured</span>
+        <span>{t("securedLabel")}</span>
         <div className="w-8 h-px bg-amazon-border" />
       </div>
     </div>
@@ -51,17 +56,22 @@ function NoConversationSelected() {
 // ─── Sidebar header ───────────────────────────────────────
 
 function SidebarHeader() {
+  const t = useTranslations("ChatPage");
   const totalUnread = useAppSelector((state) =>
-    state.chat.conversations.reduce((s, c) => s + (c.unreadCount ?? 0), 0)
+    state.chat.conversations.reduce((s, c) => s + (c.unreadCount ?? 0), 0),
   );
   const count = useAppSelector((state) => state.chat.conversations.length);
-  const isLoading = useAppSelector((state) => state.chat.isLoadingConversations);
+  const isLoading = useAppSelector(
+    (state) => state.chat.isLoadingConversations,
+  );
 
   return (
     <div className="flex items-center justify-between px-4 py-3.5 z-10">
       <div className="flex items-center gap-2.5">
         <Users className="w-4 h-4 text-amazon-btnSecondary" />
-        <h1 className="text-sm font-black text-amazon-text ">Messages</h1>
+        <h1 className="text-sm font-black text-amazon-text ">
+          {t("messages")}
+        </h1>
         {totalUnread > 0 && (
           <span className="min-w-[18px] h-[18px] flex items-center justify-center rounded-sm bg-amazon-btnPrimary text-amazon-text text-[10px] font-black px-1">
             {totalUnread > 99 ? "99+" : totalUnread}
@@ -71,7 +81,9 @@ function SidebarHeader() {
       {isLoading ? (
         <Loader2 className="w-3.5 h-3.5 text-amazon-textMuted animate-spin" />
       ) : (
-        <span className="text-[10px] text-amazon-textMuted font-bold uppercase tracking-widest">{count} chat{count !== 1 ? "s" : ""}</span>
+        <span className="text-[10px] text-amazon-textMuted font-bold uppercase tracking-widest">
+          {count} {count === 1 ? t("chatSingular") : t("chatPlural")}
+        </span>
       )}
     </div>
   );
@@ -81,11 +93,17 @@ function SidebarHeader() {
 
 export default function ChatPage() {
   const dispatch = useAppDispatch();
-  const activeConversationId = useAppSelector((state) => state.chat.activeConversationId);
+  const activeConversationId = useAppSelector(
+    (state) => state.chat.activeConversationId,
+  );
 
   // Chat loading state — drives skeleton vs. real list
-  const isLoadingConversations = useAppSelector((state) => state.chat.isLoadingConversations);
-  const conversationsInitialized = useAppSelector((state) => state.chat.conversationsInitialized);
+  const isLoadingConversations = useAppSelector(
+    (state) => state.chat.isLoadingConversations,
+  );
+  const conversationsInitialized = useAppSelector(
+    (state) => state.chat.conversationsInitialized,
+  );
 
   const [mobileView, setMobileView] = useState<"list" | "chat">("list");
 
@@ -103,7 +121,6 @@ export default function ChatPage() {
 
   return (
     <div className="h-[100dvh] bg-amazon-bgSecondary text-amazon-text flex overflow-hidden font-sans">
-
       {/* ── Left sidebar ──────────────────────────────────── */}
       <aside
         className={`

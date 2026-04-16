@@ -1,9 +1,14 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useForm } from "react-hook-form";
+import {
+  useForm,
+  type UseFormRegister,
+  type UseFormSetValue,
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { registerShop } from "@/src/store/slices/shopSlice";
 import {
@@ -14,7 +19,6 @@ import { toast } from "react-toastify";
 import Image from "next/image";
 import {
   Camera,
-  Store,
   CreditCard,
   User,
   CheckCircle2,
@@ -24,8 +28,8 @@ import {
 
 interface ImageUploadProps {
   name: "logoImage" | "bannerImage";
-  register: any;
-  setValue: any;
+  register: UseFormRegister<RegisterShopSchemaType>;
+  setValue: UseFormSetValue<RegisterShopSchemaType>;
   preview: string | null;
   setPreview: (url: string | null) => void;
   error?: string;
@@ -41,6 +45,7 @@ const ImageUpload = ({
   error,
   type,
 }: ImageUploadProps) => {
+  const t = useTranslations("ShopRegisterPage");
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDrop = useCallback(
@@ -89,7 +94,12 @@ const ImageUpload = ({
         />
 
         {preview ? (
-          <Image src={preview} alt="Preview" fill className="object-cover" />
+          <Image
+            src={preview}
+            alt={t("imageUpload.previewAlt")}
+            fill
+            className="object-cover"
+          />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 z-10">
             <Camera
@@ -97,7 +107,7 @@ const ImageUpload = ({
             />
             {type === "banner" && (
               <span className="text-[11px] font-bold uppercase tracking-widest text-center px-4">
-                Drag or click to upload banner
+                {t("imageUpload.bannerPrompt")}
               </span>
             )}
           </div>
@@ -118,6 +128,7 @@ const ImageUpload = ({
 
 // --- TRANG CHÍNH ---
 export default function RegisterShopPage() {
+  const t = useTranslations("ShopRegisterPage");
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { loading } = useAppSelector((state) => state.shop);
@@ -139,18 +150,16 @@ export default function RegisterShopPage() {
       const res = await dispatch(registerShop(data)).unwrap();
 
       if (res) {
-        // 1. Hiện thông báo thành công
-        toast.success(
-          "Shop registration submitted successfully! Please wait for approval.",
-        );
+        toast.success(t("toast.submitSuccess"));
 
-        // 2. Chờ 2 giây rồi mới chuyển trang
         setTimeout(() => {
           router.push("/profile");
         }, 2000);
       }
-    } catch (error: any) {
-      toast.error(error.message || "Registration failed. Please try again.");
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : t("toast.submitFailed"),
+      );
     }
   };
 
@@ -161,10 +170,10 @@ export default function RegisterShopPage() {
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#1e2126] pb-4">
           <div>
             <h1 className="text-3xl font-black font-oswald uppercase tracking-widest text-white">
-              Merchant Registration
+              {t("header.title")}
             </h1>
             <p className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mt-2">
-              Complete the application to start doing business on Ameko.
+              {t("header.subtitle")}
             </p>
           </div>
         </div>
@@ -203,22 +212,22 @@ export default function RegisterShopPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <InputLabel
-                    label="Shop Name"
+                    label={t("fields.shopName")}
                     error={errors.shopName?.message}
                     required
                   />
                   <input
                     {...register("shopName")}
                     className="form-input text-[13px] font-black uppercase tracking-wider text-white"
-                    placeholder="SHOP NAME..."
+                    placeholder={t("placeholders.shopName")}
                   />
                 </div>
                 <div>
-                  <InputLabel label="Slogan / Bio" />
+                  <InputLabel label={t("fields.bio")} />
                   <input
                     {...register("bio")}
                     className="form-input text-[13px] font-bold text-white"
-                    placeholder="Short slogan or description..."
+                    placeholder={t("placeholders.bio")}
                   />
                 </div>
               </div>
@@ -230,57 +239,57 @@ export default function RegisterShopPage() {
             <div className="flex items-center gap-3 mb-6 border-b border-[#1e2126] pb-4">
               <User className="text-[#f5d800] w-5 h-5" />
               <h3 className="text-[13px] font-black text-white tracking-widest uppercase">
-                Contact Details
+                {t("sections.contactDetails")}
               </h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-1">
                 <InputLabel
-                  label="Contact Email"
+                  label={t("fields.contactEmail")}
                   error={errors.contactEmail?.message}
                   required
                 />
                 <input
                   {...register("contactEmail")}
                   className="form-input text-[13px] font-bold text-white tracking-wider"
-                  placeholder="email@domain.com"
+                  placeholder={t("placeholders.contactEmail")}
                 />
               </div>
               <div className="md:col-span-1">
                 <InputLabel
-                  label="Phone Number"
+                  label={t("fields.phoneNumber")}
                   error={errors.phoneNumber?.message}
                   required
                 />
                 <input
                   {...register("phoneNumber")}
                   className="form-input text-[13px] font-bold text-white tracking-wider"
-                  placeholder="09xxx..."
+                  placeholder={t("placeholders.phoneNumber")}
                 />
               </div>
               <div className="md:col-span-1">
                 <InputLabel
-                  label="Tax Code"
+                  label={t("fields.taxCode")}
                   error={errors.taxCode?.message}
                   required
                 />
                 <input
                   {...register("taxCode")}
                   className="form-input text-[13px] font-bold text-white tracking-wider"
-                  placeholder="TAX CODE..."
+                  placeholder={t("placeholders.taxCode")}
                 />
               </div>
               <div className="md:col-span-3">
                 <InputLabel
-                  label="Pickup Address"
+                  label={t("fields.address")}
                   error={errors.address?.message}
                   required
                 />
                 <input
                   {...register("address")}
                   className="form-input text-[13px] font-bold text-white tracking-wider"
-                  placeholder="Warehouse pickup address..."
+                  placeholder={t("placeholders.address")}
                 />
               </div>
             </div>
@@ -291,57 +300,57 @@ export default function RegisterShopPage() {
             <div className="flex items-center gap-3 mb-6 border-b border-[#1e2126] pb-4">
               <CreditCard className="text-[#f5d800] w-5 h-5" />
               <h3 className="text-[13px] font-black text-white tracking-widest uppercase">
-                Banking Information
+                {t("sections.bankingInformation")}
               </h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <InputLabel
-                  label="Citizen ID (CCCD)"
+                  label={t("fields.citizenId")}
                   error={errors.citizenId?.message}
                   required
                 />
                 <input
                   {...register("citizenId")}
                   className="form-input text-[13px] font-bold text-white tracking-wider"
-                  placeholder="CITIZEN ID"
+                  placeholder={t("placeholders.citizenId")}
                 />
               </div>
               <div>
                 <InputLabel
-                  label="Bank Name"
+                  label={t("fields.bankName")}
                   error={errors.bankName?.message}
                   required
                 />
                 <input
                   {...register("bankName")}
                   className="form-input text-[13px] font-bold text-white tracking-wider"
-                  placeholder="BANK NAME"
+                  placeholder={t("placeholders.bankName")}
                 />
               </div>
               <div>
                 <InputLabel
-                  label="Account Number"
+                  label={t("fields.bankAccountNumber")}
                   error={errors.bankAccountNumber?.message}
                   required
                 />
                 <input
                   {...register("bankAccountNumber")}
                   className="form-input font-mono text-[13px] font-bold text-white tracking-wider"
-                  placeholder="ACCOUNT NUMBER"
+                  placeholder={t("placeholders.bankAccountNumber")}
                 />
               </div>
               <div>
                 <InputLabel
-                  label="Account Holder Name"
+                  label={t("fields.bankAccountName")}
                   error={errors.bankAccountName?.message}
                   required
                 />
                 <input
                   {...register("bankAccountName")}
                   className="form-input uppercase text-[13px] font-bold text-white tracking-wider"
-                  placeholder="ACCOUNT HOLDER NAME"
+                  placeholder={t("placeholders.bankAccountName")}
                 />
               </div>
             </div>
@@ -357,11 +366,12 @@ export default function RegisterShopPage() {
               {loading ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  PROCESSING...
+                  {t("actions.processing")}
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  SUBMIT APPLICATION <CheckCircle2 className="w-5 h-5" />
+                  {t("actions.submitApplication")}{" "}
+                  <CheckCircle2 className="w-5 h-5" />
                 </span>
               )}
             </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { shopDashboardService } from "@/src/services/shopDashboard.service";
 import type {
   PurchaseFrequencyData,
@@ -38,6 +39,7 @@ interface PurchaseFrequencyCardsProps {
 export default function PurchaseFrequencyCards({
   filters,
 }: PurchaseFrequencyCardsProps) {
+  const t = useTranslations("PurchaseFrequencyCards");
   const [data, setData] = useState<PurchaseFrequencyData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -47,8 +49,7 @@ export default function PurchaseFrequencyCards({
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const result =
-          await shopDashboardService.getPurchaseFrequency(filters);
+        const result = await shopDashboardService.getPurchaseFrequency(filters);
         if (!cancelled) setData(result);
       } catch (error) {
         console.error("Purchase frequency fetch failed:", error);
@@ -67,29 +68,31 @@ export default function PurchaseFrequencyCards({
     if (!data) return [];
     return [
       {
-        label: "Orders / Customer",
+        label: t("ordersPerCustomer"),
         value: String(data.ordersPerCustomer),
       },
       {
-        label: "Avg Repurchase Cycle",
-        value: `${data.averageDaysBetweenOrders} days`,
+        label: t("avgRepurchaseCycle"),
+        value: t("avgRepurchaseCycleValue", {
+          days: data.averageDaysBetweenOrders,
+        }),
       },
       {
-        label: "Customers With Orders",
+        label: t("customersWithOrders"),
         value: new Intl.NumberFormat("vi-VN").format(data.customersWithOrders),
       },
       {
-        label: "Total Orders",
+        label: t("totalOrders"),
         value: new Intl.NumberFormat("vi-VN").format(data.totalOrders),
       },
     ];
-  }, [data]);
+  }, [data, t]);
 
   return (
     <section className="shrink-0">
       {/* Header - Thu nhỏ margin bottom và cỡ chữ */}
       <div className="flex items-center gap-2 mb-1.5">
-        <h3 className="text-sm font-bold text-amazon-text">Purchase Frequency</h3>
+        <h3 className="text-sm font-bold text-amazon-text">{t("title")}</h3>
       </div>
 
       {/* Cards Grid - Thu hẹp gap từ 4 xuống 2 */}
@@ -114,7 +117,7 @@ export default function PurchaseFrequencyCards({
         </div>
       ) : (
         <div className="text-center py-6 text-amazon-textMuted bg-white border border-amazon-border shadow-sm rounded-md">
-          <p className="text-xs font-medium">No data.</p>
+          <p className="text-xs font-medium">{t("noData")}</p>
         </div>
       )}
     </section>

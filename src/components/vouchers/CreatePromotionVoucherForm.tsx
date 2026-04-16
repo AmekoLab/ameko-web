@@ -1,10 +1,11 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "react-toastify";
 import { Loader2, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { createPromotionVoucherThunk } from "@/src/store/slices/voucherSlice";
 import {
@@ -16,46 +17,52 @@ import {
 
 // ─── Zod Schema ──────────────────────────────────────────
 
-const createVoucherSchema = z
-  .object({
-    code: z
-      .string()
-      .min(1, "Voucher code cannot be empty")
-      .max(30, "Maximum 30 characters"),
-    name: z.string().min(1, "Voucher name cannot be empty"),
-    description: z.string().min(1, "Description cannot be empty"),
-    discountType: z.string().min(1, "Select discount type"),
-    value: z.string().min(1, "Value cannot be empty"),
-    maxDiscountAmount: z.string().optional(),
-    minOrderValue: z.string().min(1, "Cannot be empty"),
-    usageLimit: z.string().min(1, "Cannot be empty"),
-    maxUsesPerUser: z.string().optional(),
-    startDate: z.string().min(1, "Select start date"),
-    endDate: z.string().min(1, "Select end date"),
-    allowStacking: z.boolean(),
-  })
-  .refine(
-    (data) => {
-      const val = Number(data.value);
-      if (isNaN(val) || val <= 0) return false;
-      if (Number(data.discountType) === DiscountType.Percentage && val > 100)
-        return false;
-      return true;
-    },
-    {
-      message: "Invalid value (percentage max 100%)",
-      path: ["value"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (!data.startDate || !data.endDate) return true;
-      return new Date(data.endDate) > new Date(data.startDate);
-    },
-    { message: "End date must be after start date", path: ["endDate"] },
-  );
+type TranslationFn = (key: string, values?: Record<string, unknown>) => string;
 
-type CreateVoucherFormValues = z.infer<typeof createVoucherSchema>;
+const createVoucherSchema = (t: TranslationFn) =>
+  z
+    .object({
+      code: z
+        .string()
+        .min(1, t("validation.codeRequired"))
+        .max(30, t("validation.codeMax")),
+      name: z.string().min(1, t("validation.nameRequired")),
+      description: z.string().min(1, t("validation.descriptionRequired")),
+      discountType: z.string().min(1, t("validation.discountTypeRequired")),
+      value: z.string().min(1, t("validation.valueRequired")),
+      maxDiscountAmount: z.string().optional(),
+      minOrderValue: z.string().min(1, t("validation.minOrderRequired")),
+      usageLimit: z.string().min(1, t("validation.usageLimitRequired")),
+      maxUsesPerUser: z.string().optional(),
+      startDate: z.string().min(1, t("validation.startDateRequired")),
+      endDate: z.string().min(1, t("validation.endDateRequired")),
+      allowStacking: z.boolean(),
+    })
+    .refine(
+      (data) => {
+        const val = Number(data.value);
+        if (isNaN(val) || val <= 0) return false;
+        if (Number(data.discountType) === DiscountType.Percentage && val > 100)
+          return false;
+        return true;
+      },
+      {
+        message: t("validation.invalidValue"),
+        path: ["value"],
+      },
+    )
+    .refine(
+      (data) => {
+        if (!data.startDate || !data.endDate) return true;
+        return new Date(data.endDate) > new Date(data.startDate);
+      },
+      {
+        message: t("validation.endDateAfterStartDate"),
+        path: ["endDate"],
+      },
+    );
+
+type CreateVoucherFormValues = z.infer<ReturnType<typeof createVoucherSchema>>;
 
 // ─── Component ───────────────────────────────────────────
 
@@ -65,17 +72,19 @@ interface Props {
 }
 
 export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
+  const t = useTranslations("CreatePromotionVoucherForm");
+  const tCommon = useTranslations("Common");
   const dispatch = useAppDispatch();
   const { isCreatingVoucher } = useAppSelector((state) => state.voucher);
 
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     reset,
     formState: { errors },
   } = useForm<CreateVoucherFormValues>({
-    resolver: zodResolver(createVoucherSchema),
+    resolver: zodResolver(createVoucherSchema(t as unknown as TranslationFn)),
     defaultValues: {
       code: "",
       name: "",
@@ -92,7 +101,10 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
     },
   });
 
-  const discountType = watch("discountType");
+  const discountType = useWatch({
+    control,
+    name: "discountType",
+  });
 
   const onSubmit = async (data: CreateVoucherFormValues) => {
     try {
@@ -125,11 +137,11 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
       const result = await dispatch(
         createPromotionVoucherThunk(payload),
       ).unwrap();
-      toast.success(result.message || "Voucher created successfully!");
+      toast.success(result.message || t("toast.createSuccess"));
       reset();
       onClose();
     } catch (err: unknown) {
-      toast.error(typeof err === "string" ? err : "Failed to create voucher");
+      toast.error(typeof err === "string" ? err : t("toast.createFailed"));
     }
   };
 
@@ -146,12 +158,11 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
       <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-sm bg-white p-6 shadow-xl border border-amazon-border">
         {/* Header */}
         <div className="flex items-center justify-between mb-5 pb-4 border-b border-amazon-border">
-          <h2 className="text-lg font-bold text-amazon-text">
-            Create Promotion Voucher
-          </h2>
+          <h2 className="text-lg font-bold text-amazon-text">{t("title")}</h2>
           <button
             type="button"
             onClick={onClose}
+            aria-label={tCommon("close")}
             className="rounded-sm p-1.5 text-amazon-textMuted hover:bg-neutral-50 hover:text-amazon-text transition border border-transparent hover:border-amazon-border"
           >
             <X className="h-5 w-5" />
@@ -162,19 +173,19 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           {/* ── Row 1: Code + Name ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className={labelCls}>Voucher Code</label>
+              <label className={labelCls}>{t("labels.voucherCode")}</label>
               <input
                 {...register("code")}
-                placeholder="Eg: SALE20"
+                placeholder={t("placeholders.code")}
                 className={`${inputCls} uppercase`}
               />
               {errors.code && <p className={errCls}>{errors.code.message}</p>}
             </div>
             <div>
-              <label className={labelCls}>Voucher Name</label>
+              <label className={labelCls}>{t("labels.voucherName")}</label>
               <input
                 {...register("name")}
-                placeholder="Eg: 20% Off for New Year"
+                placeholder={t("placeholders.name")}
                 className={inputCls}
               />
               {errors.name && <p className={errCls}>{errors.name.message}</p>}
@@ -183,11 +194,11 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
 
           {/* ── Description ── */}
           <div>
-            <label className={labelCls}>Description</label>
+            <label className={labelCls}>{t("labels.description")}</label>
             <textarea
               {...register("description")}
               rows={2}
-              placeholder="Brief description about the voucher..."
+              placeholder={t("placeholders.description")}
               className={`${inputCls} resize-none`}
             />
             {errors.description && (
@@ -198,27 +209,27 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           {/* ── Row 2: Discount Type + Value ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className={labelCls}>Discount Type</label>
+              <label className={labelCls}>{t("labels.discountType")}</label>
               <select {...register("discountType")} className={inputCls}>
                 <option value={String(DiscountType.Percentage)}>
-                  Percentage Discount
+                  {t("discountTypeOptions.percentage")}
                 </option>
                 <option value={String(DiscountType.FixedAmount)}>
-                  Fixed Amount Discount
+                  {t("discountTypeOptions.fixedAmount")}
                 </option>
               </select>
             </div>
             <div>
               <label className={labelCls}>
-                Value{" "}
+                {t("labels.value")}
                 {discountType === String(DiscountType.Percentage)
-                  ? "(%)"
-                  : "(VND)"}
+                  ? t("units.percentWrapped")
+                  : t("units.vndWrapped")}
               </label>
               <input
                 type="number"
                 {...register("value")}
-                placeholder="0"
+                placeholder={t("placeholders.value")}
                 className={inputCls}
               />
               {errors.value && <p className={errCls}>{errors.value.message}</p>}
@@ -228,11 +239,11 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           {/* ── Max Discount (only for Percentage) ── */}
           {discountType === String(DiscountType.Percentage) && (
             <div>
-              <label className={labelCls}>Max Discount (VND)</label>
+              <label className={labelCls}>{t("labels.maxDiscount")}</label>
               <input
                 type="number"
                 {...register("maxDiscountAmount")}
-                placeholder="Eg: 100000"
+                placeholder={t("placeholders.maxDiscount")}
                 className={inputCls}
               />
               {errors.maxDiscountAmount && (
@@ -244,11 +255,11 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           {/* ── Row 3: Min Order + Usage Limit + Max Uses Per User ── */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div>
-              <label className={labelCls}>Minimum Order (VND)</label>
+              <label className={labelCls}>{t("labels.minimumOrder")}</label>
               <input
                 type="number"
                 {...register("minOrderValue")}
-                placeholder="0"
+                placeholder={t("placeholders.minOrder")}
                 className={inputCls}
               />
               {errors.minOrderValue && (
@@ -256,11 +267,11 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               )}
             </div>
             <div>
-              <label className={labelCls}>Usage Limit</label>
+              <label className={labelCls}>{t("labels.usageLimit")}</label>
               <input
                 type="number"
                 {...register("usageLimit")}
-                placeholder="100"
+                placeholder={t("placeholders.usageLimit")}
                 className={inputCls}
               />
               {errors.usageLimit && (
@@ -268,11 +279,11 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               )}
             </div>
             <div>
-              <label className={labelCls}>Max Uses / User</label>
+              <label className={labelCls}>{t("labels.maxUsesPerUser")}</label>
               <input
                 type="number"
                 {...register("maxUsesPerUser")}
-                placeholder="Unlimited if empty"
+                placeholder={t("placeholders.maxUsesPerUser")}
                 className={inputCls}
               />
               {errors.maxUsesPerUser && (
@@ -284,7 +295,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           {/* ── Row 4: Dates ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className={labelCls}>Start Date</label>
+              <label className={labelCls}>{t("labels.startDate")}</label>
               <input
                 type="datetime-local"
                 {...register("startDate")}
@@ -295,7 +306,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               )}
             </div>
             <div>
-              <label className={labelCls}>End Date</label>
+              <label className={labelCls}>{t("labels.endDate")}</label>
               <input
                 type="datetime-local"
                 {...register("endDate")}
@@ -315,8 +326,11 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               {...register("allowStacking")}
               className="h-4 w-4 rounded-sm border-amazon-border text-amazon-focus focus:ring-amazon-focus transition-colors"
             />
-            <label htmlFor="allowStacking" className="text-[13px] text-amazon-text font-medium cursor-pointer">
-              Allow stacking with other vouchers
+            <label
+              htmlFor="allowStacking"
+              className="text-[13px] text-amazon-text font-medium cursor-pointer"
+            >
+              {t("labels.allowStacking")}
             </label>
           </div>
 
@@ -327,7 +341,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               onClick={onClose}
               className="rounded-sm border border-amazon-border bg-white px-5 py-2.5 text-[13px] font-medium text-amazon-textMuted transition hover:bg-neutral-50 hover:text-amazon-text"
             >
-              Cancel
+              {tCommon("cancel")}
             </button>
             <button
               type="submit"
@@ -337,7 +351,9 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
               {isCreatingVoucher && (
                 <Loader2 className="h-4 w-4 animate-spin text-amazon-textMuted" />
               )}
-              Create Voucher
+              {isCreatingVoucher
+                ? t("actions.creating")
+                : t("actions.createVoucher")}
             </button>
           </div>
         </form>
