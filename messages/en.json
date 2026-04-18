@@ -68,7 +68,8 @@
     "logout": "Logout",
     "collapseSidebar": "Collapse Sidebar",
     "expandSidebar": "Expand Sidebar",
-    "language": "Language"
+    "language": "Language",
+    "ruleBuilder": "Rules Builder"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -492,6 +493,10 @@
     "loadFailed": "Failed to load transactions",
     "pageTitle": "Transaction History",
     "pageDesc": "Track and manage your wallet balances, deposits, and financial activity.",
+    "flowIn": "ADDED TO WALLET",
+    "flowOut": "DEDUCTED",
+    "flowHeld": "ON HOLD",
+    "flowNeutral": "NO CHANGE",
     "filterTitle": "Filter Transactions",
     "clearFilters": "Clear filters",
     "type": "Type",
@@ -508,6 +513,7 @@
     "statusColumn": "Status",
     "date": "Date",
     "fee": "Fee",
+    "runningBalance": "Balance",
     "noTransactions": "No transactions found",
     "noTransactionsDesc": "Try adjusting your filters to find what you're looking for.",
     "showing": "Showing",
@@ -518,6 +524,9 @@
     "next": "Next",
     "last": "Last",
     "notAvailable": "N/A",
+    "localeCode": "en-US",
+    "statusLabel": "Status",
+    "typeLabel": "Transaction Type",
     "types": {
       "-1": "All Types",
       "0": "Order Payment",
@@ -526,7 +535,12 @@
       "3": "Deposit",
       "4": "Withdrawal",
       "5": "Sales Pending",
-      "6": "Manual Adjustment"
+      "6": "Manual Adjustment",
+      "ManualAdjustment": "Manual Adjustment",
+      "Withdrawal": "Withdrawal",
+      "SalesPending": "Pending Sales",
+      "OrderRefund": "Order Refund",
+      "OrderPayment": "Order Payment"
     },
     "statuses": {
       "-1": "All Statuses",
@@ -534,6 +548,24 @@
       "1": "Completed",
       "2": "Failed",
       "3": "Cancelled"
+    },
+    "status": {
+      "Completed": "Completed",
+      "Pending": "Pending",
+      "Failed": "Failed"
+    },
+    "details": {
+      "title": "Transaction Details",
+      "transactionId": "Transaction ID",
+      "time": "Time",
+      "balanceBefore": "Available Balance (Before)",
+      "balanceAfter": "Available Balance (After)",
+      "heldBalanceBefore": "Pending Balance (Before)",
+      "heldBalanceAfter": "Pending Balance (After)",
+      "relatedOrder": "Related Order",
+      "description": "Description",
+      "bankInfo": "Recipient Account",
+      "close": "Close"
     },
     "sortOptions": {
       "createdAt": "Date Created",
@@ -655,7 +687,12 @@
       "refunded": "Refunded",
       "failed": "Failed",
       "unpaid": "Unpaid"
-    }
+    },
+    "updateDeliveryDate": "Update Delivery Date",
+    "expectedDeliveryDateLabel": "Expected Delivery Date",
+    "deliveryDateNotice": "Updating the expected delivery date will notify the customer of the new timeline. Please ensure this date is accurate to avoid confusion.",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
   },
   "page": {
     "title": "Order History",
@@ -1027,7 +1064,12 @@
         "line2": "Custom-built products may be subject to a restocking fee.",
         "line3": "Refunds will be processed to the original method of payment within 5-7 business days of receiving the returned item."
       }
-    }
+    },
+    "walletPinPrompt": "Please enter your 6-digit wallet PIN to confirm payment.",
+    "walletPinPlaceholder": "Enter wallet PIN",
+    "walletPinConfirm": "Confirm Payment",
+    "walletPinCancel": "Cancel",
+    "walletPinInvalid": "Invalid PIN. Please try again."
   },
   "ProfileView": {
     "tabPosts": "Posts",
@@ -3010,6 +3052,111 @@
     "resetConfirm": "Reset all configuration?",
     "addToCartSuccess": "Item added to cart successfully!",
     "addToCartError": "Failed to add to cart",
-    "kitDisplayName": "Custom Lab Edition"
+    "kitDisplayName": "Custom Lab Edition",
+    "emptyVisualizer": "Please select {step} to begin",
+    "resetConfirmTitle": "Reset Configuration?",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "ProductDetailPage": {
+    "loadErrorFallback": "Failed to load product details",
+    "productNotFound": "Product Not Found",
+    "notFoundDescription": "The assembled product you're looking for doesn't exist.",
+    "backToShop": "← Back to Shop",
+    "soundTestDesc": "Listen to the satisfying sound of the {name}. Each component has been carefully selected to create the perfect acoustic profile.",
+    "details": "Details",
+    "productDescription": "Product Description",
+    "showLess": "Show Less",
+    "readMore": "Read More",
+    "specs": "Specs",
+    "technicalSpecs": "Technical Specs",
+    "fallbackParagraphOne": "Designed for enthusiasts, gamers, and professionals alike, the <strong>{name}</strong> offers unparalleled customization and performance. With its gasket-mounted structure and tri-mode connectivity, it adapts seamlessly to any setup.",
+    "fallbackParagraphTwo": "The premium build quality ensures durability, while the hot-swappable PCB allows you to customize your typing experience without soldering.",
+    "breakdown": "Breakdown",
+    "buildComponents": "Build Components",
+    "buildComponentsSubtitle": "Every part hand-selected and assembled for the perfect typing experience.",
+    "baseKit": "Base Kit: {kitName}",
+    "tableIndex": "#",
+    "tableComponent": "Component",
+    "tableQuantity": "Quantity",
+    "tableSoundTest": "Sound Test",
+    "listen": "Listen"
+  },
+  "ProductInfo": {
+    "loginRequired": "Please login to add product to cart",
+    "addedToCart": "{name} added to cart!",
+    "addToCartFailed": "Failed to add item to cart. Please try again.",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "new": "NEW",
+    "soldBy": "Sold by",
+    "layout": "Layout",
+    "mounting": "Mounting",
+    "pcb": "PCB",
+    "connection": "Connection",
+    "stockNotice": "Due to exceptionally high demand and limited stock, some orders may experience slight delays.",
+    "bundleAndSave": "Bundle and Save",
+    "bundleDiscount": "Discount applied when purchased together",
+    "decreaseQuantityAria": "Decrease quantity",
+    "increaseQuantityAria": "Increase quantity",
+    "adding": "Adding...",
+    "addToCart": "Add to Cart",
+    "qualifiesFor": "This product qualifies for",
+    "freeShipping": "free shipping",
+    "orderTodayTo": "Order today to",
+    "receiveIncentives": "receive incentives",
+    "day60": "60-day",
+    "trustSatisfaction": "100% Satisfaction Guarantee",
+    "trustPremium": "Premium Quality",
+    "trustFastShipping": "Fast Shipping",
+    "trustSupport247": "24/7 Customer Support",
+    "trustEasyReturns": "Easy Returns",
+    "trustSecurePayments": "Secure Payments"
+  },
+  "ProductSpecs": {
+    "layoutSize": "Layout Size",
+    "mountingStyle": "Mounting Style",
+    "pcbTech": "PCB Tech",
+    "connection": "Connection",
+    "batteryCapacity": "Battery Capacity",
+    "pollingRate": "Polling Rate",
+    "antiGhosting": "Anti-Ghosting",
+    "caseMaterial": "Case Material",
+    "plateMaterial": "Plate Material",
+    "weight": "Weight",
+    "warranty": "Warranty",
+    "na": "N/A"
+  },
+  "SoundTestSection": {
+    "eyebrow": "Sound Test",
+    "titleLine1": "Experience",
+    "titleLine2": "The Sound.",
+    "iframeTitle": "Sound Test"
+  },
+  "ProductGallery": {
+    "loading3DViewer": "Loading 3D Viewer...",
+    "screenshotSaved": "Screenshot saved!",
+    "breadcrumbHomeShop": "Home / Shop /",
+    "productImagesAria": "Product images",
+    "open3DViewAria": "Open 3D view",
+    "retryLoading3DModelAria": "Retry loading 3D model",
+    "loading3DModelAria": "Loading 3D model",
+    "loading": "Loading",
+    "retry": "Retry",
+    "label3D": "3D",
+    "no3D": "No 3D",
+    "viewImageAria": "View image {n}",
+    "clickToEnlargeImageAria": "Click to enlarge image",
+    "open360ViewAria": "Open 360° 3D view",
+    "view360": "360° View",
+    "clickToZoom": "Click to Zoom",
+    "moreFeatures": "More Features",
+    "viewer3DAria": "3D viewer",
+    "viewerImageAria": "Image viewer",
+    "closeViewerAria": "Close viewer (ESC)",
+    "dragToRotateScrollToZoom": "Drag to rotate • Scroll to zoom",
+    "clickCameraToCapture": "Click camera icon to capture",
+    "performanceMonitorActive": "Performance monitor active",
+    "pressEscToClose": "Press ESC to close"
   }
 }

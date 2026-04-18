@@ -188,6 +188,8 @@ function CheckoutContent() {
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [paymentMethod, setPaymentMethod] = useState<number>(0);
+  const [walletPin, setWalletPin] = useState<string>("");
+  const [pinError, setPinError] = useState<string>("");
 
   const validateForm = useCallback(
     (formData: CheckoutForm): FormErrors => {
@@ -315,6 +317,17 @@ function CheckoutContent() {
         return;
       }
 
+      // Wallet PIN Validation
+      if (paymentMethod === 1) {
+        if (!walletPin || walletPin.length < 6) {
+          setPinError(
+            t("validation.pinRequired") ||
+              "Vui lòng nhập đủ 6 số mã PIN ví ảo.",
+          );
+          return;
+        }
+      }
+
       setSubmitting(true);
       try {
         const origin =
@@ -335,6 +348,7 @@ function CheckoutContent() {
               ? payloadCodes.shopCodeGroups
               : undefined,
           paymentMethod,
+          ...(paymentMethod === 1 && { walletPin }), // Inject PIN for virtual wallet
         };
 
         console.log("🚀 FINAL CHECKOUT PAYLOAD:", payload);
@@ -343,16 +357,17 @@ function CheckoutContent() {
 
         if (res.success) {
           if (res.data?.paymentUrl) {
-            // Trường hợp 1: VNPay hoặc Stripe (Có URL chuyển hướng)
             window.location.href = res.data.paymentUrl;
           } else {
-            // Trường hợp 2: Ví Ameko Wallet (Thanh toán xong ngay lập tức, không có URL)
-            // Bạn chuyển hướng khách về thẳng trang Thành công của dự án
             window.location.href = `/payment-success?orderId=${res.data?.orderGroupId || ""}`;
           }
         } else {
-          // Thất bại thực sự (lỗi Backend, hết hàng, lỗi hệ thống...)
-          toast.error(res.message || t("toasts.checkoutFailed"));
+          // Check if error is related to PIN
+          if (res.message && res.message.toLowerCase().includes("pin")) {
+            setPinError(res.message);
+          } else {
+            toast.error(res.message || t("toasts.checkoutFailed"));
+          }
           setSubmitting(false);
         }
       } catch (error: unknown) {
@@ -361,7 +376,15 @@ function CheckoutContent() {
         setSubmitting(false);
       }
     },
-    [form, selectedOrderItemIds, payloadCodes, paymentMethod, t, validateForm],
+    [
+      form,
+      selectedOrderItemIds,
+      payloadCodes,
+      paymentMethod,
+      walletPin,
+      t,
+      validateForm,
+    ],
   );
 
   // ─── Derived data (must be above early returns — Rules of Hooks) ───────────
@@ -658,33 +681,69 @@ function CheckoutContent() {
                 </div>
               </label>
 
-              {/* Ameko Wallet */}
-              <label
-                className={`flex items-center gap-4 p-5 rounded-xl border cursor-pointer transition-all ${
-                  paymentMethod === 1
-                    ? "border-neutral-900 bg-neutral-50 shadow-sm"
-                    : "border-neutral-200 bg-white hover:border-neutral-300"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value={1}
-                  checked={paymentMethod === 1}
-                  onChange={() => setPaymentMethod(1)}
-                  className="w-5 h-5 accent-neutral-900 cursor-pointer"
-                />
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-neutral-900">
-                    {t("paymentOptions.wallet.title")}
-                  </span>
-                  <span className="text-xs text-amber-600 font-medium mt-0.5">
-                    {t("walletAvailable", {
-                      amount: `${walletDetails?.balance?.toLocaleString("vi-VN") ?? 0}₫`,
-                    })}
-                  </span>
-                </div>
-              </label>
+              {/* Ameko Wallet (Virtual Wallet) */}
+              <div className="flex flex-col">
+                <label
+                  className={`flex items-center gap-4 p-5 rounded-xl border cursor-pointer transition-all ${
+                    paymentMethod === 1
+                      ? "border-neutral-900 bg-neutral-50 shadow-sm"
+                      : "border-neutral-200 bg-white hover:border-neutral-300"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value={1}
+                    checked={paymentMethod === 1}
+                    onChange={() => {
+                      setPaymentMethod(1);
+                      setPinError(""); // Clear error when switching
+                    }}
+                    className="w-5 h-5 accent-neutral-900 cursor-pointer"
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-neutral-900">
+                      {t("paymentOptions.wallet.title")}
+                    </span>
+                    <span className="text-xs text-amber-600 font-medium mt-0.5">
+                      {t("walletAvailable", {
+                        amount: `${walletDetails?.balance?.toLocaleString("vi-VN") ?? 0}₫`,
+                      })}
+                    </span>
+                  </div>
+                </label>
+
+                {/* Virtual Wallet PIN Input (Expands when selected) */}
+                {paymentMethod === 1 && (
+                  <div className="pl-14 pr-5 pt-3 pb-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <p className="text-xs text-neutral-600 mb-2 font-medium">
+                      {t("walletPinPrompt") ||
+                        "Nhập mã PIN 6 số của ví ảo để xác nhận:"}
+                    </p>
+                    <input
+                      type="password"
+                      maxLength={6}
+                      value={walletPin}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^0-9]/g, ""); // Allow only numbers
+                        setWalletPin(value);
+                        if (pinError) setPinError("");
+                      }}
+                      placeholder="••••••"
+                      className={`w-full max-w-[160px] px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-all text-center tracking-[0.5em] font-mono text-xl ${
+                        pinError
+                          ? "border-red-400 focus:border-red-500 focus:ring-red-500 bg-red-50 text-red-900"
+                          : "border-neutral-300 focus:border-neutral-900 focus:ring-neutral-900 bg-white text-neutral-900"
+                      }`}
+                    />
+                    {pinError && (
+                      <p className="text-red-500 text-xs mt-2 font-medium">
+                        {pinError}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

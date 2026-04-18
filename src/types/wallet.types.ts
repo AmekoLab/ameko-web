@@ -15,11 +15,25 @@ export interface Transaction {
   id: string;
   amount: number;
   feeAmount: number;
+  flowDirection: string; // "In" | "Out" | "Held" | "0"
   currency: string;
   type: string;
   status: string;
   description: string | null;
+  balanceAfterTransaction: number;
+  shopName: string | null;
+  bankName: string | null;
+  bankAccountNumber: string | null;
+  bankAccountName: string | null;
   createdAt: string;
+}
+
+export interface TransactionDetail extends Transaction {
+  balanceBeforeTransaction: number;
+  heldBalanceBeforeTransaction: number;
+  heldBalanceAfterTransaction: number;
+  relatedOrderId: string | null;
+  orderGroupId: string | null;
 }
 
 // ─── Paginated Wrapper ────────────────────────────────────

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import {
   Box,
   X,
@@ -34,6 +35,19 @@ const MODAL_TYPES = {
 
 type ModalType = (typeof MODAL_TYPES)[keyof typeof MODAL_TYPES];
 
+function ThreeDLoadingFallback() {
+  const t = useTranslations("ProductGallery");
+
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 animate-pulse">
+      <Box className="w-12 h-12 animate-bounce mb-4 text-amazon-link" />
+      <span className="text-xs font-black uppercase tracking-widest text-amazon-textMuted">
+        {t("loading3DViewer")}
+      </span>
+    </div>
+  );
+}
+
 /**
  * ============================================================
  * DYNAMIC IMPORT
@@ -44,14 +58,7 @@ const KeyboardViewer = dynamic(
   () => import("@/src/components/3d/scenes/KeyboardViewer"),
   {
     ssr: false,
-    loading: () => (
-      <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 animate-pulse">
-        <Box className="w-12 h-12 animate-bounce mb-4 text-amazon-link" />
-        <span className="text-xs font-black uppercase tracking-widest text-amazon-textMuted">
-          Loading 3D Viewer...
-        </span>
-      </div>
-    ),
+    loading: () => <ThreeDLoadingFallback />,
   },
 );
 
@@ -90,6 +97,8 @@ export const ProductGallery = ({
   on3DScreenshot,
   view3DUrl,
 }: ProductGalleryProps) => {
+  const t = useTranslations("ProductGallery");
+
   const [selectedImage, setSelectedImage] = useState(images[0]);
   const [activeModal, setActiveModal] = useState<ModalType>(MODAL_TYPES.NONE);
   const [screenshotNotification, setScreenshotNotification] = useState(false);
@@ -173,16 +182,18 @@ export const ProductGallery = ({
       {screenshotNotification && (
         <div className="fixed top-4 right-4 z-[10000] bg-amazon-btnSecondary text-amazon-text border border-amazon-border px-4 py-2 shadow-sm flex items-center gap-2">
           <Camera className="w-4 h-4" />
-          <span className="text-sm font-black uppercase tracking-wider">Screenshot saved!</span>
+          <span className="text-sm font-black uppercase tracking-wider">
+            {t("screenshotSaved")}
+          </span>
         </div>
       )}
 
       {/* MAIN GALLERY — Corsair cinematic layout */}
       <div className="relative flex flex-col-reverse lg:flex-row w-full h-[600px] lg:h-[calc(100vh-104px)] select-none bg-white overflow-hidden">
-
         {/* ── Absolute Breadcrumb Overlay ── */}
         <div className="absolute top-6 left-6 lg:left-[136px] z-20 text-amazon-textMuted text-[11px] font-medium tracking-wide pointer-events-none select-none hidden lg:block">
-          Home / Shop / <span className="text-amazon-text font-bold">{productName}</span>
+          {t("breadcrumbHomeShop")}{" "}
+          <span className="text-amazon-text font-bold">{productName}</span>
         </div>
 
         {/* ── Thumbnail Column ── */}
@@ -190,7 +201,7 @@ export const ProductGallery = ({
           className="flex lg:flex-col items-center gap-3 p-4 pt-4 lg:pt-16 lg:pl-10 lg:pr-4 overflow-x-auto lg:overflow-y-auto shrink-0 z-10 w-full lg:w-[120px] h-auto lg:h-full"
           style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
           role="tablist"
-          aria-label="Product images"
+          aria-label={t("productImagesAria")}
         >
           {/* Up caret — desktop only */}
           <ChevronUp className="hidden lg:block w-5 h-5 text-amazon-textMuted hover:text-amazon-text cursor-pointer transition-colors shrink-0 mb-1" />
@@ -218,7 +229,11 @@ export const ProductGallery = ({
               }
             `}
             aria-label={
-              is3DAvailable ? "Open 3D view" : modelError ? "Retry loading 3D model" : "Loading 3D model"
+              is3DAvailable
+                ? t("open3DViewAria")
+                : modelError
+                  ? t("retryLoading3DModelAria")
+                  : t("loading3DModelAria")
             }
             type="button"
           >
@@ -230,7 +245,13 @@ export const ProductGallery = ({
               <Box className="w-5 h-5 group-hover:scale-110 transition-transform" />
             )}
             <span className="text-[8px] font-black uppercase tracking-wider">
-              {isLoadingModel ? "Loading" : modelError ? "Retry" : is3DAvailable ? "3D" : "No 3D"}
+              {isLoadingModel
+                ? t("loading")
+                : modelError
+                  ? t("retry")
+                  : is3DAvailable
+                    ? t("label3D")
+                    : t("no3D")}
             </span>
           </button>
 
@@ -249,7 +270,7 @@ export const ProductGallery = ({
               `}
               role="tab"
               aria-selected={selectedImage === img}
-              aria-label={`View image ${idx + 1}`}
+              aria-label={t("viewImageAria", { n: idx + 1 })}
               type="button"
             >
               <Image
@@ -272,7 +293,7 @@ export const ProductGallery = ({
           onClick={() => setActiveModal(MODAL_TYPES.IMAGE)}
           role="button"
           tabIndex={0}
-          aria-label="Click to enlarge image"
+          aria-label={t("clickToEnlargeImageAria")}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
@@ -299,11 +320,11 @@ export const ProductGallery = ({
                   setActiveModal(MODAL_TYPES.THREE_D);
                 }}
                 className="flex items-center gap-2 bg-white/90 shadow-sm backdrop-blur-md border border-amazon-border px-4 py-2 text-[10px] font-black uppercase tracking-widest text-amazon-text hover:text-amazon-focus hover:border-amazon-focus transition-colors"
-                aria-label="Open 360° 3D view"
+                aria-label={t("open360ViewAria")}
                 type="button"
               >
                 <Rotate3D className="w-4 h-4" />
-                360° View
+                {t("view360")}
               </button>
             </div>
           )}
@@ -312,7 +333,9 @@ export const ProductGallery = ({
           <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             <div className="bg-white/90 shadow-sm backdrop-blur-md px-3 py-2 text-amazon-textMuted flex items-center gap-2 border border-amazon-border">
               <ZoomIn className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Click to Zoom</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                {t("clickToZoom")}
+              </span>
             </div>
           </div>
         </div>
@@ -323,10 +346,9 @@ export const ProductGallery = ({
             <Star className="w-4 h-4" />
           </div>
           <span className="text-[11px] font-black uppercase tracking-widest">
-            More Features
+            {t("moreFeatures")}
           </span>
         </div>
-
       </div>
 
       {/* FULLSCREEN MODAL */}
@@ -339,7 +361,9 @@ export const ProductGallery = ({
             role="dialog"
             aria-modal="true"
             aria-label={
-              activeModal === MODAL_TYPES.THREE_D ? "3D viewer" : "Image viewer"
+              activeModal === MODAL_TYPES.THREE_D
+                ? t("viewer3DAria")
+                : t("viewerImageAria")
             }
             tabIndex={-1}
           >
@@ -347,7 +371,7 @@ export const ProductGallery = ({
             <button
               onClick={closeModal}
               className="absolute top-6 right-6 z-50 p-2 bg-white/10 hover:bg-white/20 text-white transition-all group border border-white/20"
-              aria-label="Close viewer (ESC)"
+              aria-label={t("closeViewerAria")}
               type="button"
             >
               <X className="w-8 h-8 group-hover:rotate-90 transition-transform" />
@@ -363,18 +387,18 @@ export const ProductGallery = ({
                       {modelConfig.name}
                     </h3>
                     <p className="text-white/50 text-xs">
-                      Drag to rotate • Scroll to zoom
+                      {t("dragToRotateScrollToZoom")}
                     </p>
                     {enable3DScreenshot && (
                       <p className="text-white/30 text-[10px] mt-1 flex items-center gap-1">
                         <Camera className="w-3 h-3" />
-                        Click camera icon to capture
+                        {t("clickCameraToCapture")}
                       </p>
                     )}
                     {enable3DFPS && (
                       <p className="text-white/30 text-[10px] flex items-center gap-1">
                         <Activity className="w-3 h-3" />
-                        Performance monitor active
+                        {t("performanceMonitorActive")}
                       </p>
                     )}
                   </div>
@@ -406,7 +430,7 @@ export const ProductGallery = ({
                     priority
                   />
                   <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/40 text-xs font-bold uppercase tracking-widest">
-                    Press ESC to close
+                    {t("pressEscToClose")}
                   </div>
                 </div>
               )}

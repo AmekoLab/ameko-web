@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { XCircle, Layers, Music } from "lucide-react";
 
 import { assembledProductService } from "@/src/services/assembledProduct.service";
@@ -62,6 +63,8 @@ function ComponentDetailsSection({
 }: {
   details: AssembledProductDetailItem[];
 }) {
+  const t = useTranslations("ProductDetailPage");
+
   const grouped = details.reduce(
     (acc, detail) => {
       const kitName = detail.baseKitName || detail.baseKitId;
@@ -76,14 +79,13 @@ function ComponentDetailsSection({
     <div className="pt-16 mb-20">
       {/* Section eyebrow */}
       <p className="text-[14px] font-black uppercase tracking-[0.3em] text-amazon-link mb-2">
-        Breakdown
+        {t("breakdown")}
       </p>
       <h3 className="text-2xl lg:text-[28px] font-black uppercase text-amazon-text mb-2 leading-tight">
-        Build Components
+        {t("buildComponents")}
       </h3>
       <p className="text-sm text-amazon-textMuted mb-10">
-        Every part hand-selected and assembled for the perfect typing
-        experience.
+        {t("buildComponentsSubtitle")}
       </p>
 
       {Object.entries(grouped).map(([kitName, components]) => (
@@ -91,17 +93,19 @@ function ComponentDetailsSection({
           <div className="flex items-center gap-2 mb-4">
             <Layers className="w-4 h-4 text-amazon-link" />
             <h4 className="text-sm font-black uppercase tracking-[0.2em] text-amazon-text">
-              Base Kit: {kitName}
+              {t("baseKit", { kitName })}
             </h4>
           </div>
 
           <div className="border border-amazon-border overflow-hidden">
             {/* Table header */}
             <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-neutral-100 text-[10px] font-black uppercase tracking-widest text-amazon-textMuted">
-              <div className="col-span-1">#</div>
-              <div className="col-span-5">Component</div>
-              <div className="col-span-3 text-center">Quantity</div>
-              <div className="col-span-3 text-center">Sound Test</div>
+              <div className="col-span-1">{t("tableIndex")}</div>
+              <div className="col-span-5">{t("tableComponent")}</div>
+              <div className="col-span-3 text-center">{t("tableQuantity")}</div>
+              <div className="col-span-3 text-center">
+                {t("tableSoundTest")}
+              </div>
             </div>
 
             {components.map((comp, idx) => (
@@ -131,7 +135,7 @@ function ComponentDetailsSection({
                       className="inline-flex items-center gap-1 text-[10px] font-black text-amazon-link hover:underline uppercase tracking-wider"
                     >
                       <Music className="w-3 h-3" />
-                      Listen
+                      {t("listen")}
                     </a>
                   ) : (
                     <span className="text-amazon-textMuted text-xs">—</span>
@@ -182,6 +186,7 @@ function PageSkeleton() {
 export default function AssembledProductDetailPage() {
   const params = useParams<{ id: string }>();
   const productId = params.id;
+  const t = useTranslations("ProductDetailPage");
 
   const [assembledProduct, setAssembledProduct] =
     useState<AssembledProductItem | null>(null);
@@ -199,11 +204,11 @@ export default function AssembledProductDetailPage() {
       setAssembledProduct(response.data);
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } } };
-      setError(e.response?.data?.message || "Failed to load product details");
+      setError(e.response?.data?.message || t("loadErrorFallback"));
     } finally {
       setLoading(false);
     }
-  }, [productId]);
+  }, [productId, t]);
 
   useEffect(() => {
     fetchProduct();
@@ -221,16 +226,16 @@ export default function AssembledProductDetailPage() {
             <XCircle className="w-8 h-8 text-amazon-link" />
           </div>
           <h2 className="text-xl font-black uppercase tracking-tight text-amazon-text">
-            Product Not Found
+            {t("productNotFound")}
           </h2>
           <p className="text-sm text-amazon-textMuted max-w-sm">
-            {error || "The assembled product you're looking for doesn't exist."}
+            {error || t("notFoundDescription")}
           </p>
           <Link
             href="/shop/all-products"
             className="inline-block text-[11px] font-black uppercase tracking-widest text-amazon-link hover:underline mt-2"
           >
-            ← Back to Shop
+            {t("backToShop")}
           </Link>
         </div>
       </div>
@@ -245,12 +250,10 @@ export default function AssembledProductDetailPage() {
 
   return (
     <div className="bg-white min-h-screen pb-16 w-full font-sans overflow-x-clip">
-
       {/* ================================================================
           HERO — Full-bleed 60 / 40 split, no max-width cap
           ================================================================ */}
       <div className="w-full max-w-[1920px] mx-auto flex flex-col lg:flex-row items-start ">
-
         {/* Gallery — 60% left, sticky */}
         <div className="w-full lg:w-[55%] lg:sticky lg:top-[104px] z-10">
           <ProductGallery
@@ -278,13 +281,12 @@ export default function AssembledProductDetailPage() {
           BELOW-FOLD — restricted readable width
           ================================================================ */}
       <div className="max-w-[1080px] mx-auto px-4 lg:px-6">
- 
         {/* Sound Test */}
         {soundTestUrl && (
           <div className="py-8">
             <SoundTestSection
               videoUrl={soundTestUrl}
-              description={`Listen to the satisfying sound of the ${product.name}. Each component has been carefully selected to create the perfect acoustic profile.`}
+              description={t("soundTestDesc", { name: product.name })}
             />
           </div>
         )}
@@ -293,10 +295,10 @@ export default function AssembledProductDetailPage() {
         <div className=" pt-16 grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
           <div className="lg:col-span-7">
             <p className="text-[14px] font-black uppercase tracking-[0.3em] text-amazon-link mb-2">
-              Details
+              {t("details")}
             </p>
             <h3 className="text-2xl lg:text-[28px] font-black uppercase text-amazon-text mb-6 leading-tight">
-              Product Description
+              {t("productDescription")}
             </h3>
             <div className="relative">
               <div
@@ -305,56 +307,61 @@ export default function AssembledProductDetailPage() {
                 }`}
               >
                 {product.description ? (
-                  <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                  <div
+                    dangerouslySetInnerHTML={{ __html: product.description }}
+                  />
                 ) : (
                   <>
                     <p>{product.shortDesc}</p>
                     <p>
-                      Designed for enthusiasts, gamers, and professionals alike,
-                      the{" "}
-                      <strong className="text-amazon-text font-bold">
-                        {product.name}
-                      </strong>{" "}
-                      offers unparalleled customization and performance. With its
-                      gasket-mounted structure and tri-mode connectivity, it
-                      adapts seamlessly to any setup.
+                      {t.rich("fallbackParagraphOne", {
+                        name: product.name,
+                        strong: (chunks) => (
+                          <strong className="text-amazon-text font-bold">
+                            {chunks}
+                          </strong>
+                        ),
+                      })}
                     </p>
-                    <p>
-                      The premium build quality ensures durability, while the
-                      hot-swappable PCB allows you to customize your typing
-                      experience without soldering.
-                    </p>
+                    <p>{t("fallbackParagraphTwo")}</p>
                   </>
                 )}
               </div>
-              
+
               {/* Fade out gradient when collapsed */}
               {!isDescriptionExpanded && (
                 <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent pointer-events-none" />
               )}
             </div>
-            
+
             {/* Toggle Button */}
             <button
               onClick={() => setIsDescriptionExpanded((prev) => !prev)}
               className="mt-6 text-amazon-link hover:text-amazon-focus hover:underline text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center gap-1"
             >
-              {isDescriptionExpanded ? "Show Less" : "Read More"}
+              {isDescriptionExpanded ? t("showLess") : t("readMore")}
               <svg
                 className={`w-4 h-4 transition-transform duration-300 ${isDescriptionExpanded ? "rotate-180" : ""}`}
-                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
           </div>
 
           <div className="lg:col-span-5">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amazon-link mb-2">
-              Specs
+              {t("specs")}
             </p>
             <h3 className="text-2xl lg:text-[28px] font-black uppercase text-amazon-text mb-6 leading-tight">
-              Technical Specs
+              {t("technicalSpecs")}
             </h3>
             <ProductSpecs specs={product.specs} />
           </div>

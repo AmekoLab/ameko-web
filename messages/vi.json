@@ -68,7 +68,8 @@
     "logout": "Đăng xuất",
     "collapseSidebar": "Thu gọn Menu",
     "expandSidebar": "Mở rộng Menu",
-    "language": "Ngôn ngữ"
+    "language": "Ngôn ngữ",
+    "ruleBuilder": "Trình Xây dựng Quy tắc"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -492,6 +493,10 @@
     "loadFailed": "Không thể tải danh sách giao dịch",
     "pageTitle": "Lịch Sử Giao Dịch",
     "pageDesc": "Theo dõi và quản lý số dư ví, khoản nạp, và hoạt động tài chính.",
+    "flowIn": "CỘNG VÀO VÍ",
+    "flowOut": "TRỪ KHỎI VÍ",
+    "flowHeld": "TẠM GIỮ",
+    "flowNeutral": "KHÔNG ĐỔI",
     "filterTitle": "Lọc Giao Dịch",
     "clearFilters": "Xóa bộ lọc",
     "type": "Loại",
@@ -508,6 +513,7 @@
     "statusColumn": "Trạng Thái",
     "date": "Ngày",
     "fee": "Phí",
+    "runningBalance": "Số dư",
     "noTransactions": "Không tìm thấy giao dịch nào",
     "noTransactionsDesc": "Hãy thử điều chỉnh bộ lọc để tìm kiếm những gì bạn cần.",
     "showing": "Đang xem",
@@ -517,7 +523,10 @@
     "previous": "Trang Trước",
     "next": "Trang Sau",
     "last": "Trang Cuối",
-    "notAvailable": "Không có",
+    "notAvailable": "Không có dữ liệu",
+    "localeCode": "vi-VN",
+    "statusLabel": "Trạng thái",
+    "typeLabel": "Loại giao dịch",
     "types": {
       "-1": "Tất cả các loại",
       "0": "Thanh Toán Đơn Hàng",
@@ -526,7 +535,12 @@
       "3": "Nạp Tiền",
       "4": "Rút Tiền",
       "5": "Doanh Thu Chờ",
-      "6": "Điều Chỉnh Chuyển Đổi"
+      "6": "Điều Chỉnh Chuyển Đổi",
+      "ManualAdjustment": "Điều chỉnh thủ công",
+      "Withdrawal": "Rút tiền",
+      "SalesPending": "Doanh thu chờ",
+      "OrderRefund": "Hoàn tiền đơn hàng",
+      "OrderPayment": "Thanh toán đơn hàng"
     },
     "statuses": {
       "-1": "Tất cả trạng thái",
@@ -534,6 +548,24 @@
       "1": "Hoàn Thành",
       "2": "Thất Bại",
       "3": "Đã Hủy"
+    },
+    "status": {
+      "Completed": "Thành công",
+      "Pending": "Đang xử lý",
+      "Failed": "Thất bại"
+    },
+    "details": {
+      "title": "Chi tiết giao dịch",
+      "transactionId": "Mã giao dịch",
+      "time": "Thời gian",
+      "balanceBefore": "Số dư khả dụng (trước)",
+      "balanceAfter": "Số dư khả dụng (sau)",
+      "heldBalanceBefore": "Tiền chờ đối soát (trước)",
+      "heldBalanceAfter": "Tiền chờ đối soát (sau)",
+      "relatedOrder": "Đơn hàng liên quan",
+      "description": "Nội dung",
+      "bankInfo": "Tài khoản nhận",
+      "close": "Đóng"
     },
     "sortOptions": {
       "createdAt": "Ngày Tạo",
@@ -655,7 +687,12 @@
       "refunded": "Đã hoàn tiền",
       "failed": "Thất bại",
       "unpaid": "Chưa thanh toán"
-    }
+    },
+    "updateDeliveryDate": "Cập nhật ngày giao hàng",
+    "expectedDeliveryDateLabel": "Ngày giao dự kiến",
+    "deliveryDateNotice": "Lưu ý: Cập nhật ngày giao hàng chỉ mang tính chất tham khảo và không ảnh hưởng đến thời gian xử lý đơn hàng thực tế.",
+    "confirm": "Xác nhận",
+    "cancel": "Hủy"
   },
   "page": {
     "title": "Lịch sử đơn hàng",
@@ -1028,7 +1065,12 @@
         "line2": "Sản phẩm lắp ráp tùy chỉnh có thể chịu phí hoàn kho.",
         "line3": "Tiền hoàn sẽ được xử lý về phương thức thanh toán ban đầu trong vòng 5-7 ngày làm việc kể từ khi nhận được hàng trả lại."
       }
-    }
+    },
+    "walletPinPrompt": "Vui lòng nhập mã PIN rút tiền của bạn để xác nhận giao dịch này.",
+    "walletPinPlaceholder": "Mã PIN rút tiền",
+    "walletPinConfirm": "Xác nhận",
+    "walletPinCancel": "Hủy",
+    "walletPinInvalid": "Mã PIN không hợp lệ. Vui lòng thử lại."
   },
   "ProfileView": {
     "tabPosts": "Bài viết",
@@ -3011,6 +3053,111 @@
     "resetConfirm": "Đặt lại toàn bộ cấu hình?",
     "addToCartSuccess": "Đã thêm sản phẩm vào giỏ hàng!",
     "addToCartError": "Thêm vào giỏ hàng thất bại",
-    "kitDisplayName": "Phiên bản Custom Lab"
+    "kitDisplayName": "Phiên bản Custom Lab",
+    "emptyVisualizer": "Vui lòng chọn {step} để bắt đầu",
+    "resetConfirmTitle": "Làm mới cấu hình?",
+    "cancel": "Hủy bỏ",
+    "confirm": "Đồng ý"
+  },
+  "ProductDetailPage": {
+    "loadErrorFallback": "Không thể tải chi tiết sản phẩm",
+    "productNotFound": "Không tìm thấy sản phẩm",
+    "notFoundDescription": "Sản phẩm lắp ráp bạn đang tìm kiếm không tồn tại.",
+    "backToShop": "← Quay lại cửa hàng",
+    "soundTestDesc": "Lắng nghe âm thanh đầy cuốn hút của {name}. Mỗi linh kiện đều được lựa chọn kỹ lưỡng để tạo nên chất âm hoàn hảo.",
+    "details": "Chi tiết",
+    "productDescription": "Mô tả sản phẩm",
+    "showLess": "Thu gọn",
+    "readMore": "Xem thêm",
+    "specs": "Thông số",
+    "technicalSpecs": "Thông số kỹ thuật",
+    "fallbackParagraphOne": "Dành cho người đam mê, game thủ và dân chuyên nghiệp, <strong>{name}</strong> mang lại khả năng tùy biến và hiệu năng vượt trội. Với cấu trúc gasket-mount cùng kết nối ba chế độ, sản phẩm dễ dàng thích nghi với mọi góc máy.",
+    "fallbackParagraphTwo": "Chất lượng hoàn thiện cao cấp đảm bảo độ bền lâu dài, trong khi PCB hot-swap giúp bạn tùy chỉnh trải nghiệm gõ mà không cần hàn.",
+    "breakdown": "Phân tách",
+    "buildComponents": "Thành phần lắp ráp",
+    "buildComponentsSubtitle": "Mỗi linh kiện đều được tuyển chọn và lắp ráp thủ công để mang lại trải nghiệm gõ hoàn hảo.",
+    "baseKit": "Bộ kit nền: {kitName}",
+    "tableIndex": "#",
+    "tableComponent": "Linh kiện",
+    "tableQuantity": "Số lượng",
+    "tableSoundTest": "Kiểm tra âm thanh",
+    "listen": "Nghe"
+  },
+  "ProductInfo": {
+    "loginRequired": "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng",
+    "addedToCart": "Đã thêm {name} vào giỏ hàng!",
+    "addToCartFailed": "Thêm vào giỏ hàng thất bại. Vui lòng thử lại.",
+    "inStock": "Còn hàng",
+    "outOfStock": "Hết hàng",
+    "new": "MỚI",
+    "soldBy": "Bán bởi",
+    "layout": "Layout",
+    "mounting": "Mounting",
+    "pcb": "PCB",
+    "connection": "Kết nối",
+    "stockNotice": "Do nhu cầu tăng cao và số lượng tồn kho có hạn, một số đơn hàng có thể bị giao chậm nhé.",
+    "bundleAndSave": "Mua kèm tiết kiệm",
+    "bundleDiscount": "Giảm giá khi mua cùng nhau",
+    "decreaseQuantityAria": "Giảm số lượng",
+    "increaseQuantityAria": "Tăng số lượng",
+    "adding": "Đang thêm...",
+    "addToCart": "Thêm vào giỏ",
+    "qualifiesFor": "Sản phẩm này được",
+    "freeShipping": "miễn phí vận chuyển",
+    "orderTodayTo": "Đặt hàng hôm nay để",
+    "receiveIncentives": "nhận ưu đãi",
+    "day30": "30 ngày",
+    "trustSatisfaction": "Cam kết hài lòng 100%",
+    "trustPremium": "Chất lượng cao cấp",
+    "trustFastShipping": "Giao hàng nhanh",
+    "trustSupport247": "Hỗ trợ khách hàng 24/7",
+    "trustEasyReturns": "Đổi trả dễ dàng",
+    "trustSecurePayments": "Thanh toán an toàn"
+  },
+  "ProductSpecs": {
+    "layoutSize": "Kích thước layout",
+    "mountingStyle": "Kiểu mounting",
+    "pcbTech": "Công nghệ PCB",
+    "connection": "Kết nối",
+    "batteryCapacity": "Dung lượng pin",
+    "pollingRate": "Tần số quét",
+    "antiGhosting": "Chống ghosting",
+    "caseMaterial": "Chất liệu vỏ",
+    "plateMaterial": "Chất liệu plate",
+    "weight": "Trọng lượng",
+    "warranty": "Bảo hành",
+    "na": "N/A"
+  },
+  "SoundTestSection": {
+    "eyebrow": "Kiểm tra âm thanh",
+    "titleLine1": "Trải nghiệm",
+    "titleLine2": "âm thanh.",
+    "iframeTitle": "Kiểm tra âm thanh"
+  },
+  "ProductGallery": {
+    "loading3DViewer": "Đang tải trình xem 3D...",
+    "screenshotSaved": "Đã lưu ảnh chụp!",
+    "breadcrumbHomeShop": "Trang chủ / Cửa hàng /",
+    "productImagesAria": "Hình ảnh sản phẩm",
+    "open3DViewAria": "Mở chế độ xem 3D",
+    "retryLoading3DModelAria": "Thử tải lại mô hình 3D",
+    "loading3DModelAria": "Đang tải mô hình 3D",
+    "loading": "Đang tải",
+    "retry": "Thử lại",
+    "label3D": "3D",
+    "no3D": "Không có 3D",
+    "viewImageAria": "Xem ảnh {n}",
+    "clickToEnlargeImageAria": "Nhấn để phóng to ảnh",
+    "open360ViewAria": "Mở chế độ xem 3D 360°",
+    "view360": "Xem 360°",
+    "clickToZoom": "Nhấn để phóng to",
+    "moreFeatures": "Tính năng khác",
+    "viewer3DAria": "Trình xem 3D",
+    "viewerImageAria": "Trình xem ảnh",
+    "closeViewerAria": "Đóng trình xem (ESC)",
+    "dragToRotateScrollToZoom": "Kéo để xoay • Cuộn để phóng to",
+    "clickCameraToCapture": "Nhấn biểu tượng máy ảnh để chụp",
+    "performanceMonitorActive": "Đang bật theo dõi hiệu năng",
+    "pressEscToClose": "Nhấn ESC để đóng"
   }
 }

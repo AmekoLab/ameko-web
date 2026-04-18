@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Check,
   XCircle,
@@ -15,10 +16,7 @@ import {
 } from "lucide-react";
 import { Product } from "@/src/types/product";
 import { useAppDispatch } from "@/src/store/hook";
-import {
-  fetchServerCart,
-  setCartOpen,
-} from "@/src/store/slices/cartSlice";
+import { fetchServerCart, setCartOpen } from "@/src/store/slices/cartSlice";
 import { orderService } from "@/src/services/order.service";
 import { toast } from "react-toastify";
 
@@ -37,6 +35,7 @@ export const ProductInfo = ({
   shopName,
   logoUrl,
 }: ProductInfoProps) => {
+  const t = useTranslations("ProductInfo");
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
@@ -89,7 +88,7 @@ export const ProductInfo = ({
     // Auth guard: redirect unauthenticated users to login
     const token = localStorage.getItem("token");
     if (!token) {
-      toast.info("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng", {
+      toast.info(t("loginRequired"), {
         position: "top-right",
         theme: "dark",
       });
@@ -105,7 +104,7 @@ export const ProductInfo = ({
         quantity: quantity,
         isCustom: false,
       });
-      toast.success(`${product.name} added to cart!`, {
+      toast.success(t("addedToCart", { name: product.name }), {
         position: "top-right",
         theme: "dark",
       });
@@ -113,10 +112,10 @@ export const ProductInfo = ({
       dispatch(setCartOpen(true));
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } } };
-      toast.error(
-        e.response?.data?.message || "Failed to add item to cart. Please try again.",
-        { position: "top-right", theme: "dark" },
-      );
+      toast.error(e.response?.data?.message || t("addToCartFailed"), {
+        position: "top-right",
+        theme: "dark",
+      });
     } finally {
       setIsAddingToCart(false);
     }
@@ -128,22 +127,21 @@ export const ProductInfo = ({
           PRODUCT INFO PANEL
           ==================================================== */}
       <div className="flex flex-col gap-2 font-sans text-amazon-text justify-start ">
-
         {/* --- STATUS + NEW BADGE ROW --- */}
         <div className="relative flex items-center">
           {!isOutOfStock ? (
             <span className="flex items-center gap-1.5 text-[11px] font-black text-amazon-link uppercase tracking-[0.22em]">
               <Check className="w-3.5 h-3.5" />
-              In Stock
+              {t("inStock")}
             </span>
           ) : (
             <span className="flex items-center gap-1.5 text-[11px] font-black text-amazon-textMuted uppercase tracking-[0.22em]">
               <XCircle className="w-3.5 h-3.5" />
-              Out of Stock
+              {t("outOfStock")}
             </span>
           )}
           <span className="absolute right-0 top-0 bg-amazon-btnSecondary text-amazon-text text-[9px] rounded-sm font-black uppercase tracking-[0.2em] px-2 py-0.5">
-            NEW
+            {t("new")}
           </span>
         </div>
 
@@ -172,7 +170,7 @@ export const ProductInfo = ({
             {/* Shop Info */}
             <div className="flex flex-col min-w-0">
               <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-amazon-textMuted leading-none mb-0.5">
-                Sold by
+                {t("soldBy")}
               </span>
               <span className="text-[20px] font-bold text-amazon-text group-hover/shop:text-amazon-link transition-colors truncate leading-tight">
                 {shopName}
@@ -201,26 +199,28 @@ export const ProductInfo = ({
           <ul className="space-y-1">
             {product.specs.layout && (
               <li className="text-[14px] text-amazon-link flex items-start gap-1">
-                <span className="text-amazon-textMuted mt-0.5 select-none">—</span>
-                Layout: {product.specs.layout}
+                <span className="text-amazon-textMuted mt-0.5 select-none">
+                  —
+                </span>
+                {t("layout")}: {product.specs.layout}
               </li>
             )}
             {product.specs.mounting && (
               <li className="text-[14px] text-amazon-link flex items-start gap-1">
                 <span className="text-amazon-textMuted  select-none">—</span>
-                Mounting: {product.specs.mounting}
+                {t("mounting")}: {product.specs.mounting}
               </li>
             )}
             {product.specs.pcb && (
               <li className="text-[14px] text-amazon-link flex items-start gap-1">
                 <span className="text-amazon-textMuted  select-none">—</span>
-                PCB: {product.specs.pcb}
+                {t("pcb")}: {product.specs.pcb}
               </li>
             )}
             {product.specs.connection && (
               <li className="text-[14px] text-amazon-link flex items-start gap-1">
                 <span className="text-amazon-textMuted  select-none">—</span>
-                Connection: {product.specs.connection}
+                {t("connection")}: {product.specs.connection}
               </li>
             )}
             {product.shortDesc && (
@@ -252,8 +252,7 @@ export const ProductInfo = ({
         {/* --- STOCK NOTICE BOX --- */}
         <div className="bg-white border border-amazon-border rounded-sm p-2">
           <p className="text-[10px] text-amazon-textMuted leading-relaxed text-left tracking-wider">
-            Due to exceptionally high demand and limited stock,
-            some orders may experience slight delays.
+            {t("stockNotice")}
           </p>
         </div>
 
@@ -261,10 +260,10 @@ export const ProductInfo = ({
         {relatedProducts.length > 0 && (
           <div>
             <p className="text-[13px] font-black text-amazon-text uppercase tracking-[0.12em] mb-1">
-              Bundle and Save
+              {t("bundleAndSave")}
             </p>
             <p className="text-[12px] text-amazon-textMuted mb-3">
-              Discount applied when purchased together
+              {t("bundleDiscount")}
             </p>
             <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
               {relatedProducts.slice(0, 4).map((item) => (
@@ -296,7 +295,7 @@ export const ProductInfo = ({
               className="w-10 h-full flex items-center justify-center text-amazon-text hover:bg-neutral-100 text-lg font-black transition-colors disabled:opacity-30"
               disabled={isOutOfStock}
               type="button"
-              aria-label="Decrease quantity"
+              aria-label={t("decreaseQuantityAria")}
             >
               −
             </button>
@@ -308,7 +307,7 @@ export const ProductInfo = ({
               className="w-10 h-full flex items-center justify-center text-amazon-text hover:bg-neutral-100 text-lg font-black transition-colors disabled:opacity-30"
               disabled={isOutOfStock}
               type="button"
-              aria-label="Increase quantity"
+              aria-label={t("increaseQuantityAria")}
             >
               +
             </button>
@@ -328,11 +327,13 @@ export const ProductInfo = ({
             `}
           >
             {isAddingToCart ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Adding...</>
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> {t("adding")}
+              </>
             ) : isOutOfStock ? (
-              "Out of Stock"
+              t("outOfStock")
             ) : (
-              "Add to Cart"
+              t("addToCart")
             )}
           </button>
         </div>
@@ -348,8 +349,10 @@ export const ProductInfo = ({
           <div className="flex items-center gap-2">
             <Truck className="w-4 h-4 text-amazon-link shrink-0" />
             <p className="text-[12px] text-amazon-textMuted">
-              This product qualifies for{" "}
-              <span className="text-amazon-text font-bold">free shipping</span>
+              {t("qualifiesFor")}{" "}
+              <span className="text-amazon-text font-bold">
+                {t("freeShipping")}
+              </span>
             </p>
           </div>
           {/* Delivery row */}
@@ -357,13 +360,15 @@ export const ProductInfo = ({
             <Package className="w-4 h-4 text-amazon-link shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
               <p className="text-[12px] text-amazon-textMuted">
-             Order today to{" "}
-              <span className="text-amazon-text font-bold">receive incentives</span>
+                {t("orderTodayTo")}{" "}
+                <span className="text-amazon-text font-bold">
+                  {t("receiveIncentives")}
+                </span>
               </p>
             </div>
             <span className="flex items-center gap-1 border border-amazon-link text-amazon-link bg-neutral-50 text-[10px] font-black uppercase tracking-[0.1em] px-2 py-0.5 shrink-0">
               <RotateCcw className="w-2.5 h-2.5" />
-              60-day
+              {t("day30")}
             </span>
           </div>
         </div>
@@ -376,7 +381,7 @@ export const ProductInfo = ({
           </span>
           , or 4 payments at 0% interest with{" "}
           <span className="text-[#f5d800] font-bold">Klarna</span>.{" "} */}
-          {/* <button
+        {/* <button
             type="button"
             className="text-gray-400 underline underline-offset-2 hover:text-white transition-colors"
           >
@@ -384,57 +389,51 @@ export const ProductInfo = ({
           </button> */}
         {/* </p> */}
 
-
         {/* --- GUARANTEES / TRUST BADGES --- */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4 mt-2">
-          
           <div className="flex items-center gap-2.5">
             <Check className="w-4 h-4 text-amazon-link shrink-0" />
             <span className="text-[12px] font-medium text-amazon-textMuted">
-              100% Satisfaction Guarantee
+              {t("trustSatisfaction")}
             </span>
           </div>
 
           <div className="flex items-center gap-2.5">
             <Check className="w-4 h-4 text-amazon-link shrink-0" />
             <span className="text-[12px] font-medium text-amazon-textMuted">
-              Premium Quality
+              {t("trustPremium")}
             </span>
           </div>
 
           <div className="flex items-center gap-2.5">
             <Check className="w-4 h-4 text-amazon-link shrink-0" />
             <span className="text-[12px] font-medium text-amazon-textMuted">
-              Fast Shipping
+              {t("trustFastShipping")}
             </span>
           </div>
 
           <div className="flex items-center gap-2.5">
             <Check className="w-4 h-4 text-amazon-link shrink-0" />
             <span className="text-[12px] font-medium text-amazon-textMuted">
-              24/7 Customer Support
+              {t("trustSupport247")}
             </span>
           </div>
 
           <div className="flex items-center gap-2.5">
             <Check className="w-4 h-4 text-amazon-link shrink-0" />
             <span className="text-[12px] font-medium text-amazon-textMuted">
-              Easy Returns
+              {t("trustEasyReturns")}
             </span>
           </div>
 
           <div className="flex items-center gap-2.5">
             <Check className="w-4 h-4 text-amazon-link shrink-0" />
             <span className="text-[12px] font-medium text-amazon-textMuted">
-              Secure Payments
+              {t("trustSecurePayments")}
             </span>
           </div>
-
-        
-
         </div>
       </div>
-
 
       {/* ====================================================
           STICKY BOTTOM BAR
@@ -461,9 +460,11 @@ export const ProductInfo = ({
               className="h-10 px-6 bg-amazon-btnPrimary hover:brightness-95 rounded-full text-amazon-text text-[11px] font-black uppercase tracking-[0.18em] transition-all disabled:bg-neutral-200 disabled:text-amazon-textMuted disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isAddingToCart ? (
-                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Adding...</>
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t("adding")}
+                </>
               ) : (
-                "Add to Cart"
+                t("addToCart")
               )}
             </button>
           </div>

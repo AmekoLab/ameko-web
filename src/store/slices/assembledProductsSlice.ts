@@ -39,8 +39,6 @@ export const fetchMyAssembledProducts = createAsyncThunk(
   },
 );
 
-
-
 // --- THUNK: RESTORE ASSEMBLED PRODUCT ---
 export const restoreAssembledProduct = createAsyncThunk(
   "assembledProducts/restore",
@@ -87,7 +85,8 @@ export const createAssembledProduct = createAsyncThunk(
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       return rejectWithValue(
-        err.response?.data?.message || "Failed to create assembled product",
+        err.response?.data?.message ||
+          "Component 'case test update1' is no longer active",
       );
     }
   },
@@ -204,14 +203,14 @@ const assembledProductsSlice = createSlice({
       .addCase(fetchMyAssembledProducts.fulfilled, (state, action) => {
         state.loading = false;
         // The new API returns the array directly, no .items property
-        const items = action.payload as AssembledProductItem[]; 
-        
+        const items = action.payload as AssembledProductItem[];
+
         state.assembledProducts = items || [];
         state.total = items?.length || 0;
-        
+
         // Since it's a full list without pagination metadata, set defaults
         state.currentPage = 1;
-        state.pageSize = items?.length || 50; 
+        state.pageSize = items?.length || 50;
         state.totalPages = 1;
       })
       .addCase(fetchMyAssembledProducts.rejected, (state, action) => {
