@@ -28,7 +28,12 @@ import LanguageSwitcher from "@/src/components/LanguageSwitcher";
 import { useTranslations } from "next-intl";
 
 type MenuItem = { name: string; path: string };
-type MenuGroup = { groupName: string; groupKey: string; icon: LucideIcon; items: MenuItem[] };
+type MenuGroup = {
+  groupName: string;
+  groupKey: string;
+  icon: LucideIcon;
+  items: MenuItem[];
+};
 
 export default function Sidebar({ role = "staff" }: { role?: string }) {
   const t = useTranslations("Sidebar");
@@ -46,7 +51,12 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
     if (!user) return "";
     if (user.role === "Admin") return "Admin!";
     if (user.role === "Shop") {
-      return currentShop?.shopName || user?.shopName || user?.firstName || user?.username;
+      return (
+        currentShop?.shopName ||
+        user?.shopName ||
+        user?.firstName ||
+        user?.username
+      );
     }
     return user?.firstName || user?.username;
   })();
@@ -103,7 +113,9 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
       groupName: t("group_support"),
       groupKey: "support",
       icon: ShieldAlert,
-      items: [{ name: t("warrantyRequests"), path: "/admin/warranty-requests" }],
+      items: [
+        { name: t("warrantyRequests"), path: "/admin/warranty-requests" },
+      ],
     },
   ];
 
@@ -134,6 +146,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
         { name: t("categories"), path: "/shop/categories" },
         { name: t("parts"), path: "/shop/parts" },
         { name: t("assembledProducts"), path: "/shop/assembled-products" },
+        { name: t("ruleBuilder"), path: "/shop/rules-builder" },
       ],
     },
     {
@@ -215,45 +228,57 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
       }`}
     >
       {/* User Profile Block */}
-     <div className="border-b border-amazon-border p-4">
-  {isCollapsed ? (
-    <div className="flex flex-col items-center gap-2">
-      <div className="w-8 h-8 rounded-full bg-amazon-btnSecondary text-amazon-text flex items-center justify-center font-bold text-sm mx-auto shadow-sm">
-        {displayName ? displayName.charAt(0).toUpperCase() : "A"}
+      <div className="border-b border-amazon-border p-4">
+        {isCollapsed ? (
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-amazon-btnSecondary text-amazon-text flex items-center justify-center font-bold text-sm mx-auto shadow-sm">
+              {displayName ? displayName.charAt(0).toUpperCase() : "A"}
+            </div>
+            <div
+              className="w-8 h-8 rounded-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
+              title={t("language")}
+              onClick={() => setIsCollapsed(false)}
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 21a9 9 0 100-18 9 9 0 000 18z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 014 9 15 15 0 01-4 9 15 15 0 01-4-9 15 15 0 014-9z"
+                />
+              </svg>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-amazon-btnSecondary text-amazon-text flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+              {displayName ? displayName.charAt(0).toUpperCase() : "A"}
+            </div>
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="text-white text-sm font-bold truncate">
+                {t("hiName", { name: displayName })}
+              </span>
+              <span className="text-white/60 text-[11px] font-medium uppercase tracking-wider truncate">
+                {user?.role || role}
+              </span>
+            </div>
+            {/* LanguageSwitcher sits at the end of the same row */}
+            <div className="shrink-0">
+              <LanguageSwitcher />
+            </div>
+          </div>
+        )}
       </div>
-      <div
-        className="w-8 h-8 rounded-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
-        title={t("language")}
-        onClick={() => setIsCollapsed(false)}
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 014 9 15 15 0 01-4 9 15 15 0 01-4-9 15 15 0 014-9z" />
-        </svg>
-      </div>
-    </div>
-  ) : (
-    <div className="flex items-center gap-3">
-      <div className="w-8 h-8 rounded-full bg-amazon-btnSecondary text-amazon-text flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
-        {displayName ? displayName.charAt(0).toUpperCase() : "A"}
-      </div>
-      <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-white text-sm font-bold truncate">
-          {t("hiName", { name: displayName })}
-        </span>
-        <span className="text-white/60 text-[11px] font-medium uppercase tracking-wider truncate">
-          {user?.role || role}
-        </span>
-      </div>
-      {/* LanguageSwitcher sits at the end of the same row */}
-      <div className="shrink-0">
-        <LanguageSwitcher />
-      </div>
-    </div>
-  )}
-</div>
-
-      
 
       {/* Menu Area */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar p-4 flex flex-col gap-2">
@@ -347,7 +372,9 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
           <button
             onClick={handleLogout}
             className={`w-full flex items-center gap-2.5 rounded-sm transition-colors text-red-300 hover:bg-red-500/10 hover:text-red-400 ${
-              isCollapsed ? "justify-center p-2" : "px-3 py-2 text-sm font-medium"
+              isCollapsed
+                ? "justify-center p-2"
+                : "px-3 py-2 text-sm font-medium"
             }`}
             title={t("logout")}
           >
@@ -355,8 +382,6 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
             {!isCollapsed && <span>{t("logout")}</span>}
           </button>
         </div>
-
-       
 
         {/* Collapse Toggle */}
         <div className="px-4 pb-3 pt-1 flex justify-center items-center">

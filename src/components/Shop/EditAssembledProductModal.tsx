@@ -80,7 +80,7 @@ export default function EditAssembledProductModal({
 
   useEffect(() => {
     if (isOpen && currentShop?.id) {
-      dispatch(fetchParts(currentShop.id));
+      dispatch(fetchParts({ shopId: currentShop.id, pageSize: 1000 }));
     }
   }, [isOpen, currentShop?.id, dispatch]);
 

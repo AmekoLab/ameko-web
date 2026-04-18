@@ -70,6 +70,10 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
   const [editPhone, setEditPhone] = useState("");
   const [editAddress, setEditAddress] = useState("");
 
+  // ── Shipped Status Modal State ──
+  const [isShippedModalOpen, setIsShippedModalOpen] = useState(false);
+  const [expectedDate, setExpectedDate] = useState<string>("");
+
   const [assemblyCompletionMap, setAssemblyCompletionMap] = useState<
     Record<string, boolean>
   >({});
@@ -151,22 +155,54 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
 
   const handleUpdateStatus = async (newStatus: number) => {
     if (!orderId) return;
+
+    // Intercept Shipped status to open modal instead
+    if (newStatus === 3) {
+      setIsShippedModalOpen(true);
+      return;
+    }
+
     setIsUpdatingStatus(newStatus);
     try {
-      let expectedDate = undefined;
-      if (newStatus === 3) {
-        const date = new Date();
-        date.setDate(date.getDate() + 3);
-        expectedDate = date.toISOString();
-      }
       const res = await shopOrderService.updateOrderStatus(
         orderId,
         newStatus,
-        expectedDate,
+        undefined,
       );
       if (res.success) {
-        toast.success(t("updateStatusSuccess"));
-        fetchOrderDetail(); // Refresh the modal data
+        toast.success(t("updateStatusSuccess") || "Update successful");
+        fetchOrderDetail();
+      } else {
+        toast.error(res.message || t("updateStatusFailed"));
+      }
+    } catch (err: unknown) {
+      const message =
+        (err as { message?: string }).message ||
+        t("updateStatusUnexpectedError");
+      toast.error(message);
+    } finally {
+      setIsUpdatingStatus(null);
+    }
+  };
+
+  const handleConfirmShipped = async () => {
+    if (!orderId) return;
+    if (!expectedDate) {
+      toast.error(
+        t("deliveryDateRequired") || "Vui lòng chọn ngày dự kiến giao hàng",
+      );
+      return;
+    }
+
+    setIsUpdatingStatus(3);
+    try {
+      const isoDate = new Date(expectedDate).toISOString();
+      const res = await shopOrderService.updateOrderStatus(orderId, 3, isoDate);
+      if (res.success) {
+        toast.success(t("updateStatusSuccess") || "Update successful");
+        setIsShippedModalOpen(false);
+        setExpectedDate("");
+        fetchOrderDetail();
       } else {
         toast.error(res.message || t("updateStatusFailed"));
       }
@@ -720,6 +756,65 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
           </div>
         )}
       </div>
+
+      {/* ─── SHIPPED STATUS MODAL ─── */}
+      {isShippedModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-white rounded-sm shadow-2xl w-full max-w-sm overflow-hidden animate-slideUp border border-amazon-border">
+            <div className="px-6 py-4 border-b border-amazon-border">
+              <h3 className="text-amazon-text font-bold text-lg">
+                {t("updateDeliveryDate") || "Cập nhật ngày giao hàng"}
+              </h3>
+            </div>
+
+            <div className="p-6">
+              <label className="block text-sm font-bold text-amazon-text mb-2">
+                {t("expectedDeliveryDateLabel") || "Ngày dự kiến nhận hàng"}{" "}
+                <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="datetime-local"
+                value={expectedDate}
+                // Calculate local current time for the 'min' attribute to prevent past selections
+                min={new Date(
+                  new Date().getTime() - new Date().getTimezoneOffset() * 60000,
+                )
+                  .toISOString()
+                  .slice(0, 16)}
+                onChange={(e) => setExpectedDate(e.target.value)}
+                className="w-full px-4 py-2 border border-amazon-border rounded-sm focus:outline-none focus:border-amazon-focus transition-colors text-sm"
+              />
+              <p className="text-xs text-neutral-500 mt-2 font-medium">
+                {t("deliveryDateNotice") ||
+                  "Khách hàng sẽ nhận được thông báo về ngày dự kiến này."}
+              </p>
+            </div>
+
+            <div className="px-6 py-4 bg-neutral-50 border-t border-amazon-border flex gap-3">
+              <button
+                onClick={() => {
+                  setIsShippedModalOpen(false);
+                  setExpectedDate("");
+                }}
+                disabled={isUpdatingStatus === 3}
+                className="flex-1 py-2 text-xs font-bold text-amazon-text bg-white border border-amazon-border rounded-sm hover:bg-neutral-50 transition-colors uppercase"
+              >
+                {tCommon("cancel") || "Hủy"}
+              </button>
+              <button
+                onClick={handleConfirmShipped}
+                disabled={isUpdatingStatus === 3 || !expectedDate}
+                className="flex-1 py-2 text-xs font-bold text-amazon-text bg-amazon-primary hover:brightness-95 rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 uppercase border border-amazon-border"
+              >
+                {isUpdatingStatus === 3 && (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                )}
+                {t("confirm") || "Xác nhận"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <CancelOrderModal
         isOpen={isCancelModalOpen}

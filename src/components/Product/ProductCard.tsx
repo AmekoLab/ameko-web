@@ -41,9 +41,9 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
         position: "top-right",
         theme: "dark",
       });
-    setTimeout(() => {
-    router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
-  }, 2000);
+      setTimeout(() => {
+        router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
+      }, 2000);
       return;
     }
 
@@ -58,16 +58,15 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
       toast.success(t("addedToCart", { productName: product.name }), {
         position: "top-right",
         theme: "dark",
-      
       });
       dispatch(fetchServerCart());
       dispatch(setCartOpen(true));
     } catch (err: unknown) {
       const e2 = err as { response?: { data?: { message?: string } } };
-      toast.error(
-        e2.response?.data?.message || t("addFailed"),
-        { position: "top-right", theme: "dark" },
-      );
+      toast.error(e2.response?.data?.message || t("addFailed"), {
+        position: "top-right",
+        theme: "dark",
+      });
     } finally {
       setIsAddingToCart(false);
     }
@@ -89,13 +88,11 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
       {/* IMAGE AREA */}
       {/* IMAGE AREA */}
       <Link
-        href={href || `/shop/product/${product.slug}`}
+        href={href || `/shop/assembled-product/${product.slug}`}
         className="relative block w-full aspect-square overflow-hidden shrink-0 bg-white"
       >
         {/* Diagonal stripe texture overlay */}
-        <div
-          className="absolute inset-0 z-0 pointer-events-none"
-        />
+        <div className="absolute inset-0 z-0 pointer-events-none" />
 
         {/* Badge */}
         {product.tag && (
@@ -163,7 +160,9 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
           ) : (
             <ShoppingCart className="w-5 h-5 shrink-0" />
           )}
-          <span className="text-sm">{isAddingToCart ? t("adding") : t("addToCart")}</span>
+          <span className="text-sm">
+            {isAddingToCart ? t("adding") : t("addToCart")}
+          </span>
         </button>
       </div>
     </div>

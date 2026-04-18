@@ -1,23 +1,26 @@
 "use client";
 import { ProductSpecs as SpecsType } from "@/src/types/product";
+import { useTranslations } from "next-intl";
 
 interface ProductSpecsProps {
   specs: SpecsType;
 }
 
 export const ProductSpecs = ({ specs }: ProductSpecsProps) => {
+  const t = useTranslations("ProductSpecs");
+
   const allRows = [
-    { label: "Layout Size", value: specs.layout },
-    { label: "Mounting Style", value: specs.mounting },
-    { label: "PCB Tech", value: specs.pcb },
-    { label: "Connection", value: specs.connection },
-    { label: "Battery Capacity", value: specs.battery },
-    { label: "Polling Rate", value: specs.pollingRate },
-    { label: "Anti-Ghosting", value: specs.antiGhosting },
-    { label: "Case Material", value: specs.caseMaterial },
-    { label: "Plate Material", value: specs.plateMaterial },
-    { label: "Weight", value: specs.weight },
-    { label: "Warranty", value: specs.warranty },
+    { label: t("layoutSize"), value: specs.layout },
+    { label: t("mountingStyle"), value: specs.mounting },
+    { label: t("pcbTech"), value: specs.pcb },
+    { label: t("connection"), value: specs.connection },
+    { label: t("batteryCapacity"), value: specs.battery },
+    { label: t("pollingRate"), value: specs.pollingRate },
+    { label: t("antiGhosting"), value: specs.antiGhosting },
+    { label: t("caseMaterial"), value: specs.caseMaterial },
+    { label: t("plateMaterial"), value: specs.plateMaterial },
+    { label: t("weight"), value: specs.weight },
+    { label: t("warranty"), value: specs.warranty },
   ];
 
   const rows = allRows.filter((row) => row.value);
@@ -34,7 +37,7 @@ export const ProductSpecs = ({ specs }: ProductSpecsProps) => {
               {row.label}
             </div>
             <div className="md:col-span-7 text-sm text-amazon-text font-medium">
-              {row.value || "N/A"}
+              {row.value || t("na")}
             </div>
           </div>
         ))}

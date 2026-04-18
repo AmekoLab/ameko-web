@@ -72,9 +72,11 @@ const Visualizer = memo(
   ({
     selection,
     viewMode,
+    emptyText,
   }: {
     selection: Record<string, SelectedPart>;
     viewMode: "top" | "side" | "angled";
+    emptyText: string;
   }) => {
     const hasAnySelection = Object.keys(selection).length > 0;
 
@@ -162,10 +164,27 @@ const Visualizer = memo(
           );
         })}
 
-        {/* Empty-state: show nothing when no layers — Corsair style */}
+        {/* Empty-state: Blueprint/Wireframe with pulse effect */}
         {!hasAnySelection && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-64 h-40 rounded-sm border border-amazon-border bg-neutral-100 shadow-sm" />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <div className="flex flex-col items-center justify-center w-[65%] max-w-[600px] aspect-[2.5/1] border-[2px] border-dashed border-neutral-300 bg-white/40 backdrop-blur-sm rounded-2xl shadow-sm animate-pulse">
+              <svg
+                className="w-12 h-12 text-neutral-300 mb-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="M3 6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6zm4 4h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01M10 18h4"
+                />
+              </svg>
+              <span className="text-neutral-700 text-[13px] tracking-[0.2em]">
+                {emptyText}
+              </span>
+            </div>
           </div>
         )}
       </div>
@@ -315,6 +334,7 @@ function BuilderContent() {
   const [isCustomizeMode, setIsCustomizeMode] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
   const [stockMap, setStockMap] = useState<Record<string, number>>({});
 
   const {
@@ -488,11 +508,14 @@ function BuilderContent() {
     }
   }, [session, addingToCart, router, t]);
 
-  const handleReset = useCallback(() => {
-    if (confirm(t("resetConfirm"))) {
-      dispatch(resetBuilder());
-    }
-  }, [dispatch, t]);
+  const handleResetClick = useCallback(() => {
+    setShowResetModal(true);
+  }, []);
+
+  const handleConfirmReset = useCallback(() => {
+    dispatch(resetBuilder());
+    setShowResetModal(false);
+  }, [dispatch]);
 
   const handleLogoClick = useCallback(() => {
     window.location.href = "/";
@@ -596,7 +619,7 @@ function BuilderContent() {
     }
     const idx = workflowSteps.indexOf(currentStepName || "");
     if (idx <= 0) {
-      handleReset();
+      handleResetClick();
     } else {
       dispatch(setActiveStep(workflowSteps[idx - 1]));
     }
@@ -606,7 +629,7 @@ function BuilderContent() {
     currentStepName,
     workflowSteps,
     dispatch,
-    handleReset,
+    handleResetClick,
   ]);
 
   // =============================================
@@ -775,7 +798,13 @@ function BuilderContent() {
           {/* Keyboard layers + Keymap Overlay */}
           <div className="relative z-50 w-full h-full flex items-center justify-center">
             <div className="relative w-full max-w-5xl aspect-[16/9] flex items-center justify-center">
-              <Visualizer selection={session.selection} viewMode={viewMode} />
+              <Visualizer
+                selection={session.selection}
+                viewMode={viewMode}
+                emptyText={t("emptyVisualizer", {
+                  step: currentStepName || "CASE",
+                })}
+              />
               {viewMode === "top" &&
                 session.selection["keycap"] &&
                 isCustomizeMode && (
@@ -1144,6 +1173,60 @@ function BuilderContent() {
           )}
         </div>
       </div>
+
+      {/* ─── CUSTOM RESET CONFIRM MODAL ─── */}
+      {showResetModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-white rounded-sm shadow-2xl w-full max-w-sm overflow-hidden animate-slideUp">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-amazon-border flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0">
+                <svg
+                  className="w-5 h-5 text-red-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-amazon-text font-black text-lg tracking-tight uppercase">
+                  {t("resetConfirmTitle") || "Reset Configuration?"}
+                </h3>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="px-6 py-5 bg-neutral-50">
+              <p className="text-sm text-amazon-textMuted font-medium leading-relaxed">
+                {t("resetConfirm")}
+              </p>
+            </div>
+
+            {/* Footer Buttons */}
+            <div className="px-6 py-4 bg-white border-t border-amazon-border flex gap-3">
+              <button
+                onClick={() => setShowResetModal(false)}
+                className="flex-1 py-2.5 bg-white border border-amazon-border text-amazon-text text-xs font-black uppercase tracking-widest rounded-sm hover:bg-neutral-50 transition-colors active:scale-[0.98]"
+              >
+                {t("cancel") || "Cancel"}
+              </button>
+              <button
+                onClick={handleConfirmReset}
+                className="flex-1 py-2.5 bg-red-500 text-white text-xs font-black uppercase tracking-widest rounded-sm hover:bg-red-600 shadow-[0_4px_12px_rgba(239,68,68,0.3)] transition-all active:scale-[0.98]"
+              >
+                {t("confirm") || "Confirm"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -8,8 +8,17 @@ import {
   PaginatedTransactions,
 } from "@/src/types/wallet.types";
 import toast from "react-hot-toast";
-import { Wallet, FilterX, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import {
+  Wallet,
+  FilterX,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Eye,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
+import TransactionDetailModal from "./TransactionDetailModal";
 
 // ─── Constants ────────────────────────────────────────────
 const TRANSACTION_TYPES: { value: number }[] = [
@@ -40,56 +49,62 @@ const SORT_OPTIONS = [
 ];
 
 // ─── Helpers ──────────────────────────────────────────────
-function formatCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: currency || "VND",
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("vi-VN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function getStatusColor(status: string) {
-  switch (status.toLowerCase()) {
-    case "completed":
-      return "text-green-700 bg-green-50";
-    case "pending":
-      return "text-yellow-700 bg-yellow-50";
-    case "failed":
-      return "text-red-700 bg-red-50";
-    case "cancelled":
-      return "text-neutral-600 bg-neutral-100";
+function getFlowConfig(flow: string) {
+  switch (flow) {
+    case "In":
+      return {
+        color: "text-green-600",
+        bg: "bg-green-50/50",
+        sign: "+",
+        labelKey: "flowIn",
+      };
+    case "Out":
+      return {
+        color: "text-red-600",
+        bg: "bg-red-50/50",
+        sign: "-",
+        labelKey: "flowOut",
+      };
+    case "Held":
+      return {
+        color: "text-amber-600",
+        bg: "bg-amber-50/30",
+        sign: "",
+        labelKey: "flowHeld",
+      };
     default:
-      return "text-neutral-600 bg-neutral-100";
+      return {
+        color: "text-neutral-500",
+        bg: "bg-neutral-50/50",
+        sign: "",
+        labelKey: "flowNeutral",
+      };
   }
 }
 
 function getTypeIcon(type: string) {
   switch (type.toLowerCase()) {
-    case "payment":
-      return "💳";
-    case "deposit":
-      return "📥";
+    case "manualadjustment":
+      return "🛠️";
     case "withdrawal":
-      return "📤";
-    case "refund":
+      return "🏦";
+    case "salespending":
+      return "🛒";
+    case "orderrefund":
       return "🔄";
-    case "fee":
-      return "💸";
-    case "transfer":
-      return "🔀";
+    case "orderpayment":
+      return "💳";
     default:
-      return "📋";
+      return "📄";
   }
+}
+
+function formatCurrency(amount: number, currency: string = "VND") {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: currency,
+    maximumFractionDigits: 0,
+  }).format(amount);
 }
 
 // ─── Component ────────────────────────────────────────────
@@ -112,6 +127,8 @@ export default function TransactionsPage() {
   const [filterStatus, setFilterStatus] = useState<number>(-1);
   const [filterFromDate, setFilterFromDate] = useState("");
   const [filterToDate, setFilterToDate] = useState("");
+  const [selectedTxnId, setSelectedTxnId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // ── Fetch ───────────────────────────────────────────────
   const fetchTransactions = useCallback(async () => {
@@ -190,15 +207,15 @@ export default function TransactionsPage() {
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8">
-           <h1 className="text-3xl font-bold text-neutral-900 tracking-tight flex items-center gap-3">
-             <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hidden sm:block shadow-sm border border-blue-100">
-               <Wallet className="w-6 h-6" />
-             </div>
-             {t("pageTitle")}
-           </h1>
-           <p className="mt-2 text-sm text-neutral-500 font-medium">
-             {t("pageDesc")}
-           </p>
+          <h1 className="text-3xl font-bold text-neutral-900 tracking-tight flex items-center gap-3">
+            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hidden sm:block shadow-sm border border-blue-100">
+              <Wallet className="w-6 h-6" />
+            </div>
+            {t("pageTitle")}
+          </h1>
+          <p className="mt-2 text-sm text-neutral-500 font-medium">
+            {t("pageDesc")}
+          </p>
         </div>
 
         {/* ── Filters Card ──────────────────────────────── */}
@@ -219,7 +236,7 @@ export default function TransactionsPage() {
             {/* Type filter */}
             <div>
               <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                {t("type")}
+                {t("typeLabel")}
               </label>
               <select
                 id="filter-type"
@@ -238,7 +255,7 @@ export default function TransactionsPage() {
             {/* Status filter */}
             <div>
               <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                {t("status")}
+                {t("statusLabel")}
               </label>
               <select
                 id="filter-status"
@@ -281,15 +298,15 @@ export default function TransactionsPage() {
                 className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
               />
             </div>
-            
+
             <div className="w-full sm:col-span-2 lg:col-span-4 mt-2">
-               <button
-                 id="btn-apply-filters"
-                 onClick={handleApplyFilters}
-                 className="w-full bg-neutral-900 rounded-xl px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-neutral-800 active:scale-[0.98] shadow-sm flex items-center justify-center gap-2"
-               >
-                 {t("applyFilters")}
-               </button>
+              <button
+                id="btn-apply-filters"
+                onClick={handleApplyFilters}
+                className="w-full bg-neutral-900 rounded-xl px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-neutral-800 active:scale-[0.98] shadow-sm flex items-center justify-center gap-2"
+              >
+                {t("applyFilters")}
+              </button>
             </div>
           </div>
         </div>
@@ -297,7 +314,9 @@ export default function TransactionsPage() {
         {/* ── Sort & Page Size Controls ─────────────────── */}
         <div className="mb-4 flex flex-wrap items-center justify-between gap-4 px-1">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-xs font-semibold text-neutral-500">{t("sortBy")}</span>
+            <span className="text-xs font-semibold text-neutral-500">
+              {t("sortBy")}
+            </span>
             <div className="flex gap-2 bg-neutral-100/50 p-1 rounded-xl">
               {SORT_OPTIONS.map((opt) => (
                 <button
@@ -321,7 +340,9 @@ export default function TransactionsPage() {
           </div>
 
           <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-neutral-200 shadow-sm">
-            <label className="text-xs font-semibold text-neutral-500">{t("show")}</label>
+            <label className="text-xs font-semibold text-neutral-500">
+              {t("show")}
+            </label>
             <select
               id="page-size-select"
               value={queryParams.pageSize}
@@ -344,35 +365,45 @@ export default function TransactionsPage() {
               <thead>
                 <tr className="bg-neutral-50/50 border-b border-neutral-100 text-xs font-semibold uppercase tracking-wider text-neutral-500">
                   <th className="px-6 py-4">{t("transactionDetails")}</th>
-                  <th className="px-6 py-4 hidden md:table-cell">{t("description")}</th>
+                  <th className="px-6 py-4 hidden md:table-cell">
+                    {t("description")}
+                  </th>
                   <th className="px-6 py-4 text-right">{t("amount")}</th>
                   <th className="px-6 py-4 text-center">{t("statusColumn")}</th>
                   <th className="px-6 py-4 text-right">{t("date")}</th>
+                  <th className="px-6 py-4 text-right"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-50 bg-white">
                 {isLoading ? (
-                  Array.from({ length: queryParams.pageSize || 10 }).map((_, i) => (
-                    <tr key={`skeleton-${i}`}>
-                      {Array.from({ length: 5 }).map((_, j) => (
-                        <td key={j} className={`px-6 py-5 ${j === 1 ? 'hidden md:table-cell' : ''}`}>
-                          <div className="h-5 w-full max-w-[120px] animate-pulse rounded-md bg-neutral-100" />
-                        </td>
-                      ))}
-                    </tr>
-                  ))
+                  Array.from({ length: queryParams.pageSize || 10 }).map(
+                    (_, i) => (
+                      <tr key={`skeleton-${i}`}>
+                        {Array.from({ length: 6 }).map((_, j) => (
+                          <td
+                            key={j}
+                            className={`px-6 py-5 ${j === 1 ? "hidden md:table-cell" : ""}`}
+                          >
+                            <div className="h-5 w-full max-w-[120px] animate-pulse rounded-md bg-neutral-100" />
+                          </td>
+                        ))}
+                      </tr>
+                    ),
+                  )
                 ) : transactions.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={5}
-                      className="px-6 py-20 text-center"
-                    >
+                    <td colSpan={6} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center justify-center">
-                         <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4">
-                            <Wallet className="w-8 h-8 text-neutral-300" />
-                         </div>
-                         <p className="text-base font-semibold text-neutral-900 mb-1">No transactions found</p>
-                         <p className="text-sm text-neutral-500">Try adjusting your filters to find what you're looking for.</p>
+                        <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4">
+                          <Wallet className="w-8 h-8 text-neutral-300" />
+                        </div>
+                        <p className="text-base font-semibold text-neutral-900 mb-1">
+                          No transactions found
+                        </p>
+                        <p className="text-sm text-neutral-500">
+                          Try adjusting your filters to find what you're looking
+                          for.
+                        </p>
                       </div>
                     </td>
                   </tr>
@@ -380,47 +411,126 @@ export default function TransactionsPage() {
                   transactions.map((tx) => (
                     <tr
                       key={tx.id}
-                      className="transition-colors hover:bg-neutral-50/50 group"
+                      onClick={() => {
+                        setSelectedTxnId(tx.id);
+                        setIsModalOpen(true);
+                      }}
+                      className={`transition-colors border-b border-amazon-border last:border-0 hover:brightness-95 cursor-pointer ${getFlowConfig(tx.flowDirection).bg}`}
                     >
-                      <td className="px-6 py-5">
+                      {/* 1. Type & Cash Flow Label */}
+                      <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                           <div className="w-8 h-8 rounded-full bg-neutral-50 flex items-center justify-center border border-neutral-100 text-[15px] shrink-0">
-                               {getTypeIcon(tx.type)}
-                           </div>
-                           <span className="font-semibold text-neutral-900 capitalize block">
-                              {tx.type}
-                           </span>
+                          <div
+                            className={`w-9 h-9 rounded-full flex items-center justify-center bg-white border shadow-sm text-lg shrink-0 ${getFlowConfig(tx.flowDirection).color}`}
+                          >
+                            {getTypeIcon(tx.type)}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-bold text-neutral-900 capitalize text-sm">
+                              {t(`types.${tx.type}`) || tx.type}
+                            </span>
+                            <span
+                              className={`text-[10px]  tracking-wider uppercase mt-0.5 ${getFlowConfig(tx.flowDirection).color}`}
+                            >
+                              {t(getFlowConfig(tx.flowDirection).labelKey)}
+                            </span>
+                          </div>
                         </div>
                       </td>
-                      <td className="px-6 py-5 hidden md:table-cell">
-                         <p 
-                           title={tx.description || t("notAvailable")}
-                           className="max-w-[240px] truncate text-xs font-medium text-neutral-500 bg-neutral-50 px-2 py-1 rounded-md border border-neutral-100/50 cursor-help"
-                         >
-                           {tx.description || t("notAvailable")}
-                         </p>
-                      </td>
-                      <td className="px-6 py-5 text-right">
-                         <div className="flex flex-col items-end gap-1">
-                            <span className="font-bold text-amazon-price whitespace-nowrap bg-green-50 px-2 py-0.5 rounded-md border border-green-100">
-                               {formatCurrency(tx.amount, tx.currency)}
-                            </span>
-                            {tx.feeAmount > 0 && (
-                               <span className="text-xs font-medium text-neutral-400">
-                                  {t("fee")}: {formatCurrency(tx.feeAmount, tx.currency)}
-                               </span>
-                            )}
-                         </div>
-                      </td>
-                      <td className="px-6 py-5 text-center">
-                        <span
-                          className={`text-xs font-semibold px-2.5 py-1 box-border rounded-md border shadow-sm whitespace-nowrap ${getStatusColor(tx.status)}`}
+
+                      {/* 2. Description & Bank Details */}
+                      <td className="px-6 py-4 hidden md:table-cell w-2/5">
+                        <p
+                          title={tx.description || ""}
+                          className="text-xs font-medium text-neutral-600 line-clamp-2 leading-relaxed"
                         >
-                          {tx.status}
+                          {tx.description || t("notAvailable")}
+                        </p>
+                        {tx.bankName && (
+                          <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-neutral-500 bg-white border border-neutral-200 inline-flex px-2 py-0.5 rounded-sm shadow-sm">
+                            <span className="text-amazon-link">
+                              {tx.bankName}
+                            </span>
+                            <span>• {tx.bankAccountNumber}</span>
+                          </div>
+                        )}
+                      </td>
+
+                      {/* 3. Amount, Fee & Running Balance */}
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex flex-col items-end justify-center">
+                          <span
+                            className={`text-base font-black whitespace-nowrap ${getFlowConfig(tx.flowDirection).color}`}
+                          >
+                            {getFlowConfig(tx.flowDirection).sign}{" "}
+                            {formatCurrency(tx.amount, tx.currency)}
+                          </span>
+                          {tx.feeAmount > 0 && (
+                            <span className="text-[10px] font-medium text-red-500 bg-red-50 px-1.5 py-0.5 rounded-sm mt-1">
+                              {t("fee")}: -
+                              {formatCurrency(tx.feeAmount, tx.currency)}
+                            </span>
+                          )}
+                          {/* Running Balance */}
+                          <div className="mt-1.5 pt-1.5 border-t border-neutral-200/60 w-full flex justify-end">
+                            <span className="text-[11px] font-medium text-neutral-500">
+                              {t("runningBalance")}:{" "}
+                              <span className="font-bold text-neutral-700">
+                                {formatCurrency(
+                                  tx.balanceAfterTransaction,
+                                  tx.currency,
+                                )}
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 4. Status */}
+                      <td className="px-6 py-4 text-center">
+                        <span
+                          className={`text-[11px] font-bold px-2.5 py-1 box-border rounded-sm border shadow-sm whitespace-nowrap uppercase tracking-wide
+                            ${
+                              tx.status === "Completed"
+                                ? "bg-green-50 text-green-700 border-green-200"
+                                : tx.status === "Pending"
+                                  ? "bg-amber-50 text-amber-700 border-amber-200"
+                                  : "bg-red-50 text-red-700 border-red-200"
+                            }`}
+                        >
+                          {t(`status.${tx.status}`) || tx.status}
                         </span>
                       </td>
-                      <td className="px-6 py-5 text-right whitespace-nowrap text-xs font-medium text-neutral-500">
-                        {formatDate(tx.createdAt)}
+
+                      {/* 5. Date */}
+                      <td className="px-6 py-4 text-right whitespace-nowrap text-xs font-medium text-neutral-500">
+                        {new Date(tx.createdAt).toLocaleString(
+                          t("localeCode").includes(".")
+                            ? "vi-VN"
+                            : t("localeCode"),
+                          {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          },
+                        )}
+                      </td>
+
+                      {/* 6. Action Button */}
+                      <td className="px-6 py-4 text-right whitespace-nowrap">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent double-triggering the row click
+                            setSelectedTxnId(tx.id);
+                            setIsModalOpen(true);
+                          }}
+                          className="inline-flex items-center justify-center p-2 text-neutral-400 hover:text-amazon-link hover:bg-neutral-100 rounded-full transition-colors"
+                          title={t("details.title") || "Xem chi tiết"}
+                        >
+                          <Eye className="w-5 h-5" />
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -434,8 +544,13 @@ export default function TransactionsPage() {
         {data && totalPages > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6 px-1">
             <p className="text-sm font-medium text-neutral-500">
-              {t("showing")} <span className="font-bold text-neutral-900">{transactions.length}</span> {t("of")}{" "}
-              <span className="font-bold text-neutral-900">{totalCount}</span> {t("transactionsCount")}
+              {t("showing")}{" "}
+              <span className="font-bold text-neutral-900">
+                {transactions.length}
+              </span>{" "}
+              {t("of")}{" "}
+              <span className="font-bold text-neutral-900">{totalCount}</span>{" "}
+              {t("transactionsCount")}
             </p>
 
             <div className="flex items-center gap-2">
@@ -458,34 +573,34 @@ export default function TransactionsPage() {
 
               {/* Page numbers (show max 5 centered around current) */}
               <div className="flex items-center gap-1 mx-2">
-                  {(() => {
-                    const maxVisible = 5;
-                    let start = Math.max(
-                      1,
-                      currentPage - Math.floor(maxVisible / 2),
-                    );
-                    const end = Math.min(totalPages, start + maxVisible - 1);
-                    if (end - start + 1 < maxVisible) {
-                      start = Math.max(1, end - maxVisible + 1);
-                    }
+                {(() => {
+                  const maxVisible = 5;
+                  let start = Math.max(
+                    1,
+                    currentPage - Math.floor(maxVisible / 2),
+                  );
+                  const end = Math.min(totalPages, start + maxVisible - 1);
+                  if (end - start + 1 < maxVisible) {
+                    start = Math.max(1, end - maxVisible + 1);
+                  }
 
-                    return Array.from(
-                      { length: end - start + 1 },
-                      (_, i) => start + i,
-                    ).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`min-w-[36px] h-[36px] rounded-xl text-sm font-bold transition-all flex items-center justify-center ${
-                          page === currentPage
-                            ? "bg-neutral-900 text-white shadow-md cursor-default"
-                            : "text-neutral-600 bg-white hover:bg-neutral-50 border border-transparent hover:border-neutral-200 active:scale-[0.98]"
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ));
-                  })()}
+                  return Array.from(
+                    { length: end - start + 1 },
+                    (_, i) => start + i,
+                  ).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`min-w-[36px] h-[36px] rounded-xl text-sm font-bold transition-all flex items-center justify-center ${
+                        page === currentPage
+                          ? "bg-neutral-900 text-white shadow-md cursor-default"
+                          : "text-neutral-600 bg-white hover:bg-neutral-50 border border-transparent hover:border-neutral-200 active:scale-[0.98]"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ));
+                })()}
               </div>
 
               <button
@@ -508,6 +623,15 @@ export default function TransactionsPage() {
             </div>
           </div>
         )}
+
+        <TransactionDetailModal
+          transactionId={selectedTxnId}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedTxnId(null);
+          }}
+        />
       </div>
     </div>
   );

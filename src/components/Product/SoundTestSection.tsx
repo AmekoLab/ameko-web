@@ -1,11 +1,15 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 interface SoundTestProps {
   videoUrl: string;
   description: string;
 }
 
 export const SoundTestSection = ({ videoUrl, description }: SoundTestProps) => {
+  const t = useTranslations("SoundTestSection");
+
   return (
     <div className="relative w-[100vw] left-1/2 -translate-x-1/2 bg-amazon-bgSecondary text-amazon-text py-8 group overflow-hidden">
       {/* Yellow glow orb */}
@@ -16,12 +20,12 @@ export const SoundTestSection = ({ videoUrl, description }: SoundTestProps) => {
           <div className="text-left">
             {/* Eyebrow */}
             <p className="text-[14px] font-black uppercase tracking-[0.3em] text-amazon-link mb-3">
-              Sound Test
+              {t("eyebrow")}
             </p>
             <h2 className="text-4xl lg:text-6xl font-black uppercase tracking-tighter mb-6 leading-none">
-              Experience
+              {t("titleLine1")}
               <br />
-              The Sound.
+              {t("titleLine2")}
             </h2>
             <p className="text-amazon-textMuted text-base mb-10 max-w-md leading-relaxed">
               {description}
@@ -45,7 +49,7 @@ export const SoundTestSection = ({ videoUrl, description }: SoundTestProps) => {
               width="100%"
               height="100%"
               src={videoUrl}
-              title="Sound Test"
+              title={t("iframeTitle")}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="w-full h-full"

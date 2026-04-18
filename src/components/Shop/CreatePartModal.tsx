@@ -20,7 +20,7 @@ const createPartSchema = (t: (key: string) => string) =>
       .min(1, t("validationPartNameRequired"))
       .max(200, t("validationPartNameMax")),
     partType: z.string().min(1, t("validationPartTypeRequired")),
-    price: z.string().min(1, t("validationPriceRequired")),
+    price: z.string().min(0, t("validationPriceRequired")),
     stockQuantity: z.string().min(1, t("validationStockRequired")),
     description: z.string().min(1, t("validationDescriptionRequired")),
     categoryId: z.string().min(1, t("validationCategoryRequired")),
@@ -49,11 +49,11 @@ function buildKitSpecifications(
         title: t("workflowSwitchTitle"),
         quantity: switchCount,
       },
-      {
-        step: "stabilizer",
-        title: t("workflowStabilizerTitle"),
-        quantity: stabilizerCount,
-      },
+      // {
+      //   step: "stabilizer",
+      //   title: t("workflowStabilizerTitle"),
+      //   quantity: stabilizerCount,
+      // },
       { step: "keycap", title: t("workflowKeycapTitle"), quantity: 1 },
     ],
   };

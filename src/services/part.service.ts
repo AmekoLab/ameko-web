@@ -19,10 +19,16 @@ interface ApiResponse<T> {
 export const partService = {
   /**
    * Get parts for a shop.
-   * GET /parts?ShopId={shopId}
+   * GET /parts?ShopId={shopId}&PageNumber={pageNumber}&PageSize={pageSize}
    */
-  getParts: async (shopId: string) => {
-    return api.get<any, ApiResponse<PartListData>>(`/parts?ShopId=${shopId}`);
+  getParts: async (
+    shopId: string,
+    pageNumber: number = 1,
+    pageSize: number = 1000,
+  ) => {
+    return api.get<any, ApiResponse<PartListData>>(
+      `/parts?ShopId=${shopId}&PageNumber=${pageNumber}&PageSize=${pageSize}`,
+    );
   },
   /**
    * Create part (multipart/form-data).
@@ -140,5 +146,21 @@ export const partService = {
       `/parts/check-stock`,
       payload,
     );
+  },
+
+  /**
+   * Get existing configuration/rules for a Kit
+   * GET /api/v1/Builder/config/{baseKitId}
+   */
+  getKitConfig: async (baseKitId: string) => {
+    return api.get<any, ApiResponse<any>>(`/Builder/config/${baseKitId}`);
+  },
+
+  /**
+   * Reset/Delete all existing config rules for a Kit before saving new ones
+   * DELETE /api/v1/Builder/config/{baseKitId}
+   */
+  resetKitOptions: async (baseKitId: string) => {
+    return api.delete<any, ApiResponse<null>>(`/Builder/config/${baseKitId}`);
   },
 };

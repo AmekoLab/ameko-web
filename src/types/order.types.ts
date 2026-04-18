@@ -72,6 +72,7 @@ export interface CheckoutPayload {
   note: string;
   successUrl?: string;
   cancelUrl?: string;
+  walletPin?: string;
   selectedOrderItemIds: string[];
   paymentMethod: number;
   appliedSystemVoucherCode?: string;

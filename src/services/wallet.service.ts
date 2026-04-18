@@ -1,6 +1,7 @@
 import api from "@/src/utils/api";
 import { ApiResponse } from "@/src/types/auth.types";
 import {
+  TransactionDetail,
   TransactionQueryParams,
   TransactionResponse,
 } from "@/src/types/wallet.types";
@@ -239,6 +240,16 @@ export const walletService = {
   },
 
   /**
+   * Fetch details for a specific transaction
+   * GET /Wallet/transactions/{id}
+   */
+  getTransactionDetail: async (
+    transactionId: string,
+  ): Promise<ApiResponse<TransactionDetail>> => {
+    return api.get(`/Wallet/transactions/${transactionId}`);
+  },
+
+  /**
    * Fetch paginated wallet transactions with filtering & sorting.
    * GET /Wallet/transactions
    */
@@ -254,7 +265,8 @@ export const walletService = {
     if (params.pageNumber !== undefined) query.PageNumber = params.pageNumber;
     if (params.pageSize !== undefined) query.PageSize = params.pageSize;
     if (params.sortBy) query.SortBy = params.sortBy;
-    if (params.isAscending !== undefined) query.IsAscending = params.isAscending;
+    if (params.isAscending !== undefined)
+      query.IsAscending = params.isAscending;
 
     return api.get<unknown, TransactionResponse>("/Wallet/transactions", {
       params: query,

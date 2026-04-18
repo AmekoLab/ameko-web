@@ -71,12 +71,15 @@ function formatPrice(price: number) {
 export default function ShopPartsPage() {
   const t = useTranslations("ShopPartsPage");
   const dispatch = useAppDispatch();
-  const { parts, total, loading } = useAppSelector((state) => state.parts);
+  const { parts, loading } = useAppSelector((state) => state.parts);
+  const totalParts = useAppSelector((state) => state.parts.totalParts);
   const { currentShop } = useAppSelector((state) => state.shop);
   const { categories } = useAppSelector((state) => state.categories);
+  const PAGE_SIZE = 10;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeType, setActiveType] = useState<PartType | "all">("all");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -85,6 +88,7 @@ export default function ShopPartsPage() {
   const [deletingPart, setDeletingPart] = useState<PartItem | null>(null);
   const [isCheckStockOpen, setIsCheckStockOpen] = useState(false);
   const [addonFilter, setAddonFilter] = useState<"all" | "yes" | "no">("all");
+  const totalPages = Math.ceil(totalParts / PAGE_SIZE);
 
   useEffect(() => {
     if (!currentShop) {
@@ -94,14 +98,26 @@ export default function ShopPartsPage() {
 
   useEffect(() => {
     if (currentShop?.id) {
-      dispatch(fetchParts(currentShop.id));
+      dispatch(
+        fetchParts({
+          shopId: currentShop.id,
+          pageNumber: currentPage,
+          pageSize: PAGE_SIZE,
+        }),
+      );
       dispatch(fetchCategories(currentShop.id));
     }
-  }, [dispatch, currentShop?.id]);
+  }, [PAGE_SIZE, currentPage, dispatch, currentShop?.id]);
 
   const handleCreateSuccess = () => {
     if (currentShop?.id) {
-      dispatch(fetchParts(currentShop.id));
+      dispatch(
+        fetchParts({
+          shopId: currentShop.id,
+          pageNumber: currentPage,
+          pageSize: PAGE_SIZE,
+        }),
+      );
     }
   };
 
@@ -127,7 +143,13 @@ export default function ShopPartsPage() {
 
   const handleEditSuccess = () => {
     if (currentShop?.id) {
-      dispatch(fetchParts(currentShop.id));
+      dispatch(
+        fetchParts({
+          shopId: currentShop.id,
+          pageNumber: currentPage,
+          pageSize: PAGE_SIZE,
+        }),
+      );
     }
   };
 
@@ -143,7 +165,13 @@ export default function ShopPartsPage() {
 
   const handleDeleteSuccess = () => {
     if (currentShop?.id) {
-      dispatch(fetchParts(currentShop.id));
+      dispatch(
+        fetchParts({
+          shopId: currentShop.id,
+          pageNumber: currentPage,
+          pageSize: PAGE_SIZE,
+        }),
+      );
     }
   };
 
@@ -209,7 +237,7 @@ export default function ShopPartsPage() {
             </h1>
             <p className="text-[13px] font-medium text-amazon-textMuted">
               {t("partsDescriptionPrefix")}{" "}
-              <span className="font-bold text-amazon-text">{total}</span>{" "}
+              <span className="font-bold text-amazon-text">{totalParts}</span>{" "}
               {t("partsDescriptionSuffix")}
             </p>
           </div>
@@ -376,6 +404,36 @@ export default function ShopPartsPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {!loading && (
+            <div className="flex items-center justify-between border-t border-amazon-border bg-neutral-50/70 px-3 py-3 sm:px-4">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="rounded-sm border border-amazon-border bg-white px-3 py-1.5 text-[12px] font-medium text-amazon-text transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Previous
+              </button>
+
+              <p className="text-[12px] font-medium text-amazon-textMuted">
+                Page {totalPages === 0 ? 0 : currentPage} of {totalPages}
+              </p>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setCurrentPage((prev) =>
+                    totalPages === 0 ? prev : Math.min(totalPages, prev + 1),
+                  )
+                }
+                disabled={currentPage === totalPages || totalPages === 0}
+                className="rounded-sm border border-amazon-border bg-white px-3 py-1.5 text-[12px] font-medium text-amazon-text transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Next
+              </button>
             </div>
           )}
         </div>

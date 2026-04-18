@@ -8,12 +8,21 @@ import {
   CheckStockData,
 } from "@/src/types/part.types";
 
+interface FetchPartsArgs {
+  shopId: string;
+  pageNumber?: number;
+  pageSize?: number;
+}
+
 // --- THUNK: GET PARTS ---
 export const fetchParts = createAsyncThunk(
   "parts/fetchList",
-  async (shopId: string, { rejectWithValue }) => {
+  async (
+    { shopId, pageNumber, pageSize }: FetchPartsArgs,
+    { rejectWithValue },
+  ) => {
     try {
-      const response = await partService.getParts(shopId);
+      const response = await partService.getParts(shopId, pageNumber, pageSize);
       return response.data;
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
@@ -115,6 +124,7 @@ interface PartsState {
   error: string | null;
   parts: PartItem[];
   total: number;
+  totalParts: number;
   selectedPart: PartItem | null;
   stockMap: CheckStockData | null;
 }
@@ -129,6 +139,7 @@ const initialState: PartsState = {
   error: null,
   parts: [],
   total: 0,
+  totalParts: 0,
   selectedPart: null,
   stockMap: null,
 };
@@ -141,6 +152,7 @@ const partsSlice = createSlice({
     resetPartsState: (state) => {
       state.parts = [];
       state.total = 0;
+      state.totalParts = 0;
       state.loading = false;
       state.error = null;
     },
@@ -161,6 +173,7 @@ const partsSlice = createSlice({
         state.loading = false;
         state.parts = action.payload.data;
         state.total = action.payload.total;
+        state.totalParts = action.payload.total;
       })
       .addCase(fetchParts.rejected, (state, action) => {
         state.loading = false;
