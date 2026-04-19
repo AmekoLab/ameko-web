@@ -9,7 +9,6 @@ import {
 } from "@/src/store/slices/walletSlice";
 import { Wallet, ShieldAlert, ArrowRight, Settings } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import WithdrawModal from "@/src/components/Shop/WithdrawModal";
 import ResetPinModal from "@/src/components/Shop/ResetPinModal";
 import ChangePinModal from "@/src/components/Shop/ChangePinModal";
@@ -19,7 +18,6 @@ import { useTranslations } from "next-intl";
 export default function WalletPage() {
   const t = useTranslations("WalletPage");
   const dispatch = useAppDispatch();
-  const pathname = usePathname();
   const { details, loading, hasPin } = useAppSelector((state) => state.wallet);
   const { user } = useAppSelector((state) => state.auth);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
@@ -32,9 +30,7 @@ export default function WalletPage() {
 
   useEffect(() => {
     dispatch(fetchWalletDetails());
-    if (!isCustomer) {
-      dispatch(checkPinStatus());
-    }
+    dispatch(checkPinStatus());
   }, [dispatch, isCustomer]);
 
   // ─── Wallet Activation Card ────────────────────────────
@@ -98,7 +94,7 @@ export default function WalletPage() {
       </div>
 
       {/* ─── PIN Security Alert (Shop only) ──────────────────────── */}
-      {!isCustomer && hasPin === false && (
+      {hasPin === false && (
         <div className="flex items-start gap-4 rounded-2xl bg-yellow-50/80 border border-yellow-200 p-5 mb-8 shadow-sm relative overflow-hidden group">
           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-yellow-400"></div>
           <div className="bg-yellow-100 p-2 rounded-lg shrink-0 border border-yellow-200 group-hover:scale-105 transition-transform">
@@ -112,7 +108,7 @@ export default function WalletPage() {
               {t("securityIncompleteDesc")}
             </p>
             <Link
-              href="/shop/wallet/pin/setup"
+              href="/wallet/pin/setup"
               className="inline-flex items-center gap-1 text-sm font-bold text-yellow-700 hover:text-yellow-900 transition-colors bg-white/50 px-3 py-1.5 rounded-md hover:bg-white"
             >
               {t("setupPin")} <ArrowRight className="w-3.5 h-3.5" />
@@ -164,16 +160,18 @@ export default function WalletPage() {
           </button>
         </div>
 
-        {/* Action Buttons (Shop only) */}
-        {!isCustomer && (
+        {/* Action Buttons */}
+        {(!isCustomer || hasPin) && (
           <div className="flex flex-col sm:flex-row items-center gap-3 border-t border-neutral-50 pt-8 relative z-10">
-            <button
-              disabled={hasPin === false}
-              onClick={() => setIsWithdrawOpen(true)}
-              className="w-full sm:w-auto rounded-xl bg-neutral-900 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-neutral-800 hover:shadow active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed group-action"
-            >
-              {t("withdrawFunds")}
-            </button>
+            {!isCustomer && (
+              <button
+                disabled={hasPin === false}
+                onClick={() => setIsWithdrawOpen(true)}
+                className="w-full sm:w-auto rounded-xl bg-neutral-900 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-neutral-800 hover:shadow active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed group-action"
+              >
+                {t("withdrawFunds")}
+              </button>
+            )}
 
             {hasPin && (
               <button
@@ -188,24 +186,24 @@ export default function WalletPage() {
         )}
       </div>
 
-      {/* Shop-only Modals: Withdraw, Reset PIN, Change PIN */}
-      {!isCustomer && (
-        <>
+      {/* Modals */}
+      <>
+        {!isCustomer && (
           <WithdrawModal
             isOpen={isWithdrawOpen}
             onClose={() => setIsWithdrawOpen(false)}
             onOpenResetPin={() => setIsResetPinOpen(true)}
           />
-          <ResetPinModal
-            isOpen={isResetPinOpen}
-            onClose={() => setIsResetPinOpen(false)}
-          />
-          <ChangePinModal
-            isOpen={isChangePinOpen}
-            onClose={() => setIsChangePinOpen(false)}
-          />
-        </>
-      )}
+        )}
+        <ResetPinModal
+          isOpen={isResetPinOpen}
+          onClose={() => setIsResetPinOpen(false)}
+        />
+        <ChangePinModal
+          isOpen={isChangePinOpen}
+          onClose={() => setIsChangePinOpen(false)}
+        />
+      </>
 
       {/* Held Transactions Modal — available to all roles */}
       <HeldTransactionsModal

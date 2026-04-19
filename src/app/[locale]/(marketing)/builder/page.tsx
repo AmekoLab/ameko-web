@@ -797,6 +797,7 @@ function BuilderContent() {
 
           {/* Keyboard layers + Keymap Overlay */}
           <div className="relative z-50 w-full h-full flex items-center justify-center">
+            {/* Relative anchor for absolute key overlay */}
             <div className="relative w-full max-w-5xl aspect-[16/9] flex items-center justify-center">
               <Visualizer
                 selection={session.selection}

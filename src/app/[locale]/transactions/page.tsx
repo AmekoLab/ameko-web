@@ -145,7 +145,7 @@ export default function TransactionsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [queryParams]);
+  }, [queryParams, t]);
 
   useEffect(() => {
     fetchTransactions();
@@ -401,8 +401,8 @@ export default function TransactionsPage() {
                           No transactions found
                         </p>
                         <p className="text-sm text-neutral-500">
-                          Try adjusting your filters to find what you're looking
-                          for.
+                          Try adjusting your filters to find what you&apos;re
+                          looking for.
                         </p>
                       </div>
                     </td>
@@ -465,11 +465,22 @@ export default function TransactionsPage() {
                             {getFlowConfig(tx.flowDirection).sign}{" "}
                             {formatCurrency(tx.amount, tx.currency)}
                           </span>
-                          {tx.feeAmount > 0 && (
-                            <span className="text-[10px] font-medium text-red-500 bg-red-50 px-1.5 py-0.5 rounded-sm mt-1">
-                              {t("fee")}: -
-                              {formatCurrency(tx.feeAmount, tx.currency)}
-                            </span>
+                          {tx.amount > 0 && (
+                            <div className="mt-1 flex flex-col items-end gap-1">
+                              <span className="text-[10px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-sm">
+                                {t("fee")} (
+                                {((tx.feeAmount / tx.amount) * 100).toFixed(1)}
+                                %): -{formatCurrency(tx.feeAmount, tx.currency)}
+                              </span>
+                              <span className="text-[10px] font-medium text-green-700 bg-green-50 px-1.5 py-0.5 rounded-sm">
+                                {t("received")} (
+                                {(
+                                  100 -
+                                  (tx.feeAmount / tx.amount) * 100
+                                ).toFixed(1)}
+                                %)
+                              </span>
+                            </div>
                           )}
                           {/* Running Balance */}
                           <div className="mt-1.5 pt-1.5 border-t border-neutral-200/60 w-full flex justify-end">

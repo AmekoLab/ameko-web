@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Loader2, Settings2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import RuleBuilderGuide from "@/src/components/Shop/RuleBuilder/RuleBuilderGuide";
 import VisualRuleBuilder from "@/src/components/Shop/RuleBuilder/VisualRuleBuilder";
@@ -35,19 +36,6 @@ interface PartsStateLike {
 // Resolved by api baseURL (/api/v1) to: /api/v1/Builder/options
 const BUILDER_OPTIONS_ENDPOINT = "Builder/options";
 
-function getErrorMessage(error: unknown): string {
-  const errorWithMessage = error as {
-    message?: string;
-    errors?: string;
-  };
-
-  return (
-    errorWithMessage?.message ||
-    errorWithMessage?.errors ||
-    "Lưu quy tắc thất bại. Vui lòng thử lại."
-  );
-}
-
 function toFormData(payload: RulePayload): FormData {
   const formData = new FormData();
 
@@ -67,7 +55,24 @@ function toFormData(payload: RulePayload): FormData {
 }
 
 export default function ShopRulesBuilderPage() {
+  const t = useTranslations("ShopRulesBuilder");
   const dispatch = useAppDispatch();
+
+  const getErrorMessage = useCallback(
+    (error: unknown): string => {
+      const errorWithMessage = error as {
+        message?: string;
+        errors?: string;
+      };
+
+      return (
+        errorWithMessage?.message ||
+        errorWithMessage?.errors ||
+        t("toastSaveError")
+      );
+    },
+    [t],
+  );
 
   const partsState = useAppSelector((state) => state.parts);
   const currentShopId = useAppSelector(
@@ -189,12 +194,12 @@ export default function ShopRulesBuilderPage() {
   const handleSaveRules = useCallback(
     async (payloads: RulePayload[]) => {
       if (!payloads.length) {
-        toast.warning("Không có quy tắc để lưu.");
+        toast.warning(t("toastNoRules"));
         return;
       }
 
       if (!selectedKit?.id) {
-        toast.error("Không tìm thấy Kit đang chọn để lưu cấu hình.");
+        toast.error(t("toastNoKit"));
         return;
       }
 
@@ -212,7 +217,7 @@ export default function ShopRulesBuilderPage() {
           });
         }
 
-        toast.success("Đã lưu quy tắc tương thích thành công.");
+        toast.success(t("toastSaveSuccess"));
       } catch (error) {
         console.error("Failed to save builder options", error);
         toast.error(getErrorMessage(error));
@@ -220,14 +225,14 @@ export default function ShopRulesBuilderPage() {
         setIsSaving(false);
       }
     },
-    [selectedKit],
+    [getErrorMessage, selectedKit, t],
   );
 
   const executeResetRules = useCallback(async () => {
     setIsResetModalOpen(false);
 
     if (!baseKit?.id) {
-      toast.error("Không tìm thấy Kit đang chọn để xóa quy trình.");
+      toast.error(t("toastNoKitReset"));
       return;
     }
 
@@ -237,26 +242,23 @@ export default function ShopRulesBuilderPage() {
       await partService.resetKitOptions(baseKit.id);
       setExistingConfig(null);
       setResetCanvasKey((prev) => prev + 1);
-      toast.success("Đã xóa toàn bộ quy trình thành công!");
+      toast.success(t("toastResetSuccess"));
     } catch (error) {
       console.error("Lỗi khi reset:", error);
-      toast.error("Có lỗi xảy ra khi xóa quy trình!");
+      toast.error(t("toastResetError"));
     } finally {
       setIsResetting(false);
     }
-  }, [baseKit?.id]);
+  }, [baseKit?.id, t]);
 
   return (
     <div className="min-h-screen bg-neutral-50 p-4 md:p-6">
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4">
         <section className="rounded-md border border-neutral-200 bg-white p-5 shadow-sm">
           <h1 className="text-2xl font-bold text-neutral-900">
-            Thiết lập tương thích linh kiện
+            {t("pageTitle")}
           </h1>
-          <p className="mt-1 text-sm text-neutral-600">
-            Chọn một kit nền rồi kết nối các linh kiện theo từng bước để định
-            nghĩa quy tắc tương thích bằng giao diện trực quan.
-          </p>
+          <p className="mt-1 text-sm text-neutral-600">{t("pageSubtitle")}</p>
         </section>
 
         <section className="rounded-md border border-neutral-200 bg-white p-5 shadow-sm">
@@ -265,7 +267,7 @@ export default function ShopRulesBuilderPage() {
               htmlFor="kit-selector"
               className="text-sm font-semibold text-neutral-800"
             >
-              Chọn Kit cần cấu hình
+              {t("kitSelectorLabel")}
             </label>
             <select
               id="kit-selector"
@@ -274,7 +276,7 @@ export default function ShopRulesBuilderPage() {
               disabled={partsState.loading || isSaving || isResetting}
               className="rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-900 focus:border-neutral-400 focus:outline-none"
             >
-              <option value="">-- Chọn một Kit --</option>
+              <option value="">{t("kitSelectorPlaceholder")}</option>
               {kits.map((kit) => (
                 <option key={kit.id} value={kit.id}>
                   {kit.name}
@@ -282,8 +284,10 @@ export default function ShopRulesBuilderPage() {
               ))}
             </select>
             <p className="text-xs text-neutral-500">
-              Đã tải {kits.length} kit trong tổng số {allParts.length} linh
-              kiện.
+              {t("kitCounter", {
+                kitCount: kits.length,
+                totalCount: allParts.length,
+              })}
             </p>
           </div>
         </section>
@@ -292,9 +296,7 @@ export default function ShopRulesBuilderPage() {
           {partsState.loading ? (
             <div className="flex h-[300px] items-center justify-center gap-3 text-neutral-600">
               <Loader2 className="h-5 w-5 animate-spin" />
-              <span className="text-sm font-medium">
-                Đang tải danh sách linh kiện...
-              </span>
+              <span className="text-sm font-medium">{t("loadingParts")}</span>
             </div>
           ) : partsState.error ? (
             <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -312,7 +314,7 @@ export default function ShopRulesBuilderPage() {
                   disabled={isResetting || isSaving}
                   className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isResetting ? "Đang xóa quy trình..." : "Reset Rule"}
+                  {isResetting ? t("resetting") : t("resetButton")}
                 </button>
               </div>
 
@@ -327,17 +329,14 @@ export default function ShopRulesBuilderPage() {
               {isSaving && (
                 <div className="mt-3 inline-flex items-center gap-2 text-sm text-neutral-600">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Đang lưu quy tắc...
+                  {t("savingRules")}
                 </div>
               )}
             </div>
           ) : (
             <div className="flex h-[300px] flex-col items-center justify-center text-center text-neutral-600">
               <Settings2 className="mb-3 h-8 w-8 text-neutral-400" />
-              <p className="text-sm font-medium">
-                Chọn một kit ở phía trên để bắt đầu thiết lập quy tắc tương
-                thích.
-              </p>
+              <p className="text-sm font-medium">{t("emptyState")}</p>
             </div>
           )}
         </section>
@@ -352,25 +351,24 @@ export default function ShopRulesBuilderPage() {
                 <AlertTriangle className="h-8 w-8 text-red-600" />
               </div>
               <h3 className="mb-2 text-xl font-bold text-gray-900">
-                Xóa toàn bộ quy trình?
+                {t("modalTitle")}
               </h3>
               <p className="mb-6 text-sm text-gray-500">
-                Bạn có chắc chắn muốn xóa sạch toàn bộ dây nối và quy tắc của
-                Kit này không? Hành động này <strong>không thể hoàn tác</strong>
-                và sẽ ảnh hưởng ngay đến cửa hàng.
+                {t("modalBody")} <strong>{t("modalBodyBold")}</strong>{" "}
+                {t("modalBodySuffix")}
               </p>
               <div className="flex w-full gap-3">
                 <button
                   onClick={() => setIsResetModalOpen(false)}
                   className="flex-1 rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-200"
                 >
-                  Hủy bỏ
+                  {t("cancelButton")}
                 </button>
                 <button
                   onClick={executeResetRules}
                   className="flex-1 rounded-lg bg-red-600 px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-red-700"
                 >
-                  Xóa toàn bộ
+                  {t("confirmDeleteButton")}
                 </button>
               </div>
             </div>

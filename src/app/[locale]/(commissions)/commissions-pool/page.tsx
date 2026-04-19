@@ -14,6 +14,7 @@ import { CreateCommissionModal } from "@/src/components/Profile/CreateCommission
 import {
   Loader2,
   Package,
+  CheckCircle,
   User,
   Calendar,
   Inbox,
@@ -82,74 +83,79 @@ interface CommissionCardProps {
 const CommissionCard = ({ request, onClick, isOwner }: CommissionCardProps) => {
   const t = useTranslations("CommissionPoolPage");
   return (
-  <div
-    onClick={onClick}
-    className="group/card flex flex-col sm:flex-row w-full overflow-hidden rounded-xl border border-neutral-100 bg-white shadow-sm hover:border-neutral-300 hover:shadow-md transition-all duration-200 cursor-pointer p-4 md:p-5 gap-5"
-  >
-    {/* THUMBNAIL */}
-    <div className="relative w-full sm:w-32 h-32 shrink-0 bg-neutral-50 border border-neutral-100 rounded-lg overflow-hidden flex items-center justify-center">
-      {isOwner && (
-        <span className="absolute top-2 left-2 z-20 text-[10px] font-semibold px-2 py-0.5 bg-neutral-900 text-white rounded-md shadow-sm">
-          {t("yours")}
-        </span>
-      )}
-      {request.referenceImages ? (
-        <Image
-          src={request.referenceImages}
-          alt={request.title}
-          fill
-          className="object-cover"
-          sizes="(max-width: 640px) 100vw, 128px"
-        />
-      ) : (
-        <Package className="w-8 h-8 text-neutral-300" />
-      )}
-    </div>
+    <div
+      onClick={onClick}
+      className="group/card flex flex-col sm:flex-row w-full overflow-hidden rounded-xl border border-neutral-100 bg-white shadow-sm hover:border-neutral-300 hover:shadow-md transition-all duration-200 cursor-pointer p-4 md:p-5 gap-5"
+    >
+      {/* THUMBNAIL */}
+      <div className="relative w-full sm:w-32 h-32 shrink-0 bg-neutral-50 border border-neutral-100 rounded-lg overflow-hidden flex items-center justify-center">
+        {isOwner && (
+          <span className="absolute top-2 left-2 z-20 text-[10px] font-semibold px-2 py-0.5 bg-neutral-900 text-white rounded-md shadow-sm">
+            {t("yours")}
+          </span>
+        )}
+        {request.referenceImages ? (
+          <Image
+            src={request.referenceImages}
+            alt={request.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 640px) 100vw, 128px"
+          />
+        ) : (
+          <Package className="w-8 h-8 text-neutral-300" />
+        )}
+      </div>
 
-    {/* INFO */}
-    <div className="flex flex-col flex-grow min-w-0">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h3 className="text-base font-semibold text-neutral-900 leading-snug line-clamp-2 group-hover/card:text-blue-600 transition-colors">
-            {request.title}
-          </h3>
-          <div className="flex items-center gap-3 text-xs font-medium text-neutral-500 mt-2">
-            <span className="flex items-center gap-1.5 bg-neutral-50 px-2 py-1 rounded-md border border-neutral-100">
-              <User className="w-3.5 h-3.5" />
-              <span className="truncate max-w-[120px]">{request.userName}</span>
-            </span>
-            <span className="flex items-center gap-1.5 text-neutral-400">
-              <Calendar className="w-3.5 h-3.5" />
-              {formatDate(request.createdAt)}
-            </span>
+      {/* INFO */}
+      <div className="flex flex-col flex-grow min-w-0">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-base font-semibold text-neutral-900 leading-snug line-clamp-2 group-hover/card:text-blue-600 transition-colors">
+              {request.title}
+            </h3>
+            <div className="flex items-center gap-3 text-xs font-medium text-neutral-500 mt-2">
+              <span className="flex items-center gap-1.5 bg-neutral-50 px-2 py-1 rounded-md border border-neutral-100">
+                <User className="w-3.5 h-3.5" />
+                <span className="truncate max-w-[120px]">
+                  {request.userName}
+                </span>
+              </span>
+              <span className="flex items-center gap-1.5 text-neutral-400">
+                <Calendar className="w-3.5 h-3.5" />
+                {formatDate(request.createdAt)}
+              </span>
+            </div>
           </div>
+        </div>
+
+        {/* Badges */}
+        <div className="flex items-center gap-2 mt-auto pt-4">
+          <span className="px-2.5 py-1 bg-neutral-50 border border-neutral-200 text-xs font-semibold text-neutral-600 rounded-md flex items-center gap-1.5">
+            <Hash className="w-3.5 h-3.5" />{" "}
+            {t("quantity", { count: request.quantity })}
+          </span>
         </div>
       </div>
 
-      {/* Badges */}
-      <div className="flex items-center gap-2 mt-auto pt-4">
-        <span className="px-2.5 py-1 bg-neutral-50 border border-neutral-200 text-xs font-semibold text-neutral-600 rounded-md flex items-center gap-1.5">
-          <Hash className="w-3.5 h-3.5" /> {t("quantity", { count: request.quantity })}
-        </span>
+      {/* ACTION & PRICE (Right side) */}
+      <div className="flex flex-col sm:items-end justify-between shrink-0 sm:min-w-[160px] mt-3 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-t-0 border-neutral-100">
+        <div className="text-left sm:text-right">
+          <p className="text-xs font-medium text-neutral-500 mb-1">
+            {t("budgetRange")}
+          </p>
+          <p className="text-base font-bold text-neutral-900 leading-none">
+            {formatVND(request.minBudget)}
+          </p>
+          <p className="text-[13px] font-medium text-neutral-500 mt-1">
+            - {formatVND(request.maxBudget)}
+          </p>
+        </div>
+        <div className="hidden sm:flex w-full items-center justify-center gap-1.5 px-4 py-2.5 mt-4 bg-white border border-neutral-200 text-neutral-700 text-xs font-semibold rounded-lg group-hover/card:bg-neutral-900 group-hover/card:text-white group-hover/card:border-neutral-900 transition-colors">
+          {t("viewDetails")} <ChevronRight className="w-4 h-4" />
+        </div>
       </div>
     </div>
-
-    {/* ACTION & PRICE (Right side) */}
-    <div className="flex flex-col sm:items-end justify-between shrink-0 sm:min-w-[160px] mt-3 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-t-0 border-neutral-100">
-      <div className="text-left sm:text-right">
-        <p className="text-xs font-medium text-neutral-500 mb-1">{t("budgetRange")}</p>
-        <p className="text-base font-bold text-neutral-900 leading-none">
-          {formatVND(request.minBudget)}
-        </p>
-        <p className="text-[13px] font-medium text-neutral-500 mt-1">
-          - {formatVND(request.maxBudget)}
-        </p>
-      </div>
-      <div className="hidden sm:flex w-full items-center justify-center gap-1.5 px-4 py-2.5 mt-4 bg-white border border-neutral-200 text-neutral-700 text-xs font-semibold rounded-lg group-hover/card:bg-neutral-900 group-hover/card:text-white group-hover/card:border-neutral-900 transition-colors">
-        {t("viewDetails")} <ChevronRight className="w-4 h-4" />
-      </div>
-    </div>
-  </div>
   );
 };
 
@@ -254,7 +260,10 @@ const CommissionModal = ({
       {showCancelConfirm && (
         <div
           className="fixed inset-0 bg-black/40 z-[999] flex items-center justify-center p-4 backdrop-blur-[2px]"
-          onClick={(e) => { e.stopPropagation(); setShowCancelConfirm(false); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowCancelConfirm(false);
+          }}
         >
           <div
             className="bg-white border border-neutral-100 rounded-xl w-full max-w-sm p-8 shadow-2xl text-center animate-in zoom-in-95 duration-200"
@@ -267,14 +276,14 @@ const CommissionModal = ({
               {t("confirmCancellation")}
             </h3>
             <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
-                {t("cancelDesc")}
+              {t("cancelDesc")}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCancelConfirm(false)}
                 className="flex-1 py-2.5 bg-white hover:bg-neutral-50 text-neutral-700 font-medium text-sm rounded-lg transition-colors border border-neutral-200"
               >
-              {t("back")}
+                {t("back")}
               </button>
               <button
                 onClick={handleCancelRequest}
@@ -321,7 +330,7 @@ const CommissionModal = ({
                 <Package className="w-16 h-16 text-neutral-300" />
               </div>
             )}
-            
+
             {/* Gradient Overlay for better contrast if image is busy */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 lg:opacity-100 transition-opacity"></div>
           </div>
@@ -352,12 +361,14 @@ const CommissionModal = ({
 
             {/* Budget */}
             <div className="mt-4 p-4 rounded-xl bg-green-50 border border-green-100 inline-block w-full sm:w-auto">
-               <p className="text-xs font-semibold text-green-700 mb-1 uppercase tracking-wider">{t("clientBudgetRange")}</p>
-               <p className="text-xl font-bold text-green-600">
-                 {formatVND(request.minBudget)}
-                 <span className="text-green-400 font-normal mx-2">–</span>
-                 {formatVND(request.maxBudget)}
-               </p>
+              <p className="text-xs font-semibold text-green-700 mb-1 uppercase tracking-wider">
+                {t("clientBudgetRange")}
+              </p>
+              <p className="text-xl font-bold text-green-600">
+                {formatVND(request.minBudget)}
+                <span className="text-green-400 font-normal mx-2">–</span>
+                {formatVND(request.maxBudget)}
+              </p>
             </div>
 
             {/* Description */}
@@ -391,10 +402,11 @@ const CommissionModal = ({
                   onClick={() => setShowCancelConfirm(true)}
                   disabled={isCanceling}
                   className="w-full max-w-[280px] py-3 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-medium text-sm rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
+                >
                   {isCanceling ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" /> {t("canceling")}
+                      <Loader2 className="w-4 h-4 animate-spin" />{" "}
+                      {t("canceling")}
                     </>
                   ) : (
                     <>
@@ -408,6 +420,18 @@ const CommissionModal = ({
                   {t("viewOnlyMode")}
                 </div>
               )}
+            </div>
+          ) : request.hasMyPendingQuote ? (
+            <div className="flex flex-col items-center justify-center flex-1 text-center py-12 animate-in zoom-in-95 duration-300">
+              <div className="w-16 h-16 rounded-full bg-green-50 border border-green-100 flex items-center justify-center mb-5">
+                <CheckCircle className="w-8 h-8 text-green-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+                {t("alreadyQuotedTitle")}
+              </h3>
+              <p className="text-sm text-neutral-500 max-w-[280px] leading-relaxed">
+                {t("alreadyQuotedDesc")}
+              </p>
             </div>
           ) : (
             <>
@@ -448,7 +472,7 @@ const CommissionModal = ({
                   </div>
                   {errors.price && (
                     <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3"/> {errors.price}
+                      <AlertTriangle className="w-3 h-3" /> {errors.price}
                     </p>
                   )}
                 </div>
@@ -463,8 +487,10 @@ const CommissionModal = ({
                     onChange={(e) => setEstimatedDays(e.target.value)}
                     className="w-full border border-neutral-200 bg-white text-neutral-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-900 focus:border-neutral-900 transition-colors appearance-none cursor-pointer"
                   >
-                    {[3, 5, 7, 10, 14, 21, 30].map(num => (
-                      <option key={num} value={num.toString()}>{t("days", { count: num })}</option>
+                    {[3, 5, 7, 10, 14, 21, 30].map((num) => (
+                      <option key={num} value={num.toString()}>
+                        {t("days", { count: num })}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -475,7 +501,9 @@ const CommissionModal = ({
                     <label className="block text-sm font-semibold text-neutral-900">
                       {t("buildPlan")} <span className="text-red-500">*</span>
                     </label>
-                    <span className="text-xs text-neutral-400">{t("minChars")}</span>
+                    <span className="text-xs text-neutral-400">
+                      {t("minChars")}
+                    </span>
                   </div>
                   <textarea
                     value={note}
@@ -486,7 +514,7 @@ const CommissionModal = ({
                   />
                   {errors.note && (
                     <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3"/> {errors.note}
+                      <AlertTriangle className="w-3 h-3" /> {errors.note}
                     </p>
                   )}
                 </div>
@@ -531,7 +559,9 @@ export default function CommissionPoolPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isShopSelectionOpen, setIsShopSelectionOpen] = useState(false);
   const [shopList, setShopList] = useState<any[]>([]);
-  const [selectedTargetShopId, setSelectedTargetShopId] = useState<string | undefined>(undefined);
+  const [selectedTargetShopId, setSelectedTargetShopId] = useState<
+    string | undefined
+  >(undefined);
 
   const fetchShopsForSelection = async () => {
     try {
@@ -566,7 +596,6 @@ export default function CommissionPoolPage() {
   return (
     <div className="bg-neutral-50 min-h-[calc(100vh-4rem)] text-neutral-900 font-sans">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
         {/* Dashboard Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
@@ -577,9 +606,13 @@ export default function CommissionPoolPage() {
               {t("pageTitle")}
             </h1>
             <p className="text-neutral-500 mt-2 text-sm max-w-xl leading-relaxed">
-              {t.rich("pageDesc", { 
+              {t.rich("pageDesc", {
                 count: poolRequests.length,
-                bold: (chunks) => <strong className="font-semibold text-neutral-700">{chunks}</strong> 
+                bold: (chunks) => (
+                  <strong className="font-semibold text-neutral-700">
+                    {chunks}
+                  </strong>
+                ),
               })}
             </p>
           </div>
@@ -591,7 +624,8 @@ export default function CommissionPoolPage() {
               }}
               className="bg-white border border-neutral-200 text-neutral-700 font-medium text-sm rounded-xl px-5 py-2.5 hover:bg-neutral-50 hover:border-neutral-300 transition-all shadow-sm flex items-center gap-2 w-full sm:w-auto justify-center active:scale-[0.98]"
             >
-              <Store className="w-4 h-4 text-neutral-400" /> {t("directRequest")}
+              <Store className="w-4 h-4 text-neutral-400" />{" "}
+              {t("directRequest")}
             </button>
             <button
               onClick={handleOpenPublicRequest}
@@ -675,22 +709,35 @@ export default function CommissionPoolPage() {
 
       {/* Shop Selection Modal */}
       {isShopSelectionOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-4 sm:p-6" onClick={() => setIsShopSelectionOpen(false)}>
-          <div className="bg-white w-full max-w-md rounded-xl p-6 shadow-2xl flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-4 sm:p-6"
+          onClick={() => setIsShopSelectionOpen(false)}
+        >
+          <div
+            className="bg-white w-full max-w-md rounded-xl p-6 shadow-2xl flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center mb-5 border-b border-neutral-100 pb-4">
-              <h3 className="text-lg font-semibold text-neutral-900">{t("selectBuilder")}</h3>
-              <button onClick={() => setIsShopSelectionOpen(false)} className="text-neutral-400 hover:text-neutral-800 bg-neutral-50 hover:bg-neutral-100 p-1.5 rounded-lg transition-colors focus:outline-none">
-                <X className="w-5 h-5"/>
+              <h3 className="text-lg font-semibold text-neutral-900">
+                {t("selectBuilder")}
+              </h3>
+              <button
+                onClick={() => setIsShopSelectionOpen(false)}
+                className="text-neutral-400 hover:text-neutral-800 bg-neutral-50 hover:bg-neutral-100 p-1.5 rounded-lg transition-colors focus:outline-none"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
             <div className="overflow-y-auto space-y-3 flex-1 pr-1 custom-scrollbar">
               {shopList.length === 0 ? (
                 <div className="py-12 flex flex-col items-center justify-center text-center">
                   <Loader2 className="w-6 h-6 text-neutral-300 animate-spin mb-3 text-center" />
-                  <span className="text-neutral-500 text-sm font-medium">{t("loadingBuilders")}</span>
+                  <span className="text-neutral-500 text-sm font-medium">
+                    {t("loadingBuilders")}
+                  </span>
                 </div>
               ) : (
-                shopList.map(shop => (
+                shopList.map((shop) => (
                   <div
                     key={shop.id}
                     onClick={() => handleSelectShop(shop.id)}
@@ -699,7 +746,11 @@ export default function CommissionPoolPage() {
                     <div className="flex items-center gap-3 overflow-hidden">
                       <div className="w-12 h-12 rounded-lg bg-neutral-50 border border-neutral-100 overflow-hidden shrink-0 flex items-center justify-center">
                         {shop.logoUrl ? (
-                          <img src={shop.logoUrl} alt={shop.shopName} className="w-full h-full object-cover" />
+                          <img
+                            src={shop.logoUrl}
+                            alt={shop.shopName}
+                            className="w-full h-full object-cover"
+                          />
                         ) : (
                           <Store className="w-6 h-6 text-neutral-300" />
                         )}
@@ -713,7 +764,7 @@ export default function CommissionPoolPage() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        window.open(`/profile/shop/${shop.id}`, '_blank');
+                        window.open(`/profile/shop/${shop.id}`, "_blank");
                       }}
                       className="shrink-0 flex items-center justify-center w-8 h-8 text-neutral-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title={t("visitShopProfile")}
