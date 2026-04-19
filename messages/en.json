@@ -114,7 +114,7 @@
     "card1Title": "CUSTOM BUILDS",
     "card1Subtitle": "Build your dream PC from scratch",
     "card1Cta": "START BUILDING",
-    "card2Title": "PC CASES",
+    "card2Title": "ASSEMBLED KEYBOARDS",
     "card2Subtitle": "Premium towers for every setup",
     "card2Cta": "SHOP CASES"
   },
@@ -338,6 +338,8 @@
     "selectBuilder": "Select a Builder",
     "loadingBuilders": "Loading builders...",
     "visitShopProfile": "Visit Shop Profile",
+    "alreadyQuotedTitle": "Quote Submitted",
+    "alreadyQuotedDesc": "You have already submitted a quote for this request. Please wait for the customer to review and respond!",
     "days": "{count, plural, =1 {# day} other {# days}}"
   },
   "CreateCommissionModal": {
@@ -491,6 +493,7 @@
   },
   "Wallet": {
     "loadFailed": "Failed to load transactions",
+    "received": "Received",
     "pageTitle": "Transaction History",
     "pageDesc": "Track and manage your wallet balances, deposits, and financial activity.",
     "flowIn": "ADDED TO WALLET",
@@ -565,7 +568,8 @@
       "relatedOrder": "Related Order",
       "description": "Description",
       "bankInfo": "Recipient Account",
-      "close": "Close"
+      "close": "Close",
+      "netReceived": "Net Received"
     },
     "sortOptions": {
       "createdAt": "Date Created",
@@ -3105,7 +3109,7 @@
     "freeShipping": "free shipping",
     "orderTodayTo": "Order today to",
     "receiveIncentives": "receive incentives",
-    "day60": "60-day",
+    "day30": "30-day",
     "trustSatisfaction": "100% Satisfaction Guarantee",
     "trustPremium": "Premium Quality",
     "trustFastShipping": "Fast Shipping",
@@ -3158,5 +3162,64 @@
     "clickCameraToCapture": "Click camera icon to capture",
     "performanceMonitorActive": "Performance monitor active",
     "pressEscToClose": "Press ESC to close"
+  },
+  "ShopRulesBuilder": {
+    "pageTitle": "Component Compatibility Setup",
+    "pageSubtitle": "Select a base kit then connect components step by step to define compatibility rules using the visual interface.",
+    "kitSelectorLabel": "Select Kit to Configure",
+    "kitSelectorPlaceholder": "-- Select a Kit --",
+    "kitCounter": "Loaded {kitCount} kits out of {totalCount} total parts.",
+    "loadingParts": "Loading parts list...",
+    "emptyState": "Select a kit above to start setting up compatibility rules.",
+    "resetting": "Deleting workflow...",
+    "resetButton": "Reset Rule",
+    "savingRules": "Saving rules...",
+    "modalTitle": "Delete entire workflow?",
+    "modalBody": "Are you sure you want to clear all connections and rules for this Kit? This action",
+    "modalBodyBold": "cannot be undone",
+    "modalBodySuffix": "and will immediately affect your store.",
+    "cancelButton": "Cancel",
+    "confirmDeleteButton": "Delete All",
+    "toastNoRules": "No rules to save.",
+    "toastNoKit": "No kit selected to save configuration.",
+    "toastSaveSuccess": "Compatibility rules saved successfully.",
+    "toastNoKitReset": "No kit selected to delete workflow.",
+    "toastResetSuccess": "Entire workflow deleted successfully!",
+    "toastResetError": "An error occurred while deleting the workflow!",
+    "toastSaveError": "Failed to save rules. Please try again."
+  },
+  "RuleBuilderGuide": {
+    "openGuide": "View operation guide",
+    "closeGuide": "Close guide",
+    "guideTitle": "User Guide",
+    "guideSubtitle": "This tool lets you define which components can be assembled together. Customers use this diagram to build their keyboard without ever worrying about choosing incompatible parts.",
+    "videoLabel": "Quick demo video",
+    "step1Title": "1. Drag & Drop to Connect",
+    "step1Content": "Hold and drag from the Teal dot (output) of the previous component, then drop onto the Blue dot (input) of the next component to establish compatibility.",
+    "step2Title": "2. Multi-Branch Connections",
+    "step2Content": "Can one Case fit multiple Plates? Just drag multiple wires from that Case to all compatible Plates. Customers will only be able to select what you have connected.",
+    "step3Title": "3. Duplicate Components",
+    "step3Content": "Click the Copy button under each component to create a clone. Very useful when you want to branch out complex combination rules for the same item.",
+    "step4Title": "4. Upload Layer Images",
+    "step4Content": "Click 'Upload Image' to upload a transparent image of the component. The system will automatically stack these image layers to form a complete keyboard.",
+    "step5Title": "5. Edit & Delete",
+    "step5Content": "Delete wire: Click to select the wire then press the Delete key. Delete component: Click the Trash icon. (Note: Cannot delete if it is the only remaining clone on the board).",
+    "step6Title": "6. Save Workflow",
+    "step6Content": "After completing the diagram, you must click the 'Save Workflow' button in the top corner for the system to apply this new ruleset to your Store."
+  },
+  "VisualRuleBuilder": {
+    "panelTitle": "Compatibility Setup: {kitName}",
+    "panelSubtitle": "Drag the handles to connect compatible components together.",
+    "saveButton": "Save Workflow",
+    "toastNoConnection": "Please connect at least 1 workflow!",
+    "toastSaveSuccess": "Rules generated successfully! Check Console."
+  },
+  "CustomPartNode": {
+    "uploadedImage": "Image uploaded",
+    "uploadImage": "Upload Image",
+    "duplicateTitle": "Duplicate this branch",
+    "deleteTitle": "Delete this branch",
+    "previewLabel": "Preview Image",
+    "deleteBlocked": "Cannot delete! Must keep at least 1 copy of \"{partName}\" on the board to set up rules."
   }
 }

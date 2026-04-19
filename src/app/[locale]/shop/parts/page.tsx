@@ -503,9 +503,16 @@ function PartRow({
             )}
           </div>
           <div className="min-w-0 max-w-[120px] lg:max-w-[200px]">
-            <p className="font-medium text-amazon-text text-[13px] truncate">
-              {part.name}
-            </p>
+            <div className="flex items-center gap-2 mb-0.5">
+              <p className="font-medium text-amazon-text text-[13px] truncate">
+                {part.name}
+              </p>
+              {part.isDeleted && (
+                <span className="px-1.5 py-[1px] rounded-[3px] text-[9px] font-bold bg-red-100 text-red-600 uppercase tracking-wider shrink-0">
+                  Deleted
+                </span>
+              )}
+            </div>
             <p className="text-[12px] text-amazon-textMuted truncate">
               {part.slug}
             </p>
@@ -602,24 +609,40 @@ function PartRow({
       {/* Actions */}
       <td className="px-2 py-2 text-center">
         <div className="flex items-center justify-center gap-1">
+          {/* View Button remains the same */}
           <button
             onClick={() => onView(part.slug)}
-            className="p-1 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 hover:border-amazon-btnPrimary text-amazon-textMuted hover:text-amazon-text transition shrink-0"
+            className={`p-1 rounded-sm border border-amazon-border transition shrink-0 ${
+              part.isDeleted
+                ? "bg-neutral-100 text-neutral-300 cursor-not-allowed opacity-50"
+                : "bg-white hover:bg-neutral-50 hover:border-blue-500 text-amazon-textMuted hover:text-blue-500"
+            }`}
             title={t("viewPart")}
+            disabled={part.isDeleted}
           >
             <Eye className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onEdit(part.slug)}
-            className="p-1 rounded-sm border border-amazon-border bg-white hover:bg-neutral-50 hover:border-blue-500 text-amazon-textMuted hover:text-blue-500 transition shrink-0"
-            title={t("editPart")}
+            disabled={part.isDeleted}
+            className={`p-1 rounded-sm border border-amazon-border transition shrink-0 ${
+              part.isDeleted
+                ? "bg-neutral-100 text-neutral-300 cursor-not-allowed opacity-50"
+                : "bg-white hover:bg-neutral-50 hover:border-blue-500 text-amazon-textMuted hover:text-blue-500"
+            }`}
+            title={part.isDeleted ? "Cannot edit deleted part" : t("editPart")}
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onDelete(part)}
-            className="p-1 rounded-sm border border-amazon-border bg-white hover:bg-red-50 hover:border-red-500 text-amazon-textMuted hover:text-red-500 transition shrink-0"
-            title={t("deletePart")}
+            disabled={part.isDeleted}
+            className={`p-1 rounded-sm border border-amazon-border transition shrink-0 ${
+              part.isDeleted
+                ? "bg-neutral-100 text-neutral-300 cursor-not-allowed opacity-50"
+                : "bg-white hover:bg-red-50 hover:border-red-500 text-amazon-textMuted hover:text-red-500"
+            }`}
+            title={part.isDeleted ? "Already deleted" : t("deletePart")}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>

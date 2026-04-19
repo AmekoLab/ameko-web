@@ -75,6 +75,20 @@ export interface TransactionItem {
   status: string;
   description: string | null;
   createdAt: string;
+
+  // --- Các field thông tin ngân hàng mới ---
+  bankName: string | null;
+  bankAccountNumber: string | null;
+  bankAccountName: string | null;
+
+  // --- Các field BỔ SUNG TỪ API PENDING WITHDRAWAL ---
+  totalDeducted?: number;
+  shopName?: string | null;
+  userId?: string | null;
+  requestedAt?: string | null;
+  processedAt?: string | null;
+  adminMessage?: string | null;
+  evidenceUrl?: string | null;
 }
 
 export interface HeldTransaction {

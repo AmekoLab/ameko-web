@@ -46,6 +46,7 @@ export interface CommissionRequest {
   createdAt: string;
   quantity: number;
   isDraft: boolean;
+  hasMyPendingQuote?: boolean;
   shopResponseWindowHours: number;
   customerResponseWindowHours: number;
   quotes: CommissionQuote[];

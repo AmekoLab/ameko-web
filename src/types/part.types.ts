@@ -21,6 +21,7 @@ export interface PartItem {
   shopName: string;
   categoryName: string;
   isAddonEligible: boolean;
+  isDeleted: boolean;
 }
 
 export interface PartListData {

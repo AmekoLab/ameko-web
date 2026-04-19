@@ -149,7 +149,7 @@ export default function PinSetupPage() {
     );
 
     if (setupWalletPin.fulfilled.match(result)) {
-      router.push("/shop/wallet");
+      router.push("/wallet");
     }
   };
 
@@ -214,7 +214,6 @@ export default function PinSetupPage() {
                   value={pinValue}
                   onChange={onPinChange}
                   error={errors.newPin?.message}
-                
                 />
               </div>
 
@@ -223,7 +222,7 @@ export default function PinSetupPage() {
                 <label className="block text-sm font-semibold text-amazon-text mb-3">
                   {t("confirmPin")}
                 </label>
-                <PinInput 
+                <PinInput
                   value={confirmPinValue}
                   onChange={onConfirmPinChange}
                   error={errors.confirmPin?.message}

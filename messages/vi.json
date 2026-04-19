@@ -114,7 +114,7 @@
     "card1Title": "DÀN PHÍM TÙY CHỈNH",
     "card1Subtitle": "Lựa chọn từ thiết kế của riêng bạn",
     "card1Cta": "BẮT ĐẦU NGAY",
-    "card2Title": "LINH KIỆN CAO CẤP",
+    "card2Title": "BÀN PHÍM LẮP RÁP SẴN",
     "card2Subtitle": "Kết hợp với mọi hệ thống thiết bị",
     "card2Cta": "XEM NGAY"
   },
@@ -338,6 +338,8 @@
     "selectBuilder": "Chọn Builder",
     "loadingBuilders": "Đang tải danh sách...",
     "visitShopProfile": "Xem hồ sơ Shop",
+    "alreadyQuotedTitle": "Đã gửi báo giá",
+    "alreadyQuotedDesc": "Bạn đã báo giá cho yêu cầu này. Vui lòng chờ khách hàng xem xét và phản hồi nhé!",
     "days": "{count} ngày"
   },
   "CreateCommissionModal": {
@@ -494,6 +496,7 @@
     "pageTitle": "Lịch Sử Giao Dịch",
     "pageDesc": "Theo dõi và quản lý số dư ví, khoản nạp, và hoạt động tài chính.",
     "flowIn": "CỘNG VÀO VÍ",
+    "received": "Nhận",
     "flowOut": "TRỪ KHỎI VÍ",
     "flowHeld": "TẠM GIỮ",
     "flowNeutral": "KHÔNG ĐỔI",
@@ -565,7 +568,8 @@
       "relatedOrder": "Đơn hàng liên quan",
       "description": "Nội dung",
       "bankInfo": "Tài khoản nhận",
-      "close": "Đóng"
+      "close": "Đóng",
+      "netReceived": "Thực nhận"
     },
     "sortOptions": {
       "createdAt": "Ngày Tạo",
@@ -3159,5 +3163,64 @@
     "clickCameraToCapture": "Nhấn biểu tượng máy ảnh để chụp",
     "performanceMonitorActive": "Đang bật theo dõi hiệu năng",
     "pressEscToClose": "Nhấn ESC để đóng"
+  },
+  "ShopRulesBuilder": {
+    "pageTitle": "Thiết lập tương thích linh kiện",
+    "pageSubtitle": "Chọn một kit nền rồi kết nối các linh kiện theo từng bước để định nghĩa quy tắc tương thích bằng giao diện trực quan.",
+    "kitSelectorLabel": "Chọn Kit cần cấu hình",
+    "kitSelectorPlaceholder": "-- Chọn một Kit --",
+    "kitCounter": "Đã tải {kitCount} kit trong tổng số {totalCount} linh kiện.",
+    "loadingParts": "Đang tải danh sách linh kiện...",
+    "emptyState": "Chọn một kit ở phía trên để bắt đầu thiết lập quy tắc tương thích.",
+    "resetting": "Đang xóa quy trình...",
+    "resetButton": "Reset Rule",
+    "savingRules": "Đang lưu quy tắc...",
+    "modalTitle": "Xóa toàn bộ quy trình?",
+    "modalBody": "Bạn có chắc chắn muốn xóa sạch toàn bộ dây nối và quy tắc của Kit này không? Hành động này",
+    "modalBodyBold": "không thể hoàn tác",
+    "modalBodySuffix": "và sẽ ảnh hưởng ngay đến cửa hàng.",
+    "cancelButton": "Hủy bỏ",
+    "confirmDeleteButton": "Xóa toàn bộ",
+    "toastNoRules": "Không có quy tắc để lưu.",
+    "toastNoKit": "Không tìm thấy Kit đang chọn để lưu cấu hình.",
+    "toastSaveSuccess": "Đã lưu quy tắc tương thích thành công.",
+    "toastNoKitReset": "Không tìm thấy Kit đang chọn để xóa quy trình.",
+    "toastResetSuccess": "Đã xóa toàn bộ quy trình thành công!",
+    "toastResetError": "Có lỗi xảy ra khi xóa quy trình!",
+    "toastSaveError": "Lưu quy tắc thất bại. Vui lòng thử lại."
+  },
+  "RuleBuilderGuide": {
+    "openGuide": "Xem hướng dẫn thao tác",
+    "closeGuide": "Đóng hướng dẫn",
+    "guideTitle": "Hướng dẫn sử dụng",
+    "guideSubtitle": "Công cụ này giúp bạn quy định linh kiện nào được phép lắp ráp với nhau. Khách hàng sẽ dựa vào sơ đồ này để build phím mà không bao giờ sợ chọn nhầm đồ.",
+    "videoLabel": "Video minh họa nhanh",
+    "step1Title": "1. Kéo Thả Nối Dây",
+    "step1Content": "Nhấn giữ chấm Xanh Ngọc (đầu ra) của linh kiện trước, kéo thả vào chấm Xanh Dương (đầu vào) của linh kiện sau để thiết lập tương thích.",
+    "step2Title": "2. Nối Đa Nhánh",
+    "step2Content": "Một Vỏ (Case) lắp được nhiều Plate? Cứ kéo nhiều sợi dây từ Case đó cắm vào tất cả các Plate phù hợp. Khách hàng sẽ chỉ được chọn những gì bạn đã nối.",
+    "step3Title": "3. Nhân Bản Linh Kiện",
+    "step3Content": "Bấm nút Copy dưới mỗi linh kiện để đẻ ra bản sao. Rất hữu ích khi bạn muốn rẽ nhánh các quy tắc kết hợp phức tạp cho cùng một món đồ.",
+    "step4Title": "4. Upload Ảnh Bóc Tách",
+    "step4Content": "Bấm 'Upload Ảnh' để tải lên hình ảnh trong suốt của linh kiện. Hệ thống sẽ tự động xếp chồng các lớp ảnh này lên nhau thành bàn phím hoàn chỉnh.",
+    "step5Title": "5. Sửa Sai & Xóa",
+    "step5Content": "Xóa dây: Bấm chọn dây rồi nhấn phím Delete. Xóa linh kiện: Bấm nút Thùng rác. (Lưu ý: Không thể xóa nếu đó là bản sao duy nhất còn lại trên bảng).",
+    "step6Title": "6. Lưu Quy Trình",
+    "step6Content": "Sau khi nối sơ đồ hoàn chỉnh, bắt buộc phải nhấn nút 'Lưu Quy Trình' ở góc trên cùng để hệ thống áp dụng bộ luật mới này cho Cửa hàng."
+  },
+  "VisualRuleBuilder": {
+    "panelTitle": "Thiết lập tương thích: {kitName}",
+    "panelSubtitle": "Kéo thả các điểm (Handles) để kết nối các linh kiện hợp lệ với nhau.",
+    "saveButton": "Lưu Quy Trình",
+    "toastNoConnection": "Vui lòng kết nối ít nhất 1 quy trình!",
+    "toastSaveSuccess": "Đã sinh Rule thành công! Xem Console."
+  },
+  "CustomPartNode": {
+    "uploadedImage": "Đã up ảnh",
+    "uploadImage": "Upload Ảnh",
+    "duplicateTitle": "Nhân bản nhánh này",
+    "deleteTitle": "Xóa nhánh này",
+    "previewLabel": "Ảnh Preview",
+    "deleteBlocked": "Không thể xóa! Phải giữ lại ít nhất 1 bản sao của \"{partName}\" trên bảng để thiết lập rule."
   }
 }

@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { Handle, Position, useReactFlow } from "@xyflow/react";
 import Image from "next/image";
-import { CheckCircle2, Copy, Package, UploadCloud } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { CheckCircle2, Copy, Package, Trash2, UploadCloud } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { PartItem } from "@/src/types/part.types";
+import { toast } from "react-toastify";
 
 export interface PartNodeData extends Record<string, unknown> {
   part: PartItem;
@@ -22,6 +24,7 @@ export default function CustomPartNode({
   id: string;
   data: PartNodeData;
 }) {
+  const t = useTranslations("CustomPartNode");
   const { part, stepName, isFirst, isLast } = data;
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { updateNodeData, getNodes, setNodes } = useReactFlow();
@@ -81,6 +84,26 @@ export default function CustomPartNode({
     setNodes((nds) => nds.concat(newNode));
   };
 
+  const handleDelete = () => {
+    const currentNodes = getNodes();
+
+    // Count how many nodes represent the EXACT SAME part (match by part.id)
+    const samePartNodes = currentNodes.filter(
+      (n) =>
+        (n.data as PartNodeData).stepName === stepName &&
+        (n.data as PartNodeData).part.id === part.id,
+    );
+
+    // If this is the only instance of this specific part, block deletion
+    if (samePartNodes.length <= 1) {
+      toast.warning(t("deleteBlocked", { partName: part.name }));
+      return;
+    }
+
+    // Otherwise, delete the node
+    setNodes((nds) => nds.filter((node) => node.id !== id));
+  };
+
   const hasUploadedImage = Boolean(
     data.customLayerFile || data.existingLayerUrl,
   );
@@ -95,7 +118,7 @@ export default function CustomPartNode({
         <Handle
           type="target"
           position={Position.Left}
-          className="h-3 w-3 rounded-full border-2 border-white bg-blue-500"
+          className="!h-4 !w-4 rounded-full border-[3px] border-white bg-blue-500 hover:bg-blue-600 hover:scale-125 transition-all cursor-crosshair shadow-sm"
         />
       )}
 
@@ -151,25 +174,36 @@ export default function CustomPartNode({
               hasUploadedImage ? "text-emerald-700" : "text-neutral-600"
             }
           >
-            {hasUploadedImage ? "Đã up ảnh" : "Upload Ảnh"}
+            {hasUploadedImage ? t("uploadedImage") : t("uploadImage")}
           </span>
         </button>
 
         <button
           type="button"
           onClick={handleDuplicate}
-          title="Nhân bản nhánh này"
+          title={t("duplicateTitle")}
           className="flex flex-shrink-0 items-center justify-center rounded-md border border-neutral-200 bg-white px-2 py-1.5 text-neutral-500 transition-colors hover:bg-blue-50 hover:text-blue-600"
         >
           <Copy className="h-3.5 w-3.5" />
         </button>
+
+        {!isFirst && (
+          <button
+            type="button"
+            onClick={handleDelete}
+            title={t("deleteTitle")}
+            className="flex flex-shrink-0 items-center justify-center rounded-md border border-neutral-200 bg-white px-2 py-1.5 text-neutral-500 transition-colors hover:bg-red-50 hover:text-red-600"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
 
       {!isLast && (
         <Handle
           type="source"
           position={Position.Right}
-          className="h-3 w-3 rounded-full border-2 border-white bg-emerald-500"
+          className="!h-4 !w-4 rounded-full border-[3px] border-white bg-emerald-500 hover:bg-emerald-600 hover:scale-125 transition-all cursor-crosshair shadow-sm"
         />
       )}
 
@@ -177,7 +211,7 @@ export default function CustomPartNode({
         <div className="absolute left-[105%] top-0 z-[100] w-56 animate-in zoom-in fade-in rounded-xl border border-neutral-200 bg-white p-2 shadow-2xl duration-200">
           <div className="mb-1.5 flex items-center justify-between px-1">
             <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
-              Ảnh Preview
+              {t("previewLabel")}
             </span>
           </div>
           <div className="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg bg-neutral-100">

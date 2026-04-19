@@ -9,33 +9,35 @@ import ApproveWithdrawalModal from "@/src/components/Admin/ApproveWithdrawalModa
 import RejectWithdrawalModal from "@/src/components/Admin/RejectWithdrawalModal";
 import { toast } from "react-toastify";
 
-// ─── Parse bank details from description ─────────────────
-interface BankDetails {
-  bankName: string;
-  accountNumber: string;
-  accountName: string;
-}
-
-function parseBankDetails(description: string | null): BankDetails | null {
-  if (!description) return null;
-  // Format: "Withdraw to: {bankName} - {accountNumber} - {accountName}"
-  const match = description.match(
-    /Withdraw to:\s*(.+?)\s*-\s*(\S+)\s*-\s*(.+)/,
-  );
-  if (!match) return null;
-  return {
-    bankName: match[1].trim(),
-    accountNumber: match[2].trim(),
-    accountName: match[3].trim(),
-  };
-}
-
 // ─── Main Page ───────────────────────────────────────────
 export default function PendingWithdrawalsPage() {
   const t = useTranslations("AdminPendingWithdrawalsPage");
   const locale = useLocale();
   const dateLocale = locale === "vi" ? "vi-VN" : "en-US";
   const numberLocale = locale === "vi" ? "vi-VN" : "en-US";
+
+  const formatCurrency = (amount: number, currency?: string) => {
+    const safeCurrency =
+      currency && /^[A-Z]{3}$/.test(currency) ? currency : "VND";
+    return new Intl.NumberFormat(numberLocale, {
+      style: "currency",
+      currency: safeCurrency,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatRequestedAt = (value?: string | null) => {
+    if (!value) return "—";
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return "—";
+    return parsed.toLocaleDateString(dateLocale, {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   const dispatch = useAppDispatch();
   const { pendingWithdrawals, loadingPending, pendingPagination } =
@@ -120,10 +122,12 @@ export default function PendingWithdrawalsPage() {
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead className="bg-neutral-50 border-b border-amazon-border">
                   <tr className="text-left text-[10px] font-medium text-amazon-textMuted">
-                    <th className="px-4 py-2">{t("tableDate")}</th>
-                    <th className="px-4 py-2">{t("tableAmount")}</th>
-                    <th className="px-4 py-2">{t("tableFee")}</th>
-                    <th className="px-4 py-2">{t("tableBank")}</th>
+                    <th className="px-4 py-2">Requested At</th>
+                    <th className="px-4 py-2">Shop</th>
+                    <th className="px-4 py-2">Amount</th>
+                    <th className="px-4 py-2">Fee</th>
+                    <th className="px-4 py-2">Total Deducted</th>
+                    <th className="px-4 py-2">Bank Details</th>
                     <th className="px-4 py-2 text-center">
                       {t("tableActions")}
                     </th>
@@ -131,53 +135,69 @@ export default function PendingWithdrawalsPage() {
                 </thead>
                 <tbody className="divide-y divide-amazon-border">
                   {pendingWithdrawals.map((tx: TransactionItem) => {
-                    const bank = parseBankDetails(tx.description);
+                    const totalDeducted =
+                      tx.totalDeducted ?? tx.amount + tx.feeAmount;
+                    const hasBankDetails = !!(
+                      tx.bankName ||
+                      tx.bankAccountNumber ||
+                      tx.bankAccountName
+                    );
+
                     return (
                       <tr
                         key={tx.id}
                         className="hover:bg-neutral-50 transition-colors"
                       >
-                        {/* Date */}
+                        {/* Requested At */}
                         <td className="px-4 py-3 text-[10px] text-amazon-textMuted">
-                          {new Date(tx.createdAt).toLocaleDateString(
-                            dateLocale,
-                            {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            },
-                          )}
+                          {formatRequestedAt(tx.requestedAt ?? tx.createdAt)}
+                        </td>
+
+                        {/* Shop */}
+                        <td className="px-4 py-3">
+                          <span className="text-[11px] font-medium text-amazon-text">
+                            {tx.shopName || t("noInformation")}
+                          </span>
                         </td>
 
                         {/* Amount */}
                         <td className="px-4 py-3">
                           <span className="font-bold text-[11px] text-amazon-text">
-                            {tx.amount.toLocaleString(numberLocale)}₫
+                            {formatCurrency(tx.amount, tx.currency)}
                           </span>
                         </td>
 
                         {/* Fee */}
                         <td className="px-4 py-3">
-                          <span className="text-[11px] text-amazon-textMuted">
-                            {tx.feeAmount > 0
-                              ? `${tx.feeAmount.toLocaleString(numberLocale)}₫`
-                              : "—"}
+                          <span className="text-[11px] font-medium text-red-600">
+                            -
+                            {formatCurrency(
+                              Math.abs(tx.feeAmount),
+                              tx.currency,
+                            )}
+                          </span>
+                        </td>
+
+                        {/* Total Deducted */}
+                        <td className="px-4 py-3">
+                          <span className="font-bold text-[11px] text-amazon-text">
+                            {formatCurrency(totalDeducted, tx.currency)}
                           </span>
                         </td>
 
                         {/* Bank Details */}
                         <td className="px-4 py-3">
-                          {bank ? (
+                          {hasBankDetails ? (
                             <div className="space-y-0.5">
                               <p className="text-[11px] font-medium text-amazon-text">
-                                {bank.bankName}
+                                {tx.bankName ?? "—"}
                               </p>
                               <div className="flex items-center gap-1.5 text-[10px] text-amazon-textMuted">
-                                <span>{bank.accountNumber}</span>
+                                <span>{tx.bankAccountNumber ?? "—"}</span>
                                 <button
-                                  onClick={() => handleCopy(bank.accountNumber)}
+                                  onClick={() =>
+                                    handleCopy(tx.bankAccountNumber ?? "")
+                                  }
                                   className="text-blue-600 hover:text-blue-800 transition-colors px-1 border border-transparent hover:border-blue-200 bg-transparent hover:bg-blue-50 rounded"
                                   title={t("copyAccountNumberTitle")}
                                 >
@@ -185,7 +205,7 @@ export default function PendingWithdrawalsPage() {
                                 </button>
                               </div>
                               <p className="text-[10px] text-amazon-textMuted">
-                                {bank.accountName}
+                                {tx.bankAccountName ?? "—"}
                               </p>
                             </div>
                           ) : (

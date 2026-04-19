@@ -25,42 +25,114 @@ type KeyDef = [string, number];
 const KEYBOARD_ROWS: KeyDef[][] = [
   // Row 0: Function row
   [
-    ["Esc", 1], ["F1", 1], ["F2", 1], ["F3", 1], ["F4", 1],
-    ["F5", 1], ["F6", 1], ["F7", 1], ["F8", 1],
-    ["F9", 1], ["F10", 1], ["F11", 1], ["F12", 1],
-    ["PrtSc", 0.8], ["Del", 1.2],
+    ["Esc", 1],
+    ["F1", 1],
+    ["F2", 1],
+    ["F3", 1],
+    ["F4", 1],
+    ["F5", 1],
+    ["F6", 1],
+    ["F7", 1],
+    ["F8", 1],
+    ["F9", 1],
+    ["F10", 1],
+    ["F11", 1],
+    ["F12", 1],
+    ["PrtSc", 0.8],
+    ["Del", 1.2],
   ],
   // Row 1: Number row
   [
-    ["`", 1], ["1", 1], ["2", 1], ["3", 1], ["4", 1], ["5", 1],
-    ["6", 1], ["7", 1], ["8", 1], ["9", 1], ["0", 1],
-    ["-", 1], ["=", 1], ["Backspace", 1.6], ["Home", 1],
+    ["`", 1],
+    ["1", 1],
+    ["2", 1],
+    ["3", 1],
+    ["4", 1],
+    ["5", 1],
+    ["6", 1],
+    ["7", 1],
+    ["8", 1],
+    ["9", 1],
+    ["0", 1],
+    ["-", 1],
+    ["=", 1],
+    ["Backspace", 1.6],
+    ["Home", 1],
   ],
   // Row 2: QWERTY top
   [
-    ["Tab", 1.5], ["Q", 1], ["W", 1], ["E", 1], ["R", 1], ["T", 1],
-    ["Y", 1], ["U", 1], ["I", 1], ["O", 1], ["P", 1],
-    ["[", 1], ["]", 1], ["\\", 1.5], ["PgUp", 1],
+    ["Tab", 1.5],
+    ["Q", 1],
+    ["W", 1],
+    ["E", 1],
+    ["R", 1],
+    ["T", 1],
+    ["Y", 1],
+    ["U", 1],
+    ["I", 1],
+    ["O", 1],
+    ["P", 1],
+    ["[", 1],
+    ["]", 1],
+    ["\\", 1.5],
+    ["PgUp", 1],
   ],
   // Row 3: Home row
   [
-    ["Caps", 1.75], ["A", 1], ["S", 1], ["D", 1], ["F", 1], ["G", 1],
-    ["H", 1], ["J", 1], ["K", 1], ["L", 1], [";", 1],
-    ["'", 1], ["Enter", 2.25], ["PgDn", 1],
+    ["Caps", 1.75],
+    ["A", 1],
+    ["S", 1],
+    ["D", 1],
+    ["F", 1],
+    ["G", 1],
+    ["H", 1],
+    ["J", 1],
+    ["K", 1],
+    ["L", 1],
+    [";", 1],
+    ["'", 1],
+    ["Enter", 2.25],
+    ["PgDn", 1],
   ],
   // Row 4: Shift row
   [
-    ["LShift", 2.25], ["Z", 1], ["X", 1], ["C", 1], ["V", 1], ["B", 1],
-    ["N", 1], ["M", 1], [",", 1], [".", 1], ["/", 1],
-    ["RShift", 1.7], ["↑", 1], ["End", 1],
+    ["LShift", 2.25],
+    ["Z", 1],
+    ["X", 1],
+    ["C", 1],
+    ["V", 1],
+    ["B", 1],
+    ["N", 1],
+    ["M", 1],
+    [",", 1],
+    [".", 1],
+    ["/", 1],
+    ["RShift", 1.7],
+    ["↑", 1],
+    ["End", 1],
   ],
   // Row 5: Bottom row
   [
-    ["Ctrl", 1.25], ["Win", 1.25], ["Alt", 1.25],
+    ["Ctrl", 1.25],
+    ["Win", 1.25],
+    ["Alt", 1.25],
     ["Space", 6],
-    ["Alt", 1.25], ["Fn", 1], ["←", 1], ["↓", 1], ["→", 1],
+    ["Alt", 1.25],
+    ["Fn", 1],
+    ["←", 1],
+    ["↓", 1],
+    ["→", 1],
   ],
 ];
+
+const KEYMAP_CALIBRATION = {
+  pTop: 10.8,
+  pBottom: 18.9,
+  pLeft: 18.1,
+  pRight: 17.4,
+  rowGap: 0.8,
+  colGap: 0.3,
+};
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 
@@ -69,7 +141,7 @@ const formatKeycapPosition = (rawName: string) => {
     /\(Position:\s*R(\d+)-([^-]+)-\d+\)/g,
     (_, rowNum, keyName) => {
       return `(Position: ${keyName} - Row ${rowNum})`;
-    }
+    },
   );
 };
 
@@ -105,7 +177,6 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [showInstruction, setShowInstruction] = useState(true);
   const modalRef = useRef<HTMLDivElement>(null);
-
 
   // Close modal on Escape
   useEffect(() => {
@@ -146,33 +217,47 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
     [isProcessing, onAddonRemoved],
   );
 
-  const handleOverlayClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        setActiveKey(null);
-      }
-    },
-    [],
-  );
+  const handleOverlayClick = useCallback((e: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      setActiveKey(null);
+    }
+  }, []);
 
   // Current addon for the active modal key
-  const activeAddon = activeKey ? findAddonForKey(activeKey, selectedAddons) : null;
+  const activeAddon = activeKey
+    ? findAddonForKey(activeKey, selectedAddons)
+    : null;
 
   return (
     <>
       {/* ── KEYBOARD GRID OVERLAY ── */}
-     <div 
-        className="absolute inset-0 z-[55] pointer-events-auto 
-                   pt-[18.5%] pb-[19.4%] pl-[25.2%] pr-[24.9%] 
-                   text-[7.5px] tracking-[0.7px] 
-                   [&>button]:px-[0.5%] [&>button]:py-[0%]"
+      <div
+        className="absolute inset-0 z-[999] pointer-events-auto text-[7.5px] tracking-[0.7px]"
+        style={{
+          paddingTop: `${KEYMAP_CALIBRATION.pTop}%`,
+          paddingBottom: `${KEYMAP_CALIBRATION.pBottom}%`,
+          paddingLeft: `${KEYMAP_CALIBRATION.pLeft}%`,
+          paddingRight: `${KEYMAP_CALIBRATION.pRight}%`,
+        }}
       >
         {/* ── ONBOARDING COACHMARK ── */}
         {showInstruction && (
-          <div className="absolute top-[8%] left-1/2 -translate-x-1/2 z-[100] animate-bounce pointer-events-none flex flex-col items-center drop-shadow-2xl">
+          <div className="absolute top-[-5%] left-1/2 -translate-x-1/2 z-[100] animate-bounce pointer-events-none flex flex-col items-center drop-shadow-2xl">
             <div className="bg-neutral-900/90 backdrop-blur-md px-6 py-3.5 rounded-full border border-orange-500/50 flex items-center gap-4 shadow-[0_10px_30px_rgba(249,115,22,0.3)]">
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-500 text-white shrink-0">
-                <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg>
+                <svg
+                  className="w-5 h-5 animate-pulse"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2.5"
+                    d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+                  />
+                </svg>
               </div>
               <div>
                 <p className="text-[11px] font-black uppercase tracking-[0.15em] text-orange-400 mb-0.5">
@@ -183,17 +268,23 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
                 </p>
               </div>
             </div>
-            {/* Line pointing down to the keyboard */}
             <div className="w-0.5 h-10 bg-gradient-to-b from-orange-500/80 to-transparent mt-1 rounded-full"></div>
           </div>
         )}
 
-        <div className="w-full h-full flex flex-col gap-[2%]">
+        <div
+          className="w-full h-full flex flex-col"
+          style={{ gap: `${KEYMAP_CALIBRATION.rowGap}%` }}
+        >
           {KEYBOARD_ROWS.map((row, rowIdx) => (
-            <div 
-              key={rowIdx} 
-              // Dòng F-row trên cùng có khoảng cách margin-bottom (nếu bạn có chỉnh số này thì thay vào đây, ví dụ mb-[2%])
-              className={`flex gap-[3px] flex-1 ${rowIdx === 0 ? "mb-[2%]" : ""}`}
+            <div
+              key={rowIdx}
+              className="flex flex-1"
+              style={{
+                gap: `${KEYMAP_CALIBRATION.colGap}%`,
+                marginBottom:
+                  rowIdx === 0 ? `${KEYMAP_CALIBRATION.rowGap}%` : undefined,
+              }}
             >
               {row.map(([label, flexVal], colIdx) => {
                 const kid = keyId(rowIdx, colIdx, label);
@@ -208,12 +299,17 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
                     className={`
                       relative rounded-[3px] transition-all duration-150
                       flex items-center justify-center font-bold uppercase
-                      ${hasAddon
-                        ? "border-2 border-orange-400 bg-orange-400/15 shadow-[0_0_8px_rgba(251,146,60,0.4)] text-orange-300"
-                        : "border border-transparent hover:border-white/30 hover:bg-white/5 text-transparent hover:text-white/40"
+                      ${
+                        hasAddon
+                          ? "border-2 border-orange-400 bg-orange-400/15 shadow-[0_0_8px_rgba(251,146,60,0.4)] text-orange-300"
+                          : "border border-transparent hover:border-white/30 hover:bg-white/5 text-transparent hover:text-white/40"
                       }
                     `}
-                    title={hasAddon ? `${addon[1].name} — Click to manage` : `Customize: ${label}`}
+                    title={
+                      hasAddon
+                        ? `${addon[1].name} — Click to manage`
+                        : `Customize: ${label}`
+                    }
                   >
                     {label}
                     {hasAddon && (
@@ -251,8 +347,18 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
                 onClick={() => setActiveKey(null)}
                 className="p-2 hover:bg-neutral-200 rounded-full transition-colors text-amazon-textMuted"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2.5"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -338,7 +444,12 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2.5"
+                          d="M12 4v16m8-8H4"
+                        />
                       </svg>
                     </button>
                   ))}
@@ -349,7 +460,6 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
         </div>
       )}
     </>
-    
   );
 };
 

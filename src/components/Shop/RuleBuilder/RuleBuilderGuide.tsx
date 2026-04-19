@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   GitMerge,
   Info,
@@ -9,36 +10,20 @@ import {
   Save,
   Trash2,
   X,
+  Copy,
+  UploadCloud,
 } from "lucide-react";
 
-const steps = [
-  {
-    icon: MousePointer2,
-    title: "1. Cách Nối Dây",
-    content:
-      "Nhấn giữ chuột vào chấm tròn bên phải của linh kiện nguồn, kéo sợi dây và thả vào chấm tròn bên trái của linh kiện đích.",
-  },
-  {
-    icon: GitMerge,
-    title: "2. Nối Đa Nhánh",
-    content:
-      "Một Case có thể lắp vừa nhiều Plate? Cứ thoải mái kéo nhiều sợi dây từ Case đó cắm vào các Plate tương ứng.",
-  },
-  {
-    icon: Trash2,
-    title: "3. Sửa Sai",
-    content:
-      "Nếu lỡ tay nối nhầm, Click chuột vào sợi dây (dây sẽ phát sáng), sau đó nhấn phím Delete hoặc Backspace để xóa.",
-  },
-  {
-    icon: Save,
-    title: "4. Lưu Hệ Thống",
-    content:
-      "Sau khi nối hoàn chỉnh, bắt buộc phải nhấn Lưu Quy Trình để áp dụng luật lên Cửa hàng.",
-  },
-];
-
 export default function RuleBuilderGuide() {
+  const t = useTranslations("RuleBuilderGuide");
+  const steps = [
+    { icon: MousePointer2, title: t("step1Title"), content: t("step1Content") },
+    { icon: GitMerge, title: t("step2Title"), content: t("step2Content") },
+    { icon: Copy, title: t("step3Title"), content: t("step3Content") },
+    { icon: UploadCloud, title: t("step4Title"), content: t("step4Content") },
+    { icon: Trash2, title: t("step5Title"), content: t("step5Content") },
+    { icon: Save, title: t("step6Title"), content: t("step6Content") },
+  ];
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -49,7 +34,7 @@ export default function RuleBuilderGuide() {
         className="inline-flex items-center gap-2 rounded-md border border-blue-200 bg-white px-3 py-2 text-sm font-medium text-blue-800 transition-colors hover:bg-blue-50"
       >
         <span className="text-blue-700">[?]</span>
-        <span>Xem hướng dẫn thao tác</span>
+        <span>{t("openGuide")}</span>
       </button>
 
       {isOpen && (
@@ -58,14 +43,14 @@ export default function RuleBuilderGuide() {
           onClick={() => setIsOpen(false)}
         >
           <div
-            className="relative w-full max-w-3xl overflow-hidden rounded-xl bg-white shadow-2xl"
+            className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-xl bg-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <button
               type="button"
               onClick={() => setIsOpen(false)}
               className="absolute right-3 top-3 rounded-md border border-blue-200 bg-white p-1.5 text-blue-700 transition-colors hover:bg-blue-50"
-              aria-label="Đóng hướng dẫn"
+              aria-label={t("closeGuide")}
             >
               <X className="h-4 w-4" />
             </button>
@@ -78,12 +63,10 @@ export default function RuleBuilderGuide() {
 
                 <div className="flex-1">
                   <h3 className="text-base font-bold text-blue-900">
-                    Hướng dẫn sử dụng
+                    {t("guideTitle")}
                   </h3>
                   <p className="mt-0.5 text-xs leading-snug text-blue-900/90">
-                    Công cụ này giúp bạn quy định linh kiện nào được phép lắp
-                    ráp với nhau. Khách hàng sẽ dựa vào sơ đồ này để build phím
-                    mà không bao giờ sợ chọn nhầm đồ.
+                    {t("guideSubtitle")}
                   </p>
                 </div>
               </div>
@@ -92,7 +75,7 @@ export default function RuleBuilderGuide() {
                 <div className="flex items-center gap-2 border-b border-blue-100 bg-blue-50 px-3 py-1.5">
                   <PlayCircle className="h-4 w-4 text-blue-700" />
                   <span className="text-xs font-semibold uppercase tracking-wide text-blue-800">
-                    Video minh họa nhanh
+                    {t("videoLabel")}
                   </span>
                 </div>
 
@@ -109,12 +92,12 @@ export default function RuleBuilderGuide() {
               </div>
 
               <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
-                {steps.map((step) => {
+                {steps.map((step, index) => {
                   const Icon = step.icon;
 
                   return (
                     <div
-                      key={step.title}
+                      key={index}
                       className="rounded-lg border border-blue-200 bg-white p-3"
                     >
                       <div className="flex items-start gap-3">

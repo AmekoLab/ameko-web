@@ -180,13 +180,78 @@ export default function TransactionDetailModal({
                     </span>
                   </div>
                 )}
-                {detail.feeAmount > 0 && (
+                {detail.orderGroupId && (
                   <div className="flex justify-between p-3">
-                    <span className="text-neutral-500">{t("fee")}</span>
-                    <span className="font-medium text-red-600">
-                      -{formatCurrency(detail.feeAmount, detail.currency)}
+                    <span className="text-neutral-500">Order Group</span>
+                    <span className="font-mono text-neutral-900 text-xs">
+                      {detail.orderGroupId.split("-")[0]}...
                     </span>
                   </div>
+                )}
+                {detail.shopName && (
+                  <div className="flex justify-between p-3">
+                    <span className="text-neutral-500">Shop</span>
+                    <span className="font-medium text-neutral-900">
+                      {detail.shopName}
+                    </span>
+                  </div>
+                )}
+                {detail.bankName && (
+                  <div className="p-3 bg-white">
+                    <p className="text-[10px] font-bold uppercase tracking-wide text-neutral-500 mb-2">
+                      Bank Details
+                    </p>
+                    <div className="space-y-1.5 text-xs">
+                      <div className="flex justify-between gap-4">
+                        <span className="text-neutral-500">Bank Name</span>
+                        <span className="font-medium text-neutral-900 text-right">
+                          {detail.bankName}
+                        </span>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <span className="text-neutral-500">Account Number</span>
+                        <span className="font-mono text-neutral-900 text-right">
+                          {detail.bankAccountNumber || "N/A"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <span className="text-neutral-500">Account Name</span>
+                        <span className="font-medium text-neutral-900 text-right">
+                          {detail.bankAccountName || "N/A"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {detail.amount > 0 && (
+                  <>
+                    <div className="flex justify-between p-3 bg-red-50/70">
+                      <span className="text-red-700">
+                        {t("fee")} (
+                        {((detail.feeAmount / detail.amount) * 100).toFixed(1)}
+                        %)
+                      </span>
+                      <span className="font-medium text-red-600">
+                        -{formatCurrency(detail.feeAmount, detail.currency)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between p-3 bg-green-50/70">
+                      <span className="text-green-700">
+                        {t("details.netReceived")} (
+                        {(
+                          100 -
+                          (detail.feeAmount / detail.amount) * 100
+                        ).toFixed(1)}
+                        %)
+                      </span>
+                      <span className="font-semibold text-green-700">
+                        {formatCurrency(
+                          detail.amount - detail.feeAmount,
+                          detail.currency,
+                        )}
+                      </span>
+                    </div>
+                  </>
                 )}
               </div>
 
@@ -219,6 +284,40 @@ export default function TransactionDetailModal({
                     </span>
                   </div>
                 </div>
+
+                {(typeof detail.heldBalanceBeforeTransaction === "number" ||
+                  typeof detail.heldBalanceAfterTransaction === "number") && (
+                  <>
+                    <h5 className="text-xs font-bold text-neutral-900 uppercase tracking-wider pt-2">
+                      {t("details.heldBalanceAfter")} &{" "}
+                      {t("details.heldBalanceBefore")}
+                    </h5>
+                    <div className="bg-white border border-neutral-200 rounded-md p-3 text-sm space-y-2 shadow-sm">
+                      <div className="flex justify-between items-center">
+                        <span className="text-neutral-500 text-xs">
+                          {t("details.heldBalanceBefore")}
+                        </span>
+                        <span className="font-medium text-neutral-600 line-through decoration-neutral-300">
+                          {formatCurrency(
+                            detail.heldBalanceBeforeTransaction ?? 0,
+                            detail.currency,
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center border-t border-dashed border-neutral-200 pt-2">
+                        <span className="text-neutral-900 font-medium text-xs">
+                          {t("details.heldBalanceAfter")}
+                        </span>
+                        <span className="font-bold text-neutral-900 text-base">
+                          {formatCurrency(
+                            detail.heldBalanceAfterTransaction ?? 0,
+                            detail.currency,
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Description */}
