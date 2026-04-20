@@ -11,6 +11,7 @@ import { PromoList } from "@/src/components/Home/PromoList";
 import { SplitPromoSection } from "@/src/components/Home/SplitPromoSection";
 import { TopCreators } from "@/src/components/Home/TopCreators";
 import { LatestNews } from "@/src/components/News/LatestNews";
+import AIAssistantWidget from "@/src/components/AI/AIAssistantWidget";
 
 export default function Home() {
   return (
@@ -26,6 +27,7 @@ export default function Home() {
       {/* <LatestNews /> */}
       <BecomeSellerSection />
       {/* <TopCreators /> */}
+      <AIAssistantWidget />
     </main>
   );
 }

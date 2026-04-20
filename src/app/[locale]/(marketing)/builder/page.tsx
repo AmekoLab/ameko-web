@@ -32,6 +32,7 @@ import { orderService } from "@/src/services/order.service";
 import { toast } from "react-toastify";
 import { Logo } from "@/src/components/Header/Logo";
 import { useTranslations } from "next-intl";
+import AIAssistantWidget from "@/src/components/AI/AIAssistantWidget";
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 const getZIndex = (categorySlug?: string) => {
@@ -694,6 +695,9 @@ function BuilderContent() {
             </div>
           )}
         </div>
+
+        {/* AI Assistant - No kit selected yet */}
+        <AIAssistantWidget shopId={shopId || undefined} />
       </div>
     );
   }
@@ -1228,6 +1232,12 @@ function BuilderContent() {
           </div>
         </div>
       )}
+
+      {/* AI Assistant - Kit is active in session */}
+      <AIAssistantWidget
+        shopId={shopId || undefined}
+        baseKitId={session.kitId}
+      />
     </div>
   );
 }

@@ -68,8 +68,8 @@ const ImageUpload = ({
 
   const containerClass =
     type === "banner"
-      ? "w-full h-48 md:h-64 rounded-t-sm bg-black border border-[#1e2126] border-dashed relative overflow-hidden group hover:border-[#f5d800] transition-all"
-      : "w-32 h-32 md:w-40 md:h-40 rounded-full bg-black border-4 border-[#151515] shadow-lg relative overflow-hidden group cursor-pointer hover:border-[#f5d800] transition-all";
+      ? "w-full h-48 md:h-64 rounded-md bg-neutral-50 border border-neutral-300 border-dashed relative overflow-hidden group hover:border-blue-500 transition-colors"
+      : "w-32 h-32 md:w-40 md:h-40 rounded-full bg-white border-4 border-white shadow-md relative overflow-hidden group cursor-pointer hover:border-blue-500 transition-colors";
 
   return (
     <div className="relative">
@@ -101,20 +101,20 @@ const ImageUpload = ({
             className="object-cover"
           />
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 z-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-neutral-500 z-10">
             <Camera
-              className={`${type === "banner" ? "w-8 h-8" : "w-6 h-6"} mb-2 ${isDragging ? "text-[#f5d800]" : ""}`}
+              className={`${type === "banner" ? "w-8 h-8" : "w-6 h-6"} mb-2 ${isDragging ? "text-blue-600" : ""}`}
             />
             {type === "banner" && (
-              <span className="text-[11px] font-bold uppercase tracking-widest text-center px-4">
+              <span className="text-xs font-medium text-center px-4">
                 {t("imageUpload.bannerPrompt")}
               </span>
             )}
           </div>
         )}
 
-        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
-          <UploadCloud className="text-white w-8 h-8" />
+        <div className="absolute inset-0 bg-neutral-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+          <UploadCloud className="text-neutral-100 w-8 h-8" />
         </div>
       </div>
       {error && (
@@ -164,15 +164,15 @@ export default function RegisterShopPage() {
   };
 
   return (
-    <div className="py-6 px-2 md:px-0 relative">
+    <div className="py-6 px-2 md:px-0 relative bg-neutral-50">
       <div className="max-w-5xl mx-auto">
         {/* HEADER TEXT */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#1e2126] pb-4">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 pb-4">
           <div>
-            <h1 className="text-3xl font-black font-oswald uppercase tracking-widest text-white">
+            <h1 className="text-3xl font-bold text-neutral-900">
               {t("header.title")}
             </h1>
-            <p className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mt-2">
+            <p className="text-neutral-500 text-sm font-medium mt-2">
               {t("header.subtitle")}
             </p>
           </div>
@@ -180,7 +180,7 @@ export default function RegisterShopPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* --- SECTION 1: VISUAL IDENTITY  --- */}
-          <div className="bg-[#151515] rounded-sm shadow-sm border border-[#1e2126]">
+          <div className="bg-white rounded-md shadow-sm border border-neutral-200">
             {/* 1. Banner Area */}
             <div className="relative">
               <ImageUpload
@@ -218,7 +218,7 @@ export default function RegisterShopPage() {
                   />
                   <input
                     {...register("shopName")}
-                    className="form-input text-[13px] font-black uppercase tracking-wider text-white"
+                    className="w-full px-3 py-2.5 rounded-md border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-neutral-400"
                     placeholder={t("placeholders.shopName")}
                   />
                 </div>
@@ -226,7 +226,7 @@ export default function RegisterShopPage() {
                   <InputLabel label={t("fields.bio")} />
                   <input
                     {...register("bio")}
-                    className="form-input text-[13px] font-bold text-white"
+                    className="w-full px-3 py-2.5 rounded-md border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-neutral-400"
                     placeholder={t("placeholders.bio")}
                   />
                 </div>
@@ -235,10 +235,10 @@ export default function RegisterShopPage() {
           </div>
 
           {/* --- SECTION 2: CONTACT & ADDRESS --- */}
-          <div className="bg-[#151515] rounded-sm shadow-sm border border-[#1e2126] p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6 border-b border-[#1e2126] pb-4">
-              <User className="text-[#f5d800] w-5 h-5" />
-              <h3 className="text-[13px] font-black text-white tracking-widest uppercase">
+          <div className="bg-white rounded-md shadow-sm border border-neutral-200 p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-6 border-b border-neutral-200 pb-4">
+              <User className="text-blue-600 w-5 h-5" />
+              <h3 className="text-sm font-bold text-neutral-900 uppercase">
                 {t("sections.contactDetails")}
               </h3>
             </div>
@@ -252,7 +252,7 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("contactEmail")}
-                  className="form-input text-[13px] font-bold text-white tracking-wider"
+                  className="w-full px-3 py-2.5 rounded-md border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-neutral-400"
                   placeholder={t("placeholders.contactEmail")}
                 />
               </div>
@@ -264,7 +264,7 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("phoneNumber")}
-                  className="form-input text-[13px] font-bold text-white tracking-wider"
+                  className="w-full px-3 py-2.5 rounded-md border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-neutral-400"
                   placeholder={t("placeholders.phoneNumber")}
                 />
               </div>
@@ -276,7 +276,7 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("taxCode")}
-                  className="form-input text-[13px] font-bold text-white tracking-wider"
+                  className="w-full px-3 py-2.5 rounded-md border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-neutral-400"
                   placeholder={t("placeholders.taxCode")}
                 />
               </div>
@@ -288,7 +288,7 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("address")}
-                  className="form-input text-[13px] font-bold text-white tracking-wider"
+                  className="w-full px-3 py-2.5 rounded-md border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-neutral-400"
                   placeholder={t("placeholders.address")}
                 />
               </div>
@@ -296,10 +296,10 @@ export default function RegisterShopPage() {
           </div>
 
           {/* --- SECTION 3: BANKING & LEGAL --- */}
-          <div className="bg-[#151515] rounded-sm shadow-sm border border-[#1e2126] p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6 border-b border-[#1e2126] pb-4">
-              <CreditCard className="text-[#f5d800] w-5 h-5" />
-              <h3 className="text-[13px] font-black text-white tracking-widest uppercase">
+          <div className="bg-white rounded-md shadow-sm border border-neutral-200 p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-6 border-b border-neutral-200 pb-4">
+              <CreditCard className="text-blue-600 w-5 h-5" />
+              <h3 className="text-sm font-bold text-neutral-900 uppercase">
                 {t("sections.bankingInformation")}
               </h3>
             </div>
@@ -313,7 +313,7 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("citizenId")}
-                  className="form-input text-[13px] font-bold text-white tracking-wider"
+                  className="w-full px-3 py-2.5 rounded-md border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-neutral-400"
                   placeholder={t("placeholders.citizenId")}
                 />
               </div>
@@ -325,7 +325,7 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("bankName")}
-                  className="form-input text-[13px] font-bold text-white tracking-wider"
+                  className="w-full px-3 py-2.5 rounded-md border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-neutral-400"
                   placeholder={t("placeholders.bankName")}
                 />
               </div>
@@ -337,7 +337,7 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("bankAccountNumber")}
-                  className="form-input font-mono text-[13px] font-bold text-white tracking-wider"
+                  className="w-full px-3 py-2.5 rounded-md border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-neutral-400"
                   placeholder={t("placeholders.bankAccountNumber")}
                 />
               </div>
@@ -349,7 +349,7 @@ export default function RegisterShopPage() {
                 />
                 <input
                   {...register("bankAccountName")}
-                  className="form-input uppercase text-[13px] font-bold text-white tracking-wider"
+                  className="w-full px-3 py-2.5 rounded-md border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-neutral-400"
                   placeholder={t("placeholders.bankAccountName")}
                 />
               </div>
@@ -361,7 +361,7 @@ export default function RegisterShopPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative inline-flex items-center justify-center px-8 py-4 text-[13px] font-black text-black transition-all duration-200 bg-[#f5d800] uppercase tracking-widest rounded-sm hover:bg-[#ffe500] focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed w-full md:w-auto shadow-[0_0_15px_rgba(245,216,0,0.3)] disabled:shadow-none"
+              className="inline-flex items-center justify-center px-8 py-3 text-sm font-bold text-white bg-neutral-900 rounded-md hover:bg-neutral-800 transition-colors disabled:opacity-70 disabled:cursor-not-allowed w-full md:w-auto shadow-sm"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -378,25 +378,6 @@ export default function RegisterShopPage() {
           </div>
         </form>
       </div>
-
-      <style jsx>{`
-        .form-input {
-          width: 100%;
-          padding: 0.75rem 1rem;
-          border-radius: 2px;
-          border: 1px solid #1e2126;
-          background-color: black;
-          transition: all 0.2s;
-          outline: none;
-        }
-        .form-input:focus:not(:disabled) {
-          border-color: #f5d800;
-          box-shadow: 0 0 0 1px rgba(245, 216, 0, 0.3);
-        }
-        .form-input::placeholder {
-          color: #4b5563;
-        }
-      `}</style>
     </div>
   );
 }
@@ -412,13 +393,9 @@ const InputLabel = ({
   required?: boolean;
 }) => (
   <div className="flex justify-between mb-2 items-end">
-    <label className="text-[11px] font-black uppercase tracking-widest text-gray-400">
-      {label} {required && <span className="text-[#f5d800]">*</span>}
+    <label className="text-xs font-medium text-neutral-600">
+      {label} {required && <span className="text-red-500">*</span>}
     </label>
-    {error && (
-      <span className="text-red-500 text-[10px] font-black uppercase tracking-widest animate-pulse">
-        {error}
-      </span>
-    )}
+    {error && <span className="text-red-500 text-xs font-medium">{error}</span>}
   </div>
 );
