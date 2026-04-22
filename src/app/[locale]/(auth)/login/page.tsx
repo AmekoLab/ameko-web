@@ -83,9 +83,10 @@ export default function LoginPage() {
         }
       }
     } catch (error: any) {
+      // Interceptor already unwraps to error.message
       const errorMessage =
-        error?.response?.data?.message ||
         error?.message ||
+        error?.response?.data?.message ||
         "Account or password is not correct!";
 
       toast.error(errorMessage);

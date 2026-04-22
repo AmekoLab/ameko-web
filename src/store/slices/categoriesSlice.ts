@@ -15,7 +15,7 @@ export const fetchCategories = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch categories",
+        error?.message || error?.response?.data?.message || "Failed to fetch categories",
       );
     }
   },
@@ -30,7 +30,7 @@ export const createCategory = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to create category",
+        error?.message || error?.response?.data?.message || "Failed to create category",
       );
     }
   },
@@ -45,7 +45,7 @@ export const updateCategory = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to update category",
+        error?.message || error?.response?.data?.message || "Failed to update category",
       );
     }
   },
@@ -60,7 +60,7 @@ export const deleteCategory = createAsyncThunk(
       return id;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to delete category",
+        error?.message || error?.response?.data?.message || "Failed to delete category",
       );
     }
   },

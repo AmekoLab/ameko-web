@@ -110,9 +110,10 @@ export const ProductInfo = ({
       });
       dispatch(fetchServerCart());
       dispatch(setCartOpen(true));
-    } catch (err: unknown) {
-      const e = err as { response?: { data?: { message?: string } } };
-      toast.error(e.response?.data?.message || t("addToCartFailed"), {
+    } catch (err: any) {
+      // Interceptor already unwraps to err.message
+      const errorMessage = err?.message || err?.response?.data?.message || t("addToCartFailed");
+      toast.error(errorMessage, {
         position: "top-right",
         theme: "dark",
       });

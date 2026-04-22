@@ -34,7 +34,7 @@ export const fetchShopVouchers = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Lỗi lấy danh sách voucher",
+        error?.message || error?.response?.data?.message || "Lỗi lấy danh sách voucher",
       );
     }
   },
@@ -57,7 +57,7 @@ export const createPromotionVoucherThunk = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || "Lỗi tạo voucher",
+        error?.message || error?.response?.data?.message || "Lỗi tạo voucher",
       );
     }
   },
@@ -80,8 +80,8 @@ export const updateVoucherThunk = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          error.message ||
+        error?.message ||
+          error?.response?.data?.message ||
           "Lỗi cập nhật voucher",
       );
     }
@@ -102,7 +102,7 @@ export const deleteVoucherThunk = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || "Lỗi xoá voucher",
+        error?.message || error?.response?.data?.message || "Lỗi xoá voucher",
       );
     }
   },
@@ -127,8 +127,8 @@ export const toggleVoucherStatusThunk = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          error.message ||
+        error?.message ||
+          error?.response?.data?.message ||
           "Lỗi cập nhật trạng thái voucher",
       );
     }
@@ -148,8 +148,8 @@ export const getVoucherDetailsThunk = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          error.message ||
+        error?.message ||
+          error?.response?.data?.message ||
           "Lỗi lấy chi tiết voucher",
       );
     }
@@ -176,8 +176,8 @@ export const getVoucherUsageHistoryThunk = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          error.message ||
+        error?.message ||
+          error?.response?.data?.message ||
           "Lỗi lấy lịch sử sử dụng voucher",
       );
     }
@@ -192,8 +192,8 @@ export const fetchApplicableVouchersThunk = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          error.message ||
+        error?.message ||
+          error?.response?.data?.message ||
           "Lỗi lấy voucher áp dụng",
       );
     }
@@ -211,7 +211,7 @@ export const applyVoucherThunk = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || "Lỗi áp dụng voucher",
+        error?.message || error?.response?.data?.message || "Lỗi áp dụng voucher",
       );
     }
   },
@@ -228,7 +228,7 @@ export const removeAllVouchersThunk = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || "Lỗi xoá voucher",
+        error?.message || error?.response?.data?.message || "Lỗi xoá voucher",
       );
     }
   },
@@ -248,7 +248,7 @@ export const removeVoucherThunk = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || "Lỗi xoá voucher",
+        error?.message || error?.response?.data?.message || "Lỗi xoá voucher",
       );
     }
   },
@@ -265,7 +265,7 @@ export const createNegotiationVoucherThunk = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || "Lỗi tạo voucher thương lượng",
+        error?.message || error?.response?.data?.message || "Lỗi tạo voucher thương lượng",
       );
     }
   },

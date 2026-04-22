@@ -14,10 +14,9 @@ export const fetchAssembledProducts = createAsyncThunk(
       const response = await assembledProductService.getAssembledProducts();
       // response.data = { items, totalCount, currentPage, ... }
       return response.data;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch assembled products",
+        error?.message || error?.response?.data?.message || "Failed to fetch assembled products",
       );
     }
   },
@@ -30,10 +29,9 @@ export const fetchMyAssembledProducts = createAsyncThunk(
     try {
       const response = await assembledProductService.getMyAssembledProducts();
       return response.data;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch my assembled products",
+        error?.message || error?.response?.data?.message || "Failed to fetch my assembled products",
       );
     }
   },
@@ -47,10 +45,9 @@ export const restoreAssembledProduct = createAsyncThunk(
       const response =
         await assembledProductService.restoreAssembledProduct(id);
       return response;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to restore assembled product",
+        error?.message || error?.response?.data?.message || "Failed to restore assembled product",
       );
     }
   },
@@ -64,10 +61,10 @@ export const fetchAssembledProductDetail = createAsyncThunk(
       const response =
         await assembledProductService.getAssembledProductDetail(id);
       return response.data;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message ||
+        error?.message ||
+          error?.response?.data?.message ||
           "Failed to fetch assembled product detail",
       );
     }
@@ -82,11 +79,11 @@ export const createAssembledProduct = createAsyncThunk(
       const response =
         await assembledProductService.createAssembledProduct(payload);
       return response;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message ||
-          "Component 'case test update1' is no longer active",
+        error?.message ||
+          error?.response?.data?.message ||
+          "Failed to create assembled product",
       );
     }
   },
@@ -100,10 +97,9 @@ export const updateAssembledProduct = createAsyncThunk(
       const response =
         await assembledProductService.updateAssembledProduct(payload);
       return response;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to update assembled product",
+        error?.message || error?.response?.data?.message || "Failed to update assembled product",
       );
     }
   },
@@ -116,10 +112,9 @@ export const deleteAssembledProduct = createAsyncThunk(
     try {
       const response = await assembledProductService.deleteAssembledProduct(id);
       return response;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to delete assembled product",
+        error?.message || error?.response?.data?.message || "Failed to delete assembled product",
       );
     }
   },

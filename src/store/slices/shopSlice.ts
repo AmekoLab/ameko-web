@@ -21,7 +21,7 @@ export const fetchCurrentShop = createAsyncThunk(
       if (error.response && error.response.status === 404) {
         return null;
       }
-      return rejectWithValue(error.response?.data?.message || "Lỗi hệ thống");
+      return rejectWithValue(error?.message || error?.response?.data?.message || "Lỗi hệ thống");
     }
   },
 );
@@ -58,7 +58,7 @@ export const registerShop = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data || { message: error.message },
+        { message: error?.message || "Đăng ký shop thất bại" },
       );
     }
   },
@@ -73,7 +73,7 @@ export const adminApproveShop = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data || { message: error.message },
+        { message: error?.message || "Duyệt đơn thất bại" },
       );
     }
   },
@@ -92,7 +92,7 @@ export const fetchAdminShopList = createAsyncThunk(
       return response.data as unknown as AdminShopListResponse;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Lỗi lấy danh sách",
+        error?.message || error?.response?.data?.message || "Lỗi lấy danh sách",
       );
     }
   },
@@ -128,7 +128,7 @@ export const updateShopProfile = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data || { message: error.message },
+        { message: error?.message || "Cập nhật Shop thất bại" },
       );
     }
   },
@@ -163,7 +163,7 @@ export const patchShopProfile = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data || { message: error.message },
+        { message: error?.message || "Cập nhật Shop thất bại" },
       );
     }
   },
@@ -178,7 +178,7 @@ export const adminBanShop = createAsyncThunk(
       return shopId;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data || { message: error.message },
+        { message: error?.message || "Ban shop thất bại" },
       );
     }
   },
@@ -193,7 +193,7 @@ export const adminUnbanShop = createAsyncThunk(
       return shopId;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data || { message: error.message },
+        { message: error?.message || "Unban shop thất bại" },
       );
     }
   },
@@ -212,7 +212,7 @@ export const fetchShopById = createAsyncThunk(
         response.message || "Không thể tải thông tin shop",
       );
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Lỗi kết nối");
+      return rejectWithValue(error?.message || error?.response?.data?.message || "Lỗi kết nối");
     }
   },
 );
@@ -227,7 +227,7 @@ export const deactivateShop = createAsyncThunk(
       return response.message;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Lỗi khi tắt shop",
+        error?.message || error?.response?.data?.message || "Lỗi khi tắt shop",
       );
     }
   },
@@ -242,7 +242,7 @@ export const reactivateShop = createAsyncThunk(
       return response.message;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Lỗi khi mở lại shop",
+        error?.message || error?.response?.data?.message || "Lỗi khi mở lại shop",
       );
     }
   },

@@ -62,11 +62,9 @@ function VerifyEmailContent() {
         toast.error(res.message || "Invalid OTP code.");
       }
     } catch (error: any) {
-      const msg =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Confirm email failed. Please try again.";
-      toast.error(msg);
+      // Interceptor already unwraps to error.message
+      const errorMessage = error?.message || error?.response?.data?.message || "Confirm email failed. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -87,11 +85,9 @@ function VerifyEmailContent() {
         toast.error(res.message || "Resend OTP failed");
       }
     } catch (error: any) {
-      const msg =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Resend OTP failed.";
-      toast.error(msg);
+      // Interceptor already unwraps to error.message
+      const errorMessage = error?.message || error?.response?.data?.message || "Resend OTP failed.";
+      toast.error(errorMessage);
     } finally {
       setIsResending(false);
     }
