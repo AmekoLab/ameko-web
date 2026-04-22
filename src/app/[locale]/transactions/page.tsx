@@ -452,30 +452,27 @@ export default function TransactionsPage() {
                             className={`text-base font-black whitespace-nowrap ${getFlowConfig(tx).color}`}
                           >
                             {getFlowConfig(tx).sign}{" "}
-                            {formatCurrency(tx.amount, tx.currency)}
+                            {formatCurrency(tx.netAmount, tx.currency)}
                           </span>
-                          {tx.amount > 0 && (
+
+                          {tx.feeAmount > 0 && (
                             <div className="mt-1 flex flex-col items-end gap-1">
-                              <span className="text-[10px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-sm">
-                                {t("fee")} (
-                                {((tx.feeAmount / tx.amount) * 100).toFixed(1)}
-                                %): -{formatCurrency(tx.feeAmount, tx.currency)}
+                              <span className="text-[10px] font-medium text-neutral-500 line-through">
+                                {t("grossAmount") || "Gốc"}:{" "}
+                                {formatCurrency(tx.grossAmount, tx.currency)}
                               </span>
-                              <span className="text-[10px] font-medium text-green-700 bg-green-50 px-1.5 py-0.5 rounded-sm">
-                                {t("received")} (
-                                {(
-                                  100 -
-                                  (tx.feeAmount / tx.amount) * 100
-                                ).toFixed(1)}
-                                %)
+                              <span className="text-[10px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-sm border border-red-100">
+                                {t("fee") || "Phí"}:{" "}
+                                -{formatCurrency(tx.feeAmount, tx.currency)}
                               </span>
                             </div>
                           )}
-                          {/* Running Balance */}
-                          <div className="mt-1.5 pt-1.5 border-t border-neutral-200/60 w-full flex justify-end">
-                            <span className="text-[11px] font-medium text-neutral-500">
+
+                          {/* Số dư sau giao dịch */}
+                          <div className="mt-2 pt-1.5 border-t border-neutral-100 w-full flex justify-end">
+                            <span className="text-[10px] text-neutral-400">
                               {t("runningBalance")}:{" "}
-                              <span className="font-bold text-neutral-700">
+                              <span className="font-bold text-neutral-600">
                                 {formatCurrency(
                                   tx.balanceAfterTransaction,
                                   tx.currency,

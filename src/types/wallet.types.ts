@@ -13,8 +13,11 @@ export interface TransactionQueryParams {
 // ─── Transaction ──────────────────────────────────────────
 export interface Transaction {
   id: string;
+  transactionCode: string;
   amount: number;
+  grossAmount: number;
   feeAmount: number;
+  netAmount: number;
   flowDirection: string; // "In" | "Out" | "Held" | "0"
   currency: string;
   type: string;

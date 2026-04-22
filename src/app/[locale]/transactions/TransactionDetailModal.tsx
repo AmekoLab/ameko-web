@@ -9,7 +9,7 @@ import {
   Loader2,
   ArrowUpRight,
   ArrowDownRight,
-  Lock,
+  Clock,
   Repeat,
 } from "lucide-react";
 
@@ -65,7 +65,7 @@ export default function TransactionDetailModal({
     if (flow === "Out") return { color: "text-red-600", sign: "-", icon: <ArrowUpRight className="w-8 h-8" /> };
     if (flow === "Held") {
       const isDecrease = (detail.heldBalanceAfterTransaction ?? 0) < (detail.heldBalanceBeforeTransaction ?? 0);
-      return { color: "text-amber-600", sign: isDecrease ? "-" : "+", icon: <Lock className="w-8 h-8" /> };
+      return { color: "text-amber-600", sign: isDecrease ? "-" : "+", icon: <Clock className="w-8 h-8" /> };
     }
     return { color: "text-neutral-500", sign: "", icon: <Repeat className="w-8 h-8" /> };
   };
@@ -99,20 +99,21 @@ export default function TransactionDetailModal({
           ) : (
             <div className="space-y-6">
               {/* Big Amount Header */}
+              {(() => { const uiConfig = getFlowUI(detail); return (
               <div className="flex flex-col items-center justify-center py-4 text-center">
                 <div
-                  className={`w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4 border shadow-sm ${getFlowUI(detail).color}`}
+                  className={`w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4 border shadow-sm ${uiConfig.color}`}
                 >
-                  {getFlowUI(detail).icon}
+                  {uiConfig.icon}
                 </div>
                 <h4 className="text-sm font-bold text-neutral-500 uppercase tracking-wider mb-1">
                   {t(`types.${detail.type}`) || detail.type}
                 </h4>
-                <div
-                  className={`text-3xl font-black ${getFlowUI(detail).color}`}
-                >
-                  {getFlowUI(detail).sign}{" "}
-                  {formatCurrency(detail.amount, detail.currency)}
+                <div className="text-3xl font-black tracking-tight mt-2 flex items-center justify-center gap-1">
+                  <span className={uiConfig.color}>{uiConfig.sign}</span>
+                  <span className={uiConfig.color}>
+                    {formatCurrency(detail.netAmount ?? (detail.amount - detail.feeAmount), detail.currency)}
+                  </span>
                 </div>
                 <span
                   className={`text-[11px] font-bold px-2 py-0.5 rounded-sm uppercase mt-2 border ${
@@ -126,6 +127,7 @@ export default function TransactionDetailModal({
                   {t(`status.${detail.status}`) || detail.status}
                 </span>
               </div>
+              ); })()}
 
               {/* Data Grid */}
               <div className="bg-neutral-50/50 border border-neutral-200 rounded-md divide-y divide-neutral-200/60 text-sm">
@@ -205,37 +207,31 @@ export default function TransactionDetailModal({
                     </div>
                   </div>
                 )}
-                {detail.amount > 0 && (
-                  <>
-                    <div className="flex justify-between p-3 bg-red-50/70">
-                      <span className="text-red-700">
-                        {t("fee")} (
-                        {((detail.feeAmount / detail.amount) * 100).toFixed(1)}
-                        %)
-                      </span>
-                      <span className="font-medium text-red-600">
-                        -{formatCurrency(detail.feeAmount, detail.currency)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between p-3 bg-green-50/70">
-                      <span className="text-green-700">
-                        {t("details.netReceived")} (
-                        {(
-                          100 -
-                          (detail.feeAmount / detail.amount) * 100
-                        ).toFixed(1)}
-                        %)
-                      </span>
-                      <span className="font-semibold text-green-700">
-                        {formatCurrency(
-                          detail.amount - detail.feeAmount,
-                          detail.currency,
-                        )}
-                      </span>
-                    </div>
-                  </>
-                )}
               </div>
+
+              {/* Fee Breakdown */}
+              {detail.feeAmount > 0 && (
+                <div className="mt-4 rounded-md border border-neutral-200 overflow-hidden text-sm">
+                  <div className="flex justify-between p-3 bg-neutral-50 border-b border-neutral-200">
+                    <span className="text-neutral-600">{t("details.grossAmount") || "Tiền gốc"}</span>
+                    <span className="font-medium text-neutral-900">
+                      {formatCurrency(detail.grossAmount ?? detail.amount, detail.currency)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between p-3 bg-red-50/70">
+                    <span className="text-red-700">{t("fee") || "Phí / Phạt"}</span>
+                    <span className="font-medium text-red-600">
+                      -{formatCurrency(detail.feeAmount, detail.currency)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between p-3 bg-green-50/70 border-t border-green-100/50">
+                    <span className="text-green-800 font-bold">{t("details.netReceived") || "Thực nhận"}</span>
+                    <span className="font-black text-green-700">
+                      {formatCurrency(detail.netAmount ?? (detail.amount - detail.feeAmount), detail.currency)}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* Balance Tracking (Before vs After) */}
               <div className="space-y-2 pt-2">

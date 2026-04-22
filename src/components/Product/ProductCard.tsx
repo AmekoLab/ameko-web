@@ -61,9 +61,11 @@ export const ProductCard: FC<ProductCardProps> = ({ product, href }) => {
       });
       dispatch(fetchServerCart());
       dispatch(setCartOpen(true));
-    } catch (err: unknown) {
-      const e2 = err as { response?: { data?: { message?: string } } };
-      toast.error(e2.response?.data?.message || t("addFailed"), {
+    } catch (err: any) {
+      // Since api.ts rejects with error.response.data, the message is directly on err.message
+      const errorMessage = err?.message || err?.response?.data?.message || t("addFailed");
+      
+      toast.error(errorMessage, {
         position: "top-right",
         theme: "dark",
       });

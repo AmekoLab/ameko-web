@@ -521,6 +521,7 @@
     "statusColumn": "Trạng Thái",
     "date": "Ngày",
     "fee": "Phí",
+    "grossAmount": "Gốc",
     "runningBalance": "Số dư",
     "noTransactions": "Không tìm thấy giao dịch nào",
     "noTransactionsDesc": "Hãy thử điều chỉnh bộ lọc để tìm kiếm những gì bạn cần.",
@@ -574,7 +575,8 @@
       "description": "Nội dung",
       "bankInfo": "Tài khoản nhận",
       "close": "Đóng",
-      "netReceived": "Thực nhận"
+      "netReceived": "Thực nhận",
+      "grossAmount": "Tiền gốc"
     },
     "sortOptions": {
       "createdAt": "Ngày Tạo",

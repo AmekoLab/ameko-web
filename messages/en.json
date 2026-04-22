@@ -521,6 +521,7 @@
     "statusColumn": "Status",
     "date": "Date",
     "fee": "Fee",
+    "grossAmount": "Gross",
     "runningBalance": "Balance",
     "noTransactions": "No transactions found",
     "noTransactionsDesc": "Try adjusting your filters to find what you're looking for.",
@@ -574,7 +575,8 @@
       "description": "Description",
       "bankInfo": "Recipient Account",
       "close": "Close",
-      "netReceived": "Net Received"
+      "netReceived": "Net Received",
+      "grossAmount": "Gross Amount"
     },
     "sortOptions": {
       "createdAt": "Date Created",
