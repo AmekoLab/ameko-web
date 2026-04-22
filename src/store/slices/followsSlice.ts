@@ -28,7 +28,7 @@ export const fetchFollowingList = createAsyncThunk(
       return [];
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Lỗi lấy danh sách follow",
+        error?.message || error?.response?.data?.message || "Lỗi lấy danh sách follow",
       );
     }
   },
@@ -45,7 +45,7 @@ export const toggleFollowUser = createAsyncThunk(
       }
       return rejectWithValue(response.errors);
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Lỗi kết nối");
+      return rejectWithValue(error?.message || error?.response?.data?.message || "Lỗi kết nối");
     }
   },
 );

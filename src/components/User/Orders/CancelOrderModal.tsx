@@ -65,10 +65,9 @@ export default function CancelOrderModal({
         toast.error(res.message || t("toastSubmitFailed"));
       }
     } catch (error: any) {
-      const backendMessage = error.response?.data?.message;
-      const fallbackMessage = error.message || t("toastUnknownError");
-      
-      toast.error(backendMessage || fallbackMessage);
+      // Interceptor already unwraps to error.message
+      const errorMessage = error?.message || error?.response?.data?.message || t("toastUnknownError");
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

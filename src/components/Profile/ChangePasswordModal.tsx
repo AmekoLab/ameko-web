@@ -55,11 +55,9 @@ export const ChangePasswordModal = ({
       setFormData({ oldPassword: "", newPassword: "", confirmNewPassword: "" });
       onClose();
     } catch (error: any) {
-      const msg =
-        error.response?.data?.message ||
-        error.message ||
-        "Password change failed";
-      toast.error(msg);
+      // Interceptor already unwraps to error.message
+      const errorMessage = error?.message || error?.response?.data?.message || "Password change failed";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

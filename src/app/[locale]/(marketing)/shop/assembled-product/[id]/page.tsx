@@ -204,9 +204,10 @@ export default function AssembledProductDetailPage() {
       const response =
         await assembledProductService.getAssembledProductDetail(productId);
       setAssembledProduct(response.data);
-    } catch (err: unknown) {
-      const e = err as { response?: { data?: { message?: string } } };
-      setError(e.response?.data?.message || t("loadErrorFallback"));
+    } catch (err: any) {
+      // Interceptor already unwraps to err.message
+      const errorMessage = err?.message || err?.response?.data?.message || t("loadErrorFallback");
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

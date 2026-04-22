@@ -185,15 +185,21 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
                     const isSelected = selectedItemIds?.includes(
                       item.orderItemId,
                     );
+                    const isDisabled = item.hasActiveIssue;
                     return (
                       <button
                         key={item.orderItemId}
                         type="button"
-                        onClick={() => toggleItem(item.orderItemId)}
+                        disabled={isDisabled}
+                        onClick={() => {
+                          if (!isDisabled) toggleItem(item.orderItemId);
+                        }}
                         className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-colors text-left ${
-                          isSelected
-                            ? "border-amazon-btnPrimary bg-yellow-50"
-                            : "border-amazon-border hover:border-neutral-300"
+                          isDisabled
+                            ? "opacity-50 bg-neutral-100 border-neutral-200 cursor-not-allowed"
+                            : isSelected
+                              ? "border-amazon-btnPrimary bg-yellow-50"
+                              : "border-amazon-border hover:border-neutral-300 cursor-pointer"
                         }`}
                       >
                         {/* Checkbox indicator */}
@@ -239,9 +245,16 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
 
                         {/* Product Info */}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-amazon-text truncate">
-                            {item.productName}
-                          </p>
+                          <div className="flex justify-between items-start gap-2">
+                            <p className="text-sm font-medium text-amazon-text truncate">
+                              {item.productName}
+                            </p>
+                            {isDisabled && (
+                              <span className="shrink-0 text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded-sm border border-red-100">
+                                Đã yêu cầu
+                              </span>
+                            )}
+                          </div>
                           <p className="text-xs text-amazon-textMuted">
                             {tCommon("qty")}: {item.quantity} ×{" "}
                             {formatCurrency(item.unitPrice)}

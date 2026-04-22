@@ -19,10 +19,9 @@ export const fetchBaseKits = createAsyncThunk(
     try {
       const response = await builderService.getBaseKits(shopId);
       return response.data; // { data: PartItem[], total: number }
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch base kits",
+        error?.message || error?.response?.data?.message || "Failed to fetch base kits",
       );
     }
   },
@@ -35,10 +34,9 @@ export const startBuilderSession = createAsyncThunk(
     try {
       const payload = await builderService.startSession({ baseKitId });
       return payload; // BuilderPayload
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to start builder session",
+        error?.message || error?.response?.data?.message || "Failed to start builder session",
       );
     }
   },
@@ -62,10 +60,9 @@ export const selectBuilderComponent = createAsyncThunk(
         stepName,
       });
       return payload; // BuilderPayload
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to select component",
+        error?.message || error?.response?.data?.message || "Failed to select component",
       );
     }
   },
@@ -81,10 +78,9 @@ export const removeBuilderComponent = createAsyncThunk(
     try {
       const payload = await builderService.removeComponent(sessionId, stepName);
       return payload; // BuilderPayload
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to remove component",
+        error?.message || error?.response?.data?.message || "Failed to remove component",
       );
     }
   },
@@ -110,10 +106,9 @@ export const addBuilderAddon = createAsyncThunk(
     try {
       const responsePayload = await builderService.addAddon(payload);
       return responsePayload;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to add customization",
+        error?.message || error?.response?.data?.message || "Failed to add customization",
       );
     }
   },
@@ -132,10 +127,9 @@ export const removeBuilderAddon = createAsyncThunk(
         componentId,
       );
       return responsePayload;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to remove customization",
+        error?.message || error?.response?.data?.message || "Failed to remove customization",
       );
     }
   },

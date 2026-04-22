@@ -22,7 +22,7 @@ export const fetchAdminUserList = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch user list",
+        error?.message || error?.response?.data?.message || "Failed to fetch user list",
       );
     }
   },
@@ -37,7 +37,7 @@ export const adminCreateUser = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to create user",
+        error?.message || error?.response?.data?.message || "Failed to create user",
       );
     }
   },
@@ -55,7 +55,7 @@ export const adminUpdateUser = createAsyncThunk(
       return { userId, data: response.data };
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to update user",
+        error?.message || error?.response?.data?.message || "Failed to update user",
       );
     }
   },

@@ -68,7 +68,7 @@ export const loginAndFetchProfile =
       return fullUserData;
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message || error.message || "Login failed";
+        error?.message || error?.response?.data?.message || "Login failed";
 
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
@@ -176,7 +176,7 @@ export const updateUserProfile =
       }
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message || error.message || "Update failed";
+        error?.message || error?.response?.data?.message || "Update failed";
       dispatch(loginFailure(errorMessage)); // Tạm dùng loginFailure để hiện lỗi
       throw error;
     }
@@ -214,7 +214,7 @@ export const requestForgotPassword =
       }
     } catch (error: any) {
       const msg =
-        error.response?.data?.message || error.message || "Error System";
+        error?.message || error?.response?.data?.message || "Error System";
       dispatch(loginFailure(msg));
       throw error;
     }
@@ -235,7 +235,7 @@ export const confirmResetPassword =
       }
     } catch (error: any) {
       const msg =
-        error.response?.data?.message || error.message || "Error System";
+        error?.message || error?.response?.data?.message || "Error System";
       dispatch(loginFailure(msg));
       throw error;
     }

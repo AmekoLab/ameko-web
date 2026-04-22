@@ -24,10 +24,9 @@ export const fetchParts = createAsyncThunk(
     try {
       const response = await partService.getParts(shopId, pageNumber, pageSize);
       return response.data;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch parts",
+        error?.message || error?.response?.data?.message || "Failed to fetch parts",
       );
     }
   },
@@ -40,10 +39,9 @@ export const fetchPartDetail = createAsyncThunk(
     try {
       const response = await partService.getPartDetail(slug);
       return response.data;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch part detail",
+        error?.message || error?.response?.data?.message || "Failed to fetch part detail",
       );
     }
   },
@@ -56,10 +54,9 @@ export const createPart = createAsyncThunk(
     try {
       const response = await partService.createPart(payload);
       return response;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to create part",
+        error?.message || error?.response?.data?.message || "Failed to create part",
       );
     }
   },
@@ -72,10 +69,9 @@ export const checkStock = createAsyncThunk(
     try {
       const response = await partService.checkStock(payload);
       return response.data;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to check stock",
+        error?.message || error?.response?.data?.message || "Failed to check stock",
       );
     }
   },
@@ -88,10 +84,9 @@ export const deletePart = createAsyncThunk(
     try {
       const response = await partService.deletePart(id);
       return response;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to delete part",
+        error?.message || error?.response?.data?.message || "Failed to delete part",
       );
     }
   },
@@ -104,10 +99,9 @@ export const updatePart = createAsyncThunk(
     try {
       const response = await partService.updatePart(payload);
       return response;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to update part",
+        error?.message || error?.response?.data?.message || "Failed to update part",
       );
     }
   },

@@ -51,14 +51,10 @@ export const submitWarrantyRequest = createAsyncThunk(
         return res.data;
       }
       return rejectWithValue(res.message || "Submit warranty request failed");
-    } catch (error: unknown) {
-      const err = error as {
-        message?: string;
-        response?: { data?: { message?: string } };
-      };
+    } catch (error: any) {
       const msg =
-        err.response?.data?.message ||
-        err.message ||
+        error?.message ||
+        error?.response?.data?.message ||
         "Có lỗi xảy ra khi tạo yêu cầu bảo hành.";
       return rejectWithValue(msg);
     }
@@ -115,14 +111,10 @@ export const updateWarranty = createAsyncThunk(
         return res.data;
       }
       return rejectWithValue(res.message || "Update warranty request failed");
-    } catch (error: unknown) {
-      const err = error as {
-        message?: string;
-        response?: { data?: { message?: string } };
-      };
+    } catch (error: any) {
       const msg =
-        err.response?.data?.message ||
-        err.message ||
+        error?.message ||
+        error?.response?.data?.message ||
         "Update warranty request failed";
       return rejectWithValue(msg);
     }

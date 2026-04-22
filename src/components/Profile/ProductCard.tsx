@@ -48,13 +48,10 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
       });
       dispatch(fetchServerCart());
       dispatch(setCartOpen(true));
-    } catch (err: unknown) {
-      const e2 = err as { response?: { data?: { message?: string } } };
-      toast.error(
-        e2.response?.data?.message ||
-          "Failed to add item to cart. Please try again.",
-        { position: "top-right", theme: "light" },
-      );
+    } catch (err: any) {
+      // Interceptor already unwraps to err.message
+      const errorMessage = err?.message || err?.response?.data?.message || "Failed to add item to cart. Please try again.";
+      toast.error(errorMessage, { position: "top-right", theme: "light" });
     } finally {
       setIsAddingToCart(false);
     }
