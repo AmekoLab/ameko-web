@@ -6,6 +6,7 @@ export interface SocialProduct {
   imageUrls: string[];
   quantity: number;
   isAvailable: boolean;
+  soldQuantity: number;
 }
 
 export interface Post {

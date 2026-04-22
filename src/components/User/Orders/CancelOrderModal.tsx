@@ -64,12 +64,11 @@ export default function CancelOrderModal({
       } else {
         toast.error(res.message || t("toastSubmitFailed"));
       }
-    } catch (error: unknown) {
-      toast.error(
-        error instanceof Error
-          ? error.message || t("toastUnknownError")
-          : t("toastUnknownError"),
-      );
+    } catch (error: any) {
+      const backendMessage = error.response?.data?.message;
+      const fallbackMessage = error.message || t("toastUnknownError");
+      
+      toast.error(backendMessage || fallbackMessage);
     } finally {
       setLoading(false);
     }

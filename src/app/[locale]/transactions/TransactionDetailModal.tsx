@@ -59,33 +59,15 @@ export default function TransactionDetailModal({
 
   if (!isOpen) return null;
 
-  const getFlowUI = (flow: string) => {
-    switch (flow) {
-      case "In":
-        return {
-          color: "text-green-600",
-          sign: "+",
-          icon: <ArrowDownRight className="w-8 h-8" />,
-        };
-      case "Out":
-        return {
-          color: "text-red-600",
-          sign: "-",
-          icon: <ArrowUpRight className="w-8 h-8" />,
-        };
-      case "Held":
-        return {
-          color: "text-amber-600",
-          sign: "",
-          icon: <Lock className="w-8 h-8" />,
-        };
-      default:
-        return {
-          color: "text-neutral-500",
-          sign: "",
-          icon: <Repeat className="w-8 h-8" />,
-        };
+  const getFlowUI = (detail: TransactionDetail) => {
+    const flow = detail.flowDirection;
+    if (flow === "In") return { color: "text-green-600", sign: "+", icon: <ArrowDownRight className="w-8 h-8" /> };
+    if (flow === "Out") return { color: "text-red-600", sign: "-", icon: <ArrowUpRight className="w-8 h-8" /> };
+    if (flow === "Held") {
+      const isDecrease = (detail.heldBalanceAfterTransaction ?? 0) < (detail.heldBalanceBeforeTransaction ?? 0);
+      return { color: "text-amber-600", sign: isDecrease ? "-" : "+", icon: <Lock className="w-8 h-8" /> };
     }
+    return { color: "text-neutral-500", sign: "", icon: <Repeat className="w-8 h-8" /> };
   };
 
   return (
@@ -119,17 +101,17 @@ export default function TransactionDetailModal({
               {/* Big Amount Header */}
               <div className="flex flex-col items-center justify-center py-4 text-center">
                 <div
-                  className={`w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4 border shadow-sm ${getFlowUI(detail.flowDirection).color}`}
+                  className={`w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4 border shadow-sm ${getFlowUI(detail).color}`}
                 >
-                  {getFlowUI(detail.flowDirection).icon}
+                  {getFlowUI(detail).icon}
                 </div>
                 <h4 className="text-sm font-bold text-neutral-500 uppercase tracking-wider mb-1">
                   {t(`types.${detail.type}`) || detail.type}
                 </h4>
                 <div
-                  className={`text-3xl font-black ${getFlowUI(detail.flowDirection).color}`}
+                  className={`text-3xl font-black ${getFlowUI(detail).color}`}
                 >
-                  {getFlowUI(detail.flowDirection).sign}{" "}
+                  {getFlowUI(detail).sign}{" "}
                   {formatCurrency(detail.amount, detail.currency)}
                 </div>
                 <span
@@ -308,12 +290,23 @@ export default function TransactionDetailModal({
                         <span className="text-neutral-900 font-medium text-xs">
                           {t("details.heldBalanceAfter")}
                         </span>
-                        <span className="font-bold text-neutral-900 text-base">
-                          {formatCurrency(
-                            detail.heldBalanceAfterTransaction ?? 0,
-                            detail.currency,
-                          )}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          {(() => {
+                            const diff = (detail.heldBalanceAfterTransaction ?? 0) - (detail.heldBalanceBeforeTransaction ?? 0);
+                            if (diff === 0) return null;
+                            return (
+                              <span className={`text-[11px] font-bold ${diff > 0 ? "text-green-600" : "text-red-600"}`}>
+                                {diff > 0 ? "+" : ""}{formatCurrency(diff, detail.currency)}
+                              </span>
+                            );
+                          })()}
+                          <span className="font-bold text-neutral-900 text-base">
+                            {formatCurrency(
+                              detail.heldBalanceAfterTransaction ?? 0,
+                              detail.currency,
+                            )}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </>

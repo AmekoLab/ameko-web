@@ -177,6 +177,8 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
         { name: t("assemblyTemplates"), path: "/shop/assembly-templates" },
         { name: t("warrantyRequests"), path: "/shop/warranty-requests" },
         { name: t("cancelRequests"), path: "/shop/cancel-requests" },
+        { name: t("feedback"), path: "/shop/feedbacks" },
+        { name: t("assembledFeedbacks"), path: "/shop/assembled-feedbacks" },
       ],
     },
   ];

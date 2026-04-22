@@ -7,7 +7,7 @@ import { StoreProvider } from "../../store/StoreProvider";
 import { CartSidebar } from "../../components/Cart/CartSideBar";
 import GlobalChatInitializer from "../../components/chat/GlobalChatInitializer";
 import FloatingChatWidget from "../../components/chat/FloatingChatWidget";
-import GlobalAIChatbot from "../../components/AI/GlobalAIChatbot";
+import ChatbotWrapper from "../../components/AI/ChatbotWrapper";
 
 // Font chính (Inter)
 const inter = Inter({
@@ -49,7 +49,7 @@ export default async function LocaleLayout({
             {children}
             <CartSidebar />
             <FloatingChatWidget />
-            <GlobalAIChatbot />
+            <ChatbotWrapper />
           </StoreProvider>
         </NextIntlClientProvider>
       </body>

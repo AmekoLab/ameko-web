@@ -49,37 +49,26 @@ const SORT_OPTIONS = [
 ];
 
 // ─── Helpers ──────────────────────────────────────────────
-function getFlowConfig(flow: string) {
-  switch (flow) {
-    case "In":
-      return {
-        color: "text-green-600",
-        bg: "bg-green-50/50",
-        sign: "+",
-        labelKey: "flowIn",
-      };
-    case "Out":
-      return {
-        color: "text-red-600",
-        bg: "bg-red-50/50",
-        sign: "-",
-        labelKey: "flowOut",
-      };
-    case "Held":
-      return {
-        color: "text-amber-600",
-        bg: "bg-amber-50/30",
-        sign: "",
-        labelKey: "flowHeld",
-      };
-    default:
-      return {
-        color: "text-neutral-500",
-        bg: "bg-neutral-50/50",
-        sign: "",
-        labelKey: "flowNeutral",
-      };
+function getFlowConfig(tx: Transaction) {
+  const flow = tx.flowDirection;
+  if (flow === "In") return { color: "text-green-600", bg: "bg-green-50/50", sign: "+", labelKey: "flowIn" };
+  if (flow === "Out") return { color: "text-red-600", bg: "bg-red-50/50", sign: "-", labelKey: "flowOut" };
+  if (flow === "Held") {
+    let isDecrease = false;
+    
+    // 1. Try math if API provides the fields
+    const safeTx = tx as any;
+    if (typeof safeTx.heldBalanceAfterTransaction === 'number' && typeof safeTx.heldBalanceBeforeTransaction === 'number') {
+      isDecrease = safeTx.heldBalanceAfterTransaction < safeTx.heldBalanceBeforeTransaction;
+    } else {
+      // 2. Fallback: Parse description/type since List APIs often omit heavy balance tracking fields
+      const desc = (tx.description || "").toLowerCase();
+      isDecrease = desc.includes("deduct") || desc.includes("refund");
+    }
+    
+    return { color: "text-amber-600", bg: "bg-amber-50/30", sign: isDecrease ? "-" : "+", labelKey: "flowHeld" };
   }
+  return { color: "text-neutral-500", bg: "bg-neutral-50/50", sign: "", labelKey: "flowNeutral" };
 }
 
 function getTypeIcon(type: string) {
@@ -415,13 +404,13 @@ export default function TransactionsPage() {
                         setSelectedTxnId(tx.id);
                         setIsModalOpen(true);
                       }}
-                      className={`transition-colors border-b border-amazon-border last:border-0 hover:brightness-95 cursor-pointer ${getFlowConfig(tx.flowDirection).bg}`}
+                      className={`transition-colors border-b border-amazon-border last:border-0 hover:brightness-95 cursor-pointer ${getFlowConfig(tx).bg}`}
                     >
                       {/* 1. Type & Cash Flow Label */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div
-                            className={`w-9 h-9 rounded-full flex items-center justify-center bg-white border shadow-sm text-lg shrink-0 ${getFlowConfig(tx.flowDirection).color}`}
+                            className={`w-9 h-9 rounded-full flex items-center justify-center bg-white border shadow-sm text-lg shrink-0 ${getFlowConfig(tx).color}`}
                           >
                             {getTypeIcon(tx.type)}
                           </div>
@@ -430,9 +419,9 @@ export default function TransactionsPage() {
                               {t(`types.${tx.type}`) || tx.type}
                             </span>
                             <span
-                              className={`text-[10px]  tracking-wider uppercase mt-0.5 ${getFlowConfig(tx.flowDirection).color}`}
+                              className={`text-[10px]  tracking-wider uppercase mt-0.5 ${getFlowConfig(tx).color}`}
                             >
-                              {t(getFlowConfig(tx.flowDirection).labelKey)}
+                              {t(getFlowConfig(tx).labelKey)}
                             </span>
                           </div>
                         </div>
@@ -460,9 +449,9 @@ export default function TransactionsPage() {
                       <td className="px-6 py-4 text-right">
                         <div className="flex flex-col items-end justify-center">
                           <span
-                            className={`text-base font-black whitespace-nowrap ${getFlowConfig(tx.flowDirection).color}`}
+                            className={`text-base font-black whitespace-nowrap ${getFlowConfig(tx).color}`}
                           >
-                            {getFlowConfig(tx.flowDirection).sign}{" "}
+                            {getFlowConfig(tx).sign}{" "}
                             {formatCurrency(tx.amount, tx.currency)}
                           </span>
                           {tx.amount > 0 && (

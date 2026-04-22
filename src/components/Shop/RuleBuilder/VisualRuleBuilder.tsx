@@ -25,7 +25,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import Image from "next/image";
-import { CheckCircle2, Package, Trash2, UploadCloud, X } from "lucide-react";
+import { CheckCircle2, Package, Trash2, UploadCloud, X, ChevronDown, ChevronRight } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import { PartItem, PartSpecifications } from "@/src/types/part.types";
@@ -222,6 +222,23 @@ function resolveSidebarGroupLabel(part: PartItem): string {
     partWithMeta.category?.name?.trim() ||
     part.categoryName?.trim() ||
     "Other Components"
+  );
+}
+
+const SIDEBAR_GROUP_ORDER = ["case", "plate", "switch", "keycap"] as const;
+
+const SIDEBAR_GROUP_PATTERNS: Record<string, RegExp> = {
+  case: /\bcase(s)?\b/,
+  plate: /\bplate(s)?\b/,
+  switch: /\bswitch(es)?\b/,
+  keycap: /\bkeycap(s)?\b/,
+};
+
+function getSidebarGroupSortIndex(label: string): number {
+  const normalizedLabel = normalizeText(label).replace(/[_-]/g, " ");
+
+  return SIDEBAR_GROUP_ORDER.findIndex((groupName) =>
+    SIDEBAR_GROUP_PATTERNS[groupName].test(normalizedLabel),
   );
 }
 
@@ -447,6 +464,12 @@ export default function VisualRuleBuilder({
   const [lastAddedNodeId, setLastAddedNodeId] = useState<string | null>(null);
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
 
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+
+  const toggleGroup = useCallback((key: string) => {
+    setCollapsedGroups((prev) => ({ ...prev, [key]: !prev[key] }));
+  }, []);
+
   const initBoard = useCallback(() => {
     const rawSpecifications = baseKit.specifications as unknown;
 
@@ -665,7 +688,27 @@ export default function VisualRuleBuilder({
         ...group,
         parts: [...group.parts].sort((a, b) => a.name.localeCompare(b.name)),
       }))
-      .sort((a, b) => a.label.localeCompare(b.label));
+      .sort((a, b) => {
+        const orderIndexA = getSidebarGroupSortIndex(a.label);
+        const orderIndexB = getSidebarGroupSortIndex(b.label);
+
+        const isPrioritizedA = orderIndexA !== -1;
+        const isPrioritizedB = orderIndexB !== -1;
+
+        if (isPrioritizedA && isPrioritizedB) {
+          return orderIndexA - orderIndexB;
+        }
+
+        if (isPrioritizedA) {
+          return -1;
+        }
+
+        if (isPrioritizedB) {
+          return 1;
+        }
+
+        return a.label.localeCompare(b.label);
+      });
   }, [allParts]);
 
   const handleAddPartToCanvas = useCallback(
@@ -909,49 +952,66 @@ export default function VisualRuleBuilder({
               </p>
             )}
 
-            {sidebarGroups.map((group) => (
-              <section key={group.key} className="space-y-2">
-                <div className="sticky top-[65px] z-[1] rounded-sm bg-white py-1">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
-                    {group.label}
-                  </p>
-                </div>
+            {sidebarGroups.map((group) => {
+              const isCollapsed = collapsedGroups[group.key];
+              
+              return (
+                <section key={group.key} className="space-y-1">
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup(group.key)}
+                    className="sticky top-[65px] z-[1] flex w-full items-center justify-between rounded-sm bg-white py-2 px-1 transition-colors hover:bg-neutral-50 focus:outline-none"
+                  >
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+                      {group.label} ({group.parts.length})
+                    </p>
+                    {isCollapsed ? (
+                      <ChevronRight className="h-4 w-4 text-neutral-400" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-neutral-400" />
+                    )}
+                  </button>
 
-                <div className="space-y-2">
-                  {group.parts.map((part) => (
-                    <button
-                      key={part.id}
-                      type="button"
-                      onClick={() => handleAddPartToCanvas(part)}
-                      className="flex w-full items-center gap-2 rounded-md border border-neutral-200 bg-white px-2 py-2 text-left transition-colors hover:border-blue-400 hover:bg-blue-50"
-                    >
-                      <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm border border-neutral-200 bg-neutral-50">
-                        {part.thumbnailUrl ? (
-                          <Image
-                            src={part.thumbnailUrl}
-                            alt={part.name}
-                            width={36}
-                            height={36}
-                            className="h-full w-full object-cover"
-                            unoptimized
-                          />
-                        ) : (
-                          <Package className="h-4 w-4 text-neutral-300" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-semibold text-neutral-900">
-                          {part.name}
-                        </p>
-                        <p className="truncate text-[10px] text-neutral-500">
-                          {part.categoryName || "Part"}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </section>
-            ))}
+                  <div
+                    className={`space-y-2 overflow-hidden transition-all ${
+                      isCollapsed ? "h-0 opacity-0" : "pb-2 opacity-100"
+                    }`}
+                  >
+                    {group.parts.map((part) => (
+                      <button
+                        key={part.id}
+                        type="button"
+                        onClick={() => handleAddPartToCanvas(part)}
+                        className="flex w-full items-center gap-2 rounded-md border border-neutral-200 bg-white px-2 py-2 text-left transition-colors hover:border-blue-400 hover:bg-blue-50"
+                      >
+                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm border border-neutral-200 bg-neutral-50">
+                          {part.thumbnailUrl ? (
+                            <Image
+                              src={part.thumbnailUrl}
+                              alt={part.name}
+                              width={36}
+                              height={36}
+                              className="h-full w-full object-cover"
+                              unoptimized
+                            />
+                          ) : (
+                            <Package className="h-4 w-4 text-neutral-300" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-xs font-semibold text-neutral-900">
+                            {part.name}
+                          </p>
+                          <p className="truncate text-[10px] text-neutral-500">
+                            {part.categoryName || "Part"}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
           </div>
         </aside>
       </div>

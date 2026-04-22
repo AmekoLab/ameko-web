@@ -87,4 +87,5 @@ export const shopService = {
   getShops: async (params: ShopListParams): Promise<ShopListResponse> => {
     return api.get<unknown, ShopListResponse>("/shops", { params });
   },
+
 };

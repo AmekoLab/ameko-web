@@ -89,24 +89,21 @@ api.interceptors.response.use(
     return response.data;
   },
   async (error: AxiosError) => {
+    const createStandardError = (message: string, extraData: any = {}) => {
+      const err = new Error(message);
+      Object.assign(err, extraData);
+      return err;
+    };
+
     if (
       error.code === "ECONNABORTED" ||
       (error.message && error.message.includes("timeout"))
     ) {
-      return Promise.reject({
-        success: false,
-        message:
-          "Network is unstable or server is not responding. Please try again later!",
-        errors: "TIMEOUT",
-      });
+      return Promise.reject(createStandardError("Network is unstable or server is not responding. Please try again later!", { success: false, errors: "TIMEOUT" }));
     }
 
     if (error.message === "Network Error") {
-      return Promise.reject({
-        success: false,
-        message: "Disconnected from network! Please check your connection!",
-        errors: "NETWORK_ERROR",
-      });
+      return Promise.reject(createStandardError("Disconnected from network! Please check your connection!", { success: false, errors: "NETWORK_ERROR" }));
     }
 
     const status = error.response?.status;
@@ -115,11 +112,7 @@ api.interceptors.response.use(
     if (status === 403) {
       // KHÔNG gọi handleAuthFailure() để giữ nguyên Token và trạng thái đăng nhập.
       // Chỉ trả về Promise.reject để giao diện (Component) tự bắt lỗi và hiện Toast.
-      return Promise.reject({
-        success: false,
-        message: "ERROR_FORBIDDEN",
-        errors: "FORBIDDEN",
-      });
+      return Promise.reject(createStandardError("ERROR_FORBIDDEN", { success: false, errors: "FORBIDDEN" }));
     }
 
     // 2. Xử lý lỗi Token hỏng (Mất User ID)
@@ -135,14 +128,22 @@ api.interceptors.response.use(
       | undefined;
 
     if (!originalRequest) {
-      return Promise.reject(error.response?.data || error);
+      const backendData = error.response?.data as any;
+      if (backendData) {
+        return Promise.reject(createStandardError(backendData.message || error.message, backendData));
+      }
+      return Promise.reject(error);
     } // A. Bỏ qua các API Auth (Login/Register...) để tránh vòng lặp
 
     if (
       originalRequest.url?.includes("/login") ||
       originalRequest.url?.includes("/register")
     ) {
-      return Promise.reject(error.response?.data || error);
+      const backendData = error.response?.data as any;
+      if (backendData) {
+        return Promise.reject(createStandardError(backendData.message || error.message, backendData));
+      }
+      return Promise.reject(error);
     } // B. Xử lý Refresh Token khi lỗi 401
 
     if (status === 401 && !originalRequest._retry) {
@@ -187,7 +188,11 @@ api.interceptors.response.use(
       }
     } // Trả về lỗi chuẩn
 
-    return Promise.reject(error.response?.data || error);
+    const backendData = error.response?.data as any;
+    if (backendData) {
+      return Promise.reject(createStandardError(backendData.message || error.message, backendData));
+    }
+    return Promise.reject(error);
   },
 );
 

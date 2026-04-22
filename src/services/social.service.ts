@@ -34,6 +34,18 @@ export const socialService = {
     }
   },
 
+  getPersonalizedFeed: async (page: number = 1, size: number = 10): Promise<any> => {
+    try {
+      const res = await api.get(`/SocialCommerce/personalized-feed`, {
+        params: { page, size }
+      });
+      return res; 
+    } catch (error) {
+      console.error("Failed to fetch personalized feed:", error);
+      throw error;
+    }
+  },
+
   getUserPosts: async (
     userId: string,
     pageSize: number = 10,

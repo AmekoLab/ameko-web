@@ -1,33 +1,66 @@
 "use client";
 import { FC, ReactNode } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Flame, Hash, Users, TrendingUp } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { CommunityShopSearch } from "@/src/components/Community/CommunityShopSearch";
 
 // --- LEFT SIDEBAR ---
 export const LeftSidebar: FC = () => {
   const t = useTranslations("CommunitySidebar");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentFeed = searchParams.get("feed") || "personalized";
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem("user"));
+  }, []);
+
+  const handleFeedChange = (feed: string) => {
+    router.push(`?feed=${feed}`, { scroll: false });
+  };
+
   return (
-  <div className=" top-32 space-y-2">
-    <SidebarLink
-      icon={<Flame className="w-5 h-5 text-amazon-btnSecondary" />}
-      text={t("newsFeed")}
-      active
-    />
-    <SidebarLink icon={<Hash className="w-5 h-5" />} text={t("exploreTopics")} />
+  <div className=" top-8 space-y-2 sticky">
+    {isLoggedIn ? (
+      <>
+        <SidebarLink
+          icon={<Flame className="w-5 h-5 text-amazon-btnSecondary " />}
+          text={t("personalized")}
+          active={currentFeed === "personalized"}
+          onClick={() => handleFeedChange("personalized")}
+        />
+        <SidebarLink
+          icon={<Flame className="w-5 h-5 text-amazon-btnSecondary " />}
+          text={t("newsFeed")}
+          active={currentFeed === "standard"}
+          onClick={() => handleFeedChange("standard")}
+        />
+      </>
+    ) : (
+      <SidebarLink
+        icon={<Flame className="w-5 h-5 text-amazon-btnSecondary" />}
+        text={t("newsFeed")}
+        active={true}
+      />
+    )}
+    {/* <SidebarLink icon={<Hash className="w-5 h-5" />} text={t("exploreTopics")} />
     <SidebarLink icon={<Users className="w-5 h-5" />} text={t("groups")} />
     <SidebarLink
       icon={<TrendingUp className="w-5 h-5" />}
       text={t("trendingBuilds")}
-    />
+    /> */}
 
-    <div className="border-t border-amazon-border my-4"></div>
+    {/* <div className="border-t border-amazon-border my-4"></div> */}
 
-    <h3 className="text-md font-black uppercase text-amazon-textMuted mb-3 px-3 tracking-widest">
+    {/* <h3 className="text-md font-black uppercase text-amazon-textMuted mb-3 px-3 tracking-widest">
       {t("myGroups")}
     </h3>
     <SidebarGroup text={t("groupVietnamMechKey")} />
     <SidebarGroup text={t("groupArtisanMarket")} />
-    <SidebarGroup text={t("groupOfficialSupport")} />
+    <SidebarGroup text={t("groupOfficialSupport")} /> */}
   </div>
   );
 };
@@ -36,37 +69,11 @@ export const LeftSidebar: FC = () => {
 export const RightSidebar: FC = () => {
   const t = useTranslations("CommunitySidebar");
   return (
-  <div className=" top-32 space-y-6">
-    {/* Trending Tags */}
-    <div className="bg-white p-4 rounded-sm shadow-sm border border-amazon-border">
-      <h3 className="text-sm font-black uppercase mb-4 text-amazon-text">
-        {t("trendingTags")}
-      </h3>
-      <div className="flex flex-wrap gap-2">
-        {["#TKL", "#GMK", "#Artisan", "#AmekoBuild", "#DeskSetup"].map(
-          (tag) => (
-            <span
-              key={tag}
-              className="text-md bg-amazon-bgSecondary hover:bg-neutral-50 transition-colors border border-amazon-border px-2 py-1 rounded-md cursor-pointer font-medium text-amazon-textMuted hover:text-amazon-text"
-            >
-              {tag}
-            </span>
-          )
-        )}
-      </div>
-    </div>
+  <div className=" top-8 space-y-6 sticky">
+    {/* Shop Search Bar */}
+    <CommunityShopSearch />
 
-    {/* Top Builders */}
-    <div className="bg-white p-4 rounded-md shadow-sm border border-amazon-border">
-      <h3 className="text-sm font-black uppercase mb-4 text-amazon-text">
-        {t("topBuilders")}
-      </h3>
-      <ul className="space-y-4">
-        <BuilderRow name="KBD Fans" role={t("verifiedShop")} btnText={t("follow")} />
-        <BuilderRow name="Tín Dev" role={t("proBuilder")} btnText={t("follow")} />
-        <BuilderRow name="Mochi Caps" role={t("artisan")} btnText={t("follow")} />
-      </ul>
-    </div>
+    {/* Trending Tags */}
   </div>
   );
 };
@@ -76,12 +83,15 @@ const SidebarLink = ({
   icon,
   text,
   active,
+  onClick,
 }: {
   icon: ReactNode;
   text: string;
   active?: boolean;
+  onClick?: () => void;
 }) => (
   <div
+    onClick={onClick}
     className={`flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer transition-colors ${
       active
         ? "bg-neutral-50 shadow-sm font-bold text-amazon-text border-l-4 border-amazon-btnSecondary"

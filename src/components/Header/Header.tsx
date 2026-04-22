@@ -475,9 +475,6 @@ export const Header: FC = () => {
               href="/orders"
               className="hidden md:flex flex-col items-start px-3 py-1 text-white hover:outline hover:outline-1 hover:outline-white rounded-sm transition-all"
             >
-              <span className="text-xs font-sans leading-tight">
-                {t("returns")}
-              </span>
               <span className="text-sm font-bold font-sans leading-tight">
                 {t("andOrders")}
               </span>

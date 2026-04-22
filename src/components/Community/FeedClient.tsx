@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { socialService } from "@/src/services/social.service";
 import { Post } from "@/src/types/social.types";
 import { PostCard } from "./PostCard";
@@ -16,6 +17,9 @@ export default function FeedClient({
   userId?: string;
 }) {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const searchParams = useSearchParams();
+  const currentFeed = searchParams.get("feed") || "personalized";
+  const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [, setNextCursor] = useState<string | null>(null);
@@ -23,18 +27,30 @@ export default function FeedClient({
   const t = useTranslations("FeedClient");
 
   useEffect(() => {
-    const fetchFeed = async () => {
+    const fetchPosts = async () => {
       try {
         setIsLoading(true);
         setError(null);
 
-        const response = userId
-          ? await socialService.getUserPosts(userId)
-          : await socialService.getFeed();
+        // Check auth status safely
+        const isAuth = typeof window !== 'undefined' && !!localStorage.getItem("user");
+
+        let response;
+        if (userId) {
+          // 1. Specific user profile feed
+          response = await socialService.getUserPosts(userId);
+        } else if (isAuth && currentFeed === "personalized") {
+          // 2. Logged in user + Personalized tab
+          response = await socialService.getPersonalizedFeed(page, 10);
+        } else {
+          // 3. Guest user OR Standard tab (Public feed)
+          response = await socialService.getFeed();
+        }
 
         setPosts(response.data.items);
         setNextCursor(response.data.nextCursor);
-        setHasMore(response.data.hasMore);
+        // Safely handle both cursor-based (hasMore) and page-based (hasNextPage) pagination
+        setHasMore(response.data.hasMore ?? response.data.hasNextPage ?? false);
       } catch (err) {
         console.error(err);
         setError(t("errorLoad"));
@@ -43,8 +59,8 @@ export default function FeedClient({
       }
     };
 
-    fetchFeed();
-  }, [userId]);
+    fetchPosts();
+  }, [currentFeed, page, userId, t]);
 
   useEffect(() => {
     const onPostCreated = (event: Event) => {
@@ -71,13 +87,21 @@ export default function FeedClient({
       setIsLoading(true);
       setError(null);
 
-      const response = userId
-        ? await socialService.getUserPosts(userId)
-        : await socialService.getFeed();
+      // Check auth status safely
+      const isAuth = typeof window !== 'undefined' && !!localStorage.getItem("user");
+
+      let response;
+      if (userId) {
+        response = await socialService.getUserPosts(userId);
+      } else if (isAuth && currentFeed === "personalized") {
+        response = await socialService.getPersonalizedFeed(page, 10);
+      } else {
+        response = await socialService.getFeed();
+      }
 
       setPosts(response.data.items);
       setNextCursor(response.data.nextCursor);
-      setHasMore(response.data.hasMore);
+      setHasMore(response.data.hasMore ?? response.data.hasNextPage ?? false);
     } catch (err) {
       console.error(err);
       setError(t("errorLoad"));
