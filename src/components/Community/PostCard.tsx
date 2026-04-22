@@ -375,17 +375,25 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                 <span className="font-bold text-amazon-link">{t("board")}</span>{" "}
                 {post.product.name}
               </p>
-              <p>
-                <span className="font-bold text-amazon-link">
-                  {t("switch")}
-                </span>{" "}
-                {post.product.price}
-              </p>
+              
+                <p>
+                  <span className="font-bold text-amazon-link">
+                    {t("switch")}
+                  </span>{" "}
+                  {post.product.price}
+                </p>
+            
               <p>
                 <span className="font-bold text-amazon-link">
                   {t("quantity")}
                 </span>{" "}
                 {post.product.quantity}
+              </p>
+                <p>
+                <span className="font-bold text-amazon-link">
+                  {t("soldQuantity")}
+                </span>{" "}
+                {post.product.soldQuantity}
               </p>
               <div className="pt-2">
                 <Link

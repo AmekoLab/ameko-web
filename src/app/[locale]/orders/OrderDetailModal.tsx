@@ -11,12 +11,16 @@ import {
 } from "lucide-react";
 import { orderService } from "@/src/services/order.service";
 import { shopOrderService } from "@/src/services/shopOrder.service";
+import { feedbackService } from "@/src/services/feedback.service";
 import { CartData } from "@/src/types/order.types";
+import { FeedbackEligibilityData, ProductEligibilityItem } from "@/src/types/feedback.types";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 import { useTranslations } from "next-intl";
 import AssemblyTimeline from "@/src/components/Shop/Assembly/AssemblyTimeline";
 import CancelOrderModal from "@/src/components/User/Orders/CancelOrderModal";
+import FeedbackModal from "@/src/components/User/Orders/FeedbackModal";
+import ItemFeedbackModal from "@/src/components/User/Orders/ItemFeedbackModal";
 
 interface OrderDetailModalProps {
   orderId: string | null;
@@ -53,8 +57,22 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
     pathname?.includes("/orders") && !pathname?.includes("/shop");
 
   const [order, setOrder] = useState<CartData | null>(null);
+  const [eligibility, setEligibility] =
+    useState<FeedbackEligibilityData | null>(null);
+  const [itemsEligibility, setItemsEligibility] = useState<
+    Record<string, ProductEligibilityItem>
+  >({});
   const [loading, setLoading] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [feedbackConfig, setFeedbackConfig] = useState<{
+    isOpen: boolean;
+    mode: "create" | "edit";
+  }>({ isOpen: false, mode: "create" });
+  const [itemFeedbackConfig, setItemFeedbackConfig] = useState<{
+    isOpen: boolean;
+    mode: "create" | "view" | "edit";
+    orderItemId: string | null;
+  }>({ isOpen: false, mode: "create", orderItemId: null });
   const [cancelingOrderId, setCancelingOrderId] = useState<string | null>(null);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<number | null>(null);
 
@@ -152,6 +170,62 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
       setOrder(null);
     }
   }, [isOpen, orderId, fetchOrderDetail]);
+
+  const fetchEligibility = useCallback(async () => {
+    if (
+      !isBuyerContext ||
+      !isOpen ||
+      !order ||
+      order.orderStatus.toLowerCase() !== "completed"
+    ) {
+      setEligibility(null);
+      setItemsEligibility({});
+      return;
+    }
+
+    try {
+      const res = await feedbackService.checkEligibility(order.orderId);
+      if (res.success) {
+        setEligibility(res.data);
+      } else {
+        setEligibility(null);
+      }
+
+      const customProductIds = Array.from(
+        new Set(
+          order.orderItems
+            .map((i) => i.assembledProductId || i.productId)
+            .filter((id) => id && id !== "null")
+        )
+      ) as string[];
+
+      const map: Record<string, ProductEligibilityItem> = {};
+
+      await Promise.all(
+        customProductIds.map(async (productId) => {
+          try {
+            const productRes: any = await feedbackService.getProductFeedbackEligibility(productId);
+            if (productRes?.success && productRes?.data?.items) {
+              productRes.data.items.forEach((ai: ProductEligibilityItem) => {
+                map[ai.orderItemId] = ai;
+              });
+            }
+          } catch (e) {
+            console.error(`Failed to fetch product eligibility for ${productId}`, e);
+          }
+        })
+      );
+
+      setItemsEligibility(map);
+    } catch (error) {
+      setEligibility(null);
+      console.error("Failed to fetch feedback eligibility", error);
+    }
+  }, [isBuyerContext, isOpen, order]);
+
+  useEffect(() => {
+    fetchEligibility();
+  }, [fetchEligibility]);
 
   const handleUpdateStatus = async (newStatus: number) => {
     if (!orderId) return;
@@ -362,6 +436,30 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                     <div className="text-xs text-yellow-600 border border-yellow-500/50 bg-yellow-500/10 rounded-sm px-4 py-2 text-center font-medium">
                       {t("cancelRequestPendingApproval")}
                     </div>
+                  )}
+                  {isBuyerContext &&
+                    eligibility?.canReviewShop &&
+                    !eligibility?.hasShopFeedback && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFeedbackConfig({ isOpen: true, mode: "create" })
+                        }
+                        className="text-xs text-amazon-text bg-amazon-btnPrimary rounded-sm px-4 py-2 hover:brightness-95 transition-colors font-medium text-center"
+                      >
+                        Đánh giá Shop
+                      </button>
+                    )}
+                  {isBuyerContext && eligibility?.hasShopFeedback === true && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFeedbackConfig({ isOpen: true, mode: "edit" })
+                      }
+                      className="text-xs text-amazon-text border border-amazon-border rounded-sm px-4 py-2 hover:bg-neutral-100 transition-colors font-medium text-center"
+                    >
+                      Xem / Sửa Đánh giá
+                    </button>
                   )}
 
                   {/* SHOP ACTIONS */}
@@ -642,6 +740,50 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                                   </span>
                                 </p>
                               </div>
+                              {/* Product feedback buttons */}
+                              {isBuyerContext &&
+                                order.orderStatus.toLowerCase() === "completed" && (
+                                  <div className="mt-2">
+                                    {(() => {
+                                      const itemEligibility = itemsEligibility[item.orderItemId];
+                                      if (itemEligibility?.canReview && !itemEligibility?.hasFeedback) {
+                                        return (
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              setItemFeedbackConfig({
+                                                isOpen: true,
+                                                mode: "create",
+                                                orderItemId: item.orderItemId,
+                                              })
+                                            }
+                                            className="text-xs text-amazon-text bg-amazon-btnPrimary rounded-sm px-3 py-1.5 hover:brightness-95 transition-colors font-medium border border-amazon-border"
+                                          >
+                                            Đánh giá Sản phẩm
+                                          </button>
+                                        );
+                                      }
+                                      if (itemEligibility?.hasFeedback) {
+                                        return (
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              setItemFeedbackConfig({
+                                                isOpen: true,
+                                                mode: "edit",
+                                                orderItemId: item.orderItemId,
+                                              })
+                                            }
+                                            className="text-xs text-amazon-text bg-white border border-amazon-border rounded-sm px-3 py-1.5 hover:bg-neutral-100 transition-colors font-medium"
+                                          >
+                                            Xem / Sửa đánh giá
+                                          </button>
+                                        );
+                                      }
+                                      return null;
+                                    })()}
+                                  </div>
+                                )}
                             </div>
                           </div>
 
@@ -822,6 +964,30 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
         onClose={() => setIsCancelModalOpen(false)}
         onSuccess={fetchOrderDetail}
       />
+
+      {order && isBuyerContext && (
+        <FeedbackModal
+          isOpen={feedbackConfig.isOpen}
+          onClose={() =>
+            setFeedbackConfig({ ...feedbackConfig, isOpen: false })
+          }
+          orderId={order.orderId}
+          mode={feedbackConfig.mode}
+          onSuccess={fetchEligibility}
+        />
+      )}
+
+      {order && isBuyerContext && (
+        <ItemFeedbackModal
+          isOpen={itemFeedbackConfig.isOpen}
+          onClose={() =>
+            setItemFeedbackConfig({ ...itemFeedbackConfig, isOpen: false, orderItemId: null })
+          }
+          orderItemId={itemFeedbackConfig.orderItemId}
+          mode={itemFeedbackConfig.mode}
+          onSuccess={fetchEligibility}
+        />
+      )}
     </div>
   );
 };

@@ -10,7 +10,7 @@
     "viewMyStore": "View My Store",
     "signOut": "Sign Out",
     "returns": "Returns",
-    "andOrders": "& Orders",
+    "andOrders": "Orders",
     "cart": "Cart",
     "searchPlaceholderMobile": "Search Capton products...",
     "all": "All",
@@ -52,7 +52,7 @@
     "pendingWithdrawals": "Pending Withdrawals",
     "transactions": "Transactions",
     "vouchers": "Vouchers",
-    "warrantyRequests": "Warranty Requests",
+    "warrantyRequests": "Requests After Payment",
     "tasks": "Tasks",
     "reports": "Reports",
     "shopDashboard": "Shop Dashboard",
@@ -69,7 +69,9 @@
     "collapseSidebar": "Collapse Sidebar",
     "expandSidebar": "Expand Sidebar",
     "language": "Language",
-    "ruleBuilder": "Rules Builder"
+    "ruleBuilder": "Rules Builder",
+    "feedback": "Feedback",
+    "assembledFeedbacks": "Assembled Feedbacks"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -215,7 +217,9 @@
     "verifiedShop": "Verified Shop",
     "proBuilder": "Pro Builder",
     "artisan": "Artisan",
-    "follow": "Follow"
+    "follow": "Follow",
+    "personalized": "Personalized",
+    "standard": "Standard"
   },
   "CommentSection": {
     "errorLoad": "Failed to load comments at this time",
@@ -274,7 +278,8 @@
     "deleteItemTitle": "Delete Item?",
     "deleteItemDesc": "Are you sure you want to permanently delete this? This action cannot be undone.",
     "deleteBtn": "Delete",
-    "quantity": "Quantity:"
+    "quantity": "Quantity:",
+    "soldQuantity": "Sold online:"
   },
   "FeedClient": {
     "errorLoad": "Failed to load posts. Please try again.",
@@ -516,6 +521,7 @@
     "statusColumn": "Status",
     "date": "Date",
     "fee": "Fee",
+    "grossAmount": "Gross",
     "runningBalance": "Balance",
     "noTransactions": "No transactions found",
     "noTransactionsDesc": "Try adjusting your filters to find what you're looking for.",
@@ -569,7 +575,8 @@
       "description": "Description",
       "bankInfo": "Recipient Account",
       "close": "Close",
-      "netReceived": "Net Received"
+      "netReceived": "Net Received",
+      "grossAmount": "Gross Amount"
     },
     "sortOptions": {
       "createdAt": "Date Created",
@@ -1087,7 +1094,8 @@
     "soldOut": "Sold Out",
     "contact": "Contact",
     "untitledProduct": "Untitled Product",
-    "defaultCategory": "Keyboard"
+    "defaultCategory": "Keyboard",
+    "feedback": "Feedback"
   },
   "ProfileHeader": {
     "verifiedShop": "Verified Shop",
@@ -2101,7 +2109,7 @@
   },
   "ShopWarrantyRequestsPage": {
     "header": {
-      "title": "Warranty Requests",
+      "title": "Requests After Payment",
       "subtitle": "Manage return & warranty requests from customers."
     },
     "empty": {

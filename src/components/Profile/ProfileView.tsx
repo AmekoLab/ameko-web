@@ -23,8 +23,9 @@ import {
 import clsx from "clsx";
 import { ReviewStats } from "../Review/ReviewStats";
 import { ReviewItem } from "../Review/ReviewItem";
+import ShopFeedbackList from "../Shop/Profile/ShopFeedbackList";
 
-type TabType = "posts" | "shop" | "showcase" | "reviews";
+type TabType = "posts" | "shop" | "feedback";
 
 export const ProfileView: FC<{
   profile: ShopPublicProfile;
@@ -40,10 +41,7 @@ export const ProfileView: FC<{
   const [loadingShop, setLoadingShop] = useState(false);
   const [hasFetchedShop, setHasFetchedShop] = useState(false);
 
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [reviewStats, setReviewStats] = useState<IReviewStats | null>(null);
-  const [loadingReviews, setLoadingReviews] = useState(false);
-  const [hasFetchedReviews, setHasFetchedReviews] = useState(false);
+
 
   const handleChangeTab = useCallback(
     (tab: TabType) => {
@@ -107,34 +105,7 @@ export const ProfileView: FC<{
     </div>
   );
 
-  useEffect(() => {
-    let ignore = false;
-    const fetchReviewsData = async () => {
-      if (currentTab === "reviews" && !hasFetchedReviews) {
-        setLoadingReviews(true);
-        try {
-          const [statsData, listData] = await Promise.all([
-            ProfileService.getReviewStats(profile.id),
-            ProfileService.getReviews(profile.id),
-          ]);
 
-          if (!ignore) {
-            setReviewStats(statsData);
-            setReviews(listData);
-            setHasFetchedReviews(true);
-          }
-        } catch (err) {
-          console.error(err);
-        } finally {
-          if (!ignore) setLoadingReviews(false);
-        }
-      }
-    };
-    fetchReviewsData();
-    return () => {
-      ignore = true;
-    };
-  }, [currentTab, profile.id, hasFetchedReviews]);
 
   const ReviewSkeleton = () => (
     <div className="bg-white p-6 rounded-sm border border-amazon-border mb-4 animate-pulse">
@@ -166,7 +137,7 @@ export const ProfileView: FC<{
             {[
               { id: "posts", label: t("tabPosts"), icon: List },
               { id: "shop", label: t("tabShop"), icon: ShoppingBag },
-              // { id: "showcase", label: t("tabShowcase"), icon: ImageIcon },
+              { id: "feedback", label: t("feedback"), icon: Star },
               // { id: "reviews", label: t("tabReviews"), icon: Star },
             ].map((tab) => (
               <button
@@ -219,43 +190,22 @@ export const ProfileView: FC<{
             </div>
           )}
 
-          {currentTab === "showcase" && (
+          {/* {currentTab === "showcase" && (
             <div className="bg-white p-16 text-center rounded-sm border border-amazon-border">
               <ImageIcon className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
               <p className="text-amazon-textMuted font-medium">
                 {t("showcaseUpdating")}
               </p>
             </div>
-          )}
+          )} */}
 
-          {currentTab === "reviews" && (
-            <div>
-              {loadingReviews ? (
-                <>
-                  <div className="h-32 bg-white mb-6 rounded-sm border border-amazon-border animate-pulse" />{" "}
-                  <ReviewSkeleton />
-                  <ReviewSkeleton />
-                </>
-              ) : reviewStats ? (
-                <>
-                  <ReviewStats stats={reviewStats} />
-                  <div className="space-y-4">
-                    {reviews.map((review) => (
-                      <ReviewItem key={review.id} review={review} />
-                    ))}
-                  </div>
-                  {reviews.length === 0 && (
-                    <div className="bg-white p-16 text-center rounded-sm border border-amazon-border">
-                      <Star className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
-                      <p className="text-amazon-textMuted font-medium">
-                        {t("noReviews")}
-                      </p>
-                    </div>
-                  )}
-                </>
-              ) : null}
+          {currentTab === "feedback" && (
+            <div className="bg-white rounded-sm border border-amazon-border p-6">
+              <ShopFeedbackList shopId={profile.id} />
             </div>
           )}
+
+        
         </div>
       </div>
     </div>

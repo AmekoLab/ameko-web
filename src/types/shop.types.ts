@@ -129,3 +129,12 @@ export interface ShopListParams {
   page?: number;
   size?: number;
 }
+
+export interface ShopSearchResult {
+  id: string;
+  shopName: string;
+  bio: string;
+  logoUrl: string | null;
+  rating: number;
+  followersCount: number;
+}

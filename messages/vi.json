@@ -10,7 +10,7 @@
     "viewMyStore": "Xem cửa hàng của tôi",
     "signOut": "Đăng xuất",
     "returns": "Trả hàng",
-    "andOrders": "& Đơn hàng",
+    "andOrders": "Đơn hàng",
     "cart": "Giỏ hàng",
     "searchPlaceholderMobile": "Tìm kiếm sản phẩm Capton...",
     "all": "Tất cả",
@@ -52,7 +52,7 @@
     "pendingWithdrawals": "Rút tiền chờ duyệt",
     "transactions": "Giao dịch",
     "vouchers": "Khuyến mãi",
-    "warrantyRequests": "Yêu cầu bảo hành",
+    "warrantyRequests": "Yêu cầu sau thanh toán",
     "tasks": "Công việc",
     "reports": "Báo cáo",
     "shopDashboard": "Trang Shop",
@@ -69,7 +69,9 @@
     "collapseSidebar": "Thu gọn Menu",
     "expandSidebar": "Mở rộng Menu",
     "language": "Ngôn ngữ",
-    "ruleBuilder": "Trình Xây dựng Quy tắc"
+    "ruleBuilder": "Trình Xây dựng Quy tắc",
+    "feedback": "Phản hồi",
+    "assembledFeedbacks": "Phản hồi SP Lắp Ráp"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -215,7 +217,9 @@
     "verifiedShop": "Shop Chính Hãng",
     "proBuilder": "Chuyên Gia Setup",
     "artisan": "Nghệ Nhân",
-    "follow": "Theo Dõi"
+    "follow": "Theo Dõi",
+    "personalized": "Dành cho bạn",
+    "standard": "Mới nhất"
   },
   "CommentSection": {
     "errorLoad": "Không thể tải bình luận lúc này",
@@ -274,7 +278,8 @@
     "deleteItemTitle": "Xóa nội dung này?",
     "deleteItemDesc": "Bạn có chắc chắn muốn xóa vĩnh viễn không? Dữ liệu không thể khôi phục.",
     "deleteBtn": "Xóa",
-    "quantity": "Số lượng: "
+    "quantity": "Số lượng: ",
+    "soldQuantity": "Đã bán online: "
   },
   "FeedClient": {
     "errorLoad": "Lỗi tải bản tin cộng đồng. Xin vui lòng thử lại.",
@@ -430,7 +435,7 @@
     "withdrawClaimBtn": "Rút lại khiếu nại",
     "ReturnRequest": "Trả hàng / Hoàn tiền",
     "CancelRequest": "Yêu cầu hủy đơn hàng",
-    "WarrantyClaim": "Yêu cầu bảo hành",
+    "WarrantyClaim": "Yêu cầu sau thanh toán",
     "status": {
       "InProgress": "Đang Xử Lý",
       "AwaitingReturn": "Chờ Trả Hàng",
@@ -516,6 +521,7 @@
     "statusColumn": "Trạng Thái",
     "date": "Ngày",
     "fee": "Phí",
+    "grossAmount": "Gốc",
     "runningBalance": "Số dư",
     "noTransactions": "Không tìm thấy giao dịch nào",
     "noTransactionsDesc": "Hãy thử điều chỉnh bộ lọc để tìm kiếm những gì bạn cần.",
@@ -569,7 +575,8 @@
       "description": "Nội dung",
       "bankInfo": "Tài khoản nhận",
       "close": "Đóng",
-      "netReceived": "Thực nhận"
+      "netReceived": "Thực nhận",
+      "grossAmount": "Tiền gốc"
     },
     "sortOptions": {
       "createdAt": "Ngày Tạo",
@@ -867,7 +874,7 @@
     }
   },
   "CreateWarrantyModal": {
-    "title": "Yêu cầu bảo hành / trả hàng",
+    "title": "Yêu cầu bảo hành / trả hàng & hoàn tiền",
     "selectProblematicProduct": "Chọn sản phẩm gặp vấn đề",
     "requestType": "Loại yêu cầu",
     "requestTypeOptions": {
@@ -1088,7 +1095,8 @@
     "soldOut": "Hết hàng",
     "contact": "Liên hệ",
     "untitledProduct": "Sản phẩm chưa đặt tên",
-    "defaultCategory": "Bàn phím"
+    "defaultCategory": "Bàn phím",
+    "feedback": "Phản hồi"
   },
   "ProfileHeader": {
     "verifiedShop": "Cửa hàng đã xác minh",
@@ -2102,8 +2110,8 @@
   },
   "ShopWarrantyRequestsPage": {
     "header": {
-      "title": "Yêu cầu bảo hành",
-      "subtitle": "Quản lý các yêu cầu đổi trả và bảo hành từ khách hàng."
+      "title": "Yêu cầu sau thanh toán",
+      "subtitle": "Quản lý các yêu cầu bảo hành , đổi trả & hoàn tiền từ khách hàng."
     },
     "empty": {
       "title": "Chưa có yêu cầu nào",
@@ -2160,7 +2168,7 @@
       "processFailed": "Không thể xử lý yêu cầu bảo hành"
     },
     "header": {
-      "title": "Duyệt yêu cầu bảo hành"
+      "title": "Xử lí các yêu cầu đơn hàng"
     },
     "customerFallback": "Khách hàng",
     "evidenceAlt": "Bằng chứng từ khách hàng",
