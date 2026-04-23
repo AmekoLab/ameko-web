@@ -477,7 +477,9 @@
     "orderId": "Order ID",
     "totalAmount": "Total Amount",
     "reason": "Reason for Cancellation",
-    "shopResponse": "Shop Response"
+    "shopResponse": "Shop Response",
+    "refundAmount": "Refund Amount",
+    "itemCount": "({count} items)"
   },
   "CancelRequestDetailPage": {
     "loadFailed": "Failed to load cancel request details.",
@@ -494,7 +496,8 @@
     "orderId": "Order ID",
     "statusLabel": "Status",
     "reason": "Reason for Cancellation",
-    "shopResponse": "Shop Response"
+    "shopResponse": "Shop Response",
+    "refundAmountWithCount": "Refund Amount ({count} items)"
   },
   "Wallet": {
     "loadFailed": "Failed to load transactions",
@@ -639,6 +642,7 @@
   "Common": {
     "save": "Save",
     "cancel": "Cancel",
+    "cancelled": "Cancelled",
     "close": "Close",
     "back": "Back",
     "status": "Status",
@@ -704,6 +708,7 @@
     "shippingFee": "Shipping Fee:",
     "systemVoucher": "System Voucher:",
     "finalTotal": "Final Total:",
+    "cancelled": "Cancelled",
     "status": {
       "pending": "Pending",
       "processing": "Processing",
@@ -2358,6 +2363,7 @@
       "fetchFailed": "Failed to fetch order issues",
       "fetchUnexpectedError": "An error occurred while fetching issues"
     },
+    "itemCount": "({count} items)",
     "header": {
       "title": "Order Issues Management"
     },
@@ -2382,6 +2388,7 @@
       "processFailed": "Failed to process issue.",
       "unexpectedError": "An error occurred."
     },
+    "refundAmountWithCount": "Refund Amount ({count} items)",
     "title": "Issue Details",
     "fields": {
       "orderId": "Order ID",
@@ -3000,7 +3007,12 @@
     "detailsPlaceholder": "Additional details...",
     "cancel": "Cancel",
     "submitting": "Submitting...",
-    "submitRequest": "Submit Request"
+    "submitRequest": "Submit Request",
+    "selectItemsToCancel": "Select items to cancel:",
+    "quantityAbbr": "Qty:",
+    "refundAbbr": "Refund:",
+    "shippingFeeWarning": "* Shipping fee is only refunded if the entire order is cancelled.",
+    "refundPreview": "You will be refunded {amount} for {count} selected items."
   },
   "ChatPage": {
     "messages": "Messages",

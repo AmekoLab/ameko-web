@@ -169,11 +169,11 @@ export default function OrderIssueDetailModal({
                 </span>
               </div>
               <div>
-                <span className="text-amazon-textMuted text-xs block mb-1">
-                  {t("fields.totalAmount")}
+                <span className="text-amazon-textMuted text-xs block mb-1 font-semibold uppercase tracking-wider">
+                  {t("refundAmountWithCount", { count: issue.cancelledItemCount })}
                 </span>
-                <span className="text-amazon-price font-bold">
-                  {formatCurrency(issue.orderTotalAmount)}
+                <span className="text-amazon-price font-bold text-lg">
+                  {formatCurrency(issue.cancelledItemsAmount)}
                 </span>
               </div>
             </div>

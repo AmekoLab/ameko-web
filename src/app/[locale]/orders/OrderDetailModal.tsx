@@ -689,10 +689,12 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                   {t("itemsCount", { count: order.orderItems.length })}
                 </h3>
                 <div className="list-container">
-                  {order.orderItems.map((item) => (
+                  {order.orderItems.map((item) => {
+                    const isCancelled = item.itemStatus === "Cancelled";
+                    return (
                     <div
                       key={item.orderItemId}
-                      className="bg-white border border-amazon-border rounded-md overflow-hidden mb-4 shadow-sm"
+                      className={`border border-amazon-border rounded-md overflow-hidden mb-4 shadow-sm ${isCancelled ? "opacity-50 grayscale bg-neutral-50" : "bg-white"}`}
                     >
                       <div
                         className={
@@ -725,9 +727,14 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-amazon-text pr-4 line-clamp-2">
-                                {item.productName}
-                              </p>
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-medium text-sm text-amazon-text">{item.productName}</h4>
+                                {isCancelled && (
+                                  <span className="px-2 py-0.5 text-[10px] font-bold bg-neutral-200 text-neutral-600 rounded-sm">
+                                    {t("cancelled")}
+                                  </span>
+                                )}
+                              </div>
                               <div className="flex items-center justify-between mt-2">
                                 <p className="text-xs font-normal text-amazon-textMuted">
                                   {tCommon("qty")}:{" "}
@@ -739,6 +746,42 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                                     {formatCurrency(item.unitPrice)}
                                   </span>
                                 </p>
+                              </div>
+                              {/* Discount Breakdown & Final Price */}
+                              <div className="flex flex-col items-end gap-1 mt-2">
+                                {/* Price Display */}
+                                <div className="flex items-center gap-2">
+                                  {item.allocatedDiscount && item.allocatedDiscount > 0 ? (
+                                    <>
+                                      <span className="text-xs text-neutral-400 line-through">
+                                        {formatCurrency(item.totalPrice)}
+                                      </span>
+                                      <span className="font-bold text-amazon-text text-base">
+                                        {formatCurrency(item.finalPrice ?? item.totalPrice)}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span className="font-bold text-amazon-text text-base">
+                                      {formatCurrency(item.totalPrice)}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Discount Breakdown Tags */}
+                                {((item.systemAllocatedDiscount ?? 0) > 0 || (item.shopAllocatedDiscount ?? 0) > 0) && (
+                                  <div className="flex flex-col items-end gap-0.5">
+                                    {(item.systemAllocatedDiscount ?? 0) > 0 && (
+                                      <span className="text-[10px] text-green-600 bg-green-50 border border-green-100 px-1.5 py-0.5 rounded-sm">
+                                        Giảm từ Sàn: -{formatCurrency(item.systemAllocatedDiscount!)}
+                                      </span>
+                                    )}
+                                    {(item.shopAllocatedDiscount ?? 0) > 0 && (
+                                      <span className="text-[10px] text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-sm">
+                                        Giảm từ Shop: -{formatCurrency(item.shopAllocatedDiscount!)}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                               {/* Product feedback buttons */}
                               {isBuyerContext &&
@@ -857,7 +900,8 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                         )}
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -960,7 +1004,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
 
       <CancelOrderModal
         isOpen={isCancelModalOpen}
-        orderId={cancelingOrderId}
+        order={order}
         onClose={() => setIsCancelModalOpen(false)}
         onSuccess={fetchOrderDetail}
       />
