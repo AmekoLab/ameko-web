@@ -107,6 +107,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
         { name: t("pendingWithdrawals"), path: "/admin/pending-withdrawals" },
         { name: t("transactions"), path: "/admin/transactions" },
         { name: t("vouchers"), path: "/admin/vouchers" },
+        { name: t("processedWithdrawals"), path: "/admin/processed-withdrawals" },
       ],
     },
     {

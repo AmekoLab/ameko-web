@@ -71,7 +71,8 @@
     "language": "Ngôn ngữ",
     "ruleBuilder": "Trình Xây dựng Quy tắc",
     "feedback": "Phản hồi",
-    "assembledFeedbacks": "Phản hồi SP Lắp Ráp"
+    "assembledFeedbacks": "Phản hồi SP Lắp Ráp",
+    "processedWithdrawals": "Rút tiền đã xử lý"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -1331,7 +1332,14 @@
     "recipeStabs": "stab",
     "viewPart": "Xem linh kiện",
     "editPart": "Chỉnh sửa linh kiện",
-    "deletePart": "Xóa linh kiện"
+    "deletePart": "Xóa linh kiện",
+    "restorePartTitle": "Khôi phục linh kiện",
+    "restorePartConfirm": "Bạn có chắc chắn muốn khôi phục linh kiện này?",
+    "cancel": "Hủy",
+    "confirmRestore": "Xác nhận khôi phục",
+    "restorePart": "Khôi phục linh kiện",
+    "restoreSuccess": "Khôi phục linh kiện thành công!",
+    "restoreFailed": "Không thể khôi phục linh kiện"
   },
   "CreatePartModal": {
     "validationPartNameRequired": "Tên linh kiện là bắt buộc",
@@ -1641,7 +1649,15 @@
     "soundUrlPlaceholder": "URL nhúng YouTube (tùy chọn)",
     "cancel": "Hủy",
     "updating": "Đang cập nhật...",
-    "updateProduct": "Cập nhật sản phẩm"
+    "updateProduct": "Cập nhật sản phẩm",
+    "productImages": "Ảnh sản phẩm",
+    "model3d": "Mô hình 3D",
+    "uploading": "Đang tải lên...",
+    "clickToUpload": "Nhấn để tải lên",
+    "clickToUploadGlb": "Nhấn để tải lên file GLB",
+    "modelUploaded": "Đã tải lên mô hình 3D",
+    "imageUploadFailed": "Tải lên ảnh thất bại",
+    "modelUploadFailed": "Tải lên mô hình 3D thất bại"
   },
   "DeleteAssembledProductModal": {
     "deletedSuccess": "Xóa sản phẩm lắp ráp thành công!",
@@ -2831,7 +2847,21 @@
     "reject": "Từ chối",
     "pageLabel": "Trang",
     "prev": "Trước",
-    "next": "Tiếp"
+    "next": "Tiếp",
+    "requestedAt": "Yêu cầu",
+    "processedAt": "Xử lý",
+    "transactionsLabel": "yêu cầu",
+    "time": "Thời gian",
+    "shopName": "Cửa hàng",
+    "amount": "Số tiền",
+    "bankInfo": "Thông tin Ngân hàng",
+    "statusAndNote": "Trạng thái & Lời nhắn",
+    "proof": "Chứng từ",
+    "titleProcessed": "Lịch sử rút tiền (Đã xử lý)",
+    "descriptionProcessed": "Danh sách các yêu cầu rút tiền đã được phê duyệt và chuyển khoản.",
+    "received": "Thực nhận",
+    "totalDeducted": "Trừ ví",
+    "copy": "Sao chép"
   },
   "AdminTransactionsPage": {
     "filterTypeAll": "Tất cả loại",

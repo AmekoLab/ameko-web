@@ -257,6 +257,20 @@ export const walletService = {
   },
 
   /**
+   * Admin: Fetch processed withdrawal transactions.
+   * GET /Wallet/admin/withdrawals/processed
+   */
+  getProcessedWithdrawals: async (
+    pageIndex = 1,
+    pageSize = 10,
+  ): Promise<ApiResponse<PaginatedResponse<TransactionItem>>> => {
+    return api.get<unknown, ApiResponse<PaginatedResponse<TransactionItem>>>(
+      "/Wallet/admin/withdrawals/processed",
+      { params: { pageIndex, pageSize } },
+    );
+  },
+
+  /**
    * Fetch details for a specific transaction
    * GET /Wallet/transactions/{id}
    */

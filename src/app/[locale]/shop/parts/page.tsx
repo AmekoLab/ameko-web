@@ -24,12 +24,14 @@ import {
   Trash2,
   ClipboardCheck,
   Puzzle,
+  RotateCcw,
 } from "lucide-react";
 import CreatePartModal from "@/src/components/Shop/CreatePartModal";
 import PartDetailModal from "@/src/components/Shop/PartDetailModal";
 import EditPartModal from "@/src/components/Shop/EditPartModal";
 import DeletePartModal from "@/src/components/Shop/DeletePartModal";
 import CheckStockModal from "@/src/components/Shop/CheckStockModal";
+import RestorePartModal from "@/src/components/Shop/RestorePartModal";
 
 const PART_TYPE_CONFIG: Record<
   PartType,
@@ -86,6 +88,8 @@ export default function ShopPartsPage() {
   const [editingPart, setEditingPart] = useState<PartItem | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingPart, setDeletingPart] = useState<PartItem | null>(null);
+  const [isRestoreOpen, setIsRestoreOpen] = useState(false);
+  const [restoringPart, setRestoringPart] = useState<PartItem | null>(null);
   const [isCheckStockOpen, setIsCheckStockOpen] = useState(false);
   const [addonFilter, setAddonFilter] = useState<"all" | "yes" | "no">("all");
   const totalPages = Math.ceil(totalParts / PAGE_SIZE);
@@ -178,6 +182,28 @@ export default function ShopPartsPage() {
   const handleCloseDelete = () => {
     setIsDeleteOpen(false);
     setDeletingPart(null);
+  };
+
+  const handleRestore = (part: PartItem) => {
+    setRestoringPart(part);
+    setIsRestoreOpen(true);
+  };
+
+  const handleCloseRestore = () => {
+    setIsRestoreOpen(false);
+    setRestoringPart(null);
+  };
+
+  const handleRestoreSuccess = () => {
+    if (currentShop?.id) {
+      dispatch(
+        fetchParts({
+          shopId: currentShop.id,
+          pageNumber: currentPage,
+          pageSize: PAGE_SIZE,
+        }),
+      );
+    }
   };
 
   // Count by type
@@ -285,6 +311,13 @@ export default function ShopPartsPage() {
           onClose={handleCloseDelete}
           onSuccess={handleDeleteSuccess}
           part={deletingPart}
+        />
+
+        <RestorePartModal
+          isOpen={isRestoreOpen}
+          onClose={handleCloseRestore}
+          onSuccess={handleRestoreSuccess}
+          part={restoringPart}
         />
 
         {/* Check Stock Modal */}
@@ -400,6 +433,7 @@ export default function ShopPartsPage() {
                       onView={handleViewDetail}
                       onEdit={handleEdit}
                       onDelete={handleDelete}
+                      onRestore={handleRestore}
                     />
                   ))}
                 </tbody>
@@ -448,11 +482,13 @@ function PartRow({
   onView,
   onEdit,
   onDelete,
+  onRestore,
 }: {
   part: PartItem;
   onView: (slug: string) => void;
   onEdit: (slug: string) => void;
   onDelete: (part: PartItem) => void;
+  onRestore: (part: PartItem) => void;
 }) {
   const t = useTranslations("ShopPartsPage");
   const typeCfg = PART_TYPE_CONFIG[part.partType] ?? {
@@ -646,6 +682,15 @@ function PartRow({
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
+          {part.isDeleted && (
+            <button
+              onClick={() => onRestore(part)}
+              className="p-1 rounded-sm border border-amazon-border transition shrink-0 bg-white hover:bg-green-50 hover:border-green-500 text-amazon-textMuted hover:text-green-500"
+              title={t("restorePart") || "Restore Part"}
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </td>
     </tr>
