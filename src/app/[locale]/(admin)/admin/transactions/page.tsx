@@ -10,6 +10,8 @@ import {
   ParsedTransactionInfo,
 } from "@/src/utils/parseTransaction";
 import Image from "next/image";
+import { Store, User } from "lucide-react";
+import AdminTransactionDetailModal from "@/src/components/Admin/modals/AdminTransactionDetailModal";
 
 // ─── Filter constants ────────────────────────────────────
 const TRANSACTION_TYPES: { labelKey: string; value: string }[] = [
@@ -68,6 +70,10 @@ const TYPE_BADGE: Record<string, { labelKey: string; className: string }> = {
     labelKey: "badgeTypeDeposit",
     className: "bg-cyan-50 text-cyan-700 border-cyan-200",
   },
+  PlatformFee: {
+    labelKey: "badgeTypePlatformFee",
+    className: "bg-purple-50 text-purple-700 border-purple-200",
+  }
 };
 
 const STATUS_BADGE: Record<string, { labelKey: string; className: string }> = {
@@ -178,6 +184,10 @@ export default function AdminTransactionsPage() {
   // Image preview
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
+  // Detail modal
+  const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
   // ── Fetch ───────────────────────────────────────────────
   const fetchData = useCallback(() => {
     dispatch(fetchAdminTransactions({ currentPage, pageSize }));
@@ -240,7 +250,18 @@ export default function AdminTransactionsPage() {
   // ── Rendering helpers ───────────────────────────────────
   const formatCurrency = (amount: number) => {
     const formatted = Math.abs(amount).toLocaleString(numberLocale);
-    return `${amount < 0 ? "-" : "+"}${formatted}₫`;
+    return `${formatted}₫`;
+  };
+
+  const getFlowUI = (item: TransactionItem) => {
+    const flow = item.flowDirection;
+    if (flow === "In") return { color: "text-green-600", sign: "+" };
+    if (flow === "Out") return { color: "text-red-600", sign: "-" };
+    if (flow === "Held") return { color: "text-amber-600", sign: "+" };
+    // Fallback: infer from amount sign
+    return item.amount >= 0
+      ? { color: "text-green-600", sign: "+" }
+      : { color: "text-red-600", sign: "-" };
   };
 
   const renderTypeBadge = (type: string) => {
@@ -452,12 +473,12 @@ export default function AdminTransactionsPage() {
                 <thead className="bg-neutral-50 border-b border-amazon-border">
                   <tr className="text-left text-[10px] text-amazon-textMuted">
                     <th className="px-4 py-2 font-medium">{t("tableId")}</th>
+                    <th className="px-4 py-2 font-medium">Đối tượng</th>
                     <th className="px-4 py-2 font-medium">{t("tableDate")}</th>
                     <th className="px-4 py-2 font-medium">{t("tableType")}</th>
                     <th className="px-4 py-2 font-medium">
                       {t("tableAmount")}
                     </th>
-                    <th className="px-4 py-2 font-medium">{t("tableFee")}</th>
                     <th className="px-4 py-2 font-medium">
                       {t("tableStatus")}
                     </th>
@@ -471,10 +492,15 @@ export default function AdminTransactionsPage() {
                     const parsed = parseTransactionDescription(
                       item.description,
                     );
+                    const ui = getFlowUI(item);
                     return (
                       <tr
                         key={item.id}
-                        className="hover:bg-neutral-50 transition-colors"
+                        className="hover:bg-neutral-50 transition-colors cursor-pointer"
+                        onClick={() => {
+                          setSelectedTransactionId(item.id);
+                          setIsDetailModalOpen(true);
+                        }}
                       >
                         {/* ID */}
                         <td className="px-4 py-3 whitespace-nowrap">
@@ -484,6 +510,27 @@ export default function AdminTransactionsPage() {
                           >
                             {item.id.slice(0, 8)}…
                           </span>
+                        </td>
+
+                        {/* Target (Đối tượng) */}
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex items-center gap-1.5">
+                            {item.shopName ? (
+                              <>
+                                <Store className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+                                <span className="text-[11px] font-medium text-amazon-text">
+                                  {item.shopName}
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <User className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0" />
+                                <span className="text-[11px] text-amazon-textMuted">
+                                  Hệ thống/User
+                                </span>
+                              </>
+                            )}
+                          </div>
                         </td>
 
                         {/* Date */}
@@ -514,26 +561,23 @@ export default function AdminTransactionsPage() {
                           {renderTypeBadge(item.type)}
                         </td>
 
-                        {/* Amount */}
+                        {/* Financials (Amount + Fee merged) */}
                         <td className="px-4 py-3 whitespace-nowrap">
-                          <span
-                            className={`font-bold text-[11px] ${
-                              item.amount >= 0
-                                ? "text-green-600"
-                                : "text-red-600"
-                            }`}
-                          >
-                            {formatCurrency(item.amount)}
-                          </span>
-                        </td>
-
-                        {/* Fee */}
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <span className="text-[11px] text-amazon-textMuted">
-                            {item.feeAmount > 0
-                              ? `${item.feeAmount.toLocaleString(numberLocale)}₫`
-                              : "—"}
-                          </span>
+                          <div className="flex flex-col items-start">
+                            <span className={`font-bold text-sm ${ui.color}`}>
+                              {ui.sign} {formatCurrency(item.netAmount ?? item.amount)}
+                            </span>
+                            {item.feeAmount > 0 && (
+                              <div className="mt-1 flex flex-col gap-0.5 opacity-80">
+                                <span className="text-[10px] text-neutral-400 line-through">
+                                  Gốc: {formatCurrency(item.grossAmount ?? item.amount)}
+                                </span>
+                                <span className="text-[10px] text-red-500 font-medium">
+                                  Phí: -{formatCurrency(item.feeAmount)}
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </td>
 
                         {/* Status */}
@@ -551,9 +595,10 @@ export default function AdminTransactionsPage() {
                             />
                             {parsed.proofUrl && (
                               <button
-                                onClick={() =>
-                                  setPreviewImage(parsed.proofUrl!)
-                                }
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPreviewImage(parsed.proofUrl!);
+                                }}
                                 className="px-2 py-0.5 rounded border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:border-blue-300 text-[10px] font-medium flex-shrink-0 transition-colors"
                                 title={t("viewEvidenceTitle")}
                               >
@@ -699,6 +744,16 @@ export default function AdminTransactionsPage() {
           </div>
         </div>
       )}
+
+      {/* ─── Admin Transaction Detail Modal ──────────────── */}
+      <AdminTransactionDetailModal
+        transactionId={selectedTransactionId}
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedTransactionId(null);
+        }}
+      />
     </div>
   );
 }

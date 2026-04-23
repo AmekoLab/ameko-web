@@ -1,4 +1,5 @@
 import { ChangeEvent, FC, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ImagePlus, Loader2, Star, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { feedbackService } from "@/src/services/feedback.service";
@@ -19,6 +20,7 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
   mode,
   onSuccess,
 }) => {
+  const t = useTranslations("Feedback");
   const [rating, setRating] = useState(5);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -106,7 +108,7 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
           setShopReply(data.shopReply || null);
           setShopRepliedAt(data.shopRepliedAt || null);
         } else {
-          toast.error(response?.message || "Không thể tải đánh giá của bạn.");
+          toast.error(response?.message || t("fetchError"));
           setViewImageUrls([]);
           setFeedbackId(null);
         }
@@ -114,7 +116,7 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
         if (!isMounted) return;
         const message =
           (error as { message?: string }).message ||
-          "Không thể tải đánh giá của bạn.";
+           t("fetchError");
         toast.error(message);
         setViewImageUrls([]);
         setFeedbackId(null);
@@ -151,12 +153,12 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
     );
     const safeFeedbackId = feedbackId ?? "";
     if (!Number.isFinite(normalizedRating)) {
-      toast.error("Vui lòng chọn số sao hợp lệ.");
+      toast.error(t("invalidRating"));
       return;
     }
 
     if (isEditMode && !safeFeedbackId) {
-      toast.error("Không tìm thấy đánh giá để cập nhật.");
+      toast.error(t("notFoundEdit"));
       return;
     }
 
@@ -182,7 +184,7 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
 
       if (response?.success) {
         toast.success(
-          isEditMode ? "Cập nhật thành công!" : "Đánh giá thành công!",
+          isEditMode ? t("updateSuccess") : t("createSuccess"),
         );
         onSuccess();
         resetFormState();
@@ -191,16 +193,16 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
         toast.error(
           response?.message ||
             (isEditMode
-              ? "Không thể cập nhật đánh giá."
-              : "Không thể gửi đánh giá."),
+              ? t("updateError")
+              : t("createError")),
         );
       }
     } catch (error: unknown) {
       const message =
         (error as { message?: string }).message ||
         (isEditMode
-          ? "Không thể cập nhật đánh giá."
-          : "Không thể gửi đánh giá.");
+          ? t("updateError")
+          : t("createError"));
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -209,8 +211,8 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
 
   if (!isOpen) return null;
 
-  const title = isEditMode ? "Sửa Đánh giá" : "Đánh giá Cửa hàng";
-  const submitLabel = isEditMode ? "Cập nhật" : "Gửi đánh giá";
+  const title = isEditMode ? t("titleEditShop") : t("titleCreateShop");
+  const submitLabel = isEditMode ? t("submitUpdate") : t("submitCreate");
 
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
@@ -236,7 +238,7 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
             <div className="p-6 space-y-5">
               <div>
                 <p className="text-xs font-bold text-amazon-text mb-2 uppercase tracking-wider">
-                  Đánh giá của bạn
+                  {t("yourRating")}
                 </p>
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((starValue) => {
@@ -271,14 +273,14 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
                   htmlFor="shop-feedback-comment"
                   className="text-xs font-bold text-amazon-text mb-2 uppercase tracking-wider block"
                 >
-                  Nhận xét
+                  {t("comment")}
                 </label>
                 <textarea
                   id="shop-feedback-comment"
                   rows={4}
                   value={comment}
                   onChange={(event) => setComment(event.target.value)}
-                  placeholder="Chia sẻ trải nghiệm của bạn về cửa hàng..."
+                  placeholder={t("commentPlaceholderShop")}
                   className="w-full bg-white border border-amazon-border rounded-sm px-3 py-2 text-sm text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus placeholder-neutral-400 resize-none"
                 />
               </div>
@@ -287,7 +289,7 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
                 {isEditMode && viewImageUrls.length > 0 && (
                   <>
                     <p className="text-xs font-bold text-amazon-text mb-2 uppercase tracking-wider">
-                      Hình ảnh hiện tại
+                      {t("currentImages")}
                     </p>
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3">
                       {viewImageUrls.map((url, index) => (
@@ -322,7 +324,7 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
                   className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-amazon-text border border-amazon-border rounded-sm hover:bg-neutral-100 transition-colors"
                 >
                   <ImagePlus className="w-4 h-4" />
-                  Add Photo
+                  {t("addPhoto")}
                 </button>
 
                 {images.length > 0 && (
@@ -355,12 +357,12 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
               {isEditMode && shopReply && (
                 <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-sm mt-4">
                   <p className="text-xs font-bold text-blue-800 uppercase tracking-wider mb-1 flex items-center gap-1">
-                    Phản hồi từ Cửa hàng
+                    {t("shopReply")}
                   </p>
                   <p className="text-sm text-blue-700 whitespace-pre-wrap">{shopReply}</p>
                   {shopRepliedAt && (
                     <p className="text-[10px] text-blue-500 mt-2 italic">
-                      Đã trả lời vào: {format(parseISO(shopRepliedAt), "dd/MM/yyyy HH:mm")}
+                      {t("repliedAt")}: {format(parseISO(shopRepliedAt), "dd/MM/yyyy HH:mm")}
                     </p>
                   )}
                 </div>
@@ -374,7 +376,7 @@ const FeedbackModal: FC<FeedbackModalProps> = ({
                 disabled={isSubmitting}
                 className="px-4 py-2 rounded-sm text-xs font-medium text-amazon-textMuted hover:bg-neutral-100 bg-white border border-amazon-border transition-colors disabled:opacity-50"
               >
-                Hủy
+                {t("cancel")}
               </button>
               <button
                 type="button"
