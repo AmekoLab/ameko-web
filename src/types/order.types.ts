@@ -107,7 +107,7 @@ export interface PaymentHistoryOrderItem {
   unitPrice: number;
   totalPrice: number;
   isCustom: boolean;
-  hasActiveIssue?: boolean;
+  hasWarrantyRequest?: boolean;
 }
 
 /** A single order within a payment-history order group */

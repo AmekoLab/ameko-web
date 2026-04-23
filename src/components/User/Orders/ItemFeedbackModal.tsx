@@ -1,4 +1,5 @@
 import { ChangeEvent, FC, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ImagePlus, Loader2, Star, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { feedbackService } from "@/src/services/feedback.service";
@@ -19,6 +20,7 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
   mode,
   onSuccess,
 }) => {
+  const t = useTranslations("Feedback");
   const [rating, setRating] = useState(5);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -98,12 +100,12 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
           setShopReply(data.shopReply || null);
           setShopRepliedAt(data.shopRepliedAt || null);
         } else {
-          toast.error(response?.message || "Không thể tải đánh giá của bạn.");
+          toast.error(response?.message || t("fetchError"));
           setViewImageUrls([]);
         }
       } catch (error: any) {
         if (!isMounted) return;
-        const message = error?.message || "Không thể tải đánh giá của bạn.";
+        const message = error?.message || t("fetchError");
         toast.error(message);
         setViewImageUrls([]);
       } finally {
@@ -140,7 +142,7 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
       Math.max(1, Math.round(Number(rating))),
     );
     if (!Number.isFinite(normalizedRating)) {
-      toast.error("Vui lòng chọn số sao hợp lệ.");
+      toast.error(t("invalidRating"));
       return;
     }
 
@@ -160,15 +162,15 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
           : await feedbackService.createItemFeedback(orderItemId, formData);
 
       if (response?.success) {
-        toast.success("Đánh giá thành công!");
+        toast.success(t("createSuccess"));
         onSuccess();
         resetFormState();
         onClose();
       } else {
-        toast.error(response?.message || "Không thể gửi đánh giá.");
+        toast.error(response?.message || t("createError"));
       }
     } catch (error: any) {
-      const message = error?.message || "Không thể gửi đánh giá.";
+      const message = error?.message || t("createError");
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -178,8 +180,8 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
   if (!isOpen) return null;
 
   const title = isViewMode 
-    ? "Đánh giá của bạn" 
-    : (mode === "edit" ? "Chỉnh sửa đánh giá" : "Đánh giá Sản phẩm");
+    ? t("titleViewItem") 
+    : (mode === "edit" ? t("titleEditItem") : t("titleCreateItem"));
 
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
@@ -205,7 +207,7 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
             <div className="p-6 space-y-5">
               <div>
                 <p className="text-xs font-bold text-amazon-text mb-2 uppercase tracking-wider">
-                  Đánh giá của bạn
+                  {t("yourRating")}
                 </p>
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((starValue) => {
@@ -240,7 +242,7 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
                   htmlFor="shop-feedback-comment"
                   className="text-xs font-bold text-amazon-text mb-2 uppercase tracking-wider block"
                 >
-                  Nhận xét
+                  {t("comment")}
                 </label>
                 <textarea
                   id="shop-feedback-comment"
@@ -248,7 +250,7 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
                   value={comment}
                   readOnly={isViewMode}
                   onChange={(event) => setComment(event.target.value)}
-                  placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."
+                  placeholder={t("commentPlaceholderItem")}
                   className={`w-full bg-white border border-amazon-border rounded-sm px-3 py-2 text-sm text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus placeholder-neutral-400 resize-none ${isViewMode ? 'opacity-90 bg-neutral-50' : ''}`}
                 />
               </div>
@@ -258,7 +260,7 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
                   <>
                     {viewImageUrls.length > 0 && (
                       <p className="text-xs font-bold text-amazon-text mb-2 uppercase tracking-wider">
-                        Hình ảnh
+                        {t("images")}
                       </p>
                     )}
                     {viewImageUrls.length > 0 && (
@@ -297,7 +299,7 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
                       className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-amazon-text border border-amazon-border rounded-sm hover:bg-neutral-100 transition-colors"
                     >
                       <ImagePlus className="w-4 h-4" />
-                      Add Photo
+                      {t("addPhoto")}
                     </button>
 
                     {images.length > 0 && (
@@ -331,12 +333,12 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
               {(mode === "view" || mode === "edit") && shopReply && (
                 <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-sm mt-4">
                   <p className="text-xs font-bold text-blue-800 uppercase tracking-wider mb-1 flex items-center gap-1">
-                    Phản hồi từ Cửa hàng
+                    {t("shopReply")}
                   </p>
                   <p className="text-sm text-blue-700 whitespace-pre-wrap">{shopReply}</p>
                   {shopRepliedAt && (
                     <p className="text-[10px] text-blue-500 mt-2 italic">
-                      Đã trả lời vào: {format(parseISO(shopRepliedAt), "dd/MM/yyyy HH:mm")}
+                      {t("repliedAt")}: {format(parseISO(shopRepliedAt), "dd/MM/yyyy HH:mm")}
                     </p>
                   )}
                 </div>
@@ -350,7 +352,7 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
                 disabled={isSubmitting}
                 className="px-4 py-2 rounded-sm text-xs font-medium text-amazon-textMuted hover:bg-neutral-100 bg-white border border-amazon-border transition-colors disabled:opacity-50"
               >
-                {isViewMode ? "Đóng" : "Hủy"}
+                {isViewMode ? t("close") : t("cancel")}
               </button>
               {!isViewMode && (
                 <button
@@ -360,7 +362,7 @@ const ItemFeedbackModal: FC<ItemFeedbackModalProps> = ({
                   className="px-4 py-2 rounded-sm text-xs font-medium text-white bg-amazon-link hover:brightness-95 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {mode === "edit" ? "Cập nhật đánh giá" : "Gửi đánh giá"}
+                  {mode === "edit" ? t("submitUpdate") : t("submitCreate")}
                 </button>
               )}
             </div>

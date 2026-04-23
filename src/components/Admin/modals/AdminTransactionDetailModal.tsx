@@ -11,6 +11,8 @@ import {
   ArrowDownRight,
   Clock,
   Repeat,
+  Store,
+  User,
 } from "lucide-react";
 
 interface Props {
@@ -27,7 +29,7 @@ const formatCurrency = (amount: number, currency: string = "VND") => {
   }).format(amount);
 };
 
-export default function TransactionDetailModal({
+export default function AdminTransactionDetailModal({
   transactionId,
   isOpen,
   onClose,
@@ -41,12 +43,13 @@ export default function TransactionDetailModal({
       const fetchDetail = async () => {
         setLoading(true);
         try {
-          const res = await walletService.getTransactionDetail(transactionId);
+          const res =
+            await walletService.getAdminTransactionDetail(transactionId);
           if (res.success && res.data) {
             setDetail(res.data);
           }
         } catch (error) {
-          console.error("Failed to fetch transaction details", error);
+          console.error("Failed to fetch admin transaction details", error);
         } finally {
           setLoading(false);
         }
@@ -61,13 +64,33 @@ export default function TransactionDetailModal({
 
   const getFlowUI = (detail: TransactionDetail) => {
     const flow = detail.flowDirection;
-    if (flow === "In") return { color: "text-green-600", sign: "+", icon: <ArrowDownRight className="w-8 h-8" /> };
-    if (flow === "Out") return { color: "text-red-600", sign: "-", icon: <ArrowUpRight className="w-8 h-8" /> };
+    if (flow === "In")
+      return {
+        color: "text-green-600",
+        sign: "+",
+        icon: <ArrowDownRight className="w-8 h-8" />,
+      };
+    if (flow === "Out")
+      return {
+        color: "text-red-600",
+        sign: "-",
+        icon: <ArrowUpRight className="w-8 h-8" />,
+      };
     if (flow === "Held") {
-      const isDecrease = (detail.heldBalanceAfterTransaction ?? 0) < (detail.heldBalanceBeforeTransaction ?? 0);
-      return { color: "text-amber-600", sign: isDecrease ? "-" : "+", icon: <Clock className="w-8 h-8" /> };
+      const isDecrease =
+        (detail.heldBalanceAfterTransaction ?? 0) <
+        (detail.heldBalanceBeforeTransaction ?? 0);
+      return {
+        color: "text-amber-600",
+        sign: isDecrease ? "-" : "+",
+        icon: <Clock className="w-8 h-8" />,
+      };
     }
-    return { color: "text-neutral-500", sign: "", icon: <Repeat className="w-8 h-8" /> };
+    return {
+      color: "text-neutral-500",
+      sign: "",
+      icon: <Repeat className="w-8 h-8" />,
+    };
   };
 
   return (
@@ -76,7 +99,7 @@ export default function TransactionDetailModal({
         {/* Header */}
         <div className="px-6 py-4 border-b border-neutral-200 flex items-center justify-between bg-neutral-50 shrink-0">
           <h3 className="font-bold text-neutral-900 text-lg">
-            {t("details.title")}
+            {t("details.adminTitle")}
           </h3>
           <button
             onClick={onClose}
@@ -99,107 +122,172 @@ export default function TransactionDetailModal({
           ) : (
             <div className="space-y-6">
               {/* Big Amount Header */}
-              {(() => { const uiConfig = getFlowUI(detail); return (
-              <div className="flex flex-col items-center justify-center py-4 text-center">
-                <div
-                  className={`w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4 border shadow-sm ${uiConfig.color}`}
-                >
-                  {uiConfig.icon}
-                </div>
-                <h4 className="text-sm font-bold text-neutral-500 uppercase tracking-wider mb-1">
-                  {t(`types.${detail.type}`) || detail.type}
-                </h4>
-                <div className="text-3xl font-black tracking-tight mt-2 flex items-center justify-center gap-1">
-                  <span className={uiConfig.color}>{uiConfig.sign}</span>
-                  <span className={uiConfig.color}>
-                    {formatCurrency(detail.netAmount ?? (detail.amount - detail.feeAmount), detail.currency)}
-                  </span>
-                </div>
-                <span
-                  className={`text-[11px] font-bold px-2 py-0.5 rounded-sm uppercase mt-2 border ${
-                    detail.status === "Completed"
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : detail.status === "Pending"
-                        ? "bg-amber-50 text-amber-700 border-amber-200"
-                        : "bg-red-50 text-red-700 border-red-200"
-                  }`}
-                >
-                  {t(`status.${detail.status}`) || detail.status}
-                </span>
-              </div>
-              ); })()}
+              {(() => {
+                const uiConfig = getFlowUI(detail);
+                return (
+                  <div className="flex flex-col items-center justify-center py-4 text-center">
+                    <div
+                      className={`w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4 border shadow-sm ${uiConfig.color}`}
+                    >
+                      {uiConfig.icon}
+                    </div>
+                    <h4 className="text-sm font-bold text-neutral-500 uppercase tracking-wider mb-1">
+                      {t(`types.${detail.type}`) || detail.type}
+                    </h4>
+                    <div className="text-3xl font-black tracking-tight mt-2 flex items-center justify-center gap-1">
+                      <span className={uiConfig.color}>{uiConfig.sign}</span>
+                      <span className={uiConfig.color}>
+                        {formatCurrency(
+                          detail.netAmount ??
+                            detail.amount - detail.feeAmount,
+                          detail.currency,
+                        )}
+                      </span>
+                    </div>
 
-              {/* Data Grid */}
+                    {/* Fee breakdown inline */}
+                    {detail.feeAmount > 0 && (
+                      <div className="mt-2 flex flex-col items-center gap-0.5">
+                        <span className="text-[11px] text-neutral-400 line-through">
+                          {t("details.grossLabel")}:{" "}
+                          {formatCurrency(
+                            detail.grossAmount ?? detail.amount,
+                            detail.currency,
+                          )}
+                        </span>
+                        <span className="text-[11px] text-red-500 font-medium">
+                          {t("details.feeLabel")}: -
+                          {formatCurrency(detail.feeAmount, detail.currency)}
+                        </span>
+                      </div>
+                    )}
+
+                    <span
+                      className={`text-[11px] font-bold px-2 py-0.5 rounded-sm uppercase mt-3 border ${
+                        detail.status === "Completed"
+                          ? "bg-green-50 text-green-700 border-green-200"
+                          : detail.status === "Pending"
+                            ? "bg-amber-50 text-amber-700 border-amber-200"
+                            : "bg-red-50 text-red-700 border-red-200"
+                      }`}
+                    >
+                      {t(`status.${detail.status}`) || detail.status}
+                    </span>
+                  </div>
+                );
+              })()}
+
+              {/* Info Grid */}
               <div className="bg-neutral-50/50 border border-neutral-200 rounded-md divide-y divide-neutral-200/60 text-sm">
+                {/* Transaction ID */}
                 <div className="flex justify-between p-3">
-                  <span className="text-neutral-500">
-                    {t("details.transactionId")}
-                  </span>
+                  <span className="text-neutral-500">{t("details.transactionId")}</span>
                   <span className="font-mono text-neutral-900 text-xs">
                     {detail.id.split("-")[0]}...{detail.id.split("-").pop()}
                   </span>
                 </div>
+
+                {/* Date */}
                 <div className="flex justify-between p-3">
                   <span className="text-neutral-500">{t("details.time")}</span>
                   <span className="font-medium text-neutral-900">
-                    {new Date(detail.createdAt).toLocaleString(
-                      t("localeCode").includes(".") ? "vi-VN" : t("localeCode"),
-                      {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      },
-                    )}
+                    {new Date(detail.createdAt).toLocaleString(t("localeCode").includes(".") ? "vi-VN" : t("localeCode"), {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </span>
                 </div>
+
+                {/* Type */}
+                <div className="flex justify-between p-3">
+                  <span className="text-neutral-500">{t("details.typeLabel")}</span>
+                  <span className="font-medium text-neutral-900">
+                    {t(`types.${detail.type}`) || detail.type}
+                  </span>
+                </div>
+
+                {/* Status */}
+                <div className="flex justify-between p-3">
+                  <span className="text-neutral-500">{t("details.statusLabel")}</span>
+                  <span
+                    className={`text-[11px] font-bold px-2 py-0.5 rounded-sm uppercase border ${
+                      detail.status === "Completed"
+                        ? "bg-green-50 text-green-700 border-green-200"
+                        : detail.status === "Pending"
+                          ? "bg-amber-50 text-amber-700 border-amber-200"
+                          : "bg-red-50 text-red-700 border-red-200"
+                    }`}
+                  >
+                    {t(`status.${detail.status}`) || detail.status}
+                  </span>
+                </div>
+
+                {/* Target (Đối tượng) */}
+                <div className="flex justify-between items-center p-3">
+                  <span className="text-neutral-500">{t("details.target")}</span>
+                  <div className="flex items-center gap-1.5">
+                    {detail.shopName ? (
+                      <>
+                        <Store className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+                        <span className="font-medium text-neutral-900">
+                          {detail.shopName}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <User className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0" />
+                        <span className="text-neutral-500">{t("details.system")}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Related Order */}
                 {detail.relatedOrderId && (
                   <div className="flex justify-between p-3">
-                    <span className="text-neutral-500">
-                      {t("details.relatedOrder")}
-                    </span>
+                    <span className="text-neutral-500">{t("details.relatedOrder")}</span>
                     <span className="font-mono text-amazon-link text-xs cursor-pointer">
                       {detail.relatedOrderId.split("-")[0]}...
                     </span>
                   </div>
                 )}
+
+                {/* Order Group */}
                 {detail.orderGroupId && (
                   <div className="flex justify-between p-3">
-                    <span className="text-neutral-500">Order Group</span>
+                    <span className="text-neutral-500">{t("details.orderGroup")}</span>
                     <span className="font-mono text-neutral-900 text-xs">
                       {detail.orderGroupId.split("-")[0]}...
                     </span>
                   </div>
                 )}
-                {detail.shopName && (
-                  <div className="flex justify-between p-3">
-                    <span className="text-neutral-500">Shop</span>
-                    <span className="font-medium text-neutral-900">
-                      {detail.shopName}
-                    </span>
-                  </div>
-                )}
+
+                {/* Bank Details */}
                 {detail.bankName && (
                   <div className="p-3 bg-white">
                     <p className="text-[10px] font-bold uppercase tracking-wide text-neutral-500 mb-2">
-                      Bank Details
+                      {t("details.bankDetails")}
                     </p>
                     <div className="space-y-1.5 text-xs">
                       <div className="flex justify-between gap-4">
-                        <span className="text-neutral-500">Bank Name</span>
+                        <span className="text-neutral-500">{t("details.bankNameLabel")}</span>
                         <span className="font-medium text-neutral-900 text-right">
                           {detail.bankName}
                         </span>
                       </div>
                       <div className="flex justify-between gap-4">
-                        <span className="text-neutral-500">Account Number</span>
+                        <span className="text-neutral-500">{t("details.accountNumber")}</span>
                         <span className="font-mono text-neutral-900 text-right">
                           {detail.bankAccountNumber || "N/A"}
                         </span>
                       </div>
                       <div className="flex justify-between gap-4">
-                        <span className="text-neutral-500">Account Name</span>
+                        <span className="text-neutral-500">
+                          {t("details.accountHolder")}
+                        </span>
                         <span className="font-medium text-neutral-900 text-right">
                           {detail.bankAccountName || "N/A"}
                         </span>
@@ -209,40 +297,14 @@ export default function TransactionDetailModal({
                 )}
               </div>
 
-              {/* Fee Breakdown */}
-              {detail.feeAmount > 0 && (
-                <div className="mt-4 rounded-md border border-neutral-200 overflow-hidden text-sm">
-                  <div className="flex justify-between p-3 bg-neutral-50 border-b border-neutral-200">
-                    <span className="text-neutral-600">{t("details.grossAmount") || "Tiền gốc"}</span>
-                    <span className="font-medium text-neutral-900">
-                      {formatCurrency(detail.grossAmount ?? detail.amount, detail.currency)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between p-3 bg-red-50/70">
-                    <span className="text-red-700">{t("fee") || "Phí / Phạt"}</span>
-                    <span className="font-medium text-red-600">
-                      -{formatCurrency(detail.feeAmount, detail.currency)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between p-3 bg-green-50/70 border-t border-green-100/50">
-                    <span className="text-green-800 font-bold">{t("details.netReceived") || "Thực nhận"}</span>
-                    <span className="font-black text-green-700">
-                      {formatCurrency(detail.netAmount ?? (detail.amount - detail.feeAmount), detail.currency)}
-                    </span>
-                  </div>
-                </div>
-              )}
-
               {/* Balance Tracking (Before vs After) */}
               <div className="space-y-2 pt-2">
                 <h5 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                  {t("details.balanceAfter")} & {t("details.balanceBefore")}
+                  {t("details.availableBalance")}
                 </h5>
                 <div className="bg-white border border-neutral-200 rounded-md p-3 text-sm space-y-2 shadow-sm">
                   <div className="flex justify-between items-center">
-                    <span className="text-neutral-500 text-xs">
-                      {t("details.balanceBefore")}
-                    </span>
+                    <span className="text-neutral-500 text-xs">{t("details.beforeTx")}</span>
                     <span className="font-medium text-neutral-600 line-through decoration-neutral-300">
                       {formatCurrency(
                         detail.balanceBeforeTransaction,
@@ -252,15 +314,20 @@ export default function TransactionDetailModal({
                   </div>
                   <div className="flex justify-between items-center border-t border-dashed border-neutral-200 pt-2">
                     <span className="text-neutral-900 font-medium text-xs">
-                      {t("details.balanceAfter")}
+                      {t("details.afterTx")}
                     </span>
                     <div className="flex items-center gap-2">
                       {(() => {
-                        const diff = detail.balanceAfterTransaction - detail.balanceBeforeTransaction;
+                        const diff =
+                          detail.balanceAfterTransaction -
+                          detail.balanceBeforeTransaction;
                         if (diff === 0) return null;
                         return (
-                          <span className={`text-[11px] font-bold ${diff > 0 ? "text-green-600" : "text-red-600"}`}>
-                            {diff > 0 ? "+" : ""}{formatCurrency(diff, detail.currency)}
+                          <span
+                            className={`text-[11px] font-bold ${diff > 0 ? "text-green-600" : "text-red-600"}`}
+                          >
+                            {diff > 0 ? "+" : ""}
+                            {formatCurrency(diff, detail.currency)}
                           </span>
                         );
                       })()}
@@ -274,18 +341,18 @@ export default function TransactionDetailModal({
                   </div>
                 </div>
 
+                {/* Held Balance Tracking */}
                 {(detail.shopName !== null ||
                   (detail.heldBalanceBeforeTransaction ?? 0) > 0 ||
                   (detail.heldBalanceAfterTransaction ?? 0) > 0) && (
                   <>
                     <h5 className="text-xs font-bold text-neutral-900 uppercase tracking-wider pt-2">
-                      {t("details.heldBalanceAfter")} &{" "}
-                      {t("details.heldBalanceBefore")}
+                      {t("details.heldBalanceTitle")}
                     </h5>
                     <div className="bg-white border border-neutral-200 rounded-md p-3 text-sm space-y-2 shadow-sm">
                       <div className="flex justify-between items-center">
                         <span className="text-neutral-500 text-xs">
-                          {t("details.heldBalanceBefore")}
+                          {t("details.beforeTx")}
                         </span>
                         <span className="font-medium text-neutral-600 line-through decoration-neutral-300">
                           {formatCurrency(
@@ -296,15 +363,20 @@ export default function TransactionDetailModal({
                       </div>
                       <div className="flex justify-between items-center border-t border-dashed border-neutral-200 pt-2">
                         <span className="text-neutral-900 font-medium text-xs">
-                          {t("details.heldBalanceAfter")}
+                          {t("details.afterTx")}
                         </span>
                         <div className="flex items-center gap-2">
                           {(() => {
-                            const diff = (detail.heldBalanceAfterTransaction ?? 0) - (detail.heldBalanceBeforeTransaction ?? 0);
+                            const diff =
+                              (detail.heldBalanceAfterTransaction ?? 0) -
+                              (detail.heldBalanceBeforeTransaction ?? 0);
                             if (diff === 0) return null;
                             return (
-                              <span className={`text-[11px] font-bold ${diff > 0 ? "text-green-600" : "text-red-600"}`}>
-                                {diff > 0 ? "+" : ""}{formatCurrency(diff, detail.currency)}
+                              <span
+                                className={`text-[11px] font-bold ${diff > 0 ? "text-green-600" : "text-red-600"}`}
+                              >
+                                {diff > 0 ? "+" : ""}
+                                {formatCurrency(diff, detail.currency)}
                               </span>
                             );
                           })()}
@@ -342,7 +414,7 @@ export default function TransactionDetailModal({
             onClick={onClose}
             className="w-full py-2.5 bg-white border border-neutral-300 text-neutral-700 font-bold rounded-sm shadow-sm hover:bg-neutral-100 transition-colors uppercase text-sm"
           >
-            {t("details.close")}
+            Đóng
           </button>
         </div>
       </div>

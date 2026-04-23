@@ -70,6 +70,9 @@ export interface TransactionItem {
   id: string;
   amount: number;
   feeAmount: number;
+  grossAmount?: number;
+  netAmount?: number;
+  flowDirection?: string; // "In" | "Out" | "Held"
   currency: string;
   type: string;
   status: string;
@@ -261,6 +264,16 @@ export const walletService = {
     transactionId: string,
   ): Promise<ApiResponse<TransactionDetail>> => {
     return api.get(`/Wallet/transactions/${transactionId}`);
+  },
+
+  /**
+   * Fetch details for a specific admin transaction
+   * GET /Wallet/admin/transactions/{id}
+   */
+  getAdminTransactionDetail: async (
+    transactionId: string,
+  ): Promise<ApiResponse<TransactionDetail>> => {
+    return api.get(`/Wallet/admin/transactions/${transactionId}`);
   },
 
   /**

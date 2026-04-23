@@ -185,7 +185,7 @@ const CreateWarrantyModal: FC<CreateWarrantyModalProps> = ({
                     const isSelected = selectedItemIds?.includes(
                       item.orderItemId,
                     );
-                    const isDisabled = item.hasActiveIssue;
+                    const isDisabled = item.hasWarrantyRequest;
                     return (
                       <button
                         key={item.orderItemId}

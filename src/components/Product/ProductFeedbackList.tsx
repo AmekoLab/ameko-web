@@ -42,6 +42,7 @@ const formatFeedbackDate = (dateValue: string): string => {
 };
 
 export const ProductFeedbackList: FC<ProductFeedbackListProps> = ({ productId, shopId }) => {
+  const t = useTranslations("ProductFeedbackList");
   const [feedbacks, setFeedbacks] = useState<PaginatedAssembledProductFeedbacks | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,7 +81,7 @@ export const ProductFeedbackList: FC<ProductFeedbackListProps> = ({ productId, s
         const wrappedResponse = response as ProductFeedbacksResponse;
         if (wrappedResponse?.success === false) {
           toast.error(
-            wrappedResponse.message || "Không thể tải danh sách đánh giá sản phẩm."
+            wrappedResponse.message || t("fetchError")
           );
           setFeedbacks(null);
           return;
@@ -107,7 +108,7 @@ export const ProductFeedbackList: FC<ProductFeedbackListProps> = ({ productId, s
 
       } catch (error: unknown) {
         if (!isMounted) return;
-        const message = (error as { message?: string })?.message || "Không thể tải danh sách đánh giá sản phẩm.";
+        const message = (error as { message?: string })?.message || t("fetchError");
         toast.error(message);
         setFeedbacks(null);
       } finally {
@@ -147,13 +148,13 @@ export const ProductFeedbackList: FC<ProductFeedbackListProps> = ({ productId, s
   return (
     <div className="pt-16 mb-20">
       <p className="text-[14px] font-black uppercase tracking-[0.3em] text-amazon-link mb-2">
-        Phản hồi từ khách hàng
+        {t("subtitle")}
       </p>
       <h3 className="text-2xl lg:text-[28px] font-black uppercase text-amazon-text mb-2 leading-tight">
-        Đánh giá Sản phẩm
+        {t("title")}
       </h3>
       <p className="text-sm text-amazon-textMuted mb-10">
-        Tổng số: {totalCount} đánh giá
+        {t("totalCount", { count: totalCount })}
       </p>
 
       {isLoading ? (
@@ -162,7 +163,7 @@ export const ProductFeedbackList: FC<ProductFeedbackListProps> = ({ productId, s
         </div>
       ) : items.length === 0 ? (
         <div className="py-10 text-sm text-amazon-textMuted border border-amazon-border border-dashed text-center rounded-sm">
-          Sản phẩm này chưa có đánh giá nào.
+          {t("noFeedbacks")}
         </div>
       ) : (
         <div className="space-y-6">
@@ -219,7 +220,7 @@ export const ProductFeedbackList: FC<ProductFeedbackListProps> = ({ productId, s
                         className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amazon-link hover:text-amazon-linkDark hover:underline uppercase tracking-wider"
                       >
                         <Pencil className="w-3 h-3" />
-                        Sửa đánh giá
+                        {t("editReview")}
                       </button>
                     )}
                   </div>
@@ -252,7 +253,7 @@ export const ProductFeedbackList: FC<ProductFeedbackListProps> = ({ productId, s
                 {item.shopReply ? (
                   <div className="rounded-sm border border-amazon-border bg-neutral-50 px-4 py-3">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-amazon-text mb-1">
-                      Phản hồi từ Shop
+                      {t("shopReply")}
                     </p>
                     <p className="text-sm text-amazon-text whitespace-pre-wrap break-words">
                       {item.shopReply}
@@ -265,7 +266,7 @@ export const ProductFeedbackList: FC<ProductFeedbackListProps> = ({ productId, s
                         onClick={() => setReplyFeedbackId(item.feedbackId)}
                         className="text-[11px] font-bold text-amazon-text bg-gray-100 hover:bg-gray-200 uppercase tracking-wider px-4 py-2 rounded-sm border border-gray-300 transition-colors"
                       >
-                        Phản hồi
+                        {t("replyAction")}
                       </button>
                     </div>
                   )
@@ -280,7 +281,7 @@ export const ProductFeedbackList: FC<ProductFeedbackListProps> = ({ productId, s
       {!isLoading && feedbacks && feedbacks.totalPages > 0 && (
         <div className="mt-8 pt-4 border-t border-amazon-border flex items-center justify-between">
           <p className="text-[11px] font-medium text-amazon-textMuted uppercase tracking-wider">
-            Trang {feedbacks.currentPage} / {feedbacks.totalPages}
+            {t("page")} {feedbacks.currentPage} / {feedbacks.totalPages}
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -290,7 +291,7 @@ export const ProductFeedbackList: FC<ProductFeedbackListProps> = ({ productId, s
               className="inline-flex items-center gap-1 rounded-sm border border-amazon-border bg-white px-4 py-2 text-xs font-bold uppercase tracking-wider text-amazon-text transition hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-4 h-4" />
-              Trước
+              {t("prev")}
             </button>
             <button
               type="button"
@@ -298,7 +299,7 @@ export const ProductFeedbackList: FC<ProductFeedbackListProps> = ({ productId, s
               disabled={!feedbacks.hasNextPage}
               className="inline-flex items-center gap-1 rounded-sm border border-amazon-border bg-white px-4 py-2 text-xs font-bold uppercase tracking-wider text-amazon-text transition hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Sau
+              {t("next")}
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

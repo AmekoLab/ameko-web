@@ -20,9 +20,11 @@ import {
 import { format, parseISO } from "date-fns";
 import { toast } from "react-toastify";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import ShopReplyModal from "./ShopReplyModal";
 
 export default function ShopFeedbacksPage() {
+  const t = useTranslations("ShopFeedbacks");
   const [data, setData] = useState<PaginatedShopFeedbacks | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,11 +41,11 @@ export default function ShopFeedbacksPage() {
       if (response.success) {
         setData(response.data);
       } else {
-        toast.error(response.message || "Không thể tải danh sách đánh giá");
+        toast.error(response.message || t("fetchError"));
       }
     } catch (error) {
       console.error("Fetch feedbacks error:", error);
-      toast.error("Đã có lỗi xảy ra khi kết nối máy chủ");
+      toast.error(t("serverError"));
     } finally {
       setIsLoading(false);
     }
@@ -83,10 +85,10 @@ export default function ShopFeedbacksPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
           <MessageCircle className="w-6 h-6 text-amazon-primary" />
-          Quản lý Đánh giá Cửa hàng
+          {t("titleShop")}
         </h1>
         <p className="text-gray-500 mt-1">
-          Xem và phản hồi các đánh giá từ khách hàng về cửa hàng của bạn.
+          {t("descShop")}
         </p>
       </div>
 
@@ -94,7 +96,7 @@ export default function ShopFeedbacksPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-white p-4 rounded-sm border border-gray-200 shadow-sm">
           <p className="text-sm text-gray-500 uppercase font-semibold">
-            Tổng đánh giá
+            {t("totalFeedbacks")}
           </p>
           <p className="text-2xl font-bold">{data?.totalCount || 0}</p>
         </div>
@@ -106,16 +108,16 @@ export default function ShopFeedbacksPage() {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="p-4 text-sm font-bold text-gray-600 uppercase w-1/4">
-                  Khách hàng / Đơn hàng
+                  {t("customerOrder")}
                 </th>
                 <th className="p-4 text-sm font-bold text-gray-600 uppercase w-2/5">
-                  Nội dung đánh giá
+                  {t("feedbackContent")}
                 </th>
                 <th className="p-4 text-sm font-bold text-gray-600 uppercase">
-                  Ngày tạo
+                  {t("createdDate")}
                 </th>
                 <th className="p-4 text-sm font-bold text-gray-600 uppercase text-right">
-                  Hành động
+                  {t("actions")}
                 </th>
               </tr>
             </thead>
@@ -145,7 +147,7 @@ export default function ShopFeedbacksPage() {
                     </div>
                     <div className="text-xs text-gray-500 flex items-center gap-1">
                       <Package className="w-3 h-3" />
-                      ID: {item.orderId.substring(0, 8)}...
+                      {t("id")}: {item.orderId.substring(0, 8)}...
                     </div>
                   </td>
                   <td className="p-4 align-top">
@@ -177,14 +179,13 @@ export default function ShopFeedbacksPage() {
                     {item.shopReply ? (
                       <div className="bg-blue-50 p-3 rounded-md border-l-4 border-blue-400 mt-2">
                         <p className="text-xs font-bold text-blue-800 mb-1 flex items-center gap-1">
-                          <MessageCircle className="w-3 h-3" /> Phản hồi của
-                          bạn:
+                          <MessageCircle className="w-3 h-3" /> {t("yourReply")}
                         </p>
                         <p className="text-sm text-blue-700">
                           {item.shopReply}
                         </p>
                         <p className="text-[10px] text-blue-500 mt-1 italic">
-                          Đã trả lời vào:{" "}
+                          {t("repliedAt")}{" "}
                           {format(
                             parseISO(item.shopRepliedAt!),
                             "dd/MM/yyyy HH:mm",
@@ -193,7 +194,7 @@ export default function ShopFeedbacksPage() {
                       </div>
                     ) : (
                       <p className="text-xs text-orange-500 font-medium flex items-center gap-1 mt-2">
-                        (Chưa có phản hồi)
+                        {t("noReplyYet")}
                       </p>
                     )}
                   </td>
@@ -209,14 +210,14 @@ export default function ShopFeedbacksPage() {
                         onClick={() => setReplyFeedbackId(item.feedbackId)}
                         className="bg-amazon-primary text-amazon-text px-4 py-1.5 rounded-sm text-xs font-bold hover:brightness-95 transition-all uppercase shadow-sm border border-amazon-border"
                       >
-                        Phản hồi
+                        {t("replyAction")}
                       </button>
                     ) : (
                       <button
                         disabled
                         className="bg-gray-100 text-gray-400 px-4 py-1.5 rounded-sm text-xs font-bold cursor-not-allowed uppercase border border-gray-200"
                       >
-                        Đã trả lời
+                        {t("repliedAction")}
                       </button>
                     )}
                   </td>
@@ -229,7 +230,7 @@ export default function ShopFeedbacksPage() {
                     <div className="flex flex-col items-center gap-2">
                       <ImageIcon className="w-12 h-12 text-gray-200" />
                       <p className="text-gray-400 font-medium">
-                        Chưa có đánh giá nào cho cửa hàng của bạn.
+                        {t("noFeedbacksShop")}
                       </p>
                     </div>
                   </td>
@@ -243,7 +244,7 @@ export default function ShopFeedbacksPage() {
         {data && data.totalPages > 1 && (
           <div className="p-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
             <p className="text-sm text-gray-600">
-              Trang <span className="font-bold">{data.currentPage}</span> /{" "}
+              {t("page")} <span className="font-bold">{data.currentPage}</span> /{" "}
               {data.totalPages}
             </p>
             <div className="flex gap-2">
