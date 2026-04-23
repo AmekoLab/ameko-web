@@ -46,11 +46,6 @@ function buildKitSpecifications(
         title: t("workflowSwitchTitle"),
         quantity: switchCount,
       },
-      {
-        step: "stabilizer",
-        title: t("workflowStabilizerTitle"),
-        quantity: stabilizerCount,
-      },
       { step: "keycap", title: t("workflowKeycapTitle"), quantity: 1 },
     ],
   };

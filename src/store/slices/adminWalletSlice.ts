@@ -31,6 +31,9 @@ interface AdminWalletState {
   pendingWithdrawals: TransactionItem[];
   pendingPagination: AdminWalletPagination | null;
   loadingPending: boolean;
+  processedWithdrawals: TransactionItem[];
+  processedPagination: AdminWalletPagination | null;
+  loadingProcessed: boolean;
 }
 
 const initialState: AdminWalletState = {
@@ -46,6 +49,9 @@ const initialState: AdminWalletState = {
   pendingWithdrawals: [],
   pendingPagination: null,
   loadingPending: false,
+  processedWithdrawals: [],
+  processedPagination: null,
+  loadingProcessed: false,
 };
 
 // ─── Async Thunk: Fetch pending withdrawals ──────────────
@@ -160,6 +166,30 @@ export const fetchPendingWithdrawalTxns = createAsyncThunk(
   },
 );
 
+// ─── Async Thunk: Fetch processed withdrawals ─────────────
+export const fetchProcessedWithdrawals = createAsyncThunk(
+  "adminWallet/fetchProcessedWithdrawals",
+  async (
+    { pageIndex, pageSize }: { pageIndex: number; pageSize: number },
+    { rejectWithValue },
+  ) => {
+    try {
+      const res = await walletService.getProcessedWithdrawals(pageIndex, pageSize);
+      if (res.success) {
+        return res.data;
+      }
+      return rejectWithValue(
+        res.message || "Failed to fetch processed withdrawals",
+      );
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      return rejectWithValue(
+        err.message || "Failed to fetch processed withdrawals",
+      );
+    }
+  },
+);
+
 // ─── Slice ───────────────────────────────────────────────
 const adminWalletSlice = createSlice({
   name: "adminWallet",
@@ -262,6 +292,29 @@ const adminWalletSlice = createSlice({
       })
       .addCase(fetchPendingWithdrawalTxns.rejected, (state, action) => {
         state.loadingPending = false;
+        state.error = (action.payload as string) || "Unknown error";
+      });
+
+    // fetchProcessedWithdrawals
+    builder
+      .addCase(fetchProcessedWithdrawals.pending, (state) => {
+        state.loadingProcessed = true;
+        state.error = null;
+      })
+      .addCase(fetchProcessedWithdrawals.fulfilled, (state, action) => {
+        state.loadingProcessed = false;
+        state.processedWithdrawals = action.payload.items;
+        state.processedPagination = {
+          totalCount: action.payload.totalCount,
+          currentPage: action.payload.currentPage,
+          pageSize: action.payload.pageSize,
+          totalPages: action.payload.totalPages,
+          hasPreviousPage: action.payload.hasPreviousPage,
+          hasNextPage: action.payload.hasNextPage,
+        };
+      })
+      .addCase(fetchProcessedWithdrawals.rejected, (state, action) => {
+        state.loadingProcessed = false;
         state.error = (action.payload as string) || "Unknown error";
       });
   },

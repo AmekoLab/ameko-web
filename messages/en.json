@@ -71,7 +71,8 @@
     "language": "Language",
     "ruleBuilder": "Rules Builder",
     "feedback": "Feedback",
-    "assembledFeedbacks": "Assembled Feedbacks"
+    "assembledFeedbacks": "Assembled Feedbacks",
+    "processedWithdrawals": "Processed Withdrawals"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -1331,7 +1332,15 @@
     "recipeStabs": "stabs",
     "viewPart": "View part",
     "editPart": "Edit part",
-    "deletePart": "Delete part"
+    "deletePart": "Delete part",
+    "restorePartTitle": "Restore Part",
+    "restorePartConfirm" :"Are you sure you want to restore this part?",
+    "cancel": "Cancel",
+    "confirmRestore": "Confirm Restore",
+    "restorePart": "Restore Part",
+    "restoreSuccess": "Part restored successfully!",
+    "restoreFailed": "Failed to restore part"
+
   },
   "CreatePartModal": {
     "validationPartNameRequired": "Part name is required",
@@ -1641,7 +1650,15 @@
     "soundUrlPlaceholder": "YouTube embed URL (optional)",
     "cancel": "Cancel",
     "updating": "Updating...",
-    "updateProduct": "Update Product"
+    "updateProduct": "Update Product",
+    "productImages": "Product Images",
+    "model3d": "3D Model",
+    "uploading": "Uploading...",
+    "clickToUpload": "Click to upload",
+    "clickToUploadGlb": "Click to upload GLB",
+    "modelUploaded": "3D Model Uploaded",
+    "imageUploadFailed": "Image upload failed",
+    "modelUploadFailed": "3D model upload failed"
   },
   "DeleteAssembledProductModal": {
     "deletedSuccess": "Assembled product deleted successfully!",
@@ -2832,7 +2849,21 @@
     "reject": "Reject",
     "pageLabel": "Page",
     "prev": "Prev",
-    "next": "Next"
+    "next": "Next",
+    "requestedAt": "Requested At",
+    "processedAt": "Processed At",
+    "transactionsLabel": "Request",
+    "time": "Time",
+    "shopName": "Shop Name",
+    "amount": "Amount",
+    "bankInfo": "Bank Info",
+    "statusAndNote": "Status & Note",
+    "proof": "Proof",
+    "titleProcessed": "Processed Withdrawals",
+    "descriptionProcessed": "List of withdrawal requests that have been approved and transferred.",
+    "received": "Received",
+    "totalDeducted": "Deducted",
+    "copy": "Copy"
   },
   "AdminTransactionsPage": {
     "filterTypeAll": "All Types",

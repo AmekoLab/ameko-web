@@ -26,7 +26,9 @@ export const fetchParts = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error?.message || error?.response?.data?.message || "Failed to fetch parts",
+        error?.message ||
+          error?.response?.data?.message ||
+          "Failed to fetch parts",
       );
     }
   },
@@ -41,7 +43,9 @@ export const fetchPartDetail = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error?.message || error?.response?.data?.message || "Failed to fetch part detail",
+        error?.message ||
+          error?.response?.data?.message ||
+          "Failed to fetch part detail",
       );
     }
   },
@@ -56,7 +60,9 @@ export const createPart = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error?.message || error?.response?.data?.message || "Failed to create part",
+        error?.message ||
+          error?.response?.data?.message ||
+          "Failed to create part",
       );
     }
   },
@@ -71,7 +77,9 @@ export const checkStock = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error?.message || error?.response?.data?.message || "Failed to check stock",
+        error?.message ||
+          error?.response?.data?.message ||
+          "Failed to check stock",
       );
     }
   },
@@ -86,7 +94,26 @@ export const deletePart = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error?.message || error?.response?.data?.message || "Failed to delete part",
+        error?.message ||
+          error?.response?.data?.message ||
+          "Failed to delete part",
+      );
+    }
+  },
+);
+
+// --- THUNK: RESTORE PART ---
+export const restorePart = createAsyncThunk(
+  "parts/restore",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await partService.restorePart(id);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(
+        error?.message ||
+          error?.response?.data?.message ||
+          "Failed to restore part",
       );
     }
   },
@@ -101,7 +128,9 @@ export const updatePart = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error?.message || error?.response?.data?.message || "Failed to update part",
+        error?.message ||
+          error?.response?.data?.message ||
+          "Failed to update part",
       );
     }
   },
@@ -113,6 +142,7 @@ interface PartsState {
   creating: boolean;
   updating: boolean;
   deleting: boolean;
+  restoring: boolean;
   checkingStock: boolean;
   detailLoading: boolean;
   error: string | null;
@@ -128,6 +158,7 @@ const initialState: PartsState = {
   creating: false,
   updating: false,
   deleting: false,
+  restoring: false,
   checkingStock: false,
   detailLoading: false,
   error: null,
@@ -220,6 +251,18 @@ const partsSlice = createSlice({
       })
       .addCase(deletePart.rejected, (state, action) => {
         state.deleting = false;
+        state.error = action.payload as string;
+      })
+      // --- RESTORE PART ---
+      .addCase(restorePart.pending, (state) => {
+        state.restoring = true;
+        state.error = null;
+      })
+      .addCase(restorePart.fulfilled, (state) => {
+        state.restoring = false;
+      })
+      .addCase(restorePart.rejected, (state, action) => {
+        state.restoring = false;
         state.error = action.payload as string;
       })
       // --- CHECK STOCK ---

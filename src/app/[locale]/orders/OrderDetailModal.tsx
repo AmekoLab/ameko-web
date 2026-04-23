@@ -109,10 +109,17 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
 
   const canShipOrComplete = useMemo(() => {
     if (!order) return false;
-    const customItems = order.orderItems.filter((item) => item.isCustom);
-    if (customItems.length === 0) return true; // No custom items, always ready
-    // Ready ONLY if every custom item has reported true in the map
-    return customItems.every(
+    
+    // Only check custom items that are NOT cancelled
+    const activeCustomItems = order.orderItems.filter(
+      (item) => item.isCustom && item.itemStatus !== "Cancelled"
+    );
+    
+    // If there are no active custom items left, the order is ready to ship
+    if (activeCustomItems.length === 0) return true; 
+    
+    // Ready ONLY if every ACTIVE custom item has reported true in the map
+    return activeCustomItems.every(
       (item) => assemblyCompletionMap[item.orderItemId] === true,
     );
   }, [order, assemblyCompletionMap]);

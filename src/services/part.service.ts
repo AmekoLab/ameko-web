@@ -138,6 +138,14 @@ export const partService = {
   },
 
   /**
+   * Restore a soft-deleted part by ID.
+   * PATCH /parts/{id}/restore
+   */
+  restorePart: async (id: string) => {
+    return api.patch<unknown, ApiResponse<null>>(`/parts/${id}/restore`);
+  },
+
+  /**
    * Check available inventory for given product IDs.
    * POST /parts/check-stock
    */
