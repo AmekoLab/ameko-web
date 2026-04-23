@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { orderIssueService } from "@/src/services/orderIssue.service";
 import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
+import { CartData } from "@/src/types/order.types";
 
 const createCancelOrderSchema = (t: (key: string) => string) =>
   z.object({
@@ -21,17 +22,24 @@ interface CancelOrderModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  orderId: string | null;
+  order: CartData | null;
 }
+
+const formatCurrency = (amount: number) =>
+  new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(amount);
 
 export default function CancelOrderModal({
   isOpen,
   onClose,
   onSuccess,
-  orderId,
+  order,
 }: CancelOrderModalProps) {
   const t = useTranslations("CancelOrderModal");
   const [loading, setLoading] = useState(false);
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const schema = React.useMemo(() => createCancelOrderSchema(t), [t]);
 
   const {
@@ -43,17 +51,50 @@ export default function CancelOrderModal({
     resolver: zodResolver(schema),
   });
 
+  // Reset selected items when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedItemIds([]);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
+  // Only items that are not already cancelled
+  const activeItems =
+    order?.orderItems.filter((i) => i.itemStatus !== "Cancelled") || [];
+
+  const handleToggleItem = (itemId: string) => {
+    setSelectedItemIds((prev) =>
+      prev.includes(itemId)
+        ? prev.filter((id) => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const isFullCancel =
+    activeItems.length > 0 && selectedItemIds.length === activeItems.length;
+  const selectedItems = activeItems.filter((i) =>
+    selectedItemIds.includes(i.orderItemId)
+  );
+  const itemsRefund = selectedItems.reduce(
+    (sum, item) => sum + (item.finalPrice ?? item.totalPrice),
+    0
+  );
+  const totalRefund = isFullCancel
+    ? itemsRefund + (order?.shippingFee || 0)
+    : itemsRefund;
+
   const onSubmit = async (data: FormData) => {
-    if (!orderId) return;
+    if (!order) return;
 
     try {
       setLoading(true);
       const res = await orderIssueService.submitCancelRequest({
-        orderId,
+        orderId: order.orderId,
         reason: data.reason,
         description: data.description || "",
+        itemIds: isFullCancel ? [] : selectedItemIds, // Send empty array for full cancel
       });
 
       if (res.success) {
@@ -66,7 +107,10 @@ export default function CancelOrderModal({
       }
     } catch (error: any) {
       // Interceptor already unwraps to error.message
-      const errorMessage = error?.message || error?.response?.data?.message || t("toastUnknownError");
+      const errorMessage =
+        error?.message ||
+        error?.response?.data?.message ||
+        t("toastUnknownError");
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -82,6 +126,52 @@ export default function CancelOrderModal({
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Item Selection for Partial Cancel */}
+          {order?.orderStatus === "Processing" && activeItems.length > 0 && (
+            <div className="mb-4 bg-neutral-50 p-3 border border-neutral-200 rounded-sm">
+              <p className="text-sm font-bold text-amazon-text mb-2">
+                {t("selectItemsToCancel")}
+              </p>
+              <div className="max-h-40 overflow-y-auto space-y-2 mb-3">
+                {activeItems.map((item) => (
+                  <label
+                    key={item.orderItemId}
+                    className="flex items-start gap-2 cursor-pointer group"
+                  >
+                    <input
+                      type="checkbox"
+                      className="mt-1"
+                      checked={selectedItemIds.includes(item.orderItemId)}
+                      onChange={() => handleToggleItem(item.orderItemId)}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-amazon-text line-clamp-1 group-hover:text-amazon-link">
+                        {item.productName}
+                      </p>
+                      <p className="text-[11px] text-amazon-textMuted">
+                        {t("quantityAbbr")} {item.quantity} | {t("refundAbbr")}{" "}
+                        <span className="text-amazon-price font-medium">
+                          {formatCurrency(item.finalPrice ?? item.totalPrice)}
+                        </span>
+                      </p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              <div className="pt-2 border-t border-neutral-200 border-dashed">
+                <p className="text-xs text-red-600 italic mb-1">
+                  {t("shippingFeeWarning")}
+                </p>
+                {selectedItemIds.length > 0 && (
+                  <p className="text-sm font-medium text-amazon-text bg-yellow-50 p-2 rounded-sm border border-yellow-200">
+                    {t("refundPreview", { amount: formatCurrency(totalRefund), count: selectedItemIds.length })}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="mb-4">
             <input
               {...register("reason")}

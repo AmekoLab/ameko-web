@@ -7,6 +7,7 @@ import { Eye } from "lucide-react";
 import OrderIssueDetailModal from "@/src/components/Shop/OrderIssues/OrderIssueDetailModal";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
+import { format, parseISO } from "date-fns";
 
 export default function ShopOrderIssuesPage() {
   const t = useTranslations("ShopCancelRequestsPage");
@@ -52,13 +53,11 @@ export default function ShopOrderIssuesPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("vi-VN", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    try {
+      return format(parseISO(dateString), "dd/MM/yyyy HH:mm");
+    } catch {
+      return dateString;
+    }
   };
 
   return (
@@ -120,8 +119,13 @@ export default function ShopOrderIssuesPage() {
                       <td className="px-6 py-4 text-amazon-text">
                         {issue.customerName}
                       </td>
-                      <td className="px-6 py-4 text-amazon-price font-bold">
-                        {formatCurrency(issue.orderTotalAmount)}
+                      <td className="px-6 py-4">
+                        <div className="font-bold text-amazon-price">
+                          {formatCurrency(issue.cancelledItemsAmount)}
+                        </div>
+                        <div className="text-[11px] text-amazon-textMuted">
+                          {t("itemCount", { count: issue.cancelledItemCount })}
+                        </div>
                       </td>
                       <td
                         className="px-6 py-4 text-amazon-text max-w-[200px] truncate"

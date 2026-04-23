@@ -477,7 +477,9 @@
     "orderId": "Mã Đơn Hàng",
     "totalAmount": "Tổng Tiền",
     "reason": "Lý Do Hủy",
-    "shopResponse": "Cửa Hàng Phản Hồi"
+    "shopResponse": "Cửa Hàng Phản Hồi",
+    "refundAmount": "Số tiền hoàn",
+    "itemCount": "({count} sản phẩm)"
   },
   "CancelRequestDetailPage": {
     "loadFailed": "Không thể tải chi tiết yêu cầu hủy.",
@@ -494,7 +496,8 @@
     "orderId": "Mã Đơn Hàng",
     "statusLabel": "Trạng Thái",
     "reason": "Lý Do Hủy",
-    "shopResponse": "Cửa Hàng Phản Hồi"
+    "shopResponse": "Cửa Hàng Phản Hồi",
+    "refundAmountWithCount": "Số tiền hoàn ({count} sản phẩm)"
   },
   "Wallet": {
     "loadFailed": "Không thể tải danh sách giao dịch",
@@ -645,6 +648,7 @@
     "phone": "Số điện thoại",
     "address": "Địa chỉ",
     "payment": "Thanh toán",
+    "cancelled": "Đã hủy",
     "subtotal": "Tạm tính",
     "discount": "Giảm giá",
     "qty": "SL",
@@ -703,6 +707,7 @@
     "shippingFee": "Phí vận chuyển:",
     "systemVoucher": "Voucher hệ thống:",
     "finalTotal": "Tổng thanh toán:",
+    "cancelled": "Đã hủy",
     "status": {
       "pending": "Chờ xử lý",
       "processing": "Đang xử lý",
@@ -2358,6 +2363,7 @@
       "fetchFailed": "Không thể tải danh sách vấn đề đơn hàng",
       "fetchUnexpectedError": "Đã xảy ra lỗi khi tải danh sách vấn đề"
     },
+    "refundAmountWithCount": "Số tiền hoàn ({count} SP)",
     "header": {
       "title": "Quản lý vấn đề đơn hàng"
     },
@@ -3000,7 +3006,12 @@
     "detailsPlaceholder": "Thông tin bổ sung...",
     "cancel": "Hủy",
     "submitting": "Đang gửi...",
-    "submitRequest": "Gửi yêu cầu"
+    "submitRequest": "Gửi yêu cầu",
+    "selectItemsToCancel": "Chọn sản phẩm muốn hủy:",
+    "quantityAbbr": "SL:",
+    "refundAbbr": "Hoàn:",
+    "shippingFeeWarning": "* Phí vận chuyển chỉ được hoàn nếu hủy toàn bộ đơn hàng.",
+    "refundPreview": "Bạn sẽ được hoàn {amount} cho {count} sản phẩm đã chọn."
   },
   "ChatPage": {
     "messages": "Tin nhắn",

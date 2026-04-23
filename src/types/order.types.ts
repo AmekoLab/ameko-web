@@ -30,6 +30,11 @@ export interface OrderItem {
   note: string | null;
   customComponentIds: string[];
   orderItemComponents: OrderItemComponent[];
+  systemAllocatedDiscount?: number;
+  shopAllocatedDiscount?: number;
+  allocatedDiscount?: number;
+  finalPrice?: number;
+  itemStatus?: string; // e.g., "Active" or "Cancelled"
 }
 
 /** Cart data returned by GET /orders/cart */

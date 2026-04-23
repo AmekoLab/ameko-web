@@ -7,6 +7,7 @@ import { orderIssueService } from "@/src/services/orderIssue.service";
 import { OrderIssue } from "@/src/types/orderIssue.types";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
+import { format, parseISO } from "date-fns";
 
 export default function CancelRequestsPage() {
   const t = useTranslations("CancelRequestsPage");
@@ -42,13 +43,11 @@ export default function CancelRequestsPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("vi-VN", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    try {
+      return format(parseISO(dateString), "dd/MM/yyyy HH:mm");
+    } catch {
+      return dateString;
+    }
   };
 
   return (
@@ -112,9 +111,12 @@ export default function CancelRequestsPage() {
 
                 <div className="flex flex-col flex-1">
                   <div className="flex justify-between items-center mb-5">
-                    <span className="text-neutral-500 text-sm font-medium">{t("totalAmount")}</span>
+                    <div className="flex flex-col">
+                      <span className="text-neutral-500 text-sm font-medium">{t("refundAmount")}</span>
+                      <span className="text-neutral-400 text-xs">{t("itemCount", { count: issue.cancelledItemCount })}</span>
+                    </div>
                     <span className="text-amazon-price font-bold text-base">
-                      {formatCurrency(issue.orderTotalAmount)}
+                      {formatCurrency(issue.cancelledItemsAmount)}
                     </span>
                   </div>
 

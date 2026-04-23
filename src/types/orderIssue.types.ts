@@ -2,6 +2,8 @@ export interface OrderIssue {
   id: string;
   orderId: string;
   orderTotalAmount: number;
+  cancelledItemsAmount: number;
+  cancelledItemCount: number;
   customerName: string;
   shopName: string;
   type: number; // e.g., 0 for Cancel Request
@@ -40,6 +42,7 @@ export interface CancelRequestPayload {
   orderId: string;
   reason: string;
   description: string;
+  itemIds?: string[]; // Empty or null means full order cancel
 }
 
 export interface ProcessIssuePayload {

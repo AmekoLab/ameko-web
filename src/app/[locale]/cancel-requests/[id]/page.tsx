@@ -7,6 +7,7 @@ import { orderIssueService } from "@/src/services/orderIssue.service";
 import { OrderIssue } from "@/src/types/orderIssue.types";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
+import { format, parseISO } from "date-fns";
 
 export default function CancelRequestDetailPage() {
   const t = useTranslations("CancelRequestDetailPage");
@@ -131,8 +132,13 @@ export default function CancelRequestDetailPage() {
                   {issue.orderId}
                 </span>
               </div>
-              <div className="mt-3 text-amazon-price text-xl font-bold">
-                {formatCurrency(issue.orderTotalAmount)}
+              <div className="mt-3 flex flex-col">
+                <span className="text-neutral-500 text-xs font-semibold uppercase tracking-wider mb-1">
+                  {t("refundAmountWithCount", { count: issue.cancelledItemCount })}
+                </span>
+                <span className="text-amazon-price text-xl font-bold">
+                  {formatCurrency(issue.cancelledItemsAmount)}
+                </span>
               </div>
             </div>
             <div className="flex flex-col items-start md:items-end gap-3 w-full md:w-auto">
@@ -142,7 +148,7 @@ export default function CancelRequestDetailPage() {
               </div>
               <div className="flex items-center gap-2 text-sm font-medium text-neutral-500 bg-neutral-50 px-3 py-1.5 rounded-lg border border-neutral-100 w-full md:w-auto justify-center">
                 <Clock className="w-4 h-4" />
-                <span>{new Date(issue.createdAt).toLocaleString("vi-VN")}</span>
+                <span>{format(parseISO(issue.createdAt), "dd/MM/yyyy HH:mm")}</span>
               </div>
             </div>
           </div>

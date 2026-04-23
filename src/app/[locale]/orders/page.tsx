@@ -146,9 +146,10 @@ interface OrderItemRowProps {
 
 const OrderItemRow: FC<OrderItemRowProps> = ({ item }) => {
   const tCommon = useTranslations("Common");
+  const isCancelled = item.itemStatus === "Cancelled";
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 py-4 border-b border-neutral-100 last:border-b-0 group">
+    <div className={`flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 py-4 border-b border-neutral-100 last:border-b-0 group ${isCancelled ? "opacity-50 grayscale bg-neutral-50/50" : ""}`}>
       <div className="relative w-24 h-24 sm:w-20 sm:h-20 shrink-0 rounded-xl overflow-hidden bg-neutral-50 border border-neutral-100">
         {item.productImage ? (
           <Image
@@ -164,9 +165,16 @@ const OrderItemRow: FC<OrderItemRowProps> = ({ item }) => {
         )}
       </div>
       <div className="flex-1 min-w-0 flex flex-col justify-center">
-        <p className="text-sm font-semibold text-neutral-900 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
-          {item.productName}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-semibold text-neutral-900 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
+            {item.productName}
+          </p>
+          {isCancelled && (
+            <span className="px-2 py-0.5 text-[10px] font-bold bg-neutral-200 text-neutral-600 rounded-sm whitespace-nowrap">
+              {tCommon("cancelled")}
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-2 mt-2">
           <p className="text-xs font-medium text-neutral-500 bg-neutral-100 px-2.5 py-1 rounded-md">
             {tCommon("qty")}: {item.quantity}
@@ -181,9 +189,22 @@ const OrderItemRow: FC<OrderItemRowProps> = ({ item }) => {
         <span className="text-xs font-medium text-neutral-400 sm:hidden">
           {tCommon("total")}:
         </span>
-        <p className="text-base font-bold text-amazon-price whitespace-nowrap">
-          {formatCurrency(item.totalPrice)}
-        </p>
+        <div className="flex flex-col items-end">
+          {item.allocatedDiscount && item.allocatedDiscount > 0 ? (
+            <>
+              <span className="text-xs font-medium text-neutral-400 line-through mb-0.5">
+                {formatCurrency(item.totalPrice)}
+              </span>
+              <p className="text-base font-bold text-amazon-price whitespace-nowrap">
+                {formatCurrency(item.finalPrice ?? item.totalPrice)}
+              </p>
+            </>
+          ) : (
+            <p className="text-base font-bold text-amazon-price whitespace-nowrap">
+              {formatCurrency(item.totalPrice)}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
