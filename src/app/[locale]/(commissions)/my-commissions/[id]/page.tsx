@@ -203,7 +203,7 @@ const QuoteCard = ({
       </div>
 
       {/* Body: Details grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5 bg-neutral-50 p-4 rounded-xl border border-neutral-100 relative overflow-hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-3 bg-neutral-50 p-4 rounded-xl border border-neutral-100 relative overflow-hidden">
         {/* Slight gradient flourish for pricing element */}
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-400 opacity-50 rounded-l-xl"></div>
         <div>
@@ -233,6 +233,11 @@ const QuoteCard = ({
           </p>
         </div>
       </div>
+
+      {/* Unit Price Notice */}
+      <p className="text-[11px] text-neutral-500 italic mb-5 px-1 flex items-center gap-1">
+        <span className="text-red-400 font-bold">*</span> {t("unitPriceNotice")}
+      </p>
 
       {/* Shop Notes */}
       {quote.shopNotes && (

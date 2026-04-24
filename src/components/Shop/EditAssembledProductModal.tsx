@@ -1,11 +1,20 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, Loader2, Plus, Trash2 } from "lucide-react";
+import {
+  X,
+  Loader2,
+  Plus,
+  Trash2,
+  Upload,
+  Box,
+  CheckCircle,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { updateAssembledProduct } from "@/src/store/slices/assembledProductsSlice";
 import { fetchParts } from "@/src/store/slices/partsSlice";
@@ -13,10 +22,13 @@ import { fetchCurrentShop } from "@/src/store/slices/shopSlice";
 import { AssembledProductItem } from "@/src/types/assembledProduct.types";
 import { PartItem } from "@/src/types/part.types";
 import { toast } from "react-toastify";
+import { uploadImage } from "@/src/utils/uploadImage";
+import { uploadGlb } from "@/src/utils/uploadGlb";
 
 // --- ZOD SCHEMA ---
 const detailSchema = (t: (key: string) => string) =>
   z.object({
+    id: z.string().optional(),
     baseKitId: z.string().min(1, t("validationBaseKitRequired")),
     componentId: z.string().min(1, t("validationComponentRequired")),
     quantity: z.string().min(1, t("validationQuantityRequired")),
@@ -98,11 +110,23 @@ export default function EditAssembledProductModal({
     return groups;
   }, [parts]);
 
+  // --- Image & 3D upload states ---
+  const [isUploading1, setIsUploading1] = useState(false);
+  const [isUploading2, setIsUploading2] = useState(false);
+  const [isUploading3, setIsUploading3] = useState(false);
+  const [isUploading3D, setIsUploading3D] = useState(false);
+  const fileRef1 = useRef<HTMLInputElement>(null);
+  const fileRef2 = useRef<HTMLInputElement>(null);
+  const fileRef3 = useRef<HTMLInputElement>(null);
+  const fileRef3D = useRef<HTMLInputElement>(null);
+
   const {
     register,
     handleSubmit,
     control,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<EditFormValues>({
     resolver: zodResolver(schema),
@@ -121,10 +145,37 @@ export default function EditAssembledProductModal({
       connection: "",
       battery: "",
       details: [
-        { baseKitId: "", componentId: "", quantity: "1", soundUrl: "" },
+        { id: "", baseKitId: "", componentId: "", quantity: "1", soundUrl: "" },
       ],
     },
   });
+
+  const watchedImage1 = watch("image1");
+  const watchedImage2 = watch("image2");
+  const watchedImage3 = watch("image3");
+  const watchedView3D = watch("view3DUrl");
+
+  // --- Image upload handlers ---
+  const makeFileChangeHandler =
+    (
+      field: "image1" | "image2" | "image3",
+      setUploading: (v: boolean) => void,
+      ref: React.MutableRefObject<HTMLInputElement | null>,
+    ) =>
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setUploading(true);
+      try {
+        const url = await uploadImage(file);
+        setValue(field, url, { shouldValidate: true });
+      } catch {
+        toast.error(t("imageUploadFailed"));
+      } finally {
+        setUploading(false);
+        if (ref.current) ref.current.value = "";
+      }
+    };
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -155,6 +206,7 @@ export default function EditAssembledProductModal({
         details:
           product.details && product.details.length > 0
             ? product.details.map((d) => ({
+                id: d.id || "",
                 baseKitId: d.baseKitId || "",
                 componentId: d.componentId || "",
                 quantity: String(d.quantity || 1),
@@ -162,6 +214,7 @@ export default function EditAssembledProductModal({
               }))
             : [
                 {
+                  id: "",
                   baseKitId: "",
                   componentId: "",
                   quantity: "1",
@@ -194,6 +247,7 @@ export default function EditAssembledProductModal({
           connection: data.connection || "",
           battery: data.battery || "",
           details: data.details.map((d) => ({
+            id: d.id,
             baseKitId: d.baseKitId,
             componentId: d.componentId,
             quantity: Number(d.quantity),
@@ -211,6 +265,10 @@ export default function EditAssembledProductModal({
 
   const handleClose = () => {
     if (!updating) {
+      if (fileRef1.current) fileRef1.current.value = "";
+      if (fileRef2.current) fileRef2.current.value = "";
+      if (fileRef3.current) fileRef3.current.value = "";
+      if (fileRef3D.current) fileRef3D.current.value = "";
       onClose();
     }
   };
@@ -233,6 +291,33 @@ export default function EditAssembledProductModal({
     { key: "basic" as const, label: t("tabBasicInfo") },
     { key: "specs" as const, label: t("tabSpecifications") },
     { key: "components" as const, label: t("tabComponents") },
+  ];
+
+  const imageFields = [
+    {
+      label: t("image1"),
+      field: "image1" as const,
+      ref: fileRef1,
+      isUploading: isUploading1,
+      setUploading: setIsUploading1,
+      watched: watchedImage1,
+    },
+    {
+      label: t("image2"),
+      field: "image2" as const,
+      ref: fileRef2,
+      isUploading: isUploading2,
+      setUploading: setIsUploading2,
+      watched: watchedImage2,
+    },
+    {
+      label: t("image3"),
+      field: "image3" as const,
+      ref: fileRef3,
+      isUploading: isUploading3,
+      setUploading: setIsUploading3,
+      watched: watchedImage3,
+    },
   ];
 
   const getPartTypeLabel = (type: string) => {
@@ -338,49 +423,143 @@ export default function EditAssembledProductModal({
 
               <div className="space-y-3">
                 <p className="text-[14px] font-bold text-amazon-text">
-                  {t("imageUrls")}
+                  {t("productImages")}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-[12px] font-medium text-amazon-textMuted mb-2">
-                      {t("image1")}
-                    </label>
-                    <input
-                      {...register("image1")}
-                      className={inputClass}
-                      placeholder={t("urlPlaceholder")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] font-medium text-amazon-textMuted mb-2">
-                      {t("image2")}
-                    </label>
-                    <input
-                      {...register("image2")}
-                      className={inputClass}
-                      placeholder={t("urlPlaceholder")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] font-medium text-amazon-textMuted mb-2">
-                      {t("image3")}
-                    </label>
-                    <input
-                      {...register("image3")}
-                      className={inputClass}
-                      placeholder={t("urlPlaceholder")}
-                    />
-                  </div>
+                  {imageFields.map(
+                    ({
+                      label,
+                      field,
+                      ref,
+                      isUploading,
+                      setUploading,
+                      watched,
+                    }) => (
+                      <div key={field}>
+                        <label className="block text-[12px] font-medium text-amazon-textMuted mb-2">
+                          {label}
+                        </label>
+                        {/* Hidden file input */}
+                        <input
+                          ref={ref}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={makeFileChangeHandler(
+                            field,
+                            setUploading,
+                            ref,
+                          )}
+                        />
+                        {watched ? (
+                          /* Preview state */
+                          <div className="relative w-full h-28 rounded-sm overflow-hidden border border-amazon-border bg-neutral-50 shadow-sm">
+                            <Image
+                              src={watched}
+                              alt={label}
+                              fill
+                              className="object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setValue(field, "", { shouldValidate: true })
+                              }
+                              className="absolute top-2 right-2 p-1 bg-white border border-amazon-border shadow-sm rounded-sm hover:bg-red-50 hover:text-red-500 transition-colors"
+                            >
+                              <X className="w-3.5 h-3.5 text-amazon-textMuted" />
+                            </button>
+                          </div>
+                        ) : (
+                          /* Empty / Loading state */
+                          <button
+                            type="button"
+                            disabled={isUploading}
+                            onClick={() => ref.current?.click()}
+                            className="w-full h-28 border border-dashed border-amazon-border bg-neutral-50 rounded-sm flex flex-col items-center justify-center gap-1.5 text-amazon-textMuted hover:border-amazon-btnPrimary hover:text-amazon-btnPrimary transition-colors disabled:opacity-50"
+                          >
+                            {isUploading ? (
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                              <Upload className="w-5 h-5" />
+                            )}
+                            <span className="text-[12px] font-medium">
+                              {isUploading
+                                ? t("uploading")
+                                : t("clickToUpload")}
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className={labelClass}>{t("model3dUrl")}</label>
+                <label className={labelClass}>{t("model3d")}</label>
+                {/* Hidden file input */}
                 <input
-                  {...register("view3DUrl")}
-                  className={inputClass}
-                  placeholder={t("modelUrlPlaceholder")}
+                  ref={fileRef3D}
+                  type="file"
+                  accept=".glb"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setIsUploading3D(true);
+                    try {
+                      const url = await uploadGlb(file);
+                      setValue("view3DUrl", url, { shouldValidate: true });
+                    } catch {
+                      toast.error(t("modelUploadFailed"));
+                    } finally {
+                      setIsUploading3D(false);
+                      if (fileRef3D.current) fileRef3D.current.value = "";
+                    }
+                  }}
                 />
+                {watchedView3D ? (
+                  /* Uploaded state */
+                  <div className="relative w-full h-20 rounded-sm border border-emerald-500 bg-emerald-50 flex items-center justify-center gap-3 px-4 shadow-sm">
+                    <Box className="w-5 h-5 text-emerald-600 shrink-0" />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[12px] font-medium text-emerald-700">
+                        {t("modelUploaded")}
+                      </span>
+                      <span className="text-[12px] text-emerald-600 truncate max-w-[200px]">
+                        {watchedView3D.split("/").pop()}
+                      </span>
+                    </div>
+                    <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setValue("view3DUrl", "", { shouldValidate: true })
+                      }
+                      className="absolute top-2 right-2 p-1 bg-white border border-emerald-200 shadow-sm rounded-sm hover:bg-emerald-100 hover:text-emerald-700 transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5 text-emerald-600" />
+                    </button>
+                  </div>
+                ) : (
+                  /* Empty / Loading state */
+                  <button
+                    type="button"
+                    disabled={isUploading3D}
+                    onClick={() => fileRef3D.current?.click()}
+                    className="w-full h-20 border border-dashed border-amazon-border bg-neutral-50 rounded-sm flex flex-col items-center justify-center gap-1.5 text-amazon-textMuted hover:border-amazon-btnPrimary hover:text-amazon-btnPrimary transition-colors disabled:opacity-50"
+                  >
+                    {isUploading3D ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <Box className="w-5 h-5" />
+                    )}
+                    <span className="text-[12px] font-medium">
+                      {isUploading3D ? t("uploading") : t("clickToUploadGlb")}
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -449,6 +628,7 @@ export default function EditAssembledProductModal({
                   type="button"
                   onClick={() =>
                     append({
+                      id: "",
                       baseKitId: "",
                       componentId: "",
                       quantity: "1",
@@ -474,6 +654,7 @@ export default function EditAssembledProductModal({
                     key={field.id}
                     className="p-5 bg-neutral-50 border border-amazon-border rounded-sm space-y-4 relative shadow-sm"
                   >
+                    <input type="hidden" {...register(`details.${index}.id`)} />
                     <div className="flex items-center justify-between">
                       <span className="text-[13px] font-bold text-amazon-textMuted">
                         {t("componentIndex", { index: index + 1 })}

@@ -18,7 +18,7 @@
     "orders": "Đơn hàng",
     "signIn": "Đăng nhập",
     "signUp": "Đăng ký",
-    "warranty": "Bảo hành",
+    "warranty": "Bảo hành & Đổi trả",
     "cancelOrder": "Hủy đơn hàng",
     "transactions": "Giao dịch",
     "wallet": "Ví",
@@ -836,7 +836,8 @@
       "expired": "Hết hạn",
       "revoked": "Đã thu hồi",
       "unknown": "Không xác định"
-    }
+    },
+    "unitPriceNotice": "Giá trên là đơn giá cho 01 sản phẩm. Tổng tiền sẽ được tính dựa trên số lượng bạn đã chọn."
   },
   "EditCommissionModal": {
     "title": "Chỉnh sửa yêu cầu nháp",
@@ -2380,6 +2381,7 @@
       "fetchUnexpectedError": "Đã xảy ra lỗi khi tải danh sách vấn đề"
     },
     "refundAmountWithCount": "Số tiền hoàn ({count} SP)",
+    "itemCount": "{count} sản phẩm",
     "header": {
       "title": "Quản lý vấn đề đơn hàng"
     },
@@ -2404,6 +2406,8 @@
       "processFailed": "Không thể xử lý vấn đề.",
       "unexpectedError": "Đã xảy ra lỗi."
     },
+    "refundAmountWithCount" : "Số tiền hoàn ({count} SP)",
+    "itemCount": "{count} sản phẩm",
     "title": "Chi tiết vấn đề",
     "fields": {
       "orderId": "Mã đơn hàng",
