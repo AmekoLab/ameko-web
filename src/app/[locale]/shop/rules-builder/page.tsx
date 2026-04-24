@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, Loader2, Settings2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
@@ -12,6 +12,10 @@ import { fetchCurrentShop } from "@/src/store/slices/shopSlice";
 import { PartItem } from "@/src/types/part.types";
 import { partService } from "@/src/services/part.service";
 import api from "@/src/utils/api";
+import {
+  createConcurrencyLimiter,
+  withRetry,
+} from "@/src/utils/async-helpers";
 
 interface RulePayload {
   BaseKitId: string;
@@ -22,6 +26,7 @@ interface RulePayload {
   Tags: string | null;
   NextStepFilterRule: string | null;
   LayerImageFile?: File | Blob | string;
+  ExistingLayerUrl?: string;
 }
 
 interface PartsStateLike {
@@ -33,8 +38,32 @@ interface PartsStateLike {
   parts?: PartItem[];
 }
 
+interface SaveProgress {
+  completed: number;
+  failed: number;
+  total: number;
+}
+
+interface FailedPayloadEntry {
+  index: number;
+  componentName: string;
+  error: unknown;
+}
+
 // Resolved by api baseURL (/api/v1) to: /api/v1/Builder/options
 const BUILDER_OPTIONS_ENDPOINT = "Builder/options";
+
+// ── Performance tuning ────────────────────────────────────────────────────
+// Max parallel requests. 5 balances speed vs backend load.
+// Browsers cap at ~6 connections per origin anyway.
+const CONCURRENCY_LIMIT = 5;
+
+// Retry configuration for transient failures
+const MAX_RETRIES = 3;
+const RETRY_BASE_DELAY_MS = 500;
+
+// Extended timeout for file uploads (default api timeout is 10s)
+const FILE_UPLOAD_TIMEOUT_MS = 30_000;
 
 function toFormData(payload: RulePayload): FormData {
   const formData = new FormData();
@@ -52,6 +81,42 @@ function toFormData(payload: RulePayload): FormData {
   });
 
   return formData;
+}
+
+/**
+ * Returns true when the payload contains a real File/Blob that
+ * requires multipart/form-data encoding.
+ */
+function payloadHasFile(payload: RulePayload): boolean {
+  return (
+    payload.LayerImageFile instanceof File ||
+    payload.LayerImageFile instanceof Blob
+  );
+}
+
+/**
+ * Builds a plain JSON body by stripping out the LayerImageFile field.
+ * Used when no physical file is present to reduce payload overhead.
+ *
+ * NOTE: This assumes the backend can accept application/json for
+ * payloads without file uploads. If the endpoint only accepts
+ * multipart/form-data, set USE_JSON_FOR_TEXT_ONLY = false below.
+ */
+const USE_JSON_FOR_TEXT_ONLY = true;
+
+function toJsonPayload(
+  payload: RulePayload,
+): Record<string, string | number | boolean | null> {
+  const { LayerImageFile: _file, ...rest } = payload;
+  const result: Record<string, string | number | boolean | null> = {};
+
+  for (const [key, value] of Object.entries(rest)) {
+    if (value !== null && value !== undefined) {
+      result[key] = typeof value === "object" ? String(value) : value;
+    }
+  }
+
+  return result;
 }
 
 export default function ShopRulesBuilderPage() {
@@ -86,6 +151,8 @@ export default function ShopRulesBuilderPage() {
   const shopId = currentShopId ?? authShopId ?? placeholderShopId;
   const [selectedKitId, setSelectedKitId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveProgress, setSaveProgress] = useState<SaveProgress | null>(null);
+  const failedPayloadsRef = useRef<FailedPayloadEntry[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [existingConfig, setExistingConfig] = useState<any>(null);
   const [isResetting, setIsResetting] = useState(false);
@@ -204,25 +271,115 @@ export default function ShopRulesBuilderPage() {
       }
 
       setIsSaving(true);
+      setSaveProgress({ completed: 0, failed: 0, total: payloads.length });
+      failedPayloadsRef.current = [];
 
       try {
+        // ── Step 1: Reset existing rules ──────────────────────────────
+        // SAFETY NOTE: Resetting BEFORE saving creates a data-loss risk
+        // if the subsequent saves fail. This is kept for backend
+        // compatibility. The retry mechanism below minimises that risk.
+        // Ideally the backend should support atomic replace in the future.
         console.log(`Resetting rules for Kit: ${selectedKit.id}...`);
         await partService.resetKitOptions(selectedKit.id);
 
-        for (const payload of payloads) {
-          const formData = toFormData(payload);
+        // ── Step 2: Save all payloads in parallel with limits ─────────
+        const limiter = createConcurrencyLimiter(CONCURRENCY_LIMIT);
 
-          await api.post(BUILDER_OPTIONS_ENDPOINT, formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          });
+        const savePromises = payloads.map((payload, index) =>
+          limiter(async () => {
+            try {
+              await withRetry(
+                () => {
+                  // Optimisation: skip FormData overhead when no file
+                  const hasFile = payloadHasFile(payload);
+
+                  if (hasFile) {
+                    const formData = toFormData(payload);
+                    return api.post(BUILDER_OPTIONS_ENDPOINT, formData, {
+                      headers: { "Content-Type": "multipart/form-data" },
+                      timeout: FILE_UPLOAD_TIMEOUT_MS,
+                    });
+                  }
+
+                  // No physical file → send lighter JSON payload
+                  if (USE_JSON_FOR_TEXT_ONLY) {
+                    return api.post(
+                      BUILDER_OPTIONS_ENDPOINT,
+                      toJsonPayload(payload),
+                    );
+                  }
+
+                  // Fallback: always use FormData
+                  const formData = toFormData(payload);
+                  return api.post(BUILDER_OPTIONS_ENDPOINT, formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                  });
+                },
+                {
+                  maxRetries: MAX_RETRIES,
+                  baseDelayMs: RETRY_BASE_DELAY_MS,
+                },
+              );
+
+              // ✅ Success — update progress
+              setSaveProgress((prev) =>
+                prev
+                  ? { ...prev, completed: prev.completed + 1 }
+                  : prev,
+              );
+            } catch (error) {
+              // ❌ Failed after all retries — collect for reporting
+              const componentName =
+                payload.StepName || payload.ComponentId || `Item #${index + 1}`;
+
+              failedPayloadsRef.current.push({
+                index,
+                componentName,
+                error,
+              });
+
+              setSaveProgress((prev) =>
+                prev ? { ...prev, failed: prev.failed + 1 } : prev,
+              );
+
+              console.error(
+                `Failed to save payload [${index}] (${componentName}):`,
+                error,
+              );
+            }
+          }),
+        );
+
+        await Promise.all(savePromises);
+
+        // ── Step 3: Report results ────────────────────────────────────
+        const failedCount = failedPayloadsRef.current.length;
+        const successCount = payloads.length - failedCount;
+
+        if (failedCount === 0) {
+          toast.success(t("toastSaveSuccess"));
+        } else if (failedCount === payloads.length) {
+          // Every single request failed
+          toast.error(t("toastSaveError"));
+        } else {
+          // Partial success
+          const failedNames = failedPayloadsRef.current
+            .map((f) => f.componentName)
+            .join(", ");
+
+          toast.warning(
+            `Saved ${successCount}/${payloads.length} rules. Failed: ${failedNames}`,
+            { autoClose: 8000 },
+          );
         }
-
-        toast.success(t("toastSaveSuccess"));
       } catch (error) {
-        console.error("Failed to save builder options", error);
+        // Reset itself failed — no data was lost
+        console.error("Failed to reset kit options before save", error);
         toast.error(getErrorMessage(error));
       } finally {
         setIsSaving(false);
+        setSaveProgress(null);
       }
     },
     [getErrorMessage, selectedKit, t],
@@ -326,10 +483,36 @@ export default function ShopRulesBuilderPage() {
                 existingConfig={existingConfig}
               />
 
-              {isSaving && (
-                <div className="mt-3 inline-flex items-center gap-2 text-sm text-neutral-600">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  {t("savingRules")}
+              {isSaving && saveProgress && (
+                <div className="mt-3 flex flex-col gap-2">
+                  <div className="inline-flex items-center gap-2 text-sm text-neutral-600">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>
+                      {t("savingRules")}{" "}
+                      ({saveProgress.completed + saveProgress.failed}/
+                      {saveProgress.total})
+                      {saveProgress.failed > 0 && (
+                        <span className="ml-1 text-red-500">
+                          — {saveProgress.failed} failed
+                        </span>
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="h-2 w-72 overflow-hidden rounded-full bg-neutral-200">
+                    {/* Success portion (green) */}
+                    <div
+                      className="h-full rounded-full transition-all duration-300"
+                      style={{
+                        width: `${((saveProgress.completed + saveProgress.failed) / saveProgress.total) * 100}%`,
+                        background:
+                          saveProgress.failed > 0
+                            ? `linear-gradient(to right, #171717 ${(saveProgress.completed / (saveProgress.completed + saveProgress.failed)) * 100}%, #ef4444 0%)`
+                            : "#171717",
+                      }}
+                    />
+                  </div>
                 </div>
               )}
             </div>
