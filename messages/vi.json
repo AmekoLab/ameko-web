@@ -3258,7 +3258,8 @@
     "toastNoKitReset": "Không tìm thấy Kit đang chọn để xóa quy trình.",
     "toastResetSuccess": "Đã xóa toàn bộ quy trình thành công!",
     "toastResetError": "Có lỗi xảy ra khi xóa quy trình!",
-    "toastSaveError": "Lưu quy tắc thất bại. Vui lòng thử lại."
+    "toastSaveError": "Lưu quy tắc thất bại. Vui lòng thử lại.",
+    "toastDuplicateComponent": "Lỗi Logic: Bạn đang cấu hình 2 linh kiện giống hệt nhau ở cùng một bước. Vui lòng gộp chúng lại thành 1 Node duy nhất và kéo dây ra nhiều nhánh để cấu hình!"
   },
   "RuleBuilderGuide": {
     "openGuide": "Xem hướng dẫn thao tác",

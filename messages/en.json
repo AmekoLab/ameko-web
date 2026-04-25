@@ -3257,7 +3257,8 @@
     "toastNoKitReset": "No kit selected to delete workflow.",
     "toastResetSuccess": "Entire workflow deleted successfully!",
     "toastResetError": "An error occurred while deleting the workflow!",
-    "toastSaveError": "Failed to save rules. Please try again."
+    "toastSaveError": "Failed to save rules. Please try again.",
+    "toastDuplicateComponent": "Logical Error: You are configuring 2 same components in the same step. Please merge them into 1 single node and drag the wire out to multiple branches to configure!"
   },
   "RuleBuilderGuide": {
     "openGuide": "View operation guide",

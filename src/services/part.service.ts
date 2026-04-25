@@ -165,10 +165,27 @@ export const partService = {
   },
 
   /**
-   * Reset/Delete all existing config rules for a Kit before saving new ones
-   * DELETE /api/v1/Builder/config/{baseKitId}
+   * Upload a single layer image for a builder option.
+   * POST /api/v1/Builder/options/upload-layer  (multipart/form-data)
+   * Returns { success: true, data: { url: "..." } } OR { success: true, data: "..." }
    */
-  resetKitOptions: async (baseKitId: string) => {
-    return api.delete<any, ApiResponse<null>>(`/Builder/config/${baseKitId}`);
+  uploadLayerImage: async (file: File | Blob) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return api.post<any, ApiResponse<{ url: string } | string>>(
+      `/Builder/options/upload-layer`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" }, timeout: 30_000 },
+    );
+  },
+
+  /**
+   * Batch-save all builder options for a kit in a single transactional call.
+   * POST /api/v1/Builder/options/batch  (application/json)
+   * Uses a replace-all strategy — the payload array replaces every existing option.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  batchSaveBuilderOptions: async (payload: any[]) => {
+    return api.post<any, ApiResponse<null>>(`/Builder/options/batch`, payload);
   },
 };
