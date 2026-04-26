@@ -3,11 +3,24 @@
 import { useState } from "react";
 import { Sparkles, X } from "lucide-react";
 import AIRecommendModal from "./AIRecommendModal";
+import type { AIRecommendedItem, AISourceLink } from "@/src/types/ai.types";
 
 interface AIAssistantWidgetProps {
   shopId?: string;
   baseKitId?: string;
   assembledProductId?: string;
+}
+
+type ChatRole = "user" | "ai";
+
+export interface ChatMessage {
+  id: string;
+  role: ChatRole;
+  content: string;
+  items?: AIRecommendedItem[];
+  totalEstimatedPrice?: number | null;
+  usedWebSearch?: boolean;
+  sourceLinks?: AISourceLink[];
 }
 
 export default function AIAssistantWidget({
@@ -16,6 +29,16 @@ export default function AIAssistantWidget({
   assembledProductId,
 }: AIAssistantWidgetProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // ── Persistent chat state (survives modal close/reopen) ──────────
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [conversationId, setConversationId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleNewChat = () => {
+    setMessages([]);
+    setConversationId(null);
+  };
 
   return (
     <>
@@ -44,6 +67,13 @@ export default function AIAssistantWidget({
         shopId={shopId}
         baseKitId={baseKitId}
         assembledProductId={assembledProductId}
+        messages={messages}
+        setMessages={setMessages}
+        conversationId={conversationId}
+        setConversationId={setConversationId}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
+        onNewChat={handleNewChat}
       />
     </>
   );
