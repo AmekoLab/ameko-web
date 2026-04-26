@@ -855,7 +855,7 @@ export default function VisualRuleBuilder({
         baseKitId: baseKit.id,
         componentId: data.part.id,
         stepName: data.stepName,
-        stepOrder: 0,
+       stepOrder: incomingEdges.length === 0 ? 0 : 1,
         isDefault: false,
         tags: incomingEdges.length > 0 ? myTags : null,
         nextStepFilterRule: nextStepRules,

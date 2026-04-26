@@ -188,4 +188,12 @@ export const partService = {
   batchSaveBuilderOptions: async (payload: any[]) => {
     return api.post<any, ApiResponse<null>>(`/Builder/options/batch`, payload);
   },
+
+  /**
+   * Reset/Delete all existing config rules for a Kit.
+   * DELETE /api/v1/Builder/config/{baseKitId}
+   */
+  resetKitOptions: async (baseKitId: string) => {
+    return api.delete<any, ApiResponse<null>>(`/Builder/config/${baseKitId}`);
+  },
 };

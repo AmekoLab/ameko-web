@@ -211,17 +211,20 @@ export default function ShopRulesBuilderPage() {
 
       // ── Pre-flight: Duplicate component-per-step validation ──────────
       {
-        const seen = new Set<string>();
+        const seenRoot = new Set<string>();
         for (const p of payloads) {
-          const key = `${p.componentId}::${p.stepName}`;
-          if (seen.has(key)) {
-            toast.error(
-              t("toastDuplicateComponent"),
-              { autoClose: 7000 },
-            );
-            return;
+          // Only enforce uniqueness for Root/Case steps
+          if (p.stepOrder === 0 || p.stepName.toLowerCase().includes("case")) {
+            const key = `${p.componentId}::${p.stepName}`;
+            if (seenRoot.has(key)) {
+              toast.error(
+                "Logical Error: Cannot place duplicate components at the Root step. Please merge them if they belong to the same branch.",
+                { autoClose: 7000 },
+              );
+              return;
+            }
+            seenRoot.add(key);
           }
-          seen.add(key);
         }
       }
 
@@ -315,8 +318,7 @@ export default function ShopRulesBuilderPage() {
     setIsResetting(true);
 
     try {
-      // Send an empty array to the batch endpoint → replaces all with nothing
-      await partService.batchSaveBuilderOptions([]);
+      await partService.resetKitOptions(baseKit.id);
       setExistingConfig(null);
       setResetCanvasKey((prev) => prev + 1);
       toast.success(t("toastResetSuccess"));
