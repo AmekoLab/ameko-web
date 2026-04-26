@@ -218,7 +218,7 @@ export default function ShopRulesBuilderPage() {
             const key = `${p.componentId}::${p.stepName}`;
             if (seenRoot.has(key)) {
               toast.error(
-                "Logical Error: Cannot place duplicate components at the Root step. Please merge them if they belong to the same branch.",
+              t("toastDuplicateComponent"),
                 { autoClose: 7000 },
               );
               return;
