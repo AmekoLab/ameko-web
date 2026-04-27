@@ -41,15 +41,16 @@ const ROW_HEIGHT = 90;
 type WorkflowStep = PartSpecifications["workflow"][number];
 
 interface RulePayload {
-  BaseKitId: string;
-  ComponentId: string;
-  StepName: string;
-  StepOrder: number;
-  IsDefault: boolean;
-  Tags: string | null;
-  NextStepFilterRule: string | null;
-  LayerImageFile?: File | Blob | string;
-  ExistingLayerUrl?: string;
+  baseKitId: string;
+  componentId: string;
+  stepName: string;
+  stepOrder: number;
+  isDefault: boolean;
+  tags: string | null;
+  nextStepFilterRule: string | null;
+  existingLayerUrl: string;
+  /** Frontend-only: real File to upload in Stage 1. Stripped before batch save. */
+  layerImageFile?: File | null;
 }
 
 interface ExistingConfigOption {
@@ -851,21 +852,16 @@ export default function VisualRuleBuilder({
       ).join(",");
 
       optionsPayloads.push({
-        BaseKitId: baseKit.id,
-        ComponentId: data.part.id,
-        StepName: data.stepName,
-        StepOrder: 0,
-        IsDefault: false,
-        Tags: incomingEdges.length > 0 ? myTags : null,
-        NextStepFilterRule: nextStepRules,
-
-        // 1. Chỉ gửi File vật lý nếu CÓ file mới (để Backend upload Cloudinary)
-        LayerImageFile: data.customLayerFile || undefined,
-
-        // 2. ✅ GỬI LINK CŨ: Để Backend biết đường giữ lại ảnh xịn, không đè ảnh mặc định
-        ExistingLayerUrl: data.existingLayerUrl || "",
-
-        // Lưu ý: data.part.layerImageFile sẽ để Backend tự xử lý nếu cả 2 cái trên đều trống
+        baseKitId: baseKit.id,
+        componentId: data.part.id,
+        stepName: data.stepName,
+       stepOrder: incomingEdges.length === 0 ? 0 : 1,
+        isDefault: false,
+        tags: incomingEdges.length > 0 ? myTags : null,
+        nextStepFilterRule: nextStepRules,
+        existingLayerUrl: data.existingLayerUrl || "",
+        // Frontend-only: carry the File for Stage 1 upload
+        layerImageFile: data.customLayerFile instanceof File ? data.customLayerFile : null,
       });
     });
 

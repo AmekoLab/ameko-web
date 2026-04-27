@@ -3258,7 +3258,8 @@
     "toastNoKitReset": "Không tìm thấy Kit đang chọn để xóa quy trình.",
     "toastResetSuccess": "Đã xóa toàn bộ quy trình thành công!",
     "toastResetError": "Có lỗi xảy ra khi xóa quy trình!",
-    "toastSaveError": "Lưu quy tắc thất bại. Vui lòng thử lại."
+    "toastSaveError": "Lưu quy tắc thất bại. Vui lòng thử lại.",
+    "toastDuplicateComponent": "Lỗi Logic: Bạn đang cấu hình 2 linh kiện giống hệt nhau ở cùng một bước. Vui lòng gộp chúng lại thành 1 Node duy nhất và kéo dây ra nhiều nhánh để cấu hình!"
   },
   "RuleBuilderGuide": {
     "openGuide": "Xem hướng dẫn thao tác",
@@ -3369,6 +3370,20 @@
     "page": "Trang",
     "prev": "Trước",
     "next": "Sau"
+  },
+  "AiAssistant": {
+    "aiAssistant": "Trợ lý AI Build Phím",
+    "newConversation": "Trò chuyện mới",
+    "loadingHistory": "Đang tải lịch sử...",
+    "welcome": "Xin chào, mình là trợ lý AI của bạn.",
+    "suggest": "Bạn có thể hỏi về build phím, switch, keycap hoặc ngân sách để mình gợi ý cấu hình phù hợp.",
+    "source": "Nguồn tham khảo:",
+    "totalEstimatedPrice": "Tổng ước tính",
+    "placeholder": "Nhập câu hỏi về build phím của bạn...",
+    "send": "Gửi",
+    "errorLoadHistory": "Không thể tải lịch sử. Vui lòng thử lại!",
+    "noData": "Mình đã nhận yêu cầu của bạn nhưng chưa có đủ dữ liệu để tư vấn rõ hơn.",
+    "errorSupport": "Xin lỗi, mình chưa thể tư vấn lúc này. Bạn thử lại trong ít phút nhé."
   }
 }
 
