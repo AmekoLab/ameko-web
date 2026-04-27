@@ -377,10 +377,15 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
               </p>
               
                 <p>
-                  <span className="font-bold text-amazon-link">
-                    {t("switch")}
+                <span className="font-bold text-amazon-link">
+                  {t("price")}
                   </span>{" "}
-                  {post.product.price}
+                  <span className="font-bold text-amazon-price">
+                  {post.product.price.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                  </span>
                 </p>
             
               <p>

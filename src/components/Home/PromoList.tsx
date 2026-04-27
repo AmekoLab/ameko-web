@@ -16,7 +16,7 @@ export const PromoList: FC = () => {
       image:
         "https://res.cloudinary.com/doezwafgz/image/upload/v1765551038/CHERRY-XTRFY_-MX-101_frontpage-1_hwu37j.jpg",
       description: t("promo1Desc"),
-      link: "/shop/keyboards",
+      link: "/shop/all-products",
       ctaText: t("promo1Cta"),
       position: "left",
       theme: "dark",
@@ -28,7 +28,7 @@ export const PromoList: FC = () => {
       image:
         "https://res.cloudinary.com/doezwafgz/image/upload/v1765551038/CHERRY-XTRFY-GP6_HYDRUS_frontpage_emfg0p.jpg",
       description: t("promo2Desc"),
-      link: "/shop/mice",
+      link: "/shop/all-products",
       ctaText: t("promo2Cta"),
       position: "left",
       theme: "dark",
@@ -40,7 +40,7 @@ export const PromoList: FC = () => {
       image:
         "https://res.cloudinary.com/doezwafgz/image/upload/v1765551038/CHERRY-XTRFY_-MX-8.3_frontpage_qbcpmv.jpg",
       description: t("promo3Desc"),
-      link: "/shop/audio",
+      link: "/shop/all-products",
       ctaText: t("promo3Cta"),
       position: "left",
       theme: "dark",

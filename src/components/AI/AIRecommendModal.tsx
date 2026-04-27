@@ -47,13 +47,6 @@ interface AIRecommendModalProps {
   onNewChat: () => void;
 }
 
-const SUGGESTED_PROMPTS = [
-  "Tư vấn bàn phím dưới 2 triệu",
-  "Linear switch là gì?",
-  "Cách lube switch đúng cách",
-  "Build phím cho dân văn phòng",
-];
-
 const VND_FORMATTER = new Intl.NumberFormat("vi-VN", {
   style: "currency",
   currency: "VND",
@@ -83,6 +76,7 @@ function TypingIndicator() {
 function ProductCard({ item }: { item: AIRecommendedItem }) {
   const linkHref = item.detailPath || item.shopUrl;
   const hasLink = Boolean(linkHref);
+  const t = useTranslations("AiAssistant");
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
@@ -97,7 +91,7 @@ function ProductCard({ item }: { item: AIRecommendedItem }) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-slate-400">
-              Ảnh
+              {t('imageFallback')}
             </div>
           )}
         </div>
@@ -115,7 +109,7 @@ function ProductCard({ item }: { item: AIRecommendedItem }) {
               href={linkHref!}
               className="mt-2 inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 transition-colors hover:bg-blue-100"
             >
-              Xem chi tiết
+              {t('viewDetails')}
             </Link>
           ) : (
             <button
@@ -123,7 +117,7 @@ function ProductCard({ item }: { item: AIRecommendedItem }) {
               disabled
               className="mt-2 inline-flex cursor-not-allowed items-center rounded-md border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500"
             >
-              Xem chi tiết
+              {t('viewDetails')}
             </button>
           )}
         </div>
@@ -151,6 +145,8 @@ function ConversationSidebar({
   isOpen: boolean;
   onToggle: () => void;
 }) {
+  const t = useTranslations("AiAssistant");
+
   return (
     <>
       {/* ── Mobile overlay backdrop ── */}
@@ -173,13 +169,13 @@ function ConversationSidebar({
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
             <History className="h-4 w-4" />
-            Lịch sử
+            {t('history')}
           </div>
           <button
             type="button"
             onClick={onToggle}
             className="inline-flex h-7 w-7 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600 md:hidden"
-            aria-label="Đóng sidebar"
+            aria-label={t('closeSidebar')}
           >
             <PanelLeftClose className="h-4 w-4" />
           </button>
@@ -193,7 +189,7 @@ function ConversationSidebar({
             className="flex w-full items-center gap-2 rounded-lg border border-dashed border-slate-300 px-3 py-2 text-xs font-semibold text-slate-600 transition-all hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
           >
             <MessageSquarePlus className="h-3.5 w-3.5" />
-            Trò chuyện mới
+            {t('newConversation')}
           </button>
         </div>
 
@@ -205,7 +201,7 @@ function ConversationSidebar({
             </div>
           ) : conversations.length === 0 ? (
             <p className="px-2 py-8 text-center text-xs text-slate-400">
-              Chưa có cuộc trò chuyện nào.
+              {t('noConversations')}
             </p>
           ) : (
             <ul className="space-y-1">
@@ -227,7 +223,7 @@ function ConversationSidebar({
                           isActive ? "text-blue-700" : "text-slate-800"
                         }`}
                       >
-                        {conv.title || "Cuộc trò chuyện"}
+                        {conv.title || t('conversationFallback')}
                       </p>
                       <p className="mt-0.5 truncate text-[11px] text-slate-400">
                         {conv.lastMessage || "…"}
@@ -265,6 +261,12 @@ export default function AIRecommendModal({
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const t = useTranslations("AiAssistant");
   
+  const SUGGESTED_PROMPTS = [
+    t("suggestedPrompt1"),
+    t("suggestedPrompt2"),
+    t("suggestedPrompt3"),
+    t("suggestedPrompt4"),
+  ];
 
   // ── Fetch conversation list when modal opens ─────────────────────
   const fetchConversations = useCallback(async () => {
@@ -328,7 +330,7 @@ export default function AIRecommendModal({
         setSidebarOpen(false);
       }
     } catch {
-      toast.error(t("errorLoadHistory") || "Không thể tải lịch sử. Vui lòng thử lại!");
+      toast.error(t("errorLoadHistory"));
     } finally {
       setIsLoadingMessages(false);
     }
@@ -373,8 +375,7 @@ export default function AIRecommendModal({
         id: createMessageId(),
         role: "ai",
         content:
-          responseData.reply?.trim() ||
-          (t("noData") || "Mình đã nhận yêu cầu của bạn nhưng chưa có đủ dữ liệu để tư vấn rõ hơn."),
+          responseData.reply?.trim() || t("noData"),
         items: responseData.items,
         totalEstimatedPrice: responseData.estimatedPrice,
         usedWebSearch: responseData.usedWebSearch,
@@ -384,10 +385,9 @@ export default function AIRecommendModal({
       pushMessage({
         id: createMessageId(),
         role: "ai",
-        content:
-          (t("errorSupport") || "Xin lỗi, mình chưa thể tư vấn lúc này. Bạn thử lại trong ít phút nhé."),
+        content: t("errorSupport"),
       });
-      toast.error(t("errorSupport") || "AI tư vấn thất bại. Vui lòng thử lại!");
+      toast.error(t("errorSupport"));
     } finally {
       setIsLoading(false);
     }
@@ -446,7 +446,7 @@ export default function AIRecommendModal({
                 type="button"
                 onClick={() => setSidebarOpen((v) => !v)}
                 className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-                aria-label="Mở lịch sử"
+                aria-label={t('openHistory')}
               >
                 <PanelLeftOpen className="h-4 w-4" />
               </button>
@@ -480,7 +480,7 @@ export default function AIRecommendModal({
                 type="button"
                 onClick={onClose}
                 className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                aria-label="Đóng"
+                aria-label={t('close')}
               >
                 <X className="h-5 w-5" />
               </button>

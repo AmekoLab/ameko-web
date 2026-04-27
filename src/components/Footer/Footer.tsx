@@ -15,9 +15,11 @@ import {
 } from "lucide-react";
 import { Logo } from "../Header/Logo";
 import { useAppSelector } from "@/src/store/hook";
+import { useTranslations } from "next-intl";
 
 export const Footer: FC = () => {
   const router = useRouter();
+  const t = useTranslations("Footer");
 
   const { user } = useAppSelector((state) => state.auth);
   const { currentShop } = useAppSelector((state) => state.shop);
@@ -30,7 +32,7 @@ export const Footer: FC = () => {
     if (currentShop) {
       router.push("/profile");
     } else {
-      router.push("/shop/register");
+      router.push("/profile/register");
     }
   };
 
@@ -51,7 +53,7 @@ export const Footer: FC = () => {
         onClick={scrollToTop}
         className="w-full bg-[#37475A] hover:bg-[#485769] text-white text-sm font-medium py-3.5 text-center cursor-pointer transition-colors"
       >
-        Back to top
+        {t("backToTop")}
       </button>
 
       {/* ═══════════════════════════════════════════
@@ -63,14 +65,14 @@ export const Footer: FC = () => {
             {/* COL 1: Get to Know Us */}
             <div>
               <h4 className="text-white font-bold text-base mb-4">
-                Get to Know Us
+                {t("getToKnowUs")}
               </h4>
               <ul className="space-y-2.5">
-                <FooterLink href="/about">About AMEKO</FooterLink>
-                <FooterLink href="/news">News &amp; Press</FooterLink>
-                <FooterLink href="/esports">Esports Teams</FooterLink>
-                <FooterLink href="/distributors">Distributors</FooterLink>
-                <FooterLink href="/community">Community</FooterLink>
+                <FooterLink href="/about">{t("aboutAmeko")}</FooterLink>
+                <FooterLink href="/news">{t("newsPress")}</FooterLink>
+                <FooterLink href="/esports">{t("esportsTeams")}</FooterLink>
+                <FooterLink href="/distributors">{t("distributors")}</FooterLink>
+                <FooterLink href="/community">{t("community")}</FooterLink>
               </ul>
 
               {/* Seller CTA */}
@@ -82,12 +84,12 @@ export const Footer: FC = () => {
                   >
                     <Store className="w-4 h-4" />
                     {currentShop
-                      ? "Check Application Status"
-                      : "Become a Seller"}
+                      ? t("checkApplicationStatus")
+                      : t("becomeSeller")}
                     <ArrowRight className="w-4 h-4" />
                   </button>
                   <p className="text-xs text-gray-500 mt-2">
-                    * Free registration. No hidden fees.
+                    {t("freeRegistrationNote")}
                   </p>
                 </div>
               )}
@@ -96,37 +98,37 @@ export const Footer: FC = () => {
             {/* COL 2: Customer Service */}
             <div>
               <h4 className="text-white font-bold text-base mb-4">
-                Customer Service
+                {t("customerService")}
               </h4>
               <ul className="space-y-2.5">
-                <FooterLink href="/contact">Contact Us</FooterLink>
-                <FooterLink href="/shipping">Shipping Info</FooterLink>
-                <FooterLink href="/returns">Returns &amp; Exchanges</FooterLink>
-                <FooterLink href="/warranty">Warranty</FooterLink>
-                <FooterLink href="/downloads">Drivers &amp; Downloads</FooterLink>
-                <FooterLink href="/faq">Help &amp; FAQ</FooterLink>
+                <FooterLink href="/contact">{t("contactUs")}</FooterLink>
+                <FooterLink href="/shipping">{t("shippingInfo")}</FooterLink>
+                <FooterLink href="/returns">{t("returnsExchanges")}</FooterLink>
+                <FooterLink href="/warranty">{t("warranty")}</FooterLink>
+                <FooterLink href="/downloads">{t("driversDownloads")}</FooterLink>
+                <FooterLink href="/faq">{t("helpFaq")}</FooterLink>
               </ul>
             </div>
 
             {/* COL 3: Quick Links */}
             <div>
               <h4 className="text-white font-bold text-base mb-4">
-                Quick Links
+                {t("quickLinks")}
               </h4>
               <ul className="space-y-2.5">
-                <FooterLink href="/shop/all-products">All Products</FooterLink>
-                <FooterLink href="/commissions-pool">Commissions Pool</FooterLink>
-                <FooterLink href="/custom-build">Build Your Own Keyboard</FooterLink>
-                <FooterLink href="/orders">Your Orders</FooterLink>
-                <FooterLink href="/profile">Your Account</FooterLink>
-                <FooterLink href="/privacy">Privacy Policy</FooterLink>
+                <FooterLink href="/shop/all-products">{t("allProducts")}</FooterLink>
+                <FooterLink href="/commissions-pool">{t("commissionsPool")}</FooterLink>
+                <FooterLink href="/custom-build">{t("buildYourOwnKeyboard")}</FooterLink>
+                <FooterLink href="/orders">{t("yourOrders")}</FooterLink>
+                <FooterLink href="/profile">{t("yourAccount")}</FooterLink>
+                <FooterLink href="/privacy">{t("privacyPolicy")}</FooterLink>
               </ul>
             </div>
 
             {/* COL 4: Visit Us + Socials */}
             <div>
               <h4 className="text-white font-bold text-base mb-4">
-                Visit Us
+                {t("visitUs")}
               </h4>
 
               {/* Google Map */}
@@ -150,9 +152,9 @@ export const Footer: FC = () => {
               >
                 <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <span>
-                  Lô E2a, 7 Đ. D1, Long Thạnh Mỹ,
+                  {t("addressLine1")}
                   <br />
-                  Thủ Đức, Hồ Chí Minh 700000, VN
+                  {t("addressLine2")}
                 </span>
               </a>
 
@@ -177,7 +179,7 @@ export const Footer: FC = () => {
             <Logo />
           </div>
           <p className="text-gray-400 text-xs mt-2">
-            German engineering meets Swedish design
+            {t("slogan")}
           </p>
         </div>
       </div>
@@ -190,22 +192,22 @@ export const Footer: FC = () => {
           {/* Legal links */}
           <div className="flex flex-wrap justify-center gap-6 text-xs text-gray-400">
             <Link href="/terms" className="hover:underline hover:text-white">
-              Terms of Service
+              {t("termsOfService")}
             </Link>
             <Link href="/privacy" className="hover:underline hover:text-white">
-              Privacy Policy
+              {t("privacyPolicy")}
             </Link>
             <Link href="/cookies" className="hover:underline hover:text-white">
-              Cookie Settings
+              {t("cookieSettings")}
             </Link>
             <Link href="/returns" className="hover:underline hover:text-white">
-              Returns Policy
+              {t("returnsPolicy")}
             </Link>
           </div>
 
           {/* Copyright */}
           <p className="text-xs text-gray-500 text-center">
-            © 2026 AMEKO. All rights reserved.
+            {t("copyright")}
           </p>
         </div>
       </div>
