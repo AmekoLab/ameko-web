@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -21,6 +21,9 @@ import {
   PlusCircle,
   Loader2,
   ChevronRight,
+  Filter,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 
 // ─── Constants ─────────────────────────────────────────────
@@ -121,6 +124,23 @@ export default function MyCommissionsPage() {
     (state: RootState) => state.commission,
   );
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [filterStatus, setFilterStatus] = useState<string>("All");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredRequests = myRequests.filter((req) =>
+    filterStatus === "All" ? true : req.status === filterStatus,
+  );
 
   useEffect(() => {
     dispatch(fetchMyRequests());
@@ -182,10 +202,74 @@ export default function MyCommissionsPage() {
           </div>
         )}
 
-        {/* Cards Grid */}
+        {/* Filter & Cards Grid */}
         {!loadingMyRequests && myRequests.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {myRequests.map((req) => {
+          <div className="space-y-6">
+            {/* Filter Controls */}
+            <div className="flex sm:justify-end items-center">
+              <div className="relative w-full sm:w-auto" ref={filterRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  className="flex items-center justify-between gap-3 bg-white border border-neutral-200 hover:border-neutral-300 rounded-xl px-4 py-2.5 shadow-sm w-full sm:w-[220px] transition-all active:scale-[0.98]"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Filter className="w-4 h-4 text-neutral-500 shrink-0" />
+                    <span className="text-sm font-semibold text-neutral-700">
+                      {filterStatus === "All"
+                        ? t("filterAll")
+                        : t(`status.${STATUS_STYLES[filterStatus]?.labelKey || "unknown"}`)}
+                    </span>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${isFilterOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {/* Custom Dropdown Menu */}
+                {isFilterOpen && (
+                  <div className="absolute top-[calc(100%+8px)] right-0 w-full bg-white border border-neutral-100 rounded-xl shadow-xl z-50 overflow-hidden py-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <button
+                      onClick={() => {
+                        setFilterStatus("All");
+                        setIsFilterOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-between ${
+                        filterStatus === "All"
+                          ? "bg-blue-50 text-blue-700"
+                          : "text-neutral-700 hover:bg-neutral-50"
+                      }`}
+                    >
+                      <span className="truncate pr-2">{t("filterAll")}</span>
+                      {filterStatus === "All" && <Check className="w-4 h-4 shrink-0" />}
+                    </button>
+                    <div className="h-px w-full bg-neutral-100 my-1" />
+                    {Object.entries(STATUS_STYLES).map(([key, style]) => (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          setFilterStatus(key);
+                          setIsFilterOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-between group ${
+                          filterStatus === key
+                            ? "bg-blue-50 text-blue-700"
+                            : "text-neutral-700 hover:bg-neutral-50"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 truncate pr-2">
+                          <span className={`w-2 h-2 shrink-0 rounded-full ${style.bg} border ${style.border}`} />
+                          <span className="truncate">{t(`status.${style.labelKey}`)}</span>
+                        </div>
+                        {filterStatus === key && <Check className="w-4 h-4 shrink-0 text-blue-600" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {filteredRequests.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredRequests.map((req) => {
               const statusStyle = STATUS_STYLES[req.status] || DEFAULT_STATUS;
               const isDraft = req.status === "Draft";
 
@@ -319,6 +403,28 @@ export default function MyCommissionsPage() {
                 </div>
               );
             })}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-neutral-200 bg-white rounded-2xl shadow-sm">
+                <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-5 border border-neutral-100">
+                  <Filter className="w-8 h-8 text-neutral-400" />
+                </div>
+                <h2 className="text-lg font-semibold text-neutral-900 mb-2 bg-red-100">
+                  {t("noRequestsByStatus", {
+                    status: t(`status.${STATUS_STYLES[filterStatus]?.labelKey || "unknown"}`),
+                  })}
+                </h2>
+                <p className="text-sm text-neutral-500 max-w-md mb-6 leading-relaxed">
+                  {t("noRequestsByStatusDescription")}
+                </p>
+                <button
+                  onClick={() => setFilterStatus("All")}
+                  className="bg-white border border-neutral-200 hover:bg-neutral-50 text-neutral-800 px-6 py-2.5 rounded-xl font-medium transition-all shadow-sm flex items-center gap-2 active:scale-[0.98]"
+                >
+                  {t("filterAll")}
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -183,7 +183,7 @@ export default function ProfilePage() {
                   </div>
 
                   <Link
-                    href="/shop/register"
+                    href="/profile/register"
                     className="px-6 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap active:scale-[0.98]"
                   >
                     Open a Shop <ArrowRight className="w-4 h-4" />

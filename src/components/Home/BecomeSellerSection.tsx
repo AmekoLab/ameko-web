@@ -48,7 +48,7 @@ export const BecomeSellerSection = () => {
             {/* CTA Button */}
             <div className="pt-6">
               <Link
-                href="/shop/register"
+                href="/profile/register"
                 className="group inline-flex items-center gap-3 px-8 py-4 bg-amazon-btnPrimary text-amazon-text font-bold uppercase tracking-widest text-sm rounded-md hover:brightness-95 transition-all duration-300 shadow-sm"
               >
                 {t("ctaText")}
