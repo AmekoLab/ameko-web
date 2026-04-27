@@ -29,6 +29,7 @@ import type {
   AIRecommendedItem,
 } from "@/src/types/ai.types";
 import type { ChatMessage } from "./AIAssistantWidget";
+import { useTranslations } from "next-intl";
 
 interface AIRecommendModalProps {
   isOpen: boolean;
@@ -262,6 +263,8 @@ export default function AIRecommendModal({
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const t = useTranslations("AiAssistant");
+  
 
   // ── Fetch conversation list when modal opens ─────────────────────
   const fetchConversations = useCallback(async () => {
@@ -325,7 +328,7 @@ export default function AIRecommendModal({
         setSidebarOpen(false);
       }
     } catch {
-      toast.error("Không thể tải lịch sử. Vui lòng thử lại!");
+      toast.error(t("errorLoadHistory") || "Không thể tải lịch sử. Vui lòng thử lại!");
     } finally {
       setIsLoadingMessages(false);
     }
@@ -371,7 +374,7 @@ export default function AIRecommendModal({
         role: "ai",
         content:
           responseData.reply?.trim() ||
-          "Mình đã nhận yêu cầu của bạn nhưng chưa có đủ dữ liệu để tư vấn rõ hơn.",
+          (t("noData") || "Mình đã nhận yêu cầu của bạn nhưng chưa có đủ dữ liệu để tư vấn rõ hơn."),
         items: responseData.items,
         totalEstimatedPrice: responseData.estimatedPrice,
         usedWebSearch: responseData.usedWebSearch,
@@ -382,9 +385,9 @@ export default function AIRecommendModal({
         id: createMessageId(),
         role: "ai",
         content:
-          "Xin lỗi, mình chưa thể tư vấn lúc này. Bạn thử lại trong ít phút nhé.",
+          (t("errorSupport") || "Xin lỗi, mình chưa thể tư vấn lúc này. Bạn thử lại trong ít phút nhé."),
       });
-      toast.error("AI tư vấn thất bại. Vui lòng thử lại!");
+      toast.error(t("errorSupport") || "AI tư vấn thất bại. Vui lòng thử lại!");
     } finally {
       setIsLoading(false);
     }
@@ -455,7 +458,7 @@ export default function AIRecommendModal({
                 id="ai-recommend-modal-title"
                 className="text-lg font-semibold text-slate-900"
               >
-                Trợ lý AI Build Phím
+                {t('aiAssistant')}
               </h2>
             </div>
 
@@ -469,7 +472,7 @@ export default function AIRecommendModal({
                   aria-label="Cuộc trò chuyện mới"
                 >
                   <MessageSquarePlus className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Trò chuyện mới</span>
+                  <span className="hidden sm:inline">{t('newConversation')}</span>
                 </button>
               )}
 
@@ -492,7 +495,7 @@ export default function AIRecommendModal({
                 <div className="flex flex-col items-center gap-2">
                   <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
                   <span className="text-xs text-slate-400">
-                    Đang tải lịch sử...
+                    {t('loadingHistory')}
                   </span>
                 </div>
               </div>
@@ -506,11 +509,10 @@ export default function AIRecommendModal({
                   </div>
                   <div className="max-w-[90%] rounded-2xl rounded-bl-sm border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm sm:max-w-[75%]">
                     <p className="font-semibold text-slate-900">
-                      Xin chào, mình là trợ lý AI của bạn.
+                      {t('welcome')}
                     </p>
                     <p className="mt-1 leading-relaxed">
-                      Bạn có thể hỏi về build phím, switch, keycap hoặc ngân
-                      sách để mình gợi ý cấu hình phù hợp.
+                      {t('suggest')}
                     </p>
                   </div>
                 </div>
@@ -561,7 +563,7 @@ export default function AIRecommendModal({
                                 <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5">
                                   <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-slate-600">
                                     <Globe className="h-3.5 w-3.5" />
-                                    <span>Nguồn tham khảo:</span>
+                                    <span>{t('source')}</span>
                                   </div>
                                   <ul className="list-disc space-y-1 pl-4">
                                     {message.sourceLinks.map((link, idx) => (
@@ -593,7 +595,7 @@ export default function AIRecommendModal({
                                   "number" && (
                                   <div className="flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50 px-3 py-2">
                                     <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">
-                                      Tổng ước tính
+                                      {t('totalEstimatedPrice')}
                                     </span>
                                     <span className="text-sm font-black text-blue-700">
                                       {VND_FORMATTER.format(
@@ -640,7 +642,7 @@ export default function AIRecommendModal({
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={handleInputKeyDown}
-                placeholder="Nhập câu hỏi về build phím của bạn..."
+                placeholder={t('placeholder')}
                 rows={2}
                 className="w-full resize-none rounded-lg border-0 bg-transparent px-2 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-0"
               />
@@ -656,7 +658,7 @@ export default function AIRecommendModal({
                   ) : (
                     <SendHorizontal className="h-4 w-4" />
                   )}
-                  Gửi
+                  {t('send')}
                 </button>
               </div>
             </div>

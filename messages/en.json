@@ -3369,5 +3369,19 @@
     "page": "Page",
     "prev": "Prev",
     "next": "Next"
+  },
+  "AiAssistant": {
+    "aiAssistant": "AI Keyboard Builder Assistant",
+    "newConversation": "New Conversation",
+    "loadingHistory": "Loading history...",
+    "welcome": "Hello, I am your AI assistant.",
+    "suggest": "You can ask about keyboard builds, switches, keycaps, or budget for suitable recommendations.",
+    "source": "Source references:",
+    "totalEstimatedPrice": "Total Estimated Price",
+    "placeholder": "Enter your keyboard build question...",
+    "send": "Send",
+    "errorLoadHistory": "Could not load history. Please try again!",
+    "noData": "I received your request but don't have enough data to advise further.",
+    "errorSupport": "Sorry, I can't provide advice right now. Please try again in a few minutes."
   }
 }
