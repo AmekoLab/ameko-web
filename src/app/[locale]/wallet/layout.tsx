@@ -15,8 +15,8 @@ const oswald = Oswald({
 });
 
 export const metadata = {
-  title: "AMEKO - Shop Dashboard",
-  description: "Cộng đồng bàn phím cơ Việt Nam",
+  title: "AMEKO - Wallet",
+  description: "Wallet",
 };
 
 export default function WalletLayout({ children }: { children: ReactNode }) {

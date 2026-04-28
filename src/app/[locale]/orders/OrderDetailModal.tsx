@@ -8,6 +8,7 @@ import {
   CreditCard,
   Keyboard,
   Pencil,
+  FileText,
 } from "lucide-react";
 import { orderService } from "@/src/services/order.service";
 import { shopOrderService } from "@/src/services/shopOrder.service";
@@ -91,6 +92,8 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
   // ── Shipped Status Modal State ──
   const [isShippedModalOpen, setIsShippedModalOpen] = useState(false);
   const [expectedDate, setExpectedDate] = useState<string>("");
+
+  const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false);
 
   const [assemblyCompletionMap, setAssemblyCompletionMap] = useState<
     Record<string, boolean>
@@ -366,6 +369,25 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
     setIsEditingAddress(true);
   }, [order]);
 
+  const handleDownloadInvoice = async () => {
+    if (!orderId) return;
+    setIsDownloadingInvoice(true);
+    try {
+      const blob = await orderService.downloadInvoicePDF(orderId);
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    } catch (error: any) {
+      console.error("Lỗi tải hóa đơn:", error);
+      const status = error?.response?.status;
+      if (status === 403) toast.error(t("invoiceForbidden") || "Không có quyền tải hóa đơn này.");
+      else if (status === 404) toast.error(t("invoiceNotFound") || "Không tìm thấy đơn hàng.");
+      else toast.error(t("invoiceError") || "Lỗi khi tải hóa đơn PDF.");
+    } finally {
+      setIsDownloadingInvoice(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -423,6 +445,20 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
 
                 {/* Right: Action Hub */}
                 <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleDownloadInvoice}
+                    disabled={isDownloadingInvoice}
+                    className="text-xs text-amazon-text bg-white border border-amazon-border rounded-sm px-4 py-2 hover:bg-neutral-100 transition-colors font-medium flex items-center justify-center gap-2"
+                  >
+                    {isDownloadingInvoice ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <FileText className="w-3.5 h-3.5" />
+                    )}
+                    {t("downloadInvoice") || "In hóa đơn"}
+                  </button>
+
                   {/* BUYER ACTIONS */}
                   {isBuyerContext &&
                     order.orderStatus === "Processing" &&

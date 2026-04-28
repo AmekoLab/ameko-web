@@ -106,6 +106,7 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
     updatingQuantity,
   }) => {
     const t = useTranslations("CartPage");
+    const dispatch = useAppDispatch();
     const [expanded, setExpanded] = useState(false);
     const isCustom = item.isCustom && item.orderItemComponents.length > 0;
     const isStrictCustomRequest = item.productName?.includes("Custom Request");
@@ -113,6 +114,10 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
     const displayImage =
       item.productImage ||
       (isCustom ? item.orderItemComponents[0]?.partImageUrl : null);
+
+    const productLink = (item as any).productId || (item as any).assembledProductId 
+      ? `/shop/assembled-product/${(item as any).productId || (item as any).assembledProductId}` 
+      : '#';
 
     return (
       <div
@@ -133,7 +138,11 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
           </div>
 
           {/* Image */}
-          <div className="relative w-[72px] h-[72px] shrink-0 bg-neutral-50 rounded-lg border border-neutral-100 overflow-hidden">
+          <Link 
+            href={productLink}
+            onClick={() => dispatch(setCartOpen(false))}
+            className="relative w-[72px] h-[72px] shrink-0 bg-neutral-50 rounded-lg border border-neutral-100 overflow-hidden block hover:opacity-85 transition-opacity"
+          >
             {displayImage ? (
               <Image
                 src={displayImage}
@@ -146,14 +155,20 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
                 <ShoppingBag className="w-5 h-5 text-neutral-300" />
               </div>
             )}
-          </div>
+          </Link>
 
           {/* Info */}
           <div className="flex-1 flex flex-col min-w-0">
             <div className="flex justify-between items-start mb-1.5">
-              <span className="text-sm text-neutral-800 line-clamp-2 pr-3 leading-snug">
-                {item.productName}
-              </span>
+              <Link 
+                href={productLink}
+                onClick={() => dispatch(setCartOpen(false))}
+                className="group/prodlink outline-none block"
+              >
+                <span className="text-sm text-neutral-800 group-hover/prodlink:text-blue-600 line-clamp-2 pr-3 leading-snug transition-colors">
+                  {item.productName}
+                </span>
+              </Link>
               <span className="text-sm font-semibold text-neutral-900 shrink-0 mt-0.5 tabular-nums">
                 {item.totalPrice.toLocaleString()}₫
               </span>
@@ -697,9 +712,16 @@ export const CartSidebar: FC = memo(() => {
                     {/* Shop Header */}
                     <div className="flex items-center gap-2 px-5 py-2.5 bg-neutral-50/80 border-b border-neutral-100">
                       <Store className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                      <span className="text-xs font-medium text-neutral-700 truncate">
-                        {shopName}
-                      </span>
+                      <Link 
+                        href={`/profile/shop/${shopId}`}
+                        onClick={() => dispatch(setCartOpen(false))}
+                        className="flex-1 flex items-center group/shoplink outline-none min-w-0"
+                      >
+                        <span className="text-xs font-medium text-neutral-700 group-hover/shoplink:text-blue-600 truncate transition-colors">
+                          {shopName}
+                        </span>
+                        <ChevronRight className="w-3.5 h-3.5 text-neutral-400 ml-0.5 shrink-0 group-hover/shoplink:text-blue-600 transition-colors" />
+                      </Link>
                     </div>
 
                     {/* Shop Items */}

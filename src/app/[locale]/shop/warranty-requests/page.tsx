@@ -35,6 +35,8 @@ const STATUS_STYLES: Record<string, string> = {
   AutoCancelled: "bg-red-50 text-red-700 border border-red-200",
   Returning: "bg-blue-50 text-blue-700 border border-blue-200",
   Returned: "bg-blue-50 text-blue-700 border border-blue-200",
+  ShopRejected: "bg-red-50 text-red-700 border border-red-200",
+  Disputed: "bg-red-50 text-red-700 border border-red-200",
 };
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -134,6 +136,8 @@ const TableRow: FC<RowProps> = ({
     AutoCancelled: t("status.autoCancelled"),
     Returning: t("status.returning"),
     Returned: t("status.returned"),
+    ShopRejected: t("status.shopRejected"),
+    Disputed: t("status.disputed"),
   };
 
   const typeLabels: Record<string, string> = {

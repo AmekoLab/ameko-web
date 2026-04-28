@@ -183,6 +183,10 @@ const CartItemCard: FC<CartItemCardProps> = ({
     item.productImage ||
     (isCustom ? item.orderItemComponents[0]?.partImageUrl : null);
 
+  const productLink = (item as any).productId || (item as any).assembledProductId 
+    ? `/shop/assembled-product/${(item as any).productId || (item as any).assembledProductId}` 
+    : '#';
+
   return (
     <div
       className={`border-t border-neutral-100 last:border-b-0 transition-colors ${
@@ -200,7 +204,10 @@ const CartItemCard: FC<CartItemCardProps> = ({
           />
         </div>
 
-        <div className="relative w-20 h-20 shrink-0 overflow-hidden bg-neutral-50 rounded-lg border border-neutral-100">
+        <Link 
+          href={productLink}
+          className="relative w-20 h-20 shrink-0 overflow-hidden bg-neutral-50 rounded-lg border border-neutral-100 block hover:opacity-85 transition-opacity"
+        >
           {displayImage ? (
             <Image
               src={displayImage}
@@ -214,12 +221,14 @@ const CartItemCard: FC<CartItemCardProps> = ({
               <ShoppingBag className="w-6 h-6 text-neutral-300" />
             </div>
           )}
-        </div>
+        </Link>
 
         <div className="flex-1 min-w-0 pr-2">
-          <p className="text-sm font-medium text-neutral-800 line-clamp-2 leading-snug">
-            {item.productName}
-          </p>
+          <Link href={productLink} className="group/prodlink outline-none block">
+            <p className="text-sm font-medium text-neutral-800 group-hover/prodlink:text-blue-600 line-clamp-2 leading-snug transition-colors">
+              {item.productName}
+            </p>
+          </Link>
           {isCustom && (
             <button
               onClick={() => setExpanded(!expanded)}
@@ -974,10 +983,15 @@ export default function CartPage() {
                       aria-label={t("selectAllFromShop", { shopName })}
                     />
                     <Store className="w-4 h-4 text-neutral-400 ml-3" />
-                    <span className="text-sm font-medium text-neutral-800 ml-2 truncate">
-                      {shopName}
-                    </span>
-                    <ChevronRight className="w-4 h-4 text-neutral-400 ml-1 shrink-0" />
+                    <Link 
+                      href={`/profile/shop/${shopId}`} 
+                      className="flex items-center group/shoplink outline-none"
+                    >
+                      <span className="text-sm font-medium text-neutral-800 group-hover/shoplink:text-blue-600 ml-2 truncate transition-colors">
+                        {shopName}
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-neutral-400 ml-1 shrink-0 group-hover/shoplink:text-blue-600 transition-colors" />
+                    </Link>
                   </div>
 
                   {shopItems.map((item) => (

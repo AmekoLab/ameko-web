@@ -12,8 +12,8 @@ const oswald = Oswald({
 });
 
 export const metadata = {
-  title: "AMEKO - Community",
-  description: "Cộng đồng bàn phím cơ Việt Nam",
+  title: "AMEKO - Transactions",
+  description: "Transactions",
 };
 
 export default function TransactionsLayout({

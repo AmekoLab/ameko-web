@@ -43,8 +43,8 @@ function mapToProduct(ap: AssembledProductItem): Product {
     basePrice: ap.price,
     category: "Custom Assembled Keyboard",
     status: (ap.quantity ?? 0) > 0 ? "IN_STOCK" : "OUT_OF_STOCK",
-    rating: 0,
-    reviewsCount: 0,
+  rating: ap.rating || 0,
+    reviewsCount: ap.totalReviews || 0,
     shortDesc:
       ap.description || "A fully assembled custom mechanical keyboard.",
     description: ap.description || undefined,

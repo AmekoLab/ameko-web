@@ -165,6 +165,9 @@
     "sortFeatured": "Nổi bật",
     "sortNewest": "Mới nhất",
     "sortPriceAsc": "Giá: Thấp đến Cao",
+    "clearSearch": "Xóa tìm kiếm",
+    "searchResultsFor": "Kết quả tìm kiếm cho",
+    
     "sortPriceDesc": "Giá: Cao đến Thấp",
     "loadMore": "Tải Thêm",
     "noProductsMsg": "Không có sản phẩm nào khớp với bộ lọc của bạn.",
@@ -313,14 +316,14 @@
   "CommissionPoolPage": {
     "yours": "Của bạn",
     "quantity": "Số lượng: {count}",
-    "budgetRange": "Khoảng ngân sách",
+    "budgetRange": "Ngân sách",
     "viewDetails": "Xem chi tiết",
     "confirmCancellation": "Xác nhận hủy",
     "cancelDesc": "Bạn có chắc chắn muốn hủy yêu cầu này không? Hành động này không thể hoàn tác.",
     "back": "Trở lại",
     "cancelRequestBtn": "Hủy yêu cầu",
     "canceling": "Đang hủy...",
-    "clientBudgetRange": "Khoảng ngân sách của khách hàng",
+    "clientBudgetRange": "Ngân sách của khách hàng",
     "requestDetails": "Chi tiết yêu cầu",
     "ownRequestTitle": "Đây là yêu cầu của bạn",
     "ownRequestDesc": "Bạn đang xem yêu cầu do chính bạn tạo. Bạn không thể tự gửi báo giá cho mình.",
@@ -347,7 +350,15 @@
     "visitShopProfile": "Xem hồ sơ Shop",
     "alreadyQuotedTitle": "Đã gửi báo giá",
     "alreadyQuotedDesc": "Bạn đã báo giá cho yêu cầu này. Vui lòng chờ khách hàng xem xét và phản hồi nhé!",
-    "days": "{count} ngày"
+    "days": "{count} ngày",
+    "searchShopPlaceholder": "Tìm tên shop...",
+    "allShops": "Tất cả",
+    "verifiedShop": "Verified",
+    "premiumShop": "Premium",
+    "noBuildersFound": "Không tìm thấy shop nào",
+    "ratingAll": "Đánh giá",
+    "rating4Plus": "4.0",
+    "rating45Plus": "4.5"
   },
   "CreateCommissionModal": {
     "errorImageUpload": "Tải ảnh lên thất bại, vui lòng thử lại",
@@ -413,7 +424,27 @@
     "noShopsAvailable": "Hiện tại không có shop nào mở bán trên hệ thống.",
     "clearSearch": "Xóa Tiêu Chí Lọc",
     "prev": "‹ Trước",
-    "next": "Tiếp ›"
+    "next": "Tiếp ›",
+    "sortRating": "Đánh giá",
+    "sortReview": "Nhận xét",
+    "sortSales": "Doanh thu",
+    "sortQuality": "Chất lượng",
+    "sortTotalReviews": "Tổng đánh giá",
+    "sortTotalSales": "Tổng doanh thu",
+    "sortNewest": "Mới nhất",
+    "sortQualityScore": "Chất lượng",
+    "typeAll": "Tất cả",
+    "typeVerified": "Đã xác thực",
+    "typePremium": "Cao cấp",
+    "ratingAll": "Tất cả",
+    "rating4Plus": "4+ Sao",
+    "rating3Plus": "3+ Sao",
+    "rating2Plus": "2+ Sao",
+    "rating1Plus": "1+ Sao",
+    "rating0Plus": "0+ Sao",
+    "rating45Plus": "4.5+ Sao",
+    "sortBy": "Sắp xếp",
+    "filterBy": "Lọc"
   },
   "MyWarrantyRequests": {
     "pageTitle": "Bảo Hành & Đổi Trả",
@@ -646,6 +677,7 @@
     "close": "Đóng",
     "back": "Quay lại",
     "status": "Trạng thái",
+    "downloadInvoice": "Xuất hóa đơn",
     "name": "Tên",
     "phone": "Số điện thoại",
     "address": "Địa chỉ",
@@ -674,6 +706,7 @@
   "OrderDetailModal": {
     "title": "Chi tiết đơn hàng",
     "loadingOrderDetails": "Đang tải chi tiết đơn hàng...",
+    "downloadInvoice": "Xuất hóa đơn",
     "noOrderData": "Không tìm thấy dữ liệu đơn hàng.",
     "fetchOrderDetailsFailed": "Không thể tải chi tiết đơn hàng",
     "updateStatusSuccess": "Cập nhật trạng thái đơn hàng thành công.",
@@ -2170,7 +2203,9 @@
       "completed": "Hoàn tất",
       "autoCancelled": "Tự động hủy",
       "returning": "Đang hoàn trả",
-      "returned": "Đã hoàn trả"
+      "returned": "Đã hoàn trả",
+      "shopRejected": "Shop từ chối",
+      "disputed": "Tranh chấp"
     },
     "types": {
       "returnRequest": "Đổi trả / Hoàn tiền",
@@ -2987,6 +3022,9 @@
     "statusAutoCancelled": "Tự động hủy",
     "statusAwaitingReturn": "Chờ hoàn hàng",
     "statusReturning": "Đang hoàn trả",
+    "shopRejected": "Shop từ chối",
+    "Disputed": "Tranh chấp",
+    "Disputed " : "Tranh chấp",
     "statusReturned": "Đã hoàn trả",
     "statusCompleted": "Hoàn tất",
     "statusUnknownCode": "Không xác định #{status}",
@@ -3032,7 +3070,8 @@
     "cancel": "Hủy",
     "saving": "Đang lưu...",
     "saveJudgment": "Lưu duyệt yêu cầu",
-    "noJudgmentNote": "Không có ghi chú duyệt yêu cầu"
+    "noJudgmentNote": "Không có ghi chú duyệt yêu cầu",
+    "toastDecisionSuccess": "Đã lưu quyết định thành công!"
   },
   "CancelOrderModal": {
     "validationReasonMin": "Lý do phải có ít nhất 3 ký tự",
@@ -3192,7 +3231,8 @@
     "trustFastShipping": "Giao hàng nhanh",
     "trustSupport247": "Hỗ trợ khách hàng 24/7",
     "trustEasyReturns": "Đổi trả dễ dàng",
-    "trustSecurePayments": "Thanh toán an toàn"
+    "trustSecurePayments": "Thanh toán an toàn",
+    "reviews": "đánh giá"
   },
   "ProductSpecs": {
     "layoutSize": "Kích thước layout",
@@ -3435,6 +3475,27 @@
     "cookieSettings": "Cài đặt Cookie",
     "returnsPolicy": "Chính sách đổi trả",
     "copyright": "© 2026 AMEKO. Đã đăng ký bản quyền."
+  },
+  "EditProfileModal": {
+    "title": "Chỉnh sửa thông tin",
+    "avatarUrl": "Địa chỉ ảnh đại diện",
+    "firstName": "Tên",
+    "lastName": "Họ",
+    "phoneNumber": "Số điện thoại",
+    "dateOfBirth": "Ngày sinh",
+    "gender": "Giới tính",
+    "male": "Nam",
+    "female": "Nữ",
+    "storeAddress": "Địa chỉ cửa hàng",
+    "descriptionBio": "Mô tả",
+    "cancel": "Hủy",
+    "saveChanges": "Lưu thay đổi",
+    "errFirstName": "Vui lòng nhập tên",
+    "errLastName": "Vui lòng nhập họ",
+    "errDateOfBirth": "Vui lòng chọn ngày sinh",
+    "errPhoneInvalid": "Số điện thoại không hợp lệ",
+    "successMessage": "Cập nhật hồ sơ thành công!",
+    "errorMessage": "Lỗi cập nhật hồ sơ"
   }
 }
 

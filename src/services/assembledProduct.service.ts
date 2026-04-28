@@ -25,6 +25,22 @@ export const assembledProductService = {
   },
 
   /**
+   * Search assembled products with optional filters.
+   * GET /AssembledProduct/search
+   */
+  searchProducts: async (params: { searchTerm?: string; pageNumber?: number; pageSize?: number }) => {
+    const queryParams = new URLSearchParams();
+    if (params.searchTerm) queryParams.append('searchTerm', params.searchTerm);
+    if (params.pageNumber) queryParams.append('pageNumber', params.pageNumber.toString());
+    if (params.pageSize) queryParams.append('pageSize', params.pageSize.toString());
+
+    const queryString = queryParams.toString();
+    const url = queryString ? `/AssembledProduct/search?${queryString}` : '/AssembledProduct/search';
+
+    return api.get<unknown, ApiResponse<AssembledProductListData>>(url);
+  },
+
+  /**
    * Get my assembled products (automatically filters by logged-in shop token).
    * GET /AssembledProduct/my-products
    */

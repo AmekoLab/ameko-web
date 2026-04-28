@@ -111,4 +111,15 @@ export const orderService = {
   ): Promise<ApiResponse<null>> => {
     return api.put(`/orders/${orderId}/shipping-address`, payload);
   },
+
+  /**
+   * Download the invoice PDF for an order.
+   * GET /api/v1/invoices/orders/{orderId}
+   */
+  downloadInvoicePDF: async (orderId: string): Promise<Blob> => {
+    const response: any = await api.get(`/invoices/orders/${orderId}`, {
+      responseType: "blob",
+    });
+    return response.data || response;
+  },
 };

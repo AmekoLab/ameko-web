@@ -12,8 +12,8 @@ const oswald = Oswald({
 });
 
 export const metadata = {
-  title: "AMEKO - Community",
-  description: "Cộng đồng bàn phím cơ Việt Nam",
+  title: "AMEKO - Payment History",
+  description: "Payment History",
 };
 
 export default function PaymentHistoryLayout({

@@ -13,6 +13,7 @@ import {
   RotateCcw,
   Loader2,
   Store,
+  Star,
 } from "lucide-react";
 import { Product } from "@/src/types/product";
 import { useAppDispatch } from "@/src/store/hook";
@@ -141,7 +142,7 @@ export const ProductInfo = ({
               {t("outOfStock")}
             </span>
           )}
-          <span className="absolute right-0 top-0 bg-amazon-btnSecondary text-amazon-text text-[9px] rounded-sm font-black uppercase tracking-[0.2em] px-2 py-0.5">
+          <span className="absolute right-0 top-0 bg-amazon-btnSecondary text-amazon-text text-[14px] rounded-sm font-black uppercase tracking-[0.2em] px-2 py-0.5">
             {t("new")}
           </span>
         </div>
@@ -191,9 +192,30 @@ export const ProductInfo = ({
         )}
 
         {/* --- PRODUCT NAME --- */}
-        <h1 className="text-3xl lg:text-[32px] font-black uppercase tracking-tight leading-[1.1] mb-2">
+        <h1 className="text-3xl lg:text-[32px] font-black uppercase tracking-tight leading-[1.1] mb-1">
           {product.name}
         </h1>
+
+        {/* --- RATING & REVIEWS --- */}
+        <div className="flex items-center gap-2 mb-4 mt-1">
+          <div className="flex items-center text-amber-500">
+            <Star className="w-4 h-4 fill-current" />
+            <span className="ml-1 text-sm font-bold text-amazon-text">
+              {product.rating}
+            </span>
+          </div>
+          <span className="text-amazon-textMuted text-sm select-none">•</span>
+          <button 
+            type="button" 
+            className="text-amazon-link text-sm hover:underline transition-all"
+            onClick={() => {
+              // Optional: Scroll to reviews section if you have one
+              window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }}
+          >
+            {product.reviewsCount || 0} {t("reviews") || "đánh giá"}
+          </button>
+        </div>
 
         {/* --- FEATURE BULLETS --- */}
         {product.specs && (

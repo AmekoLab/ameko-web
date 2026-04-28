@@ -71,7 +71,7 @@ const AdminDecisionModal: FC<AdminDecisionModalProps> = ({
     },
   });
 
-  const onSubmit = async (data: AdminDecisionFormValues) => {
+const onSubmit = async (data: AdminDecisionFormValues) => {
     if (!issue) return;
     try {
       await dispatch(

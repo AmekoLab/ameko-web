@@ -68,6 +68,8 @@ export interface AssembledProductItem {
   logoUrl?: string;
   createdAt?: string;
   updatedAt?: string;
+  rating?: number;
+  totalReviews?: number;
 }
 
 /** Paginated list response returned inside the API envelope `data` field */
