@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, Store, Loader2 } from "lucide-react";
+import { Search, Store, Loader2, ShieldCheck, Crown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { shopService } from "@/src/services/shopService"; 
-import { ShopSearchResult } from "@/src/types/shop.types";
+import { ShopItem } from "@/src/types/shop.types";
 import { useTranslations } from "next-intl";
 
 export const CommunityShopSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState<ShopSearchResult[]>([]);
+  const [results, setResults] = useState<ShopItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -94,11 +94,27 @@ export const CommunityShopSearch = () => {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-neutral-900 truncate">{shop.shopName}</p>
-                <div className="flex items-center gap-2 text-xs text-neutral-500">
-                  <span className="flex items-center gap-1">⭐ {shop.rating.toFixed(1)}</span>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-sm font-bold text-neutral-900 truncate">{shop.shopName}</p>
+                  {shop.badge === 1 && (
+                    <span title="Verified" className="shrink-0 flex">
+                      <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+                    </span>
+                  )}
+                  {shop.badge === 2 && (
+                    <span title="Premium" className="shrink-0 flex">
+                      <Crown className="w-3.5 h-3.5 text-amber-500" />
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-xs text-neutral-500 mt-0.5">
+                  <span className="flex items-center gap-1">
+                    ⭐ {shop.rating > 0 ? shop.rating.toFixed(1) : "Mới"} ({shop.totalReviews || 0})
+                  </span>
                   <span>•</span>
-                  <span>{shop.followersCount} followers</span>
+                  <span className="flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 text-emerald-500" /> {shop.qualityScore || 0}/100
+                  </span>
                 </div>
               </div>
             </Link>

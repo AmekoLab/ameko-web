@@ -36,6 +36,9 @@ export interface ShopResponse {
   bankAccountNumber: string;
   bankAccountName: string;
   rating: number;
+  totalReviews?: number;
+  qualityScore?: number;
+  badge?: number;
   totalSales: number;
   totalRevenue: number;
   userId: string;
@@ -53,6 +56,9 @@ export interface ShopPublicProfile {
   logoUrl: string;
   bannerUrl: string;
   rating: number;
+  totalReviews?: number;
+  qualityScore?: number;
+  badge?: number;
   totalSales: number;
   createdAt: string;
   userId: string;
@@ -106,6 +112,9 @@ export interface ShopItem {
   isActive: boolean;
   followersCount: number;
   followingCount: number;
+  totalReviews?: number;
+  qualityScore?: number;
+  badge?: number;
 }
 
 export interface ShopListPagination {
@@ -126,6 +135,10 @@ export interface ShopListResponse {
 
 export interface ShopListParams {
   searchTerm?: string;
+  minRating?: number;
+  minReviews?: number;
+  badge?: number;
+  sortBy?: number;
   page?: number;
   size?: number;
 }

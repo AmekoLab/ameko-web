@@ -22,6 +22,8 @@ const STATUS_OPTIONS: { value: number | undefined; labelKey: string }[] = [
   { value: 6, labelKey: "statusReturning" },
   { value: 7, labelKey: "statusReturned" },
   { value: 8, labelKey: "statusCompleted" },
+  { value: 9, labelKey: "shopRejected" },
+  { value: 10, labelKey: "Disputed" },
 ];
 
 const STATUS_BADGE: Record<number, { bg: string; labelKey: string }> = {
@@ -60,6 +62,14 @@ const STATUS_BADGE: Record<number, { bg: string; labelKey: string }> = {
   8: {
     bg: "bg-green-50 text-green-700 border-green-200",
     labelKey: "statusCompleted",
+  },
+  9: {
+    bg: "bg-red-50 text-red-700 border-red-200",
+    labelKey: "shopRejected",
+  },
+  10: {
+    bg: "bg-green-50 text-green-700 border-green-200",
+    labelKey: "Disputed ",
   },
 };
 

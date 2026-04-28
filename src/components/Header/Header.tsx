@@ -12,6 +12,9 @@ import { Logo } from "./Logo";
 import LanguageSwitcher from "@/src/components/LanguageSwitcher";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/src/i18n/routing";
+import { Loader2 } from "lucide-react";
+import type { AssembledProductItem } from "@/src/types/assembledProduct.types";
+import { assembledProductService } from "@/src/services/assembledProduct.service";
 
 /* ─── Inline SVG icon helpers ─── */
 const MenuIcon = () => (
@@ -124,9 +127,16 @@ export const Header: FC = () => {
   const { currentShop } = useAppSelector((state) => state.shop);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const secureInfoRef = useRef<HTMLDivElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
   const [isVisible, setIsVisible] = useState(true);
   const [isSecureInfoOpen, setIsSecureInfoOpen] = useState(false);
+
+  // Live search states
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<AssembledProductItem[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Cart item count from server cart
   const cartItemCount = serverCart?.orderItems
@@ -155,10 +165,66 @@ export const Header: FC = () => {
       ) {
         setIsSecureInfoOpen(false);
       }
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Debounce logic for search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Fetch Suggestions
+  useEffect(() => {
+    let cancelled = false;
+
+    if (debouncedSearchQuery.trim().length >= 2) {
+      const fetchSuggestions = async () => {
+        setIsLoadingSuggestions(true);
+        try {
+          const res = await assembledProductService.searchProducts({
+            searchTerm: debouncedSearchQuery,
+            pageSize: 5,
+          });
+          if (!cancelled) {
+            const items = res?.data?.items || (res as any)?.data?.data?.items || (res as any)?.items || [];
+            setSuggestions(items);
+            if (items.length > 0) {
+              setIsDropdownOpen(true);
+            } else {
+              setIsDropdownOpen(false);
+            }
+          }
+        } catch (err) {
+          console.error("Failed to fetch suggestions:", err);
+          if (!cancelled) {
+            setSuggestions([]);
+            setIsDropdownOpen(false);
+          }
+        } finally {
+          if (!cancelled) setIsLoadingSuggestions(false);
+        }
+      };
+      fetchSuggestions();
+    } else {
+      setSuggestions([]);
+      setIsDropdownOpen(false);
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedSearchQuery]);
 
   // Hide on scroll-down, reveal on scroll-up
   useEffect(() => {
@@ -192,10 +258,14 @@ export const Header: FC = () => {
     dispatch(setCartOpen(true));
   };
 
-  const handleSearch = (e?: React.FormEvent) => {
+ const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      // Đổi từ /search?q= sang trang Shop kèm tham số searchTerm của API mới
+      router.push(`/shop/all-products?searchTerm=${encodeURIComponent(searchQuery.trim())}`);
+      
+      // Nếu ở mobile thì đóng menu sau khi search
+      setMobileOpen(false); 
     }
   };
 
@@ -327,25 +397,76 @@ export const Header: FC = () => {
           </div>
 
           {/* ── CENTER: Search Bar ── */}
-          <form
-            onSubmit={handleSearch}
-            className="hidden md:flex flex-1 max-w-3xl mx-4 items-stretch"
-          >
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t("searchPlaceholderDesktop")}
-              className="flex-1 min-w-0 px-4 py-2 bg-white text-amazon-text text-sm rounded-l-md outline-none focus:ring-2 focus:ring-amazon-focus/50 placeholder:text-amazon-textMuted font-sans"
-            />
-            <button
-              type="submit"
-              className="px-4 bg-amazon-btnPrimary text-amazon-text rounded-r-md hover:brightness-95 transition-all flex items-center justify-center"
-              aria-label="Search"
+          <div ref={searchContainerRef} className="hidden md:flex flex-1 max-w-3xl mx-4 relative">
+            <form
+              onSubmit={handleSearch}
+              className="flex-1 flex items-stretch"
             >
-              <SearchIcon className="w-5 h-5" />
-            </button>
-          </form>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (suggestions.length > 0) setIsDropdownOpen(true);
+                }}
+                onFocus={() => {
+                  if (suggestions.length > 0) setIsDropdownOpen(true);
+                }}
+                placeholder={t("searchPlaceholderDesktop")}
+                className="flex-1 min-w-0 px-4 py-2 bg-white text-amazon-text text-sm rounded-l-md outline-none focus:ring-2 focus:ring-amazon-focus/50 placeholder:text-amazon-textMuted font-sans z-10"
+              />
+              <button
+                type="submit"
+                className="px-4 bg-amazon-btnPrimary text-amazon-text rounded-r-md hover:brightness-95 transition-all flex items-center justify-center z-10"
+                aria-label="Search"
+              >
+                <SearchIcon className="w-5 h-5" />
+              </button>
+            </form>
+
+            {/* Dropdown UI */}
+            {isDropdownOpen && suggestions.length > 0 && (
+              <div className="absolute top-full left-0 w-full bg-white border border-amazon-border shadow-xl rounded-md mt-1 z-50 max-h-[400px] overflow-y-auto">
+                <ul className="py-2">
+                  {suggestions.map((item) => (
+                    <li key={item.id}>
+                      <Link
+                        href={`/shop/assembled-product/${item.id}`}
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          setSearchQuery("");
+                        }}
+                        className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 transition-colors"
+                      >
+                        {item.image1 ? (
+                          <div className="relative w-10 h-10 flex-shrink-0">
+                            <Image
+                              src={item.image1}
+                              alt={item.name}
+                              fill
+                              className="object-cover rounded-md"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 flex-shrink-0 bg-gray-200 rounded-md flex items-center justify-center text-gray-500 text-xs">
+                            No Img
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-amazon-text truncate">
+                            {item.name}
+                          </p>
+                          <p className="text-xs text-amazon-price font-bold mt-0.5">
+                            {item.price ? `${item.price.toLocaleString("vi-VN")} ₫` : "Contact"}
+                          </p>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
 
           {/* ── RIGHT: Actions ── */}
           <div

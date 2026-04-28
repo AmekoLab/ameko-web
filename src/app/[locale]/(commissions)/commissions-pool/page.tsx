@@ -31,6 +31,9 @@ import {
   ChevronRight,
   Store,
   ExternalLink,
+  Search,
+  ShieldCheck,
+  Crown,
 } from "lucide-react";
 import { shopService } from "@/src/services/shopService";
 import { useTranslations } from "next-intl";
@@ -559,20 +562,41 @@ export default function CommissionPoolPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isShopSelectionOpen, setIsShopSelectionOpen] = useState(false);
   const [shopList, setShopList] = useState<any[]>([]);
+  const [shopSearchTerm, setShopSearchTerm] = useState("");
+  const [shopBadgeFilter, setShopBadgeFilter] = useState<string>("");
+  const [selectedRating, setSelectedRating] = useState<string>("");
+  const [isFetchingShops, setIsFetchingShops] = useState(false);
   const [selectedTargetShopId, setSelectedTargetShopId] = useState<
     string | undefined
   >(undefined);
 
-  const fetchShopsForSelection = async () => {
+  const fetchShopsForSelection = async (search: string, badge: string, selectedRating: string) => {
+    setIsFetchingShops(true);
     try {
-      const res = await shopService.getShops({ page: 1, pageSize: 50 } as any);
+      const res = await shopService.getShops({ 
+        searchTerm: search.trim() || undefined,
+        badge: badge !== "" ? Number(badge) : undefined,
+        minRating: selectedRating !== "" ? Number(selectedRating) : undefined,
+        page: 1, 
+        size: 50 
+      } as any);
       if (res.success && res.data) {
         setShopList(res.data.items || []);
       }
     } catch (error) {
       console.error("Failed to fetch shops", error);
+    } finally {
+      setIsFetchingShops(false);
     }
   };
+
+  useEffect(() => {
+    if (!isShopSelectionOpen) return;
+    const delayDebounceFn = setTimeout(() => {
+      fetchShopsForSelection(shopSearchTerm, shopBadgeFilter, selectedRating);
+    }, 500);
+    return () => clearTimeout(delayDebounceFn);
+  }, [shopSearchTerm, shopBadgeFilter, isShopSelectionOpen, selectedRating]);
 
   const handleOpenPublicRequest = () => {
     setSelectedTargetShopId(undefined);
@@ -620,7 +644,8 @@ export default function CommissionPoolPage() {
             <button
               onClick={() => {
                 setIsShopSelectionOpen(true);
-                fetchShopsForSelection();
+                setShopSearchTerm("");
+                setShopBadgeFilter("");
               }}
               className="bg-white border border-neutral-200 text-neutral-700 font-medium text-sm rounded-xl px-5 py-2.5 hover:bg-neutral-50 hover:border-neutral-300 transition-all shadow-sm flex items-center gap-2 w-full sm:w-auto justify-center active:scale-[0.98]"
             >
@@ -714,7 +739,7 @@ export default function CommissionPoolPage() {
           onClick={() => setIsShopSelectionOpen(false)}
         >
           <div
-            className="bg-white w-full max-w-md rounded-xl p-6 shadow-2xl flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200"
+            className="bg-white w-full max-w-lg rounded-xl p-6 shadow-2xl flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-5 border-b border-neutral-100 pb-4">
@@ -728,12 +753,53 @@ export default function CommissionPoolPage() {
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            {/* Filter Controls */}
+            <div className="flex gap-2 mb-4">
+              <div className="relative flex-1">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
+                  <Search className="w-4 h-4" />
+                </div>
+                <input
+                  type="text"
+                  placeholder={t("searchShopPlaceholder") || "Tìm tên shop..."}
+                  value={shopSearchTerm}
+                  onChange={(e) => setShopSearchTerm(e.target.value)}
+                  className="w-full bg-neutral-50 border border-neutral-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white transition-colors"
+                />
+              </div>
+              <select
+                value={shopBadgeFilter}
+                onChange={(e) => setShopBadgeFilter(e.target.value)}
+                className="bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white transition-colors outline-none"
+              >
+                <option value="">{t("allShops") || "Tất cả"}</option>
+                <option value="1">{t("verifiedShop") || "Verified"}</option>
+                <option value="2">{t("premiumShop") || "Premium"}</option>
+              </select>
+               <select
+                value={selectedRating}
+                onChange={(e) => setSelectedRating(e.target.value)}
+                className="bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white transition-colors outline-none"
+              >
+                <option value="">{t("ratingAll") || "All Ratings"}</option>
+                <option value="4">{t("rating4Plus") || "4.0 & up"}</option>
+                <option value="4.5">{t("rating45Plus") || "4.5 & up"}</option>
+              </select>
+            </div>
+
             <div className="overflow-y-auto space-y-3 flex-1 pr-1 custom-scrollbar">
-              {shopList.length === 0 ? (
+              {isFetchingShops ? (
                 <div className="py-12 flex flex-col items-center justify-center text-center">
                   <Loader2 className="w-6 h-6 text-neutral-300 animate-spin mb-3 text-center" />
                   <span className="text-neutral-500 text-sm font-medium">
                     {t("loadingBuilders")}
+                  </span>
+                </div>
+              ) : shopList.length === 0 ? (
+                <div className="py-12 flex flex-col items-center justify-center text-center">
+                  <span className="text-neutral-500 text-sm font-medium">
+                    {t("noBuildersFound") || "Không tìm thấy shop nào"}
                   </span>
                 </div>
               ) : (
@@ -755,9 +821,27 @@ export default function CommissionPoolPage() {
                           <Store className="w-6 h-6 text-neutral-300" />
                         )}
                       </div>
-                      <span className="font-semibold text-sm text-neutral-900 group-hover:text-blue-600 transition-colors truncate">
-                        {shop.shopName}
-                      </span>
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-semibold text-sm text-neutral-900 group-hover:text-blue-600 transition-colors truncate">
+                            {shop.shopName}
+                          </span>
+                          {shop.badge === 1 && (
+                            <span title="Verified" className="shrink-0 flex">
+                              <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+                            </span>
+                          )}
+                          {shop.badge === 2 && (
+                            <span title="Premium" className="shrink-0 flex">
+                              <Crown className="w-3.5 h-3.5 text-amber-500" />
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-neutral-500 flex items-center gap-1 mt-0.5">
+                          ⭐ {shop.rating > 0 ? shop.rating.toFixed(1) : "Mới"} 
+                          {shop.qualityScore !== undefined && ` • 🛡️ ${shop.qualityScore}`}
+                        </span>
+                      </div>
                     </div>
 
                     {/* View Profile Link */}

@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/src/store/index";
 import { shopService } from "@/src/services/shopService";
 import { ShopItem, ShopListParams } from "@/src/types/shop.types";
-import { Search, Star, Users, Store, Keyboard, Settings } from "lucide-react";
+import { Search, Star, Users, Store, Keyboard, Settings, ShieldCheck, Crown } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 // ─── Constants ────────────────────────────────────────────
@@ -89,9 +89,21 @@ function ShopCard({ shop, isMyShop }: { shop: ShopItem; isMyShop: boolean }) {
 
         {/* Info */}
         <Link href={`/profile/shop/${shop.id}`}>
-          <h3 className="text-base font-black text-amazon-text uppercase tracking-wide truncate mb-1 group-hover:text-amazon-link transition-colors">
-            {shop.shopName}
-          </h3>
+          <div className="flex items-center gap-1.5 mb-1">
+            <h3 className="text-base font-black text-amazon-text uppercase tracking-wide truncate group-hover:text-amazon-link transition-colors">
+              {shop.shopName}
+            </h3>
+            {shop.badge === 1 && (
+              <span title="Verified Shop" className="shrink-0 flex">
+                <ShieldCheck className="w-4 h-4 text-blue-500" />
+              </span>
+            )}
+            {shop.badge === 2 && (
+              <span title="Premium Shop" className="shrink-0 flex">
+                <Crown className="w-4 h-4 text-amber-500" />
+              </span>
+            )}
+          </div>
         </Link>
 
         <p className="text-[11px] text-amazon-textMuted leading-relaxed line-clamp-2 mb-4 min-h-[32px] font-bold">
@@ -99,13 +111,19 @@ function ShopCard({ shop, isMyShop }: { shop: ShopItem; isMyShop: boolean }) {
         </p>
 
         {/* Stats */}
-        <div className="flex items-center gap-4 mb-5">
+        <div className="flex items-center gap-4 mb-5 flex-wrap">
           <div className="flex items-center gap-1.5">
             <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
             <span className="text-xs font-bold text-amazon-text">
-              {shop.rating > 0 ? shop.rating.toFixed(1) : t("new")}
+              {shop.rating > 0 ? shop.rating.toFixed(1) : t("new")} ({shop.totalReviews || 0})
             </span>
           </div>
+          {shop.qualityScore !== undefined && (
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="text-xs font-bold text-emerald-600">{shop.qualityScore}/100</span>
+            </div>
+          )}
           <div className="flex items-center gap-1.5">
             <Users className="w-3.5 h-3.5 text-amazon-textMuted" />
             <span className="text-xs font-bold text-amazon-textMuted">
@@ -156,6 +174,10 @@ export default function CustomBuildPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [searchInput, setSearchInput] = useState("");
 
+  const [selectedBadge, setSelectedBadge] = useState<string>("");
+  const [selectedRating, setSelectedRating] = useState<string>("");
+  const [selectedSort, setSelectedSort] = useState<string>("0"); // Default 0 = Rating
+
   const [queryParams, setQueryParams] = useState<ShopListParams>({
     page: 1,
     size: 12,
@@ -171,6 +193,9 @@ export default function CustomBuildPage() {
       setQueryParams((prev) => ({
         ...prev,
         searchTerm: searchInput.trim() || undefined,
+        badge: selectedBadge !== "" ? Number(selectedBadge) : undefined,
+        minRating: selectedRating !== "" ? Number(selectedRating) : undefined,
+        sortBy: selectedSort !== "" ? Number(selectedSort) : undefined,
         page: 1,
       }));
     }, DEBOUNCE_MS);
@@ -178,7 +203,7 @@ export default function CustomBuildPage() {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [searchInput]);
+  }, [searchInput, selectedBadge, selectedRating, selectedSort]);
 
   // ── Fetch shops ─────────────────────────────────────────
   const fetchShops = useCallback(async () => {
@@ -263,7 +288,42 @@ export default function CustomBuildPage() {
                 </button>
               )}
             </div>
-            <p className="text-center mt-3 text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
+            {/* Filter Row */}
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
+              <select
+                value={selectedSort}
+                onChange={(e) => setSelectedSort(e.target.value)}
+                className="bg-white border border-amazon-border rounded-sm text-xs font-bold text-amazon-text px-3 py-2 outline-none focus:border-amazon-focus"
+              >
+                <option value="0">{t("sortRating") || "Top Rated"}</option>
+                <option value="1">{t("sortTotalReviews") || "Most Reviews"}</option>
+                <option value="2">{t("sortTotalSales") || "Most Sales"}</option>
+                <option value="3">{t("sortNewest") || "Newest"}</option>
+                <option value="4">{t("sortQualityScore") || "Quality Score"}</option>
+              </select>
+
+              <select
+                value={selectedBadge}
+                onChange={(e) => setSelectedBadge(e.target.value)}
+                className="bg-white border border-amazon-border rounded-sm text-xs font-bold text-amazon-text px-3 py-2 outline-none focus:border-amazon-focus"
+              >
+                <option value="">{t("typeAll") || "All Shops"}</option>
+                <option value="1">{t("typeVerified") || "Verified"}</option>
+                <option value="2">{t("typePremium") || "Premium"}</option>
+              </select>
+
+              <select
+                value={selectedRating}
+                onChange={(e) => setSelectedRating(e.target.value)}
+                className="bg-white border border-amazon-border rounded-sm text-xs font-bold text-amazon-text px-3 py-2 outline-none focus:border-amazon-focus"
+              >
+                <option value="">{t("ratingAll") || "All Ratings"}</option>
+                <option value="4">{t("rating4Plus") || "4.0 & up"}</option>
+                <option value="4.5">{t("rating45Plus") || "4.5 & up"}</option>
+              </select>
+            </div>
+
+            <p className="text-center mt-4 text-[10px] font-bold uppercase tracking-widest text-amazon-textMuted">
               {t("shopsAvailable", { count: totalCount })}
             </p>
           </div>

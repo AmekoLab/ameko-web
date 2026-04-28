@@ -159,6 +159,8 @@
   },
   "ShopView": {
     "title": "Ameko Best Sellers",
+    "clearSearch": "Clear Search",
+    "searchResultsFor": "Search results for",
     "subtitle": "Our most popular products based on sales. Updated frequently.",
     "filter": "Filter",
     "sortBy": "Sort by:",
@@ -347,7 +349,15 @@
     "visitShopProfile": "Visit Shop Profile",
     "alreadyQuotedTitle": "Quote Submitted",
     "alreadyQuotedDesc": "You have already submitted a quote for this request. Please wait for the customer to review and respond!",
-    "days": "{count, plural, =1 {# day} other {# days}}"
+    "days": "{count, plural, =1 {# day} other {# days}}",
+    "searchShopPlaceholder": "Search shop name...",
+    "allShops": "All",
+    "verifiedShop": "Verified",
+    "premiumShop": "Premium",
+    "noBuildersFound": "No shops found",
+    "ratingAll": "All Ratings",
+    "rating4Plus": "4.0 & up",
+    "rating45Plus": "4.5 & up"
   },
   "CreateCommissionModal": {
     "errorImageUpload": "Upload image failed, please try again",
@@ -413,7 +423,25 @@
     "noShopsAvailable": "There are no shops available at the moment.",
     "clearSearch": "Clear Search",
     "prev": "‹ Prev",
-    "next": "Next ›"
+    "next": "Next ›",
+    "sortRating": "Rating",
+    "sortReview": "Review",
+    "sortSales": "Sales",
+    "sortQuality": "Quality",
+    "sortTotalReviews": "Total Reviews",
+    "sortTotalSales": "Total Sales",
+    "sortNewest": "Newest",
+    "sortQualityScore": "Quality Score",
+    "typeAll": "All",
+    "typeVerified": "Verified",
+    "typePremium": "Premium",
+    "ratingAll": "All",
+    "rating4Plus": "4+ Stars",
+    "rating3Plus": "3+ Stars",
+    "rating2Plus": "2+ Stars",
+    "rating1Plus": "1+ Stars",
+    "rating0Plus": "0+ Stars",
+    "rating45Plus": "4.5+ Stars"
   },
   "MyWarrantyRequests": {
     "pageTitle": "Warranty & Returns",
@@ -648,6 +676,7 @@
     "close": "Close",
     "back": "Back",
     "status": "Status",
+    "downloadInvoice": "Issue invoices",
     "name": "Name",
     "phone": "Phone",
     "address": "Address",
@@ -677,6 +706,7 @@
     "loadingOrderDetails": "Loading order details...",
     "noOrderData": "No order data found.",
     "fetchOrderDetailsFailed": "Failed to fetch order details",
+    "downloadInvoice": "Issue invoices",
     "updateStatusSuccess": "Order status updated successfully.",
     "updateStatusFailed": "Failed to update status.",
     "updateStatusUnexpectedError": "An error occurred while updating status.",
@@ -2171,7 +2201,9 @@
       "completed": "Completed",
       "autoCancelled": "Auto Cancelled",
       "returning": "Returning",
-      "returned": "Returned"
+      "returned": "Returned",
+      "shopRejected": "Shop Rejected",
+      "disputed": "Disputed"
     },
     "types": {
       "returnRequest": "Return / Refund",
@@ -2986,9 +3018,12 @@
     "statusAutoCancelled": "Auto Cancelled",
     "statusAwaitingReturn": "Awaiting Return",
     "statusReturning": "Returning",
+    "Disputed ": "Disputed",
     "statusReturned": "Returned",
     "statusCompleted": "Completed",
     "statusUnknownCode": "Unknown #{status}",
+    "shopRejected": "Shop Rejected",
+    "Disputed": "Disputed",
     "title": "Warranty Requests",
     "subtitle": "Manage warranty and return requests.",
     "tableIdDate": "ID / Date",
@@ -3031,7 +3066,8 @@
     "cancel": "Cancel",
     "saving": "Saving...",
     "saveJudgment": "Save Judgment",
-    "noJudgmentNote": "No judgment note"
+    "noJudgmentNote": "No judgment note",
+    "toastDecisionSuccess": "Save Judgment successfull"
   },
   "CancelOrderModal": {
     "validationReasonMin": "Reason must be at least 3 characters",
@@ -3191,7 +3227,8 @@
     "trustFastShipping": "Fast Shipping",
     "trustSupport247": "24/7 Customer Support",
     "trustEasyReturns": "Easy Returns",
-    "trustSecurePayments": "Secure Payments"
+    "trustSecurePayments": "Secure Payments",
+    "reviews": "Reviews"
   },
   "ProductSpecs": {
     "layoutSize": "Layout Size",
@@ -3434,5 +3471,26 @@
     "cookieSettings": "Cookie Settings",
     "returnsPolicy": "Returns Policy",
     "copyright": "© 2026 AMEKO. All rights reserved."
+  },
+  "EditProfileModal": {
+    "title": "Edit Profile",
+    "avatarUrl": "Avatar Image URL",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phoneNumber": "Phone Number",
+    "dateOfBirth": "Date of Birth",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "storeAddress": "Store/Address",
+    "descriptionBio": "Description (Bio)",
+    "cancel": "Cancel",
+    "saveChanges": "Save Changes",
+    "errFirstName": "Please enter the first name",
+    "errLastName": "Please enter the last name",
+    "errDateOfBirth": "Please select date of birth",
+    "errPhoneInvalid": "Phone number invalid",
+    "successMessage": "Update profile successful!",
+    "errorMessage": "Update profile error"
   }
 }

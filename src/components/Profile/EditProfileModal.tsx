@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { updateUserProfile } from "@/src/store/action/authActions";
 import { UpdateProfilePayload } from "@/src/types/auth.types";
 import { toast } from "react-toastify";
+import { useTranslations } from "next-intl";
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ export const EditProfileModal = ({
   isOpen,
   onClose,
 }: EditProfileModalProps) => {
+  const t = useTranslations("EditProfileModal");
   const dispatch = useAppDispatch();
   const { user, loading } = useAppSelector((state) => state.auth);
 
@@ -87,21 +89,21 @@ export const EditProfileModal = ({
     let isValid = true;
 
     if (!formData.firstName?.trim()) {
-      newErrors.firstName = "Please enter the first name";
+      newErrors.firstName = t("errFirstName");
       isValid = false;
     }
     if (!formData.lastName?.trim()) {
-      newErrors.lastName = "Please enter the last name";
+      newErrors.lastName = t("errLastName");
       isValid = false;
     }
 
     if (!formData.dateOfBirth) {
-      newErrors.dateOfBirth = "Please select date of birth";
+      newErrors.dateOfBirth = t("errDateOfBirth");
       isValid = false;
     }
 
     if (formData.phoneNumber && !/^\d{9,12}$/.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = "Phone number invalid";
+      newErrors.phoneNumber = t("errPhoneInvalid");
       isValid = false;
     }
 
@@ -120,10 +122,10 @@ export const EditProfileModal = ({
 
     try {
       await dispatch(updateUserProfile(user.id, formData));
-      toast.success("Update profile successfull!");
+      toast.success(t("successMessage"));
       onClose();
     } catch (error: any) {
-      toast.error(error.message || "Update profile error");
+      toast.error(error.message || t("errorMessage"));
     }
   };
 
@@ -148,7 +150,7 @@ export const EditProfileModal = ({
       >
         <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
           <h3 className="text-xl font-bold font-oswald uppercase text-gray-800">
-            Edit Profile
+            {t("title")}
           </h3>
           <button
             onClick={onClose}
@@ -174,7 +176,7 @@ export const EditProfileModal = ({
           {/* Avatar Input) */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Avatar Image URL
+              {t("avatarUrl")}
             </label>
             <input
               type="text"
@@ -190,7 +192,7 @@ export const EditProfileModal = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
-                First Name <span className="text-red-500">*</span>
+                {t("firstName")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -209,7 +211,7 @@ export const EditProfileModal = ({
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Last Name <span className="text-red-500">*</span>
+                {t("lastName")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -230,7 +232,7 @@ export const EditProfileModal = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Phone Number
+                {t("phoneNumber")}
               </label>
               <input
                 type="tel"
@@ -249,7 +251,7 @@ export const EditProfileModal = ({
             {/* --- DATE OF BIRTH  --- */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Date of Birth <span className="text-red-500">*</span>
+                {t("dateOfBirth")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
@@ -269,7 +271,7 @@ export const EditProfileModal = ({
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Gender
+              {t("gender")}
             </label>
             <div className="flex gap-6 mt-2">
               <label className="text-black flex items-center gap-2 cursor-pointer select-none">
@@ -281,7 +283,7 @@ export const EditProfileModal = ({
                   onChange={handleChange}
                   className="w-4 h-4 text-gray-500 focus:ring-gray-300"
                 />
-                <span>Male</span>
+                <span>{t("male")}</span>
               </label>
               <label className="text-black flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -292,14 +294,14 @@ export const EditProfileModal = ({
                   onChange={handleChange}
                   className="w-4 h-4 text-gray-500 focus:ring-gray-300"
                 />
-                <span>Female</span>
+                <span>{t("female")}</span>
               </label>
             </div>
           </div>
 
           <div className="border-t border-gray-100 pt-4">
             <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Store/Address
+              {t("storeAddress")}
             </label>
             <input
               type="text"
@@ -312,7 +314,7 @@ export const EditProfileModal = ({
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Description (Bio)
+              {t("descriptionBio")}
             </label>
             <textarea
               name="storeDescription"
@@ -329,7 +331,7 @@ export const EditProfileModal = ({
               onClick={onClose}
               className="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
@@ -339,7 +341,7 @@ export const EditProfileModal = ({
               {loading && (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               )}
-              Save Changes
+              {t("saveChanges")}
             </button>
           </div>
         </form>
