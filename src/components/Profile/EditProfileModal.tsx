@@ -100,6 +100,18 @@ export const EditProfileModal = ({
     if (!formData.dateOfBirth) {
       newErrors.dateOfBirth = t("errDateOfBirth");
       isValid = false;
+    } else {
+      const dob = new Date(formData.dateOfBirth);
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+      }
+      if (age < 14) {
+        newErrors.dateOfBirth = t("errAgeUnder14") || "Bạn phải từ 14 tuổi trở lên.";
+        isValid = false;
+      }
     }
 
     if (formData.phoneNumber && !/^\d{9,12}$/.test(formData.phoneNumber)) {
@@ -139,6 +151,10 @@ export const EditProfileModal = ({
     }`;
   };
 
+  const maxDate = new Date();
+  maxDate.setFullYear(maxDate.getFullYear() - 14);
+  const maxDateString = maxDate.toISOString().split("T")[0];
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200"
@@ -172,7 +188,7 @@ export const EditProfileModal = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5" noValidate>
           {/* Avatar Input) */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -259,6 +275,7 @@ export const EditProfileModal = ({
                 value={formData.dateOfBirth || ""}
                 onChange={handleChange}
                 className={getInputClass("dateOfBirth")}
+                max={maxDateString}
               />
 
               {errors.dateOfBirth && (

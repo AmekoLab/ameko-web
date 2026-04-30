@@ -70,7 +70,7 @@ function PaymentSuccessContent() {
                      <span className="text-[12px] font-bold text-amazon-text">Order Timeline</span>
                      <div className="flex items-center gap-2 text-[11px] text-amazon-textMuted font-medium">
                        <span className="w-4 h-4 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0">1</span>
-                       Confirmation sent to email
+                       Confirm order 
                      </div>
                      <div className="flex items-center gap-2 text-[11px] text-amazon-textMuted font-medium">
                        <span className="w-4 h-4 bg-neutral-200 text-neutral-600 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0">2</span>

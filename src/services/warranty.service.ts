@@ -54,6 +54,13 @@ export interface ShopReviewPayload {
   shopResponse: string;
 }
 
+export interface ShopDisputePayload {
+  issueId: string;
+  approve: boolean;
+  shopResponse: string;
+  evidenceUrl: string;
+}
+
 export interface AdminDecisionPayload {
   issueId: string;
   approve: boolean;
@@ -146,6 +153,16 @@ export const warrantyService = {
     issueId: string,
   ): Promise<ApiResponse<null>> => {
     return api.post(`/warranty/shop-confirm-receive/${issueId}`);
+  },
+
+  /**
+   * Shop raises a dispute for a returned item.
+   * POST /warranty/shop-dispute
+   */
+  submitShopDispute: async (
+    payload: ShopDisputePayload,
+  ): Promise<ApiResponse<null>> => {
+    return api.post("/warranty/shop-dispute", payload);
   },
 
   /**

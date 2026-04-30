@@ -88,7 +88,7 @@
     "description": "Đừng hài lòng với những bàn phím có sẵn. Với <strong>Ameko 3D Builder</strong> cực kỳ hiện đại, bạn có quyền tự tạo ra chiếc bàn phím phản ánh đúng phong cách riêng của mình. Chọn từ vô số linh kiện, tùy chỉnh layout và xem bản thiết kế của bạn hiện lên trực tiếp bằng 3D chân thực.",
     "feature1": "Tùy Chỉnh Đa Lớp",
     "feature2": "Giao Diện Kéo Thả",
-    "feature3": "Xem Trước 3D Trực Tiếp",
+    "feature3": "Xem trước sản phẩm sau khi hoàn thiện",
     "ctaText": "Bắt Đầu Lắp Ráp Ngay",
     "badgeValue": "100+",
     "badgeLabel": "Linh Kiện Hoàn Thiện"
@@ -124,15 +124,15 @@
   "PromoList": {
     "promo1Title": "Tùy Chỉnh Theo Ý Thích",
     "promo1Subtitle": "Bàn Phím",
-    "promo1Desc": "Trải nghiệm âm thanh trong trẻo nhất với mic Ngale X. Thiết kế chuyên nghiệp cho Streamer và Content Creator với công nghệ lọc ồn chủ động.",
+    "promo1Desc": "Tận hưởng trải nghiệm gõ phím mượt mà, ổn định và tùy biến không giới hạn với bộ sưu tập Switch cơ độc quyền tại Ameko.",
     "promo1Cta": "ĐẶT HÀNG NGAY",
     "promo2Title": "Chính Xác & Tốc Độ",
-    "promo2Subtitle": "Chuột",
-    "promo2Desc": "Trải nghiệm độ chính xác cao và tốc độ phản hồi nhanh chóng với chuột Gaming XTRFY. Thiết kế ergonomics giúp bạn thoải mái trong mọi hoạt động.",
+    "promo2Subtitle": "Bàn phím cơ thủ công",
+    "promo2Desc": "Tận hưởng thiết kế tinh xảo, cảm giác gõ độc đáo và chất lượng build vượt trội từ những nghệ nhân hàng đầu.",
     "promo2Cta": "ĐẶT HÀNG NGAY",
-    "promo3Title": "Âm Thanh Cực Đỉnh",
-    "promo3Subtitle": "Tai Nghe",
-    "promo3Desc": "Trải nghiệm âm thanh sống động và chi tiết với tai nghe Gaming XTRFY. Thiết kế thoải mái và chất lượng âm thanh đỉnh cao cho mọi trận đấu.",
+    "promo3Title": "Sẵn Sàng Đưa Vroom Vào Game",
+    "promo3Subtitle": "Bàn phím gaming",
+    "promo3Desc": " Tối ưu hóa trải nghiệm chơi game của bạn với những mẫu bàn phím gaming tốc độ cao, độ nhạy cực thấp và thiết kế công thái học hoàn hảo",
     "promo3Cta": "ĐẶT HÀNG NGAY"
   },
   "PromoGridSection": {
@@ -337,8 +337,8 @@
     "buildPlanPlaceholder": "Mô tả chi tiết loại switch, keycap và các mod bạn sẽ sử dụng...\nVD: Gateron Oil King đã lube, clone GMK Olivia, full foam, tempest tape mod...",
     "processing": "Đang xử lý...",
     "submitQuotation": "Gửi Báo Giá",
-    "pageTitle": "Chợ Yêu Cầu Lắp Ráp",
-    "pageDesc": "Khám phá <bold>{count}</bold> yêu cầu đang hoạt động từ những người mua muốn lắp ráp bàn phím. Cung cấp báo giá của bạn và giành được hợp đồng.",
+    "pageTitle": "Đặt Bàn Phím Theo Yêu Cầu",
+    "pageDesc": "Khám phá <bold>{count}</bold> yêu cầu đang hoạt động từ những người mua muốn thiết kế bàn phím. Cung cấp báo giá của bạn và giành được hợp đồng.",
     "directRequest": "Yêu cầu trực tiếp",
     "postRequest": "Đăng yêu cầu",
     "unableToLoad": "Không thể tải danh sách",
@@ -478,7 +478,8 @@
       "Completed": "Hoàn Thành",
       "AutoCancelled": "Đã Hủy Tự Động",
       "Returning": "Đang Trả Hàng",
-      "Returned": "Đã Trả Hàng"
+      "Returned": "Đã Trả Hàng",
+      "Disputed": "Đã Gửi Khiếu Nại"
     }
   },
   "CustomerShipModal": {
@@ -2190,6 +2191,8 @@
       "title": "Yêu cầu sau thanh toán",
       "subtitle": "Quản lý các yêu cầu bảo hành , đổi trả & hoàn tiền từ khách hàng."
     },
+    "disputeSuccess": "Gửi yêu cầu tranh chấp thành công.",
+    "disputeFailed": "Không thể gửi yêu cầu tranh chấp. Vui lòng thử lại.",
     "empty": {
       "title": "Chưa có yêu cầu nào",
       "description": "Cửa hàng chưa nhận được yêu cầu bảo hành hoặc đổi trả nào từ khách hàng."
@@ -3063,7 +3066,7 @@
     "adminJudgment": "Duyệt yêu cầu của admin",
     "approveRequest": "Chấp nhận yêu cầu",
     "approveCustomerRequest": "Chấp nhận yêu cầu của khách hàng",
-    "rejectProtectShop": "Từ chối, bảo vệ shop",
+    "rejectProtectShop": "Từ chối",
     "rejectCustomerRequest": "Từ chối yêu cầu của khách hàng",
     "judgmentNote": "Ghi chú duyệt yêu cầu",
     "judgmentNotePlaceholder": "Nhập lý do/ghi chú ...",
@@ -3470,7 +3473,7 @@
     "visitUs": "Ghé thăm chúng tôi",
     "addressLine1": "Lô E2a, 7 Đ. D1, Long Thạnh Mỹ,",
     "addressLine2": "Thủ Đức, Hồ Chí Minh 700000, VN",
-    "slogan": "Kỹ thuật Đức kết hợp thiết kế Thụy Điển",
+    "slogan": "Dấu ấn cá nhân trong từng trải nghiệm",
     "termsOfService": "Điều khoản dịch vụ",
     "cookieSettings": "Cài đặt Cookie",
     "returnsPolicy": "Chính sách đổi trả",
@@ -3480,6 +3483,7 @@
     "title": "Chỉnh sửa thông tin",
     "avatarUrl": "Địa chỉ ảnh đại diện",
     "firstName": "Tên",
+    "errAgeUnder14": "Bạn phải đủ 14 tuổi để sử dụng nền tảng",
     "lastName": "Họ",
     "phoneNumber": "Số điện thoại",
     "dateOfBirth": "Ngày sinh",
@@ -3496,6 +3500,41 @@
     "errPhoneInvalid": "Số điện thoại không hợp lệ",
     "successMessage": "Cập nhật hồ sơ thành công!",
     "errorMessage": "Lỗi cập nhật hồ sơ"
+  },
+  "ProfileUserPage": {
+    "myProfile": "Hồ sơ của tôi",
+    "editProfile": "Chỉnh sửa hồ sơ",
+    "verified": "Đã xác minh",
+    "unverified": "Chưa xác minh",
+    "applicationInReview": "Đang xét duyệt",
+    "applicationInReviewDesc": "Vui lòng chờ quy trình xem xét hoàn tất. Việc này thường mất 24-48 giờ.",
+    "viewApplication": "Xem hồ sơ",
+    "wantToStartSelling": "Bạn muốn bắt đầu kinh doanh trên Ameko?",
+    "upgradeToSeller": "Nâng cấp tài khoản lên người bán để tiếp cận hàng triệu người đam mê bàn phím tùy chỉnh.",
+    "openAShop": "Mở một cửa hàng",
+    "applicationRejected": "Hồ sơ bị từ chối",
+    "reason": "Lý do: {note}",
+    "pleaseReviewAndResubmit": "Vui lòng xem lại thông tin và gửi lại.",
+    "viewOriginal": "Xem bản gốc",
+    "resubmit": "Gửi lại",
+    "manageYourStore": "Quản lý cửa hàng của bạn",
+    "accessDashboard": "Truy cập trang quản lý để quản lý sản phẩm, xem phân tích và xử lý đơn hàng.",
+    "goToDashboard": "Đi đến trang quản lý",
+    "storeBanned": "Cửa hàng bị khóa",
+    "storeSuspended": "Cửa hàng của bạn đã bị tạm khóa do vi phạm chính sách. Liên hệ bộ phận hỗ trợ để biết chi tiết.",
+    "viewDetails": "Xem chi tiết",
+    "contactInformation": "Thông tin liên hệ",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "notProvided": "Chưa cung cấp",
+    "username": "Tên đăng nhập",
+    "storeAbstract": "Tóm tắt cửa hàng",
+    "address": "Địa chỉ",
+    "noAddressProvided": "Chưa cung cấp địa chỉ",
+    "bio": "Mô tả",
+    "noDescriptionAvailable": "Không có mô tả",
+    "changePassword": "Đổi mật khẩu",
+    "signOut": "Đăng xuất"
   }
 }
 

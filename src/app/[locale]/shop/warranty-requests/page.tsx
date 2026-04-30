@@ -17,10 +17,12 @@ import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
   fetchShopWarrantyRequests,
   confirmShopReceipt,
+  submitShopDisputeThunk,
 } from "@/src/store/slices/shopWarrantySlice";
 import { WarrantyRequest } from "@/src/services/warranty.service";
 import { format, parseISO } from "date-fns";
 import ShopReviewModal from "@/src/components/Warranty/ShopReviewModal";
+import { toast } from "react-toastify";
 
 // ─── Constants ─────────────────────────────────────────────
 const PAGE_SIZE = 10;
@@ -280,7 +282,7 @@ const Pagination: FC<PaginationProps> = ({ current, total, onChange }) => {
 // ─── Confirm Receipt Modal ─────────────────────────────────
 interface ConfirmReceiptModalProps {
   isOpen: boolean;
-  onConfirm: () => void;
+  onConfirm: (action: "accept" | "dispute", disputeData?: { shopResponse: string; evidenceUrl: string }) => void;
   onCancel: () => void;
   isLoading: boolean;
 }
@@ -292,27 +294,105 @@ const ConfirmReceiptModal = ({
   isLoading,
 }: ConfirmReceiptModalProps) => {
   const t = useTranslations("ShopWarrantyRequestsPage");
+  const [actionType, setActionType] = useState<"accept" | "dispute">("accept");
+  const [shopResponse, setShopResponse] = useState("");
+  const [evidenceUrl, setEvidenceUrl] = useState("");
+
+  useEffect(() => {
+    if (isOpen) {
+      setActionType("accept");
+      setShopResponse("");
+      setEvidenceUrl("");
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
+
+  const handleSubmit = () => {
+    onConfirm(actionType, actionType === "dispute" ? { shopResponse, evidenceUrl } : undefined);
+  };
+
+  const isSubmitDisabled = isLoading || (actionType === "dispute" && (!shopResponse.trim() || !evidenceUrl.trim()));
+
   return (
     <div
       className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4 backdrop-blur-[2px]"
       onClick={onCancel}
     >
       <div
-        className="bg-white border border-neutral-100 rounded-2xl w-full max-w-sm p-8 shadow-2xl text-center animate-in zoom-in-95 duration-200"
+        className="bg-white border border-neutral-100 rounded-2xl w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="w-14 h-14 rounded-full bg-green-50 border border-green-100 flex items-center justify-center mx-auto mb-5">
-          <CheckCircle className="w-6 h-6 text-green-600" />
+        <div className="flex gap-4 mb-6 border-b border-neutral-200 pb-4">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input 
+              type="radio" 
+              name="actionType" 
+              value="accept" 
+              checked={actionType === "accept"} 
+              onChange={() => setActionType("accept")} 
+              className="accent-green-600"
+            />
+            <span className="text-sm font-medium text-neutral-800">Confirm Receipt</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input 
+              type="radio" 
+              name="actionType" 
+              value="dispute" 
+              checked={actionType === "dispute"} 
+              onChange={() => setActionType("dispute")} 
+              className="accent-red-600"
+            />
+            <span className="text-sm font-medium text-neutral-800">Dispute / Reject</span>
+          </label>
         </div>
-        <h3 className="text-lg font-bold text-neutral-900 mb-2">
-          {t("confirmReceiptModal.title")}
-        </h3>
-        <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
-          {t("confirmReceiptModal.description")}
-        </p>
-        <div className="flex gap-3">
+
+        {actionType === "accept" ? (
+          <div className="text-center">
+            <div className="w-14 h-14 rounded-full bg-green-50 border border-green-100 flex items-center justify-center mx-auto mb-5">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+            </div>
+            <h3 className="text-lg font-bold text-neutral-900 mb-2">
+              {t("confirmReceiptModal.title")}
+            </h3>
+            <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
+              {t("confirmReceiptModal.description")}
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4 mb-6">
+            <h3 className="text-lg font-bold text-neutral-900">
+              Raise a Dispute
+            </h3>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-neutral-700">Reason</label>
+              <textarea 
+                className="w-full border border-neutral-300 rounded-md p-3 text-sm min-h-[80px] focus:outline-none focus:ring-2 focus:ring-amazon-primary" 
+                placeholder="Enter dispute reason..."
+                value={shopResponse}
+                onChange={(e) => setShopResponse(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-neutral-700">Evidence</label>
+              <input 
+                type="file" 
+                className="text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-neutral-100 file:text-neutral-700 hover:file:bg-neutral-200 cursor-pointer"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    setEvidenceUrl("https://res.cloudinary.com/demo/image/upload/sample.jpg");
+                  }
+                }}
+              />
+              {evidenceUrl && (
+                <span className="text-xs text-green-600 mt-1 font-medium">File uploaded successfully (mock)</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="flex gap-3 mt-2">
           <button
             onClick={onCancel}
             className="flex-1 py-3 bg-white hover:bg-neutral-50 text-neutral-700 font-semibold text-sm rounded-xl transition-colors border border-neutral-200"
@@ -320,17 +400,23 @@ const ConfirmReceiptModal = ({
             {t("confirmReceiptModal.cancel")}
           </button>
           <button
-            onClick={onConfirm}
-            disabled={isLoading}
-            className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
+            onClick={handleSubmit}
+            disabled={isSubmitDisabled}
+            className={`flex-1 py-3 font-semibold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] ${
+              actionType === "accept" 
+                ? "bg-green-600 hover:bg-green-700 text-white" 
+                : "bg-red-600 hover:bg-red-700 text-white"
+            }`}
           >
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                {t("confirmReceiptModal.confirming")}
+                {actionType === "accept" ? t("confirmReceiptModal.confirming") : "Processing..."}
               </>
-            ) : (
+            ) : actionType === "accept" ? (
               t("confirmReceiptModal.confirm")
+            ) : (
+              "Submit Dispute"
             )}
           </button>
         </div>
@@ -380,16 +466,31 @@ const ShopWarrantyDashboard: FC = () => {
     setReceiptConfirmId(issueId);
   }, []);
 
-  const handleExecuteConfirmReceive = useCallback(async () => {
-    if (!receiptConfirmId) return;
-    try {
-      await dispatch(confirmShopReceipt(receiptConfirmId)).unwrap();
-      dispatch(fetchShopWarrantyRequests({ page: 1, pageSize: PAGE_SIZE }));
-      setReceiptConfirmId(null);
-    } catch {
-      // error toast handled by thunk
-    }
-  }, [dispatch, receiptConfirmId]);
+  const handleExecuteConfirmReceive = useCallback(
+    async (action: "accept" | "dispute", disputeData?: { shopResponse: string; evidenceUrl: string }) => {
+      if (!receiptConfirmId) return;
+      try {
+        if (action === "accept") {
+          await dispatch(confirmShopReceipt(receiptConfirmId)).unwrap();
+          toast.success(t("confirmReceiptSuccess") || "Đã xác nhận nhận hàng thành công!");
+        } else if (action === "dispute" && disputeData) {
+          await dispatch(submitShopDisputeThunk({
+            issueId: receiptConfirmId,
+            approve: false,
+            shopResponse: disputeData.shopResponse,
+            evidenceUrl: disputeData.evidenceUrl,
+          })).unwrap();
+          toast.success(t("disputeSuccess") || "Đã gửi khiếu nại lên Admin thành công!");
+        }
+        
+        dispatch(fetchShopWarrantyRequests({ page: shopPagination.current, pageSize: PAGE_SIZE }));
+        setReceiptConfirmId(null);
+      } catch (error) {
+        toast.error(t("actionFailed") || "Có lỗi xảy ra, vui lòng thử lại!");
+      }
+    },
+    [dispatch, receiptConfirmId, shopPagination.current, t]
+  );
 
   if (loadingShopWarranties) return <TableSkeleton />;
 
