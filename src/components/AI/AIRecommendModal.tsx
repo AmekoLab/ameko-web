@@ -356,40 +356,57 @@ export default function AIRecommendModal({
       content: nextPrompt,
     });
     setPrompt("");
-
     setIsLoading(true);
+
     try {
-      const responseData = await aiService.sendMessage({
-        conversationId,
-        message: nextPrompt,
-      });
+      await aiService.sendStreamMessage(
+        { conversationId, message: nextPrompt },
+        {
+          onStart: () => {
+            // Stream started successfully, UI is already showing loading indicator
+          },
+          onHeartbeat: () => {
+            // Received heartbeat, keep loading indicator active
+          },
+          onResult: (chunk) => {
+            // Persist conversationId for multi-turn context
+            if (chunk.conversationId && conversationId === null) {
+              setConversationId(chunk.conversationId);
+              void fetchConversations();
+            }
 
-      // Persist conversationId for multi-turn context
-      if (responseData.conversationId && conversationId === null) {
-        setConversationId(responseData.conversationId);
-        // Refresh sidebar to include the new conversation
-        void fetchConversations();
-      }
-
-      pushMessage({
-        id: createMessageId(),
-        role: "ai",
-        content:
-          responseData.reply?.trim() || t("noData"),
-        items: responseData.items,
-        totalEstimatedPrice: responseData.estimatedPrice,
-        usedWebSearch: responseData.usedWebSearch,
-        sourceLinks: responseData.sourceLinks,
-      });
+            pushMessage({
+              id: createMessageId(),
+              role: "ai",
+              content: chunk.reply?.trim() || t("noData"),
+              items: chunk.items,
+              totalEstimatedPrice: chunk.estimatedPrice,
+              usedWebSearch: chunk.usedWebSearch,
+              sourceLinks: chunk.sourceLinks,
+            });
+          },
+          onError: (errMsg) => {
+            toast.error(errMsg || t("errorSupport"));
+            pushMessage({
+              id: createMessageId(),
+              role: "ai",
+              content: t("errorSupport"),
+            });
+          },
+          onDone: () => {
+            // Stream is fully complete
+            setIsLoading(false);
+          }
+        }
+      );
     } catch (_error) {
+      setIsLoading(false);
       pushMessage({
         id: createMessageId(),
         role: "ai",
         content: t("errorSupport"),
       });
       toast.error(t("errorSupport"));
-    } finally {
-      setIsLoading(false);
     }
   };
 

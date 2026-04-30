@@ -66,7 +66,7 @@ const BenefitBar: FC = () => {
           {t("whyBuyTitle2")}
         </h3>
         <Link
-          href="/about"
+          href="/shop/all-products"
           className="text-amazon-btnPrimary text-[11px] font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1 mt-2"
         >
           {t("learnMore")} <ChevronRight className="w-3 h-3" />
@@ -110,7 +110,7 @@ export const PromoGridSection: FC<PromoGridSectionProps> = ({
     title: t("heroTitle"),
     subtitle: t("heroSubtitle"),
     ctaText: t("heroCta"),
-    ctaHref: "/shop",
+    ctaHref: "/custom-build",
   };
 
   const defaultPromoCards: [PromoCard, PromoCard] = [
@@ -118,7 +118,7 @@ export const PromoGridSection: FC<PromoGridSectionProps> = ({
       title: t("card1Title"),
       description: t("card1Desc"),
       ctaText: t("card1Cta"),
-      ctaHref: "/shop?category=keycaps",
+      ctaHref: "/shop/all-products",
       imageSrc:
         "https://res.cloudinary.com/doezwafgz/image/upload/v1773515613/home2_xpdnpr.png",
     },
@@ -126,7 +126,7 @@ export const PromoGridSection: FC<PromoGridSectionProps> = ({
       title: t("card2Title"),
       description: t("card2Desc"),
       ctaText: t("card2Cta"),
-      ctaHref: "/shop?category=accessories",
+      ctaHref: "/shop/all-products",
       imageSrc:
         "https://res.cloudinary.com/doezwafgz/image/upload/v1773515614/home3_nw6ntt.png",
     },

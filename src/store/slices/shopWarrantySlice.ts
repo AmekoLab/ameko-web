@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   warrantyService,
   ShopReviewPayload,
+  ShopDisputePayload,
   WarrantyRequest,
 } from "@/src/services/warranty.service";
 import { toast } from "react-toastify";
@@ -83,6 +84,22 @@ export const confirmShopReceipt = createAsyncThunk(
   },
 );
 
+export const submitShopDisputeThunk = createAsyncThunk(
+  "shopWarranty/submitShopDisputeThunk",
+  async (payload: ShopDisputePayload, { rejectWithValue }) => {
+    try {
+      const res = await warrantyService.submitShopDispute(payload);
+      if (res.success) {
+        return res.data;
+      }
+      return rejectWithValue(res.message || "Failed to submit dispute");
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      return rejectWithValue(err.message || "Failed to submit dispute");
+    }
+  },
+);
+
 // ─── Slice ───────────────────────────────────────────────
 const shopWarrantySlice = createSlice({
   name: "shopWarranty",
@@ -128,6 +145,18 @@ const shopWarrantySlice = createSlice({
         state.isConfirmingReceipt = false;
       })
       .addCase(confirmShopReceipt.rejected, (state, action) => {
+        state.isConfirmingReceipt = false;
+        state.error = (action.payload as string) || "Something went wrong";
+      })
+      // submit dispute
+      .addCase(submitShopDisputeThunk.pending, (state) => {
+        state.isConfirmingReceipt = true;
+        state.error = null;
+      })
+      .addCase(submitShopDisputeThunk.fulfilled, (state) => {
+        state.isConfirmingReceipt = false;
+      })
+      .addCase(submitShopDisputeThunk.rejected, (state, action) => {
         state.isConfirmingReceipt = false;
         state.error = (action.payload as string) || "Something went wrong";
       });

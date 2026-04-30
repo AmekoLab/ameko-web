@@ -475,7 +475,8 @@
       "Completed": "Completed",
       "AutoCancelled": "Auto Cancelled",
       "Returning": "Returning",
-      "Returned": "Returned"
+      "Returned": "Returned",
+      "Disputed": "Disputed"
     }
   },
   "CustomerShipModal": {
@@ -2188,6 +2189,8 @@
       "title": "Requests After Payment",
       "subtitle": "Manage return & warranty requests from customers."
     },
+    "disputeSuccess": "Dispute request sent successfully.",
+    "disputeFailed": "Failed to send dispute request. Please try again.",
     "empty": {
       "title": "No requests yet",
       "description": "The shop has not received any warranty or return requests from customers."
@@ -3059,7 +3062,7 @@
     "adminJudgment": "Admin's Judgment",
     "approveRequest": "Approve Request",
     "approveCustomerRequest": "Approve customer's request",
-    "rejectProtectShop": "Reject, protect Shop",
+    "rejectProtectShop": "Reject",
     "rejectCustomerRequest": "Reject customer's request",
     "judgmentNote": "Judgment Note",
     "judgmentNotePlaceholder": "Enter Admin's reason/note for judgment...",
@@ -3476,6 +3479,7 @@
     "title": "Edit Profile",
     "avatarUrl": "Avatar Image URL",
     "firstName": "First Name",
+    "errAgeUnder14": "You must be at least 14 years old to use the platform",
     "lastName": "Last Name",
     "phoneNumber": "Phone Number",
     "dateOfBirth": "Date of Birth",
@@ -3492,5 +3496,40 @@
     "errPhoneInvalid": "Phone number invalid",
     "successMessage": "Update profile successful!",
     "errorMessage": "Update profile error"
+  },
+  "ProfileUserPage": {
+    "myProfile": "My Profile",
+    "editProfile": "Edit Profile",
+    "verified": "Verified",
+    "unverified": "Unverified",
+    "applicationInReview": "Application in Review",
+    "applicationInReviewDesc": "Please wait for the review process to complete. This usually takes 24-48 hours.",
+    "viewApplication": "View Application",
+    "wantToStartSelling": "Want to start selling on Ameko?",
+    "upgradeToSeller": "Upgrade your account to a seller to reach millions of custom keyboard enthusiasts.",
+    "openAShop": "Open a Shop",
+    "applicationRejected": "Application Rejected",
+    "reason": "Reason: {note}",
+    "pleaseReviewAndResubmit": "Please review your information and resubmit.",
+    "viewOriginal": "View Original",
+    "resubmit": "Resubmit",
+    "manageYourStore": "Manage Your Store",
+    "accessDashboard": "Access your merchant dashboard to manage products, view analytics, and fulfill orders.",
+    "goToDashboard": "Go to Dashboard",
+    "storeBanned": "Store Banned",
+    "storeSuspended": "Your shop has been suspended due to policy violations. Contact support for details.",
+    "viewDetails": "View Details",
+    "contactInformation": "Contact Information",
+    "email": "Email",
+    "phone": "Phone",
+    "notProvided": "Not provided",
+    "username": "Username",
+    "storeAbstract": "Store Abstract",
+    "address": "Address",
+    "noAddressProvided": "No address provided",
+    "bio": "Bio",
+    "noDescriptionAvailable": "No description available.",
+    "changePassword": "Change Password",
+    "signOut": "Sign Out"
   }
 }

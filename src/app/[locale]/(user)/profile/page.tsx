@@ -24,8 +24,10 @@ import { ShopStatus } from "@/src/types/shop.types";
 import { ShopApplicationModal } from "@/src/components/Profile/ShopApplicationModal";
 import { UpdateShopApplicationModal } from "@/src/components/Profile/UpdateShopApplicationModal";
 import { fetchCurrentShop } from "@/src/store/slices/shopSlice";
+import { useTranslations } from "next-intl";
 
 export default function ProfilePage() {
+  const t = useTranslations("ProfileUserPage");
   const { user, isInitialized } = useAppSelector((state) => state.auth);
   const { currentShop } = useAppSelector((state) => state.shop);
 
@@ -88,7 +90,7 @@ export default function ProfilePage() {
   return (
     <div className="max-w-4xl mx-auto mt-8 px-4 pb-12">
       <h1 className="text-2xl font-bold mb-6 text-neutral-900">
-        My Profile
+        {t("myProfile")}
       </h1>
 
       <div className="bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.08)] rounded-xl overflow-hidden border border-neutral-100 relative">
@@ -120,7 +122,7 @@ export default function ProfilePage() {
               className="bg-white border border-neutral-200 text-neutral-600 px-4 py-2 hover:bg-neutral-50 hover:text-neutral-900 rounded-lg transition-colors shadow-sm font-medium text-sm flex items-center gap-2 mb-2"
             >
               <Pencil className="w-4 h-4" />
-              Edit Profile
+              {t("editProfile")}
             </button>
           </div>
 
@@ -134,7 +136,7 @@ export default function ProfilePage() {
               <span
                 className={`px-2.5 py-0.5 text-xs font-semibold rounded-md border ${user.emailConfirmed ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}
               >
-                {user.emailConfirmed ? "Verified" : "Unverified"}
+                {user.emailConfirmed ? t("verified") : t("unverified")}
               </span>
             </div>
           </div>
@@ -150,17 +152,17 @@ export default function ProfilePage() {
                     </div>
                     <div className="text-center sm:text-left flex-1">
                       <h3 className="font-semibold text-sm text-neutral-900">
-                        Application in Review
+                        {t("applicationInReview")}
                       </h3>
                       <p className="text-sm text-neutral-600 mt-1">
-                        Please wait for the review process to complete. This usually takes 24-48 hours.
+                        {t("applicationInReviewDesc")}
                       </p>
                     </div>
                     <button
                       onClick={() => setIsApplicationModalOpen(true)}
                       className="px-4 py-2 bg-white text-neutral-700 font-medium hover:bg-neutral-50 text-sm rounded-lg border border-neutral-200 transition-colors flex items-center gap-2 whitespace-nowrap shadow-sm"
                     >
-                      <Eye className="w-4 h-4 text-neutral-400" /> View Application
+                      <Eye className="w-4 h-4 text-neutral-400" /> {t("viewApplication")}
                     </button>
                   </div>
                 )}
@@ -174,10 +176,10 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-base text-neutral-900">
-                        Want to start selling on Ameko?
+                        {t("wantToStartSelling")}
                       </h3>
                       <p className="text-sm text-neutral-500 mt-1">
-                        Upgrade your account to a seller to reach millions of custom keyboard enthusiasts.
+                        {t("upgradeToSeller")}
                       </p>
                     </div>
                   </div>
@@ -186,7 +188,7 @@ export default function ProfilePage() {
                     href="/profile/register"
                     className="px-6 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap active:scale-[0.98]"
                   >
-                    Open a Shop <ArrowRight className="w-4 h-4" />
+                    {t("openAShop")} <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               )}
@@ -200,12 +202,12 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-sm text-neutral-900">
-                        Application Rejected
+                        {t("applicationRejected")}
                       </h3>
                       <p className="text-sm text-red-600 mt-1 font-medium">
                         {currentShop.adminNote
-                          ? `Reason: ${currentShop.adminNote}`
-                          : "Please review your information and resubmit."}
+                          ? t("reason", { note: currentShop.adminNote })
+                          : t("pleaseReviewAndResubmit")}
                       </p>
                     </div>
                   </div>
@@ -215,13 +217,13 @@ export default function ProfilePage() {
                       onClick={() => setIsApplicationModalOpen(true)}
                       className="px-4 py-2.5 bg-white border border-neutral-200 text-neutral-700 text-sm font-medium rounded-lg hover:bg-neutral-50 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap"
                     >
-                      <Eye className="w-4 h-4 text-neutral-400" /> View Original
+                      <Eye className="w-4 h-4 text-neutral-400" /> {t("viewOriginal")}
                     </button>
                     <button
                       onClick={() => setIsUpdateShopModalOpen(true)}
                       className="px-5 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap active:scale-[0.98]"
                     >
-                      Resubmit <ArrowRight className="w-4 h-4" />
+                      {t("resubmit")} <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -236,10 +238,10 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-base text-neutral-900">
-                        Manage Your Store
+                        {t("manageYourStore")}
                       </h3>
                       <p className="text-sm text-neutral-600 mt-1">
-                        Access your merchant dashboard to manage products, view analytics, and fulfill orders.
+                        {t("accessDashboard")}
                       </p>
                     </div>
                   </div>
@@ -247,7 +249,7 @@ export default function ProfilePage() {
                     href="/shop/dashboard"
                     className="px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap active:scale-[0.98]"
                   >
-                    Go to Dashboard <ArrowRight className="w-4 h-4" />
+                    {t("goToDashboard")} <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               )}
@@ -261,17 +263,17 @@ export default function ProfilePage() {
                   </div>
                   <div className="text-center sm:text-left flex-1">
                     <h3 className="font-semibold text-sm text-neutral-900">
-                      Store Banned
+                      {t("storeBanned")}
                     </h3>
                     <p className="text-sm text-red-600 font-medium mt-1">
-                      Your shop has been suspended due to policy violations. Contact support for details.
+                      {t("storeSuspended")}
                     </p>
                   </div>
                   <button
                     onClick={() => setIsApplicationModalOpen(true)}
                     className="px-4 py-2 bg-red-50 text-red-700 font-medium hover:bg-red-100 border border-red-100 text-sm rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap shadow-sm"
                   >
-                    <Eye className="w-4 h-4" /> View Details
+                    <Eye className="w-4 h-4" /> {t("viewDetails")}
                   </button>
                 </div>
               )}
@@ -283,23 +285,23 @@ export default function ProfilePage() {
             {/* Contact Info */}
             <div className="p-6 sm:p-8 bg-neutral-50 rounded-xl border border-neutral-100">
               <h3 className="font-semibold text-neutral-900 mb-6 text-sm flex items-center gap-2 border-b border-neutral-200 pb-3">
-                Contact Information
+                {t("contactInformation")}
               </h3>
               <div className="space-y-4 text-sm mt-4">
                 <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-neutral-100">
-                  <span className="text-neutral-500 font-medium">Email</span>
+                  <span className="text-neutral-500 font-medium">{t("email")}</span>
                   <span className="font-medium text-neutral-800 break-all text-right ml-4">
                     {user.email}
                   </span>
                 </div>
                 <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-neutral-100">
-                  <span className="text-neutral-500 font-medium">Phone</span>
+                  <span className="text-neutral-500 font-medium">{t("phone")}</span>
                   <span className="font-medium text-neutral-800">
-                    {user.phoneNumber || "Not provided"}
+                    {user.phoneNumber || t("notProvided")}
                   </span>
                 </div>
                 <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-neutral-100">
-                  <span className="text-neutral-500 font-medium">Username</span>
+                  <span className="text-neutral-500 font-medium">{t("username")}</span>
                   <span className="font-medium text-neutral-800">
                     @{user.username}
                   </span>
@@ -311,19 +313,19 @@ export default function ProfilePage() {
             {user.role !== "Admin" && (
               <div className="p-6 sm:p-8 bg-neutral-50 rounded-xl border border-neutral-100">
                 <h3 className="font-semibold text-neutral-900 mb-6 text-sm flex items-center gap-2 border-b border-neutral-200 pb-3">
-                  Store Abstract
+                  {t("storeAbstract")}
                 </h3>
                 <div className="space-y-4 text-sm mt-4">
                   <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-neutral-100">
-                    <span className="text-neutral-500 font-medium">Address</span>
+                    <span className="text-neutral-500 font-medium">{t("address")}</span>
                     <span className="font-medium text-neutral-800 text-right max-w-[60%] truncate ml-4">
-                      {user.storeAddress || "No address provided"}
+                      {user.storeAddress || t("noAddressProvided")}
                     </span>
                   </div>
                   <div className="flex flex-col gap-2 bg-white p-3 rounded-lg border border-neutral-100">
-                    <span className="text-neutral-500 font-medium">Bio</span>
+                    <span className="text-neutral-500 font-medium">{t("bio")}</span>
                     <p className="font-medium text-neutral-700 leading-relaxed text-[13px]">
-                      {user.storeDescription ? `"${user.storeDescription}"` : "No description available."}
+                      {user.storeDescription ? `"${user.storeDescription}"` : t("noDescriptionAvailable")}
                     </p>
                   </div>
                 </div>
@@ -338,14 +340,14 @@ export default function ProfilePage() {
               className="text-neutral-600 font-medium hover:text-neutral-900 hover:bg-neutral-50 bg-white border border-neutral-200 px-5 py-2.5 rounded-lg transition-colors flex items-center gap-2 text-sm shadow-sm"
             >
               <KeyRound className="w-4 h-4 text-neutral-400" />
-              Change Password
+              {t("changePassword")}
             </button>
             <button
               onClick={handleLogout}
               className="text-red-600 font-medium hover:bg-red-50 px-5 py-2.5 rounded-lg transition-colors flex items-center gap-2 text-sm border border-red-200 bg-white shadow-sm"
             >
               <LogOut className="w-4 h-4 text-red-500" />
-              Sign Out
+              {t("signOut")}
             </button>
           </div>
         </div>

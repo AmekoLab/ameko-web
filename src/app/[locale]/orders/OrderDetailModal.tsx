@@ -374,9 +374,14 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
     setIsDownloadingInvoice(true);
     try {
       const blob = await orderService.downloadInvoicePDF(orderId);
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Hoa_Don_${orderId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => window.URL.revokeObjectURL(url), 5000);
     } catch (error: any) {
       console.error("Lỗi tải hóa đơn:", error);
       const status = error?.response?.status;
