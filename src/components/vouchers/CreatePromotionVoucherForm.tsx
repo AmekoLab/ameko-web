@@ -40,7 +40,7 @@ const createVoucherSchema = (t: TranslationFn) =>
     })
     .refine(
       (data) => {
-        const val = Number(data.value);
+        const val = Number(data.value.replace(/\D/g, ""));
         if (isNaN(val) || val <= 0) return false;
         if (Number(data.discountType) === DiscountType.Percentage && val > 100)
           return false;
@@ -82,6 +82,7 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<CreateVoucherFormValues>({
     resolver: zodResolver(createVoucherSchema(t as unknown as TranslationFn)),
@@ -115,12 +116,12 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
         description: data.description,
         type: VoucherType.Promotion,
         discountType: dt as DiscountType,
-        value: Number(data.value),
+        value: Number(data.value.replace(/\D/g, "")),
         maxDiscountAmount:
           dt === DiscountType.Percentage && data.maxDiscountAmount
-            ? Number(data.maxDiscountAmount)
+            ? Number(data.maxDiscountAmount.replace(/\D/g, ""))
             : null,
-        minOrderValue: Number(data.minOrderValue),
+        minOrderValue: Number(data.minOrderValue.replace(/\D/g, "")),
         startDate: new Date(data.startDate).toISOString(),
         endDate: new Date(data.endDate).toISOString(),
         usageLimit: Number(data.usageLimit),
@@ -226,12 +227,28 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
                   ? t("units.percentWrapped")
                   : t("units.vndWrapped")}
               </label>
-              <input
-                type="number"
-                {...register("value")}
-                placeholder={t("placeholders.value")}
-                className={inputCls}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  {...register("value")}
+                  onChange={(e) => {
+                    const rawValue = e.target.value.replace(/\D/g, "");
+                    if (!rawValue) {
+                      setValue("value", "", { shouldValidate: true });
+                    } else {
+                      const formatted = new Intl.NumberFormat("vi-VN").format(Number(rawValue));
+                      setValue("value", formatted, { shouldValidate: true });
+                    }
+                  }}
+                  placeholder={t("placeholders.value")}
+                  className={inputCls}
+                />
+                {discountType === String(DiscountType.FixedAmount) && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] font-medium text-amazon-textMuted select-none pointer-events-none">
+                    ₫
+                  </span>
+                )}
+              </div>
               {errors.value && <p className={errCls}>{errors.value.message}</p>}
             </div>
           </div>
@@ -240,12 +257,26 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           {discountType === String(DiscountType.Percentage) && (
             <div>
               <label className={labelCls}>{t("labels.maxDiscount")}</label>
-              <input
-                type="number"
-                {...register("maxDiscountAmount")}
-                placeholder={t("placeholders.maxDiscount")}
-                className={inputCls}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  {...register("maxDiscountAmount")}
+                  onChange={(e) => {
+                    const rawValue = e.target.value.replace(/\D/g, "");
+                    if (!rawValue) {
+                      setValue("maxDiscountAmount", "", { shouldValidate: true });
+                    } else {
+                      const formatted = new Intl.NumberFormat("vi-VN").format(Number(rawValue));
+                      setValue("maxDiscountAmount", formatted, { shouldValidate: true });
+                    }
+                  }}
+                  placeholder={t("placeholders.maxDiscount")}
+                  className={inputCls}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] font-medium text-amazon-textMuted select-none pointer-events-none">
+                  ₫
+                </span>
+              </div>
               {errors.maxDiscountAmount && (
                 <p className={errCls}>{errors.maxDiscountAmount.message}</p>
               )}
@@ -256,12 +287,26 @@ export default function CreatePromotionVoucherForm({ isOpen, onClose }: Props) {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div>
               <label className={labelCls}>{t("labels.minimumOrder")}</label>
-              <input
-                type="number"
-                {...register("minOrderValue")}
-                placeholder={t("placeholders.minOrder")}
-                className={inputCls}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  {...register("minOrderValue")}
+                  onChange={(e) => {
+                    const rawValue = e.target.value.replace(/\D/g, "");
+                    if (!rawValue) {
+                      setValue("minOrderValue", "", { shouldValidate: true });
+                    } else {
+                      const formatted = new Intl.NumberFormat("vi-VN").format(Number(rawValue));
+                      setValue("minOrderValue", formatted, { shouldValidate: true });
+                    }
+                  }}
+                  placeholder={t("placeholders.minOrder")}
+                  className={inputCls}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] font-medium text-amazon-textMuted select-none pointer-events-none">
+                  ₫
+                </span>
+              </div>
               {errors.minOrderValue && (
                 <p className={errCls}>{errors.minOrderValue.message}</p>
               )}

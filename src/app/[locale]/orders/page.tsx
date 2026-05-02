@@ -17,6 +17,7 @@ import {
   Keyboard,
   Loader2,
   FileText,
+  Info,
 } from "lucide-react";
 import OrderDetailModal from "./OrderDetailModal";
 import { orderService } from "@/src/services/order.service";
@@ -511,6 +512,22 @@ export default function MyOrdersPage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Warranty & Return Notice Banner */}
+        <div className="mb-6 flex items-start sm:items-center gap-3 px-5 py-4 bg-blue-50/50 border border-blue-100 rounded-xl shadow-sm">
+          <div className="p-1.5 bg-blue-100 rounded-lg shrink-0 mt-0.5 sm:mt-0">
+            <Info className="w-5 h-5 text-blue-600" />
+          </div>
+          <p className="text-sm text-neutral-700 font-medium leading-relaxed">
+            {t("warrantyAndReturnNotice")}{" "}
+            <Link 
+              href="/my-payments" 
+              className="text-blue-600 font-bold hover:text-blue-700 hover:underline transition-all inline-flex items-center gap-1"
+            >
+              {t("warrantyAndReturnLink")}
+            </Link>
+          </p>
         </div>
 
         {/* Filter Tabs */}

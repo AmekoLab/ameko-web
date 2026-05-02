@@ -392,8 +392,8 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
   const handleSendVoucher = useCallback(async () => {
     if (!activeConversation || !activeConversationId || !currentUserId) return;
 
-    const discount = Number(discountAmount);
-    const minOrder = Number(minOrderValue);
+    const discount = Number(String(discountAmount).replace(/\D/g, ""));
+    const minOrder = Number(String(minOrderValue).replace(/\D/g, ""));
 
     if (discount <= 0 || minOrder < 0) {
       toast.error(t("toastInvalidAmount"));
@@ -649,25 +649,41 @@ const ChatArea: FC<ChatAreaProps> = ({ onBack, compact }) => {
                   <label className="block text-[11px] font-black text-amazon-textMuted uppercase tracking-widest mb-1.5">
                     {t("voucherModalDiscountLabel")}
                   </label>
-                  <input
-                    type="number"
-                    value={discountAmount}
-                    onChange={(e) => setDiscountAmount(e.target.value)}
-                    className="w-full bg-neutral-50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border border-amazon-border rounded-sm px-3 py-2 text-sm font-bold text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/20"
-                    placeholder={t("voucherModalDiscountPlaceholder")}
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={discountAmount}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/\D/g, "");
+                        setDiscountAmount(raw ? new Intl.NumberFormat("vi-VN").format(Number(raw)) : "");
+                      }}
+                      className="w-full bg-neutral-50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border border-amazon-border rounded-sm px-3 py-2 text-sm font-bold text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/20"
+                      placeholder={t("voucherModalDiscountPlaceholder")}
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] font-bold text-amazon-textMuted select-none pointer-events-none">
+                      ₫
+                    </span>
+                  </div>
                 </div>
                 <div>
                   <label className="block text-[11px] font-black text-amazon-textMuted uppercase tracking-widest mb-1.5">
                     {t("voucherModalMinOrderLabel")}
                   </label>
-                  <input
-                    type="number"
-                    value={minOrderValue}
-                    onChange={(e) => setMinOrderValue(e.target.value)}
-                    className="w-full bg-neutral-50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border border-amazon-border rounded-sm px-3 py-2 text-sm font-bold text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/20"
-                    placeholder={t("voucherModalMinOrderPlaceholder")}
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={minOrderValue}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/\D/g, "");
+                        setMinOrderValue(raw ? new Intl.NumberFormat("vi-VN").format(Number(raw)) : "");
+                      }}
+                      className="w-full bg-neutral-50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border border-amazon-border rounded-sm px-3 py-2 text-sm font-bold text-amazon-text focus:outline-none focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus/20"
+                      placeholder={t("voucherModalMinOrderPlaceholder")}
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] font-bold text-amazon-textMuted select-none pointer-events-none">
+                      ₫
+                    </span>
+                  </div>
                 </div>
               </div>
 

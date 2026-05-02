@@ -192,7 +192,7 @@ export default function EditAssembledProductModal({
       reset({
         name: product.name || "",
         view3DUrl: product.view3DUrl || "",
-        price: String(product.price || 0),
+        price: new Intl.NumberFormat("vi-VN").format(product.price || 0),
         description: product.description || "",
         quantity: String(product.quantity || 1),
         image1: product.image1 || "",
@@ -235,7 +235,7 @@ export default function EditAssembledProductModal({
           id: product.id,
           name: data.name,
           view3DUrl: data.view3DUrl || "",
-          price: Number(data.price),
+          price: Number(String(data.price).replace(/\D/g, "")),
           description: data.description,
           quantity: Number(data.quantity),
           image1: data.image1 || "",
@@ -385,12 +385,25 @@ export default function EditAssembledProductModal({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>{t("price")} *</label>
-                  <input
-                    type="number"
-                    {...register("price")}
-                    className={inputClass}
-                    min={0}
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      {...register("price")}
+                      onChange={(e) => {
+                        const rawValue = e.target.value.replace(/\D/g, "");
+                        if (!rawValue) {
+                          setValue("price", "", { shouldValidate: true });
+                        } else {
+                          const formatted = new Intl.NumberFormat("vi-VN").format(Number(rawValue));
+                          setValue("price", formatted, { shouldValidate: true });
+                        }
+                      }}
+                      className={inputClass}
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] font-medium text-amazon-textMuted select-none pointer-events-none">
+                      ₫
+                    </span>
+                  </div>
                   {errors.price && (
                     <p className={errorClass}>{errors.price.message}</p>
                   )}

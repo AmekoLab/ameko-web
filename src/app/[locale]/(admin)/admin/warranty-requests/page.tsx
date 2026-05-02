@@ -68,8 +68,8 @@ const STATUS_BADGE: Record<number, { bg: string; labelKey: string }> = {
     labelKey: "shopRejected",
   },
   11: {
-    bg: "bg-green-50 text-green-700 border-green-200",
-    labelKey: "Disputed ",
+    bg: "bg-red-50 text-red-700 border-red-200",
+    labelKey: "Disputed",
   },
 };
 
@@ -235,11 +235,19 @@ const TableRow: FC<RowProps> = ({
       </td>
       {/* Status */}
       <td className="px-4 py-3">
-        <span
-          className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-sm border whitespace-nowrap ${badge.bg}`}
-        >
-          {badge.label}
-        </span>
+        <div className="flex flex-col items-start gap-1">
+          <span
+            className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-sm border whitespace-nowrap ${badge.bg}`}
+          >
+            {badge.label}
+          </span>
+          {/* Admin Note for Disputed status */}
+          {request.status === 11 && (
+            <span className="text-[9px] text-amazon-accent  font-medium flex items-center gap-1">
+              {t("awaitingAdminReview")}
+            </span>
+          )}
+        </div>
       </td>
       {/* Notes */}
       <td className="px-4 py-3">

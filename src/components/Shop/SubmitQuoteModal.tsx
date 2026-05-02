@@ -13,7 +13,10 @@ type TranslationFn = (key: string, values?: Record<string, unknown>) => string;
 
 const quoteSchema = (t: TranslationFn) =>
   z.object({
-    quotedPrice: z.number().gt(0, t("validation.invalidQuotedPrice")),
+    quotedPrice: z.string().refine((val) => {
+      const num = Number(val.replace(/\D/g, ""));
+      return num > 0;
+    }, t("validation.invalidQuotedPrice")),
     estimatedDays: z.number().min(1, t("validation.estimatedDaysMin")),
     shopNotes: z.string().min(10, t("validation.notesMin")),
   });
@@ -44,11 +47,12 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<QuoteFormData>({
     resolver: zodResolver(quoteSchema(t as unknown as TranslationFn)),
     defaultValues: {
-      quotedPrice: 0,
+      quotedPrice: "",
       estimatedDays: 1,
       shopNotes: "",
     },
@@ -60,7 +64,7 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
         submitCommissionQuote({
           requestId,
           payload: {
-            quotedPrice: data.quotedPrice,
+            quotedPrice: Number(data.quotedPrice.replace(/\D/g, "")),
             estimatedDays: data.estimatedDays,
             shopNotes: data.shopNotes,
           },
@@ -112,9 +116,17 @@ export const SubmitQuoteModal: FC<SubmitQuoteModalProps> = ({
             </label>
             <div className="relative">
               <input
-                type="number"
-                {...register("quotedPrice", { valueAsNumber: true })}
-                min={0}
+                type="text"
+                {...register("quotedPrice")}
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/\D/g, "");
+                  if (!rawValue) {
+                    setValue("quotedPrice", "", { shouldValidate: true });
+                  } else {
+                    const formatted = new Intl.NumberFormat("vi-VN").format(Number(rawValue));
+                    setValue("quotedPrice", formatted, { shouldValidate: true });
+                  }
+                }}
                 placeholder={t("placeholders.quotedPrice")}
                 className="w-full px-3 py-2 pr-14 border border-amazon-border rounded-sm text-[13px] font-medium text-amazon-text focus:outline-none focus:ring-1 focus:ring-amazon-btnPrimary focus:border-amazon-btnPrimary transition placeholder:text-neutral-400"
               />
