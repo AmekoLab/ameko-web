@@ -222,7 +222,7 @@ const CommissionModal = ({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const newErrors: { price?: string; note?: string } = {};
-    const quotedPrice = Number(price);
+    const quotedPrice = Number(String(price).replace(/\D/g, ""));
 
     if (!quotedPrice || quotedPrice <= 0) {
       newErrors.price = "Please enter a valid price";
@@ -462,11 +462,13 @@ const CommissionModal = ({
                       <DollarSign className="w-4 h-4" />
                     </div>
                     <input
-                      type="number"
+                      type="text"
                       value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      min={1}
-                      placeholder="1500000"
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/\D/g, "");
+                        setPrice(raw ? new Intl.NumberFormat("vi-VN").format(Number(raw)) : "");
+                      }}
+                      placeholder="1.500.000"
                       className={`w-full border ${errors.price ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "border-neutral-200 focus:border-neutral-900 focus:ring-neutral-900"} bg-white text-neutral-900 rounded-xl pl-11 pr-14 py-3 text-sm focus:outline-none focus:ring-1 transition-colors`}
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-neutral-400 font-semibold">

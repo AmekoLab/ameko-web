@@ -89,6 +89,7 @@ export default function EditPartModal({
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<EditPartFormValues>({
     resolver: zodResolver(schema),
@@ -115,7 +116,7 @@ export default function EditPartModal({
       reset({
         name: part.name,
         partType: part.partType,
-        price: String(part.price),
+        price: new Intl.NumberFormat("vi-VN").format(part.price || 0),
         stockQuantity: String(part.stockQuantity),
         description: part.description || "",
         categoryId: matchedCat?.id || "",
@@ -139,7 +140,7 @@ export default function EditPartModal({
   const onSubmit = async (data: EditPartFormValues) => {
     if (!part) return;
     try {
-      const price = Number(data.price);
+      const price = Number(String(data.price).replace(/\D/g, ""));
       const stockQuantity = Number(data.stockQuantity);
       const switchCount = Number(data.recipeSwitchCount || 0);
       const stabCount = Number(data.recipeStabilizerCount || 0);
@@ -279,13 +280,26 @@ export default function EditPartModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>{t("price")}</label>
-              <input
-                type="number"
-                {...register("price")}
-                className={inputClass}
-                placeholder={t("pricePlaceholder")}
-                min={0}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  {...register("price")}
+                  onChange={(e) => {
+                    const rawValue = e.target.value.replace(/\D/g, "");
+                    if (!rawValue) {
+                      setValue("price", "", { shouldValidate: true });
+                    } else {
+                      const formatted = new Intl.NumberFormat("vi-VN").format(Number(rawValue));
+                      setValue("price", formatted, { shouldValidate: true });
+                    }
+                  }}
+                  className={inputClass}
+                  placeholder={t("pricePlaceholder")}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] font-medium text-amazon-textMuted select-none pointer-events-none">
+                  ₫
+                </span>
+              </div>
               {errors.price && (
                 <p className={errorClass}>{errors.price.message}</p>
               )}

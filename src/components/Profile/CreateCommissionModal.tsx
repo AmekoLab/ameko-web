@@ -24,13 +24,17 @@ const getCommissionSchema = (t: any) =>
       casePlatePref: z.string().min(1, t("valEmptyCase")),
       additionalNotes: z.string().optional(),
       quantity: z.number().min(1, t("valMinQuantity")),
-      minBudget: z.number().min(0, t("valMinBudget")),
-      maxBudget: z.number().min(0, t("valMaxBudget")),
+      minBudget: z.string().refine((val) => Number(val.replace(/\D/g, "")) >= 0, t("valMinBudget")),
+      maxBudget: z.string().refine((val) => Number(val.replace(/\D/g, "")) >= 0, t("valMaxBudget")),
       referenceImages: z.string().min(1, t("valEmptyImage")),
       shopResponseWindowHours: z.number().min(24),
       customerResponseWindowHours: z.number().min(24),
     })
-    .refine((data) => data.maxBudget > data.minBudget, {
+    .refine((data) => {
+      const min = Number(data.minBudget.replace(/\D/g, ""));
+      const max = Number(data.maxBudget.replace(/\D/g, ""));
+      return max > min;
+    }, {
       message: t("valBudgetMismatch"),
       path: ["maxBudget"],
     });
@@ -74,8 +78,8 @@ export const CreateCommissionModal: FC<CreateCommissionModalProps> = ({
       casePlatePref: "",
       additionalNotes: "",
       quantity: 1,
-      minBudget: 0,
-      maxBudget: 0,
+      minBudget: "",
+      maxBudget: "",
       referenceImages: "",
       shopResponseWindowHours: 72,
       customerResponseWindowHours: 72,
@@ -117,8 +121,8 @@ Additional Notes: ${data.additionalNotes || "None"}
           title: data.title,
           description: compiledDescription,
           referenceImages: data.referenceImages,
-          minBudget: data.minBudget,
-          maxBudget: data.maxBudget,
+          minBudget: Number(data.minBudget.replace(/\D/g, "")),
+          maxBudget: Number(data.maxBudget.replace(/\D/g, "")),
           quantity: data.quantity,
           isDraft,
           shopResponseWindowHours: data.shopResponseWindowHours,
@@ -312,13 +316,26 @@ Additional Notes: ${data.additionalNotes || "None"}
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
                 {t("minBudget")}
               </label>
-              <input
-                type="number"
-                {...register("minBudget", { valueAsNumber: true })}
-                min={0}
-                placeholder="500000"
-                className={`w-full border ${errors.minBudget ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "border-neutral-200 focus:border-neutral-900 focus:ring-neutral-900"} bg-white text-neutral-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-colors`}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  {...register("minBudget")}
+                  onChange={(e) => {
+                    const rawValue = e.target.value.replace(/\D/g, "");
+                    if (!rawValue) {
+                      setValue("minBudget", "", { shouldValidate: true });
+                    } else {
+                      const formatted = new Intl.NumberFormat("vi-VN").format(Number(rawValue));
+                      setValue("minBudget", formatted, { shouldValidate: true });
+                    }
+                  }}
+                  placeholder="500.000"
+                  className={`w-full border ${errors.minBudget ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "border-neutral-200 focus:border-neutral-900 focus:ring-neutral-900"} bg-white text-neutral-900 rounded-xl px-4 py-3 pr-8 text-sm focus:outline-none focus:ring-1 transition-colors`}
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] font-semibold text-neutral-400 pointer-events-none select-none">
+                  ₫
+                </span>
+              </div>
               {errors.minBudget && (
                 <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1"><AlertTriangle className="w-3 h-3"/> {errors.minBudget.message}</p>
               )}
@@ -327,13 +344,26 @@ Additional Notes: ${data.additionalNotes || "None"}
                <label className="block text-sm font-semibold text-neutral-900 mb-2">
                 {t("maxBudget")}
               </label>
-              <input
-                type="number"
-                {...register("maxBudget", { valueAsNumber: true })}
-                min={0}
-                placeholder="1000000"
-                className={`w-full border ${errors.maxBudget ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "border-neutral-200 focus:border-neutral-900 focus:ring-neutral-900"} bg-white text-neutral-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-colors`}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  {...register("maxBudget")}
+                  onChange={(e) => {
+                    const rawValue = e.target.value.replace(/\D/g, "");
+                    if (!rawValue) {
+                      setValue("maxBudget", "", { shouldValidate: true });
+                    } else {
+                      const formatted = new Intl.NumberFormat("vi-VN").format(Number(rawValue));
+                      setValue("maxBudget", formatted, { shouldValidate: true });
+                    }
+                  }}
+                  placeholder="1.000.000"
+                  className={`w-full border ${errors.maxBudget ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "border-neutral-200 focus:border-neutral-900 focus:ring-neutral-900"} bg-white text-neutral-900 rounded-xl px-4 py-3 pr-8 text-sm focus:outline-none focus:ring-1 transition-colors`}
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] font-semibold text-neutral-400 pointer-events-none select-none">
+                  ₫
+                </span>
+              </div>
               {errors.maxBudget && (
                 <p className="text-xs text-red-500 mt-1">
                   {errors.maxBudget.message}

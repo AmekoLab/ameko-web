@@ -12,6 +12,8 @@ import {
   CheckCircle,
   FileText,
   Loader2,
+  AlertTriangle,
+  UploadCloud,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import {
@@ -198,11 +200,20 @@ const TableRow: FC<RowProps> = ({
       </td>
       {/* Status */}
       <td className="px-5 py-3.5">
-        <span
-          className={`inline-block text-xs font-medium px-2.5 py-1 rounded-sm whitespace-nowrap ${statusStyle}`}
-        >
-          {statusLabel}
-        </span>
+        <div className="flex flex-col items-start gap-1">
+          <span
+            className={`inline-block text-xs font-medium px-2.5 py-1 rounded-sm whitespace-nowrap ${statusStyle}`}
+          >
+            {statusLabel}
+          </span>
+
+          {/* Sub-note for Disputed / AdminReviewing statuses */}
+          {(request.statusName === "Disputed" || request.statusName === "AdminReviewing") && (
+            <span className="text-[10px] text-neutral-500 italic flex items-center gap-1">
+              {t("status.awaitingAdminReview")}
+            </span>
+          )}
+        </div>
       </td>
       {/* Actions */}
       <td className="px-5 py-3.5">
@@ -309,10 +320,15 @@ const ConfirmReceiptModal = ({
   if (!isOpen) return null;
 
   const handleSubmit = () => {
-    onConfirm(actionType, actionType === "dispute" ? { shopResponse, evidenceUrl } : undefined);
+    onConfirm(
+      actionType,
+      actionType === "dispute" ? { shopResponse, evidenceUrl } : undefined
+    );
   };
 
-  const isSubmitDisabled = isLoading || (actionType === "dispute" && (!shopResponse.trim() || !evidenceUrl.trim()));
+  const isSubmitDisabled =
+    isLoading ||
+    (actionType === "dispute" && (!shopResponse.trim() || !evidenceUrl.trim()));
 
   return (
     <div
@@ -320,103 +336,119 @@ const ConfirmReceiptModal = ({
       onClick={onCancel}
     >
       <div
-        className="bg-white border border-neutral-100 rounded-2xl w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-200"
+        className="bg-white border border-neutral-100 rounded-2xl w-full max-w-md p-6 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex gap-4 mb-6 border-b border-neutral-200 pb-4">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input 
-              type="radio" 
-              name="actionType" 
-              value="accept" 
-              checked={actionType === "accept"} 
-              onChange={() => setActionType("accept")} 
-              className="accent-green-600"
-            />
-            <span className="text-sm font-medium text-neutral-800">Confirm Receipt</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input 
-              type="radio" 
-              name="actionType" 
-              value="dispute" 
-              checked={actionType === "dispute"} 
-              onChange={() => setActionType("dispute")} 
-              className="accent-red-600"
-            />
-            <span className="text-sm font-medium text-neutral-800">Dispute / Reject</span>
-          </label>
+        {/* Modern Segmented Control for Action Type */}
+        <div className="flex p-1 bg-neutral-100/80 rounded-xl mb-6 shadow-inner">
+          <button
+            onClick={() => setActionType("accept")}
+            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
+              actionType === "accept"
+                ? "bg-white text-green-600 shadow-sm ring-1 ring-neutral-200/50"
+                : "text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200/50"
+            }`}
+          >
+            <CheckCircle className="w-4 h-4" /> {t("confirmReceiptModal.acceptTab") || "Xác nhận"}
+          </button>
+          <button
+            onClick={() => setActionType("dispute")}
+            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
+              actionType === "dispute"
+                ? "bg-white text-red-600 shadow-sm ring-1 ring-neutral-200/50"
+                : "text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200/50"
+            }`}
+          >
+            <AlertTriangle className="w-4 h-4" /> {t("confirmReceiptModal.disputeTab") || "Khiếu nại"}
+          </button>
         </div>
 
-        {actionType === "accept" ? (
-          <div className="text-center">
-            <div className="w-14 h-14 rounded-full bg-green-50 border border-green-100 flex items-center justify-center mx-auto mb-5">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+        {/* Dynamic Content based on Action */}
+        <div className="min-h-[220px] flex flex-col justify-center">
+          {actionType === "accept" ? (
+            <div className="text-center animate-in fade-in duration-300">
+              <div className="w-16 h-16 rounded-full bg-green-50 border border-green-100 flex items-center justify-center mx-auto mb-5 shadow-sm">
+                <CheckCircle className="w-8 h-8 text-green-500" />
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 mb-2">
+                {t("confirmReceiptModal.title")}
+              </h3>
+              <p className="text-sm text-neutral-500 leading-relaxed px-4">
+                {t("confirmReceiptModal.description") || "Bạn có chắc chắn muốn xác nhận đã nhận được hàng trả về? Hành động này không thể hoàn tác."}
+              </p>
             </div>
-            <h3 className="text-lg font-bold text-neutral-900 mb-2">
-              {t("confirmReceiptModal.title")}
-            </h3>
-            <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
-              {t("confirmReceiptModal.description")}
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-4 mb-6">
-            <h3 className="text-lg font-bold text-neutral-900">
-              Raise a Dispute
-            </h3>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-neutral-700">Reason</label>
-              <textarea 
-                className="w-full border border-neutral-300 rounded-md p-3 text-sm min-h-[80px] focus:outline-none focus:ring-2 focus:ring-amazon-primary" 
-                placeholder="Enter dispute reason..."
-                value={shopResponse}
-                onChange={(e) => setShopResponse(e.target.value)}
-              />
+          ) : (
+            <div className="flex flex-col gap-4 animate-in fade-in duration-300">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-bold text-neutral-700 flex items-center gap-1">
+                  {t("confirmReceiptModal.disputeReason")} <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  className="w-full border border-neutral-200 rounded-xl p-3 text-sm min-h-[90px] focus:outline-none focus:border-red-400 focus:ring-4 focus:ring-red-400/10 transition-all resize-none bg-neutral-50 focus:bg-white placeholder:text-neutral-400"
+                  placeholder={t("confirmReceiptModal.disputeReasonPlaceholder") || "Mô tả chi tiết vấn đề bạn gặp phải với hàng hoàn trả..."}
+                  value={shopResponse}
+                  onChange={(e) => setShopResponse(e.target.value)}
+                />
+              </div>
+              
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-bold text-neutral-700 flex items-center gap-1">
+                  {t("confirmReceiptModal.disputeEvidence")} <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files.length > 0) {
+                        setEvidenceUrl(
+                          "[https://res.cloudinary.com/demo/image/upload/sample.jpg](https://res.cloudinary.com/demo/image/upload/sample.jpg)"
+                        );
+                      }
+                    }}
+                  />
+                  <div className={`w-full flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-xl transition-colors ${evidenceUrl ? "border-green-400 bg-green-50" : "border-neutral-300 bg-neutral-50 group-hover:bg-neutral-100"}`}>
+                    {evidenceUrl ? (
+                      <>
+                        <CheckCircle className="w-6 h-6 text-green-500 mb-1" />
+                        <span className="text-xs font-medium text-green-600">{t("confirmReceiptModal.disputeEvidenceUploaded")}</span>
+                      </>
+                    ) : (
+                      <>
+                        <UploadCloud className="w-6 h-6 text-neutral-400 mb-1" />
+                        <span className="text-xs font-medium text-neutral-500">{t("confirmReceiptModal.disputeEvidencePlaceholder")}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-neutral-700">Evidence</label>
-              <input 
-                type="file" 
-                className="text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-neutral-100 file:text-neutral-700 hover:file:bg-neutral-200 cursor-pointer"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files.length > 0) {
-                    setEvidenceUrl("https://res.cloudinary.com/demo/image/upload/sample.jpg");
-                  }
-                }}
-              />
-              {evidenceUrl && (
-                <span className="text-xs text-green-600 mt-1 font-medium">File uploaded successfully (mock)</span>
-              )}
-            </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="flex gap-3 mt-2">
+        {/* Action Buttons */}
+        <div className="flex gap-3 mt-6 pt-6 border-t border-neutral-100">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 bg-white hover:bg-neutral-50 text-neutral-700 font-semibold text-sm rounded-xl transition-colors border border-neutral-200"
+            className="flex-1 py-3 bg-white hover:bg-neutral-50 text-neutral-600 font-bold text-sm rounded-xl transition-colors border border-neutral-200"
           >
-            {t("confirmReceiptModal.cancel")}
+            {t("confirmReceiptModal.cancel") || "Hủy bỏ"}
           </button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitDisabled}
-            className={`flex-1 py-3 font-semibold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] ${
-              actionType === "accept" 
-                ? "bg-green-600 hover:bg-green-700 text-white" 
-                : "bg-red-600 hover:bg-red-700 text-white"
+            className={`flex-1 py-3 font-bold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] ${
+              actionType === "accept"
+                ? "bg-green-500 hover:bg-green-600 text-white"
+                : "bg-red-500 hover:bg-red-600 text-white"
             }`}
           >
             {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                {actionType === "accept" ? t("confirmReceiptModal.confirming") : "Processing..."}
-              </>
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : actionType === "accept" ? (
-              t("confirmReceiptModal.confirm")
+              t("confirmReceiptModal.confirm") || "Xác nhận"
             ) : (
-              "Submit Dispute"
+              t("confirmReceiptModal.dispute") || "Submit Dispute"
             )}
           </button>
         </div>

@@ -455,7 +455,7 @@
     "refundAmount": "Số Tiền Yêu Cầu Hoàn Lại",
     "evidenceImage": "Hình Ảnh Bằng Chứng",
     "shopResponse": "Cửa Hàng Phản Hồi",
-    "adminNote": "Ghi Chú Của Quản Trị Viên",
+    "adminNote": "Ghi chú hệ thống",
     "viewDetails": "Xem Chi Tiết",
     "withdraw": "Rút Đơn",
     "editRequest": "Chỉnh Sửa Yêu Cầu",
@@ -479,6 +479,7 @@
       "AutoCancelled": "Đã Hủy Tự Động",
       "Returning": "Đang Trả Hàng",
       "Returned": "Đã Trả Hàng",
+      "ShopRejected": "Cửa Hàng Từ Chối",
       "Disputed": "Đã Gửi Khiếu Nại"
     }
   },
@@ -777,6 +778,8 @@
     "noOrdersByStatus": "Không có đơn hàng {status}",
     "noOrdersByStatusDescription": "Bạn không có đơn hàng nào phù hợp với bộ lọc trạng thái này.",
     "viewAllOrders": "Xem tất cả đơn hàng",
+    "warrantyAndReturnNotice": "Bạn có vấn đề gì với đơn hàng?",
+    "warrantyAndReturnLink": "Nhấn vào đây để Bảo hành và Đổi trả",
     "filters": {
       "all": "Tất cả",
       "pending": "Chờ xử lý",
@@ -1452,9 +1455,9 @@
     "typeComponent": "Component",
     "typeAccessory": "Accessory",
     "price": "Giá (VND)",
-    "pricePlaceholder": "vd: 20000",
+    "pricePlaceholder": "vd: 20.000",
     "stockQuantity": "Số lượng tồn kho",
-    "stockQuantityPlaceholder": "vd: 100000",
+    "stockQuantityPlaceholder": "vd: 100.000",
     "category": "Danh mục",
     "selectCategory": "— Chọn danh mục —",
     "description": "Mô tả",
@@ -1597,7 +1600,7 @@
     "productName": "Tên sản phẩm",
     "productNamePlaceholder": "vd: Bàn phím thủ công",
     "price": "Giá (VND)",
-    "pricePlaceholder": "vd: 60000000",
+    "pricePlaceholder": "vd: 6.000.000",
     "quantity": "Số lượng",
     "quantityPlaceholder": "vd: 1",
     "description": "Mô tả",
@@ -2208,7 +2211,8 @@
       "returning": "Đang hoàn trả",
       "returned": "Đã hoàn trả",
       "shopRejected": "Shop từ chối",
-      "disputed": "Tranh chấp"
+      "disputed": "Tranh chấp",
+      "awaitingAdminReview": "Hệ thống đang kiểm tra bằng chứng..."
     },
     "types": {
       "returnRequest": "Đổi trả / Hoàn tiền",
@@ -2227,7 +2231,7 @@
     "actions": {
       "viewProcess": "Xem và xử lý",
       "waitReturn": "Chờ hoàn hàng",
-      "confirmReceipt": "Xác nhận nhận hàng",
+      "confirmReceipt": "Xử lý hàng hoàn",
       "viewInfo": "Xem thông tin"
     },
     "pagination": {
@@ -2238,7 +2242,15 @@
       "description": "Bạn có chắc chắn đã nhận lại sản phẩm trả về trong tình trạng tốt không? Hành động này sẽ đóng đơn và không thể hoàn tác.",
       "cancel": "Hủy",
       "confirm": "Xác nhận",
-      "confirming": "Đang xác nhận..."
+      "confirming": "Đang xác nhận...",
+      "acceptTab": "Xác nhận nhận hàng",
+      "disputeTab": "Gửi khiếu nại",
+      "dispute": "Gửi khiếu nại",
+      "disputeReason": "Lý do khiếu nại",
+      "disputeReasonPlaceholder": "Mô tả chi tiết vấn đề bạn gặp phải với hàng hoàn trả...",
+      "disputeEvidence": "Hình ảnh/Video bằng chứng",
+      "disputeEvidencePlaceholder": "Nhấn hoặc kéo thả file vào đây",
+      "disputeEvidenceUploaded": "Đã tải lên thành công"
     }
   },
   "ShopReviewModal": {
@@ -3049,7 +3061,8 @@
     "viewDetails": "Xem chi tiết",
     "pageLabel": "Trang",
     "prev": "Trước",
-    "next": "Tiếp"
+    "next": "Tiếp",
+    "awaitingAdminReview": "Hệ thống đang kiểm tra bằng chứng..."
   },
   "AdminDecisionModal": {
     "validationSelectJudgment": "Vui lòng chọn duyệt yêu cầu",
@@ -3130,9 +3143,9 @@
     "sendMessageAria": "Gửi tin nhắn",
     "sendHint": "Nhấn Enter để gửi · Shift+Enter để xuống dòng",
     "voucherModalDiscountLabel": "Số tiền giảm (VND)",
-    "voucherModalDiscountPlaceholder": "VD: 50000",
+    "voucherModalDiscountPlaceholder": "VD: 50.000",
     "voucherModalMinOrderLabel": "Giá trị đơn tối thiểu (VND)",
-    "voucherModalMinOrderPlaceholder": "VD: 200000",
+    "voucherModalMinOrderPlaceholder": "VD: 200.000",
     "cancel": "Hủy",
     "gifting": "Đang tặng...",
     "gift": "Tặng"
