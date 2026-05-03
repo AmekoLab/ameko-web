@@ -14,6 +14,13 @@ import {
   PaginatedResult,
 } from "@/src/types/order.types";
 
+export interface RepayOrderPayload {
+  paymentMethod: number;
+  walletPin?: string;
+  successUrl?: string;
+  cancelUrl?: string;
+}
+
 export const orderService = {
   /**
    * Add an item to the cart.
@@ -79,13 +86,14 @@ export const orderService = {
   },
 
   /**
-   * Generate a new Stripe payment link for an order.
-   * POST /orders/repay/{orderGroupId}
+   * Repay an order group.
+   * POST /orders/{orderGroupId}/repay
    */
-  repayOrder: async (
+ repayOrder: async (
     orderGroupId: string,
-  ): Promise<ApiResponse<{ paymentUrl: string }>> => {
-    return api.post(`/orders/repay/${orderGroupId}`);
+    payload: RepayOrderPayload
+  ): Promise<ApiResponse<{ paymentUrl?: string }>> => {
+    return api.post(`/orders/repay/${orderGroupId}`, payload);
   },
 
   /**

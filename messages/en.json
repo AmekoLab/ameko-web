@@ -1,4 +1,50 @@
 {
+  "AdjustReputationModal": {
+    "title": "Adjust {targetType} Reputation",
+    "adjustingFor": "Adjusting for:",
+    "deltaLabel": "Delta (Points)",
+    "reasonLabel": "Reason (Required)",
+    "reasonPlaceholder": "Enter reason for adjustment...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "processing": "Processing...",
+    "errorDelta": "Delta must be between -100 and +100",
+    "errorReason": "Reason is required (max 500 chars)",
+    "success": "Reputation adjusted. New Score: {score}",
+    "errorApi": "Failed to adjust reputation"
+  },
+  "ShopReputation": {
+    "title": "Shop Reputation",
+    "subtitle": "Track your performance and service quality",
+    "currentScore": "Current Quality Score",
+    "currentBadge": "Shop Badge",
+    "breakdownTitle": "Detailed Metrics Breakdown",
+    "issueRate": "Issue Rate",
+    "avgResponse": "Average Response Time",
+    "refundRate": "Refund Rate",
+    "repurchaseRate": "Repurchase Rate",
+    "positiveFeedback": "Positive Feedback Rate",
+    "improveRep": "Improve Reputation",
+    "lowerIsBetter": "Lower is better",
+    "refundRateDescription": "Percentage of refunded or returned orders",
+    "badgeHistoryTitle": "Badge History"
+  },
+  "RepayModal": {
+    "title": "Select payment method",
+    "wallet": "AMEKO Wallet",
+    "vnpay": "VNPAY",
+    "creditCard": "Credit Card (Stripe)",
+    "pinLabel": "Enter AMEKO Wallet PIN (6 digits)",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "pinRequired": "Please enter your 6-digit PIN.",
+    "paymentSuccess": "Payment successful!",
+    "paymentFailed": "Payment failed.",
+    "incorrectPin": "Incorrect PIN. Please try again.",
+    "pinNotSetup": "You have not set up a Wallet PIN. Please go to Settings to set one up.",
+    "orderNotPending": "This order is no longer in pending payment status.",
+    "genericError": "An error occurred during payment."
+  },
   "Financial": {
     "title": "Shop Revenue",
     "subtitle": "Manage cash flow, revenue, and fees for the month.",
@@ -47,7 +93,18 @@
     "commissionsPool": "Commissions Pool",
     "search": "Search",
     "secureCheckout": "Secure checkout",
-    "secureCheckoutDesc": "We secure your payment and personal information when you share or save it with us. We don't share payment details with third-party sellers. We don't sell your information to others."
+    "secureCheckoutDesc": "We secure your payment and personal information when you share or save it with us. We don't share payment details with third-party sellers. We don't sell your information to others.",
+    "reputation": {
+      "label": "Reputation",
+      "locked": "Locked",
+      "tierHigh": "High",
+      "tierMid": "Mid",
+      "tierLow": "Low",
+      "shopLabel": "Shop Trust",
+      "premium": "Premium",
+      "verified": "Verified",
+      "basic": "Basic"
+    }
   },
   "Sidebar": {
     "group_overview": "Overview",
@@ -90,7 +147,8 @@
     "feedback": "Feedback",
     "assembledFeedbacks": "Assembled Feedbacks",
     "processedWithdrawals": "Processed Withdrawals",
-    "financialManagement": "Financial Management"
+    "financialManagement": "Financial Management",
+    "reputation": "Reputation"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -1096,6 +1154,9 @@
       "phoneLengthInvalid": "Phone number must be 9-15 digits",
       "shippingAddressRequired": "Shipping address is required"
     },
+    "repuLockedTitle": "Account restricted from purchasing",
+    "repuLockedDesc": "Your reputation score is too low, and the ordering feature has been temporarily locked. Please contact Customer Support.",
+    "checkoutLockedBtn": "Checkout Locked",
     "itemRow": {
       "hideComponents": "Hide components",
       "viewComponents": "View {count} components"
@@ -1208,7 +1269,10 @@
     "chat": "Chat",
     "online": "Online",
     "followersModalTitle": "Followers",
-    "followingModalTitle": "Following"
+    "followingModalTitle": "Following",
+    "reputation": {
+      "tooltip": "Quality Score: {score}/100"
+    }
   },
   "ProfilePage": {
     "shopNotFound": "Shop Not Found",
@@ -2617,7 +2681,8 @@
     "pageLabel": "Page",
     "usersTotalLabel": "users total",
     "prev": "Prev",
-    "next": "Next"
+    "next": "Next",
+    "reputation": "Reputation"
   },
   "CreateUserModal": {
     "validation": {
@@ -2757,7 +2822,8 @@
     "toastUnbanSuccess": "Shop \"{shopName}\" has been unbanned!",
     "toastApproveSuccess": "Shop approved successfully!",
     "toastRejectSuccess": "Shop rejected successfully!",
-    "toastDecisionFailed": "Handle admin decision failed"
+    "toastDecisionFailed": "Handle admin decision failed",
+    "reputation":"Reputation"
   },
   "ShopApplicationModal": {
     "statusPending": "Pending",
@@ -3584,6 +3650,19 @@
     "bio": "Bio",
     "noDescriptionAvailable": "No description available.",
     "changePassword": "Change Password",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "repu": {
+      "title": "Reputation Profile",
+      "points": "pts",
+      "tier": "Tier",
+      "locked": "Locked",
+      "monthlyLimit": "Monthly Order Limit",
+      "unlimited": "Unlimited",
+      "orders": "orders",
+      "autoCancels": "Auto-canceled Orders",
+      "recentLogs": "Recent Activity",
+      "noLogs": "No recent reputation changes.",
+      "lockedWarning": "Your purchasing ability has been locked due to low reputation score. Please contact support."
+    }
   }
 }

@@ -18,6 +18,13 @@ import {
   Pencil,
   LogOut,
   KeyRound,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  Activity,
+  TrendingUp,
+  TrendingDown,
+  Info
 } from "lucide-react";
 import Link from "next/link";
 import { ShopStatus } from "@/src/types/shop.types";
@@ -25,6 +32,7 @@ import { ShopApplicationModal } from "@/src/components/Profile/ShopApplicationMo
 import { UpdateShopApplicationModal } from "@/src/components/Profile/UpdateShopApplicationModal";
 import { fetchCurrentShop } from "@/src/store/slices/shopSlice";
 import { useTranslations } from "next-intl";
+import { reputationService, CustomerReputationData, ReputationLog } from "@/src/services/reputation.service";
 
 export default function ProfilePage() {
   const t = useTranslations("ProfileUserPage");
@@ -38,6 +46,27 @@ export default function ProfilePage() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
   const [isUpdateShopModalOpen, setIsUpdateShopModalOpen] = useState(false);
+
+  // --- Reputation State ---
+  const [reputation, setReputation] = useState<CustomerReputationData | null>(null);
+  const [reputationLogs, setReputationLogs] = useState<ReputationLog[]>([]);
+  const [isLoadingReputation, setIsLoadingReputation] = useState(false);
+
+  useEffect(() => {
+    if (user && user.role !== "Admin") {
+      setIsLoadingReputation(true);
+      Promise.all([
+        reputationService.getMyReputation(),
+        reputationService.getMyReputationLogs(1, 5) // Fetch top 5 recent logs
+      ])
+        .then(([repRes, logsRes]) => {
+          if (repRes.success && repRes.data) setReputation(repRes.data);
+          if (logsRes.success && logsRes.data) setReputationLogs(logsRes.data.items);
+        })
+        .catch((err) => console.error("Failed to fetch reputation data", err))
+        .finally(() => setIsLoadingReputation(false));
+    }
+  }, [user]);
 
   useEffect(() => {
     if (isInitialized && !user) {
@@ -277,6 +306,124 @@ export default function ProfilePage() {
                   </button>
                 </div>
               )}
+            </div>
+          )}
+          {/* ============================================================== */}
+
+          {/* ================= REPUTATION DASHBOARD ================= */}
+          {user.role !== "Admin" && (
+            <div className="mb-8">
+              {isLoadingReputation ? (
+                <div className="h-48 bg-neutral-100 animate-pulse rounded-xl border border-neutral-200"></div>
+              ) : reputation ? (
+                <div className={`p-6 rounded-xl border relative overflow-hidden shadow-sm ${reputation.gate.isLocked ? "bg-red-50/50 border-red-200" : "bg-white border-neutral-200"}`}>
+                  
+                  {/* Decorative Icon */}
+                  <div className="absolute -right-4 -top-4 opacity-[0.03] pointer-events-none">
+                    <Shield className="w-48 h-48" />
+                  </div>
+
+                  <div className="flex flex-col md:flex-row gap-8 relative z-10">
+                    {/* Left: Score & Progress */}
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg text-neutral-900 flex items-center gap-2 mb-6">
+                        {reputation.gate.isLocked ? <ShieldAlert className="w-6 h-6 text-red-500" /> : <ShieldCheck className="w-6 h-6 text-green-500" />}
+                        {t("repu.title")}
+                      </h3>
+                      
+                      <div className="flex items-end gap-3 mb-2">
+                        <span className="text-4xl font-black tracking-tighter text-neutral-900">
+                          {reputation.currentScore}
+                        </span>
+                        <span className="text-sm font-medium text-neutral-500 mb-1.5">/ 100 {t("repu.points")}</span>
+                        
+                        <span className={`ml-auto px-3 py-1 text-xs font-bold rounded-full border ${
+                            reputation.gate.isLocked ? "bg-red-100 text-red-700 border-red-200" :
+                            reputation.gate.tier === "High" ? "bg-green-100 text-green-700 border-green-200" :
+                            reputation.gate.tier === "Mid" || reputation.gate.tier === "Normal" ? "bg-blue-100 text-blue-700 border-blue-200" :
+                            "bg-orange-100 text-orange-700 border-orange-200"
+                        }`}>
+                          {reputation.gate.isLocked ? t("repu.locked") : `${t("repu.tier")}: ${reputation.gate.tier}`}
+                        </span>
+                      </div>
+
+                      <div className="w-full h-2.5 bg-neutral-100 rounded-full overflow-hidden border border-neutral-200/60">
+                        <div
+                          className={`h-full transition-all duration-1000 ease-out ${
+                            reputation.gate.isLocked ? "bg-red-500" :
+                            reputation.gate.tier === "High" ? "bg-green-500" :
+                            reputation.gate.tier === "Mid" || reputation.gate.tier === "Normal" ? "bg-blue-500" : "bg-orange-500"
+                          }`}
+                          style={{ width: `${Math.min(Math.max(reputation.currentScore, 0), 100)}%` }}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 mt-6">
+                        <div className="bg-neutral-50 rounded-lg p-3 border border-neutral-100">
+                          <p className="text-xs text-neutral-500 font-medium mb-1">{t("repu.monthlyLimit")}</p>
+                          <p className="text-sm font-bold text-neutral-800">
+                            {reputation.gate.monthlyOrderLimit === 0 ? t("repu.unlimited") : `${reputation.gate.monthlyOrderLimit} ${t("repu.orders")}`}
+                          </p>
+                        </div>
+                        <div className="bg-neutral-50 rounded-lg p-3 border border-neutral-100">
+                          <p className="text-xs text-neutral-500 font-medium mb-1">{t("repu.autoCancels")}</p>
+                          <p className="text-sm font-bold text-neutral-800">
+                            {reputation.monthlyAutoCancels} <span className="text-xs font-normal text-neutral-500">/ 10</span>
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {reputation.gate.isLocked && (
+                        <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm font-medium flex items-start gap-2">
+                          <Info className="w-5 h-5 shrink-0" />
+                          <p>{t("repu.lockedWarning")}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right: Recent Logs */}
+                    <div className="flex-1 md:border-l md:border-neutral-100 md:pl-8">
+                      <h4 className="font-semibold text-neutral-900 text-sm flex items-center gap-2 mb-4">
+                        <Activity className="w-4 h-4 text-neutral-400" />
+                        {t("repu.recentLogs")}
+                      </h4>
+                      
+                      {reputationLogs.length > 0 ? (
+                        <div className="space-y-3">
+                          {reputationLogs.map((log) => (
+                            <div key={log.id} className="flex gap-3 text-sm">
+                              <div className="mt-0.5 shrink-0">
+                                {log.delta > 0 ? (
+                                  <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center">
+                                    <TrendingUp className="w-3.5 h-3.5 text-green-600" />
+                                  </div>
+                                ) : (
+                                  <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center">
+                                    <TrendingDown className="w-3.5 h-3.5 text-red-600" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-neutral-800 font-medium leading-snug">{log.reason}</p>
+                                <p className="text-xs text-neutral-400 mt-0.5">
+                                  {new Date(log.createdAt).toLocaleDateString()}
+                                </p>
+                              </div>
+                              <div className={`font-bold shrink-0 ${log.delta > 0 ? "text-green-600" : "text-red-600"}`}>
+                                {log.delta > 0 ? "+" : ""}{log.delta}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-neutral-500 italic bg-neutral-50 p-4 rounded-lg text-center border border-neutral-100">
+                          {t("repu.noLogs")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
             </div>
           )}
           {/* ============================================================== */}

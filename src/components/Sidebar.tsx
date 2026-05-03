@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import LanguageSwitcher from "@/src/components/LanguageSwitcher";
 import { useTranslations } from "next-intl";
+import { shopReputationService, ShopReputationCurrent } from "@/src/services/shopReputation.service";
 
 type MenuItem = { name: string; path: string };
 type MenuGroup = {
@@ -65,6 +66,16 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
     await dispatch(logoutUser());
     router.push("/login");
   };
+
+  const [shopReputation, setShopReputation] = useState<ShopReputationCurrent | null>(null);
+
+  useEffect(() => {
+    if (user?.role === "Shop") {
+      shopReputationService.getMyCurrent()
+        .then((res) => { if (res.success) setShopReputation(res.data); })
+        .catch(console.error);
+    }
+  }, [user]);
 
   // 1. Define menus
   const commonMenu: MenuGroup[] = [
@@ -180,6 +191,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
         { name: t("cancelRequests"), path: "/shop/cancel-requests" },
         { name: t("feedback"), path: "/shop/feedbacks" },
         { name: t("assembledFeedbacks"), path: "/shop/assembled-feedbacks" },
+        { name: t("reputation"), path: "/shop/reputation" },
       ],
     },
     {
@@ -277,9 +289,37 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
               <span className="text-white text-sm font-bold truncate">
                 {t("hiName", { name: displayName })}
               </span>
-              <span className="text-white/60 text-[11px] font-medium uppercase tracking-wider truncate">
-                {user?.role || role}
-              </span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-white/60 text-[11px] font-medium uppercase tracking-wider truncate">
+                  {user?.role || role}
+                </span>
+                {shopReputation && (
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${
+                    shopReputation.badge === "Premium" ? "bg-yellow-400 text-yellow-900" :
+                    shopReputation.badge === "Verified" ? "bg-blue-400 text-blue-900" :
+                    "bg-green-400 text-green-900"
+                  }`}>
+                    {shopReputation.badge}
+                  </span>
+                )}
+              </div>
+              
+              {/* Reputation Progress Bar for Shop */}
+              {shopReputation && (
+                <div className="flex items-center gap-1.5 mt-1 text-white/80">
+                  <span className="text-[10px] font-medium">{t("reputation") || "Uy tín"}:</span>
+                  <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        shopReputation.badge === "Premium" ? "bg-yellow-400" :
+                        shopReputation.badge === "Verified" ? "bg-blue-400" : "bg-green-400"
+                      }`}
+                      style={{ width: `${shopReputation.currentQualityScore}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] font-bold">{shopReputation.currentQualityScore}</span>
+                </div>
+              )}
             </div>
             {/* LanguageSwitcher sits at the end of the same row */}
             <div className="shrink-0">

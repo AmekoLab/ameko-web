@@ -20,6 +20,7 @@ import {
   Info,
 } from "lucide-react";
 import OrderDetailModal from "./OrderDetailModal";
+import { RepayModal } from "@/src/components/Orders/RepayModal";
 import { orderService } from "@/src/services/order.service";
 import { CartData, OrderItem } from "@/src/types/order.types";
 import { toast } from "react-toastify";
@@ -216,11 +217,11 @@ const OrderItemRow: FC<OrderItemRowProps> = ({ item }) => {
 interface OrderCardProps {
   order: CartData;
   onViewDetails: (orderId: string) => void;
+  onRepay: (orderGroupId: string) => void;
 }
 
-const OrderCard: FC<OrderCardProps> = ({ order, onViewDetails }) => {
+const OrderCard: FC<OrderCardProps> = ({ order, onViewDetails, onRepay }) => {
   const [expanded, setExpanded] = useState(false);
-  const [paying, setPaying] = useState(false);
   const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false);
   const t = useTranslations("page");
   const tCommon = useTranslations("Common");
@@ -251,25 +252,6 @@ const OrderCard: FC<OrderCardProps> = ({ order, onViewDetails }) => {
       else toast.error("Lỗi khi tải hóa đơn PDF.");
     } finally {
       setIsDownloadingInvoice(false);
-    }
-  };
-
-  // Repay handler
-  const handleRepay = async () => {
-    setPaying(true);
-    try {
-      const res = await orderService.repayOrder(order.orderGroupId);
-      if (res.success && res.data?.paymentUrl) {
-        window.location.href = res.data.paymentUrl;
-      } else {
-        toast.error(res.message || t("paymentLinkFailed"));
-      }
-    } catch (err: unknown) {
-      toast.error(
-        (err as { message?: string }).message || t("paymentLinkFailed"),
-      );
-    } finally {
-      setPaying(false);
     }
   };
 
@@ -396,12 +378,10 @@ const OrderCard: FC<OrderCardProps> = ({ order, onViewDetails }) => {
             {order.orderStatus === "Pending" &&
               order.paymentStatus === "Pending" && (
                 <button
-                  onClick={handleRepay}
-                  disabled={paying}
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98]"
+                  onClick={() => onRepay(order.orderGroupId)}
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-all active:scale-[0.98]"
                 >
-                  {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  {tCommon("payNow")}
+                  {tCommon("payNow") || "Thanh toán ngay"}
                 </button>
               )}
             <button
@@ -448,6 +428,7 @@ export default function MyOrdersPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [repayOrderGroupId, setRepayOrderGroupId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -624,6 +605,7 @@ export default function MyOrdersPage() {
                 key={order.orderId}
                 order={order}
                 onViewDetails={(id) => setSelectedOrderId(id)}
+                onRepay={(groupId) => setRepayOrderGroupId(groupId)}
               />
             ))}
           </div>
@@ -651,6 +633,11 @@ export default function MyOrdersPage() {
         isOpen={!!selectedOrderId}
         orderId={selectedOrderId}
         onClose={() => setSelectedOrderId(null)}
+      />
+      <RepayModal 
+        isOpen={!!repayOrderGroupId}
+        orderGroupId={repayOrderGroupId}
+        onClose={() => setRepayOrderGroupId(null)}
       />
     </div>
   );

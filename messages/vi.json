@@ -1,4 +1,50 @@
 {
+  "AdjustReputationModal": {
+    "title": "Điều chỉnh Uy tín {targetType}",
+    "adjustingFor": "Đang điều chỉnh cho:",
+    "deltaLabel": "Điểm cộng/trừ (Delta)",
+    "reasonLabel": "Lý do (Bắt buộc)",
+    "reasonPlaceholder": "Nhập lý do điều chỉnh...",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "processing": "Đang xử lý...",
+    "errorDelta": "Delta phải từ -100 đến +100",
+    "errorReason": "Lý do là bắt buộc (tối đa 500 ký tự)",
+    "success": "Đã điều chỉnh uy tín. Điểm mới: {score}",
+    "errorApi": "Lỗi khi điều chỉnh uy tín"
+  },
+  "ShopReputation": {
+    "title": "Uy tín cửa hàng",
+    "subtitle": "Theo dõi hiệu suất và chất lượng dịch vụ của bạn",
+    "currentScore": "Điểm chất lượng hiện tại",
+    "currentBadge": "Huy hiệu cửa hàng",
+    "breakdownTitle": "Phân tích chỉ số chi tiết",
+    "issueRate": "Tỉ lệ đơn có sự cố",
+    "avgResponse": "Thời gian phản hồi",
+    "refundRate": "Tỉ lệ hoàn tiền",
+    "repurchaseRate": "Tỉ lệ mua lại",
+    "positiveFeedback": "Tỉ lệ đánh giá tốt",
+    "improveRep": "Cải thiện Uy tín",
+    "lowerIsBetter": "Thấp thì càng tốt",
+    "refundRateDescription": "Tỉ lệ đơn hàng bị trả lại / hoàn tiền",
+    "badgeHistoryTitle": "Lịch sử thăng hạng"
+  },
+  "RepayModal": {
+    "title": "Chọn phương thức thanh toán",
+    "wallet": "Ví AMEKO",
+    "vnpay": "VNPAY",
+    "creditCard": "Thẻ Tín Dụng (Stripe)",
+    "pinLabel": "Nhập mã PIN ví AMEKO (6 số)",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "pinRequired": "Vui lòng nhập mã PIN 6 số.",
+    "paymentSuccess": "Thanh toán thành công!",
+    "paymentFailed": "Thanh toán thất bại.",
+    "incorrectPin": "Mã PIN không chính xác. Vui lòng thử lại.",
+    "pinNotSetup": "Bạn chưa cài đặt mã PIN cho ví. Vui lòng vào Cài đặt để thiết lập.",
+    "orderNotPending": "Đơn hàng không còn ở trạng thái chờ thanh toán.",
+    "genericError": "Có lỗi xảy ra khi thanh toán."
+  },
   "Financial": {
     "title": "Doanh thu Shop",
     "subtitle": "Quản lý dòng tiền, doanh thu và các khoản phí trong tháng.",
@@ -47,7 +93,18 @@
     "commissionsPool": "Chợ chung",
     "search": "Tìm kiếm",
     "secureCheckout": "Thanh toán bảo mật",
-    "secureCheckoutDesc": "Chúng tôi bảo mật thông tin thanh toán và thông tin cá nhân của bạn. Chúng tôi không chia sẻ chi tiết thanh toán với người bán bên thứ ba và không bán thông tin của bạn cho người khác."
+    "secureCheckoutDesc": "Chúng tôi bảo mật thông tin thanh toán và thông tin cá nhân của bạn. Chúng tôi không chia sẻ chi tiết thanh toán với người bán bên thứ ba và không bán thông tin của bạn cho người khác.",
+    "reputation": {
+      "label": "Uy tín",
+      "locked": "Đã khóa",
+      "tierHigh": "High",
+      "tierMid": "Mid",
+      "tierLow": "Low",
+      "shopLabel": "Uy tín Shop",
+      "premium": "Premium",
+      "verified": "Verified",
+      "basic": "Basic"
+    }
   },
   "Sidebar": {
     "group_overview": "Tổng quan",
@@ -90,7 +147,8 @@
     "feedback": "Phản hồi",
     "assembledFeedbacks": "Phản hồi SP Lắp Ráp",
     "processedWithdrawals": "Rút tiền đã xử lý",
-    "financialManagement": "Quản lý tài chính"
+    "financialManagement": "Quản lý tài chính",
+    "reputation": "Uy tín"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -1099,6 +1157,9 @@
       "phoneLengthInvalid": "Số điện thoại phải có 9-15 chữ số",
       "shippingAddressRequired": "Địa chỉ giao hàng là bắt buộc"
     },
+    "repuLockedTitle": "Tài khoản bị hạn chế mua hàng",
+    "repuLockedDesc": "Điểm uy tín của bạn quá thấp nên tính năng đặt hàng đã bị khóa tạm thời. Vui lòng liên hệ CSKH.",
+    "checkoutLockedBtn": "Khóa thanh toán",
     "itemRow": {
       "hideComponents": "Ẩn thành phần",
       "viewComponents": "Xem {count} thành phần"
@@ -1211,7 +1272,10 @@
     "chat": "Nhắn tin",
     "online": "Đang hoạt động",
     "followersModalTitle": "Followers",
-    "followingModalTitle": "Following"
+    "followingModalTitle": "Following",
+    "reputation": {
+      "tooltip": "Điểm uy tín phục vụ: {score}/100"
+    }
   },
   "ProfilePage": {
     "shopNotFound": "Không tìm thấy cửa hàng",
@@ -2622,7 +2686,8 @@
     "pageLabel": "Trang",
     "usersTotalLabel": "người dùng",
     "prev": "Trước",
-    "next": "Tiếp"
+    "next": "Tiếp",
+    "reputation": "Uy tín"
   },
   "CreateUserModal": {
     "validation": {
@@ -2762,7 +2827,8 @@
     "toastUnbanSuccess": "Cửa hàng \"{shopName}\" đã được bỏ cấm!",
     "toastApproveSuccess": "Đã duyệt cửa hàng thành công!",
     "toastRejectSuccess": "Đã từ chối cửa hàng thành công!",
-    "toastDecisionFailed": "Xử lý quyết định của quản trị viên thất bại"
+    "toastDecisionFailed": "Xử lý quyết định của quản trị viên thất bại",
+    "reputation": "Uy tín"
   },
   "ShopApplicationModal": {
     "statusPending": "Đang chờ duyệt",
@@ -3589,7 +3655,20 @@
     "bio": "Mô tả",
     "noDescriptionAvailable": "Không có mô tả",
     "changePassword": "Đổi mật khẩu",
-    "signOut": "Đăng xuất"
+    "signOut": "Đăng xuất",
+    "repu": {
+      "title": "Hồ sơ Uy tín",
+      "points": "điểm",
+      "tier": "Hạng",
+      "locked": "Bị Khóa",
+      "monthlyLimit": "Giới hạn mua/tháng",
+      "unlimited": "Không giới hạn",
+      "orders": "đơn",
+      "autoCancels": "Đơn boom/tự hủy",
+      "recentLogs": "Lịch sử biến động gần đây",
+      "noLogs": "Chưa có biến động điểm nào.",
+      "lockedWarning": "Tài khoản của bạn đã bị khóa tính năng mua hàng do điểm uy tín quá thấp. Vui lòng liên hệ bộ phận CSKH để được hỗ trợ."
+    }
   }
 }
 
