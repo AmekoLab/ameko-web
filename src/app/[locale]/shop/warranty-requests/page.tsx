@@ -356,7 +356,7 @@ const ConfirmReceiptModal = ({
             className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
               actionType === "dispute"
                 ? "bg-white text-red-600 shadow-sm ring-1 ring-neutral-200/50"
-                : "text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200/50"
+                : "text-red-500 hover:text-neutral-700 hover:bg-neutral-200/50"
             }`}
           >
             <AlertTriangle className="w-4 h-4" /> {t("confirmReceiptModal.disputeTab") || "Khiếu nại"}

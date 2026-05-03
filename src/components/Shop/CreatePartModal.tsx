@@ -4,7 +4,7 @@ import { useState, useRef, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, Loader2, Upload, ImageIcon } from "lucide-react";
+import { X, Loader2, Upload, ImageIcon, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { createPart } from "@/src/store/slices/partsSlice";
@@ -362,7 +362,12 @@ export default function CreatePartModal({
                   )}
                 </div>
                 <div>
-                  <label className={labelClass}>{t("stabilizerCount")}</label>
+                  <label className={`${labelClass} flex items-center gap-1`}>
+                    {t("stabilizerCount")}
+                    <span title={t("stabilizerTooltip")}>
+                      <Info className="w-3.5 h-3.5 text-amazon-textMuted cursor-help" />
+                    </span>
+                  </label>
                   <input
                     type="number"
                     {...register("recipeStabilizerCount")}

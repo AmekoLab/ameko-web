@@ -233,10 +233,10 @@ const onSubmit = async (data: AdminDecisionFormValues) => {
                               : "text-amazon-text"
                           }`}
                         >
-                          {t("approveRequest")}
+                          {issue.status === 11 ? t("approveShopRequest") : t("approveRequest")}
                         </p>
                         <p className="text-[10px] text-amazon-textMuted">
-                          {t("approveCustomerRequest")}
+                          {issue.status === 11 ? t("approveShopRequestDesc") : t("approveCustomerRequest")}
                         </p>
                       </button>
 
@@ -257,10 +257,10 @@ const onSubmit = async (data: AdminDecisionFormValues) => {
                               : "text-amazon-text"
                           }`}
                         >
-                          {t("rejectProtectShop")}
+                          {issue.status === 11 ? t("rejectShopRequest") : t("rejectProtectShop")}
                         </p>
                         <p className="text-[10px] text-amazon-textMuted">
-                          {t("rejectCustomerRequest")}
+                          {issue.status === 11 ? t("rejectShopRequestDesc") : t("rejectCustomerRequest")}
                         </p>
                       </button>
                     </div>

@@ -1,4 +1,67 @@
 {
+  "AdjustReputationModal": {
+    "title": "Adjust {targetType} Reputation",
+    "adjustingFor": "Adjusting for:",
+    "deltaLabel": "Delta (Points)",
+    "reasonLabel": "Reason (Required)",
+    "reasonPlaceholder": "Enter reason for adjustment...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "processing": "Processing...",
+    "errorDelta": "Delta must be between -100 and +100",
+    "errorReason": "Reason is required (max 500 chars)",
+    "success": "Reputation adjusted. New Score: {score}",
+    "errorApi": "Failed to adjust reputation"
+  },
+  "ShopReputation": {
+    "title": "Shop Reputation",
+    "subtitle": "Track your performance and service quality",
+    "currentScore": "Current Quality Score",
+    "currentBadge": "Shop Badge",
+    "breakdownTitle": "Detailed Metrics Breakdown",
+    "issueRate": "Issue Rate",
+    "avgResponse": "Average Response Time",
+    "refundRate": "Refund Rate",
+    "repurchaseRate": "Repurchase Rate",
+    "positiveFeedback": "Positive Feedback Rate",
+    "improveRep": "Improve Reputation",
+    "lowerIsBetter": "Lower is better",
+    "refundRateDescription": "Percentage of refunded or returned orders",
+    "badgeHistoryTitle": "Badge History"
+  },
+  "RepayModal": {
+    "title": "Select payment method",
+    "wallet": "AMEKO Wallet",
+    "vnpay": "VNPAY",
+    "creditCard": "Credit Card (Stripe)",
+    "pinLabel": "Enter AMEKO Wallet PIN (6 digits)",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "pinRequired": "Please enter your 6-digit PIN.",
+    "paymentSuccess": "Payment successful!",
+    "paymentFailed": "Payment failed.",
+    "incorrectPin": "Incorrect PIN. Please try again.",
+    "pinNotSetup": "You have not set up a Wallet PIN. Please go to Settings to set one up.",
+    "orderNotPending": "This order is no longer in pending payment status.",
+    "genericError": "An error occurred during payment."
+  },
+  "Financial": {
+    "title": "Shop Revenue",
+    "subtitle": "Manage cash flow, revenue, and fees for the month.",
+    "closingBalance": "Closing Balance",
+    "revenue": "Revenue (Recognized)",
+    "pending": "Pending Settlement",
+    "platformFees": "Total Platform Fees",
+    "transactionHistory": "Transaction History",
+    "noData": "No Data",
+    "noDataDesc": "No transactions or wallet records found for this month.",
+    "table": {
+      "time": "Time",
+      "description": "Description",
+      "type": "Type",
+      "amount": "Amount"
+    }
+  },
   "Header": {
     "searchPlaceholderDesktop": "Search products...",
     "hiName": "Hi, {name}",
@@ -30,7 +93,18 @@
     "commissionsPool": "Commissions Pool",
     "search": "Search",
     "secureCheckout": "Secure checkout",
-    "secureCheckoutDesc": "We secure your payment and personal information when you share or save it with us. We don't share payment details with third-party sellers. We don't sell your information to others."
+    "secureCheckoutDesc": "We secure your payment and personal information when you share or save it with us. We don't share payment details with third-party sellers. We don't sell your information to others.",
+    "reputation": {
+      "label": "Reputation",
+      "locked": "Locked",
+      "tierHigh": "High",
+      "tierMid": "Mid",
+      "tierLow": "Low",
+      "shopLabel": "Shop Trust",
+      "premium": "Premium",
+      "verified": "Verified",
+      "basic": "Basic"
+    }
   },
   "Sidebar": {
     "group_overview": "Overview",
@@ -72,7 +146,9 @@
     "ruleBuilder": "Rules Builder",
     "feedback": "Feedback",
     "assembledFeedbacks": "Assembled Feedbacks",
-    "processedWithdrawals": "Processed Withdrawals"
+    "processedWithdrawals": "Processed Withdrawals",
+    "financialManagement": "Financial Management",
+    "reputation": "Reputation"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -555,7 +631,7 @@
     "amount": "Amount",
     "statusColumn": "Status",
     "date": "Date",
-    "fee": "Fee",
+    "fee": "Platform fee",
     "grossAmount": "Gross",
     "runningBalance": "Balance",
     "noTransactions": "No transactions found",
@@ -585,7 +661,8 @@
       "SalesPending": "Pending Sales",
       "OrderRefund": "Order Refund",
       "OrderPayment": "Order Payment",
-      "PlatformFee": "Platform Fee"
+      "PlatformFee": "Platform Fee",
+      "Deposit": "Deposit"
     },
     "statuses": {
       "-1": "All Statuses",
@@ -650,6 +727,7 @@
     "availableBalance": "Total Available Balance",
     "pendingEscrowBalance": "Pending Escrow Balance",
     "viewDetails": "View Details",
+    "depositFunds": "Deposit Funds",
     "withdrawFunds": "Withdraw Funds",
     "changePin": "Change PIN"
   },
@@ -673,12 +751,13 @@
   },
   "Common": {
     "save": "Save",
+    "all" : "All",
     "cancel": "Cancel",
     "cancelled": "Cancelled",
     "close": "Close",
     "back": "Back",
     "status": "Status",
-    "downloadInvoice": "Issue invoices",
+    "downloadInvoice": "Print Purchase Order",
     "name": "Name",
     "phone": "Phone",
     "address": "Address",
@@ -701,14 +780,15 @@
     "reject": "Reject",
     "processing": "Processing...",
     "canceling": "Canceling...",
-    "confirmCancel": "Confirm Cancel"
+    "confirmCancel": "Confirm Cancel",
+    "loadMore": "Load More"
   },
   "OrderDetailModal": {
     "title": "Order Details",
     "loadingOrderDetails": "Loading order details...",
     "noOrderData": "No order data found.",
     "fetchOrderDetailsFailed": "Failed to fetch order details",
-    "downloadInvoice": "Issue invoices",
+    "downloadInvoice": "Print Purchase Order",
     "updateStatusSuccess": "Order status updated successfully.",
     "updateStatusFailed": "Failed to update status.",
     "updateStatusUnexpectedError": "An error occurred while updating status.",
@@ -743,6 +823,15 @@
     "systemVoucher": "System Voucher:",
     "finalTotal": "Final Total:",
     "cancelled": "Cancelled",
+    "orderCancelledBy": "Cancelled by",
+    "orderCancelReason": "Cancellation reason",
+    "platformFee": "Platform Fee",
+    "netRevenue": "Net Revenue",
+    "revenueRecognizedAt": "Revenue recognized at",
+    "discountFromPlatform": "Discount from platform",
+    "discountFromShop": "Discount from shop",
+    "evaluateProduct": "Evaluate product",
+    "baseKit": "Base Kit",
     "status": {
       "pending": "Pending",
       "processing": "Processing",
@@ -778,6 +867,8 @@
     "viewAllOrders": "View All Orders",
     "warrantyAndReturnNotice": "Have any issue with order? ",
     "warrantyAndReturnLink": "Click here to warranty and return",
+    "orderCancelledBy": "Cancelled by",
+    "orderCancelReason": "Cancellation reason",
     "filters": {
       "all": "All",
       "pending": "Pending",
@@ -1020,6 +1111,7 @@
     "chooseAmekoVoucher": "Choose Ameko Voucher",
     "selectVoucherFrom": "Select voucher from {shopName}",
     "shopFallbackName": "Shop",
+    "baseKit": "Base Kit",
     "voucherModal": {
       "discountPercentageWithCap": "Discount {value}% (max {cap})",
       "discountPercentage": "Discount {value}%",
@@ -1062,6 +1154,9 @@
       "phoneLengthInvalid": "Phone number must be 9-15 digits",
       "shippingAddressRequired": "Shipping address is required"
     },
+    "repuLockedTitle": "Account restricted from purchasing",
+    "repuLockedDesc": "Your reputation score is too low, and the ordering feature has been temporarily locked. Please contact Customer Support.",
+    "checkoutLockedBtn": "Checkout Locked",
     "itemRow": {
       "hideComponents": "Hide components",
       "viewComponents": "View {count} components"
@@ -1174,7 +1269,10 @@
     "chat": "Chat",
     "online": "Online",
     "followersModalTitle": "Followers",
-    "followingModalTitle": "Following"
+    "followingModalTitle": "Following",
+    "reputation": {
+      "tooltip": "Quality Score: {score}/100"
+    }
   },
   "ProfilePage": {
     "shopNotFound": "Shop Not Found",
@@ -1416,8 +1514,9 @@
     "kitRecipeConfiguration": "Kit Recipe Configuration",
     "switchCount": "Switch Count",
     "switchCountPlaceholder": "e.g. 82",
-    "stabilizerCount": "Stabilizer Count",
+    "stabilizerCount": "Stab Count",
     "stabilizerCountPlaceholder": "e.g. 5",
+    "stabilizerTooltip": "Stabilizers are components that keep larger keys (like Space, Shift, Enter, Backspace) balanced and prevent them from wobbling when pressed.",
     "specAutoGeneratedHint": "Specifications (recipe + workflow) will be auto-generated and sent as JSON.",
     "isAddonEligible": "Is Addon Eligible",
     "thumbnailImage": "Thumbnail Image",
@@ -1757,7 +1856,9 @@
       "failed": "Failed"
     },
     "viewOrderDetails": "View order details",
-    "page": "Page"
+    "page": "Page",
+    "cancelledByCustomer": "Cancelled by Customer",
+    "cancelledByShop": "Cancelled by Shop"
   },
   "ShopVouchersPage": {
     "loading": "Loading vouchers...",
@@ -2580,7 +2681,8 @@
     "pageLabel": "Page",
     "usersTotalLabel": "users total",
     "prev": "Prev",
-    "next": "Next"
+    "next": "Next",
+    "reputation": "Reputation"
   },
   "CreateUserModal": {
     "validation": {
@@ -2720,7 +2822,8 @@
     "toastUnbanSuccess": "Shop \"{shopName}\" has been unbanned!",
     "toastApproveSuccess": "Shop approved successfully!",
     "toastRejectSuccess": "Shop rejected successfully!",
-    "toastDecisionFailed": "Handle admin decision failed"
+    "toastDecisionFailed": "Handle admin decision failed",
+    "reputation":"Reputation"
   },
   "ShopApplicationModal": {
     "statusPending": "Pending",
@@ -3075,8 +3178,12 @@
     "adminJudgment": "Admin's Judgment",
     "approveRequest": "Approve Request",
     "approveCustomerRequest": "Approve customer's request",
+    "approveShopRequest": "Approve Shop's Request",
+    "approveShopRequestDesc": "Approve shop's request (Customer will not get refund)",
     "rejectProtectShop": "Reject",
     "rejectCustomerRequest": "Reject customer's request",
+    "rejectShopRequest": "Reject Shop's Request",
+    "rejectShopRequestDesc": "Reject shop's request (Customer will get refund)",
     "judgmentNote": "Judgment Note",
     "judgmentNotePlaceholder": "Enter Admin's reason/note for judgment...",
     "cancel": "Cancel",
@@ -3543,6 +3650,19 @@
     "bio": "Bio",
     "noDescriptionAvailable": "No description available.",
     "changePassword": "Change Password",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "repu": {
+      "title": "Reputation Profile",
+      "points": "pts",
+      "tier": "Tier",
+      "locked": "Locked",
+      "monthlyLimit": "Monthly Order Limit",
+      "unlimited": "Unlimited",
+      "orders": "orders",
+      "autoCancels": "Auto-canceled Orders",
+      "recentLogs": "Recent Activity",
+      "noLogs": "No recent reputation changes.",
+      "lockedWarning": "Your purchasing ability has been locked due to low reputation score. Please contact support."
+    }
   }
 }

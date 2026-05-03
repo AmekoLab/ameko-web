@@ -12,6 +12,7 @@ import {
 import { ShopStatus } from "@/src/types/shop.types";
 import { toast } from "react-toastify";
 import { ShopApplicationModal } from "@/src/components/Profile/ShopApplicationModal";
+import { AdjustReputationModal } from "@/src/components/Admin/AdjustReputationModal";
 
 export default function AdminShopRequestsPage() {
   const locale = useLocale();
@@ -33,6 +34,14 @@ export default function AdminShopRequestsPage() {
   // 3. State cho Modal Xem Chi Tiết
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewingShop, setViewingShop] = useState<any | null>(null);
+
+  const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
+  const [adjustingShop, setAdjustingShop] = useState<any | null>(null);
+
+  const openAdjustModal = (shop: any) => {
+    setAdjustingShop(shop);
+    setIsAdjustModalOpen(true);
+  };
 
   useEffect(() => {
     dispatch(fetchAdminShopList({ page: 1, size: 20 }));
@@ -308,13 +317,22 @@ export default function AdminShopRequestsPage() {
                           </button>
                         </div>
                       ) : shop.status === ShopStatus.Active ? (
-                        <button
-                          onClick={() => openActionModal(shop, "ban")}
-                          className="text-[10px] font-medium text-red-600 hover:text-red-800 px-2 py-1 rounded border border-transparent hover:border-red-200 hover:bg-red-50 transition-colors inline-block"
-                          title={t("banTitle")}
-                        >
-                          {t("ban")}
-                        </button>
+                        <div className="flex justify-end gap-1">
+                          <button
+                            onClick={() => openAdjustModal(shop)}
+                            className="text-[10px] font-medium text-blue-600 hover:text-blue-800 px-2 py-1 rounded border border-transparent hover:border-blue-200 hover:bg-blue-50 transition-colors inline-block"
+                            title="Điều chỉnh uy tín"
+                          >
+                           {t("reputation")}
+                          </button>
+                          <button
+                            onClick={() => openActionModal(shop, "ban")}
+                            className="text-[10px] font-medium text-red-600 hover:text-red-800 px-2 py-1 rounded border border-transparent hover:border-red-200 hover:bg-red-50 transition-colors inline-block"
+                            title={t("banTitle")}
+                          >
+                            {t("ban")}
+                          </button>
+                        </div>
                       ) : shop.status === ShopStatus.Banned ? (
                         <button
                           onClick={() => openActionModal(shop, "unban")}
@@ -418,6 +436,20 @@ export default function AdminShopRequestsPage() {
           isOpen={isViewModalOpen}
           onClose={() => setIsViewModalOpen(false)}
           shopData={viewingShop}
+        />
+      )}
+
+      {/* --- MODAL ĐIỀU CHỈNH UY TÍN --- */}
+      {adjustingShop && (
+        <AdjustReputationModal
+          isOpen={isAdjustModalOpen}
+          onClose={() => {
+            setIsAdjustModalOpen(false);
+            setAdjustingShop(null);
+          }}
+          targetType="Shop"
+          targetId={adjustingShop.id}
+          targetName={adjustingShop.shopName}
         />
       )}
     </div>

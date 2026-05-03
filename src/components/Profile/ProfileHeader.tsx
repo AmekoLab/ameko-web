@@ -9,16 +9,16 @@ import {
   Wrench,
   ChevronDown,
   FileText,
+  Award,
+  ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/src/store/index";
-import {
-  toggleFollowUser,
-  fetchFollowingList,
-} from "@/src/store/slices/followsSlice";
+import { toggleFollowUser, fetchFollowingList } from "@/src/store/slices/followsSlice";
 import { ShopPublicProfile } from "@/src/types/shop.types";
+import { shopReputationService, ShopReputationCurrent } from "@/src/services/shopReputation.service";
 import { ImageModal } from "../Community/ImageModal";
 
 import { FollowsModal } from "./FollowModal";
@@ -56,6 +56,21 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
   const { followingIds, isLoading } = useSelector(
     (state: RootState) => state.follows,
   );
+
+  // Reputation State
+  const [shopReputation, setShopReputation] = useState<ShopReputationCurrent | null>(null);
+
+  useEffect(() => {
+    if (profile?.id) {
+      shopReputationService.getPublicShopReputation(profile.id)
+        .then((res) => {
+          if (res.success && res.data) {
+            setShopReputation(res.data);
+          }
+        })
+        .catch((err) => console.error("Failed to fetch public shop reputation", err));
+    }
+  }, [profile?.id]);
 
   // 2. Logic kiểm tra quyền và trạng thái follow
   const isMe = isAuthenticated && user?.id === profile.userId;
@@ -172,9 +187,29 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
               <h1 className="text-2xl font-black text-amazon-text">
                 {profile.shopName}
               </h1>
-              <span className="inline-flex items-center gap-1 bg-amazon-btnSecondary text-amazon-text px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border border-amazon-border">
-                <CheckCircle className="w-3 h-3" /> {t("verifiedShop")}
-              </span>
+              
+              {/* Dynamic Reputation Badge */}
+             {shopReputation && (
+                <span 
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wide border cursor-help transition-all ${
+                    shopReputation.badge === "Premium" 
+                      ? "bg-gradient-to-r from-yellow-50 to-amber-100 text-amber-700 border-yellow-300 shadow-sm"
+                      : shopReputation.badge === "Verified"
+                      ? "bg-blue-50 text-blue-700 border-blue-200"
+                      : "bg-neutral-100 text-neutral-600 border-neutral-200"
+                  }`}
+                  title={t("reputation.tooltip", { score: shopReputation.currentQualityScore })}
+                >
+                  {shopReputation.badge === "Premium" ? (
+                    <Award className="w-4 h-4 text-amber-600" />
+                  ) : shopReputation.badge === "Verified" ? (
+                    <ShieldCheck className="w-4 h-4 text-blue-600" />
+                  ) : (
+                    <CheckCircle className="w-4 h-4 text-neutral-500" />
+                  )}
+                  {shopReputation.badge} Shop
+                </span>
+              )}
             </div>
 
             <p className="text-sm text-amazon-textMuted font-medium mb-3">

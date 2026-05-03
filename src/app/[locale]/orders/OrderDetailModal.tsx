@@ -428,6 +428,25 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
             </div>
           ) : (
             <div className="space-y-6">
+              {/* CANCELLATION BANNER */}
+              {order.orderStatus === "Cancelled" && order.cancelledBy && (
+                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-sm flex items-start gap-3">
+                  <div className="p-1 bg-red-100 rounded-full shrink-0">
+                    <X className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-red-800">
+                     {t("orderCancelledBy")} {order.cancelledBy === "Customer" ? "Khách hàng" : order.cancelledBy}
+                    </h3>
+                    {order.cancelReason && (
+                      <p className="text-sm text-red-600 mt-1">
+                        <span className="font-medium">{t("orderCancelReason")}</span> {order.cancelReason}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* 1. STATUS BANNER (TOP) */}
               <div className="bg-neutral-50 border border-amazon-border rounded-sm p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 {/* Left: Status & Date */}
@@ -820,12 +839,12 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                                   <div className="flex flex-col items-end gap-0.5">
                                     {(item.systemAllocatedDiscount ?? 0) > 0 && (
                                       <span className="text-[10px] text-green-600 bg-green-50 border border-green-100 px-1.5 py-0.5 rounded-sm">
-                                        Giảm từ Sàn: -{formatCurrency(item.systemAllocatedDiscount!)}
+                                        {t("discountFromPlatform") || "Discount from Platform"}: -{formatCurrency(item.systemAllocatedDiscount!)}
                                       </span>
                                     )}
                                     {(item.shopAllocatedDiscount ?? 0) > 0 && (
                                       <span className="text-[10px] text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-sm">
-                                        Giảm từ Shop: -{formatCurrency(item.shopAllocatedDiscount!)}
+                                        {t("discountFromShop") || "Discount from Shop"}: -{formatCurrency(item.shopAllocatedDiscount!)}
                                       </span>
                                     )}
                                   </div>
@@ -850,7 +869,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                                             }
                                             className="text-xs text-amazon-text bg-amazon-btnPrimary rounded-sm px-3 py-1.5 hover:brightness-95 transition-colors font-medium border border-amazon-border"
                                           >
-                                            Đánh giá Sản phẩm
+                                            {t("evaluateProduct")}
                                           </button>
                                         );
                                       }
@@ -867,7 +886,7 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                                             }
                                             className="text-xs text-amazon-text bg-white border border-amazon-border rounded-sm px-3 py-1.5 hover:bg-neutral-100 transition-colors font-medium"
                                           >
-                                            Xem / Sửa đánh giá
+                                            {t("viewOrEditFeedback")}
                                           </button>
                                         );
                                       }
@@ -879,15 +898,31 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                           </div>
 
                           {/* Custom Components Nesting */}
-                          {item.isCustom &&
-                            item.orderItemComponents &&
-                            item.orderItemComponents.length > 0 && (
-                              <div className="mt-2 pt-4 border-t border-amazon-border border-dashed">
-                                <p className="text-xs font-medium text-amazon-textMuted mb-3 block">
-                                  {t("includesCustomParts")}
-                                </p>
-                                <div className="space-y-3">
-                                  {item.orderItemComponents.map((part) => (
+                          {item.isCustom && (
+                            <div className="mt-2 pt-4 border-t border-amazon-border border-dashed">
+                              <p className="text-xs font-bold text-amazon-text mb-3 block uppercase tracking-wider">
+                                {t("includesCustomParts") || "Chi tiết linh kiện Build"}
+                              </p>
+                              <div className="space-y-3">
+                                {/* BASE KIT */}
+                                {item.baseKitPriceSnapshot != null && (
+                                  <div className="flex items-center gap-3 pb-3 border-b border-amazon-border border-dashed">
+                                    <div className="relative w-10 h-10 bg-neutral-100 border border-amazon-border rounded-sm flex-shrink-0 flex items-center justify-center">
+                                      <Keyboard className="w-5 h-5 text-neutral-400" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-bold text-amazon-text truncate">
+                                        {t("baseKit") || "Base Kit"}
+                                      </p>
+                                      <p className="text-xs font-normal text-amazon-textMuted">
+                                        {tCommon("qty") || "SL"}: <span className="text-amazon-link">1</span> × {formatCurrency(item.baseKitPriceSnapshot)}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* OTHER COMPONENTS */}
+                                {item.orderItemComponents?.map((part) => (
                                     <div
                                       key={part.partId}
                                       className="flex items-center gap-3"
@@ -987,6 +1022,26 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                 {formatCurrency(order.totalAmount)}
               </span>
             </div>
+
+            {/* Platform Fee & Revenue - ONLY FOR SHOP/ADMIN */}
+            {!isBuyerContext && order.platformFeeAmount !== undefined && (
+              <>
+                <div className="flex justify-between text-sm py-1 border-t border-amazon-border border-dashed mt-2 pt-2">
+                  <span className="text-amazon-textMuted italic">{t("platformFee")}:</span>
+                  <span className="text-red-500">-{formatCurrency(order.platformFeeAmount!)}</span>
+                </div>
+                <div className="flex justify-between text-sm py-1 font-bold bg-neutral-50 px-2 rounded-sm mt-1">
+                  <span className="text-amazon-text">{t("netRevenue")}:</span>
+                  <span className="text-green-600">{formatCurrency(order.totalAmount - (order.platformFeeAmount || 0))}</span>
+                </div>
+                {order.revenueRecognizedAt && (
+                  <div className="flex justify-between text-[10px] text-neutral-400 mt-1 px-2 italic">
+                    <span>{t("revenueRecognizedAt")}:</span>
+                    <span>{format(parseISO(order.revenueRecognizedAt), "dd/MM/yyyy HH:mm")}</span>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
       </div>

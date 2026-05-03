@@ -2,6 +2,34 @@
 // Order / Cart / Checkout Types
 // ============================================================
 
+export interface PaginatedResult<T> {
+  items: T[];
+  totalCount: number;
+  currentPage: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+export interface GetMyOrdersParams {
+  page?: number;
+  size?: number;
+  status?: string;
+  shopName?: string;
+  fromDate?: string;
+  toDate?: string;
+}
+
+export interface GetMyPaymentHistoryParams {
+  page?: number;
+  size?: number;
+  paymentStatus?: string;
+  paymentMethod?: string;
+  fromDate?: string;
+  toDate?: string;
+}
+
 /** A component inside a custom-built order item */
 export interface OrderItemComponent {
   partId: string;
@@ -35,6 +63,7 @@ export interface OrderItem {
   allocatedDiscount?: number;
   finalPrice?: number;
   itemStatus?: string; // e.g., "Active" or "Cancelled"
+  baseKitPriceSnapshot?: number | null;
 }
 
 /** Cart data returned by GET /orders/cart */
@@ -58,6 +87,10 @@ export interface CartData {
   shippingAddress: string;
   note: string | null;
   createdAt: string;
+  cancelledBy?: "Shop" | "Customer" | "System" | null;
+  cancelReason?: string | null;
+  platformFeeAmount?: number;
+  revenueRecognizedAt?: string | null;
   orderItems: OrderItem[];
 }
 
@@ -113,6 +146,7 @@ export interface PaymentHistoryOrderItem {
   totalPrice: number;
   isCustom: boolean;
   hasWarrantyRequest?: boolean;
+  baseKitPriceSnapshot?: number | null;
 }
 
 /** A single order within a payment-history order group */
@@ -129,6 +163,10 @@ export interface PaymentHistoryOrder {
   discountAmount: number;
   totalAmount: number;
   createdAt: string;
+  cancelledBy?: "Shop" | "Customer" | "System" | null;
+  cancelReason?: string | null;
+  platformFeeAmount?: number;
+  revenueRecognizedAt?: string | null;
   orderItems: PaymentHistoryOrderItem[];
 }
 

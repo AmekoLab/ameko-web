@@ -103,6 +103,26 @@ export interface HeldTransaction {
   reason: string;
 }
 
+export interface WalletTransactionResponse {
+  id: string;
+  amount: number;
+  type: string;
+  description: string;
+  createdAt: string;
+}
+
+export interface WalletStatementResponse {
+  month: number;
+  year: number;
+  openingBalance: number;
+  closingBalance: number;
+  totalSalesRevenue: number;
+  totalSalesPending: number;
+  totalPlatformFees: number;
+  transactionCount: number;
+  transactions: WalletTransactionResponse[];
+}
+
 export interface PaginatedResponse<T> {
   items: T[];
   totalCount: number;
@@ -178,6 +198,14 @@ export const walletService = {
    */
   withdraw: async (payload: WithdrawPayload): Promise<ApiResponse<null>> => {
     return api.post<unknown, ApiResponse<null>>("/wallet/withdraw", payload);
+  },
+
+  /**
+   * Request to deposit funds into the wallet.
+   * POST /wallet/deposit
+   */
+  deposit: async (payload: { amount: number; successUrl?: string; cancelUrl?: string }): Promise<ApiResponse<{ url: string }>> => {
+    return api.post<unknown, ApiResponse<{ url: string }>>("/wallet/deposit", payload);
   },
 
   /**
@@ -312,5 +340,13 @@ export const walletService = {
     return api.get<unknown, TransactionResponse>("/Wallet/transactions", {
       params: query,
     });
+  },
+
+  /**
+   * Fetch wallet statements for a specific month/year.
+   * GET /wallet/statements
+   */
+  getWalletStatements: async (month: number, year: number): Promise<ApiResponse<WalletStatementResponse>> => {
+    return api.get(`/wallet/statements?month=${month}&year=${year}`);
   },
 };

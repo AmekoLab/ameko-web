@@ -20,7 +20,8 @@ export const categoryService = {
    * - Shop (with shopId): returns global + shop's private categories
    */
   getCategories: async (shopId?: string) => {
-    const params = shopId ? `?ShopId=${shopId}` : "";
+    // Explicitly set pageSize=200 as recommended by backend
+    const params = shopId ? `?ShopId=${shopId}&pageSize=200` : "?pageSize=200";
     return api.get<any, ApiResponse<CategoryItem[]>>(
       `/catalog/categories${params}`,
     );

@@ -11,6 +11,7 @@ import {
   Calendar,
   ShieldAlert,
   CreditCard,
+  Loader2,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { fetchMyPaymentHistory } from "@/src/store/slices/orderSlice";
@@ -301,7 +302,13 @@ const OrderCard: FC<OrderCardProps> = ({
 const MyPaymentsPage: FC = () => {
   const dispatch = useAppDispatch();
   const t = useTranslations("MyPaymentsPage");
-  const { orderGroups, loadingHistory } = useAppSelector(
+  const tCommon = useTranslations("Common");
+  
+  const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  
+  const { orderGroups, loadingHistory, hasNextPage } = useAppSelector(
     (state) => state.order,
   );
   const { warrantyList } = useAppSelector((state) => state.warranty);
@@ -332,11 +339,18 @@ const MyPaymentsPage: FC = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(fetchMyPaymentHistory());
-    dispatch(fetchMyWarrantyRequests({ page: 1, pageSize: 100 }));
-  }, [dispatch]);
+    dispatch(fetchMyPaymentHistory({ page, size: 10, paymentStatus: statusFilter }));
+    if (page === 1) {
+      dispatch(fetchMyWarrantyRequests({ page: 1, pageSize: 100 }));
+    }
+  }, [dispatch, page, statusFilter]);
 
-  if (loadingHistory) return <PaymentHistorySkeleton />;
+  const handleFilterChange = (status: string) => {
+    setStatusFilter(status);
+    setPage(1);
+  };
+
+  if (loadingHistory && page === 1) return <PaymentHistorySkeleton />;
 
   return (
     <div className="bg-neutral-50 min-h-[calc(100vh-4rem)] text-neutral-900 font-sans">
@@ -351,6 +365,23 @@ const MyPaymentsPage: FC = () => {
           <p className="mt-3 text-sm text-neutral-500 max-w-2xl leading-relaxed">
             {t("description")}
           </p>
+        </div>
+
+        {/* Filter Pills */}
+        <div className="flex flex-wrap gap-2 mb-8">
+          {["all", "Pending", "Paid", "Released", "Failed", "Refunded"].map((status) => (
+            <button
+              key={status}
+              onClick={() => handleFilterChange(status)}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm border ${
+                statusFilter === status
+                  ? "bg-neutral-900 text-white border-neutral-900"
+                  : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+              }`}
+            >
+              {status === "all" ? tCommon("all") : t(`paymentStatusValues.${status.toLowerCase()}`) || status}
+            </button>
+          ))}
         </div>
 
         {orderGroups.length === 0 ? (
@@ -410,6 +441,24 @@ const MyPaymentsPage: FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Load More Button */}
+        {hasNextPage && (
+          <div className="flex justify-center mt-10">
+            <button
+              onClick={() => {
+                setIsFetchingMore(true);
+                setPage((prev) => prev + 1);
+                setTimeout(() => setIsFetchingMore(false), 1000); // UI feedback
+              }}
+              disabled={loadingHistory || isFetchingMore}
+              className="px-6 py-2.5 bg-white border border-neutral-200 text-neutral-700 font-medium rounded-xl hover:bg-neutral-50 transition-colors flex items-center gap-2 shadow-sm"
+            >
+              {(loadingHistory || isFetchingMore) && <Loader2 className="w-4 h-4 animate-spin" />}
+              {tCommon("loadMore") || "Tải thêm"}
+            </button>
           </div>
         )}
 

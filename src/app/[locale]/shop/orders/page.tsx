@@ -45,43 +45,50 @@ export default function ShopOrdersPage() {
   >(STATUS_FILTERS[0].value);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce logic for search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500); // 500ms delay
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Reset page to 1 when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [activeStatusFilter, debouncedSearch]);
+
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const res = await shopOrderService.getShopOrders(page, size);
+        const res = await shopOrderService.getShopOrders({
+          page,
+          size,
+          status: activeStatusFilter,
+          search: debouncedSearch
+        });
+        
         if (res.success && res.data) {
-          setOrders(res.data);
+          // Backward compatibility check to prevent .filter or .map crashes
+          const itemsList = Array.isArray(res.data) ? res.data : ((res.data as any).items || []);
+          setOrders(itemsList);
         } else {
           toast.error(res.message || t("errors.fetchFailed"));
         }
       } catch (err: unknown) {
-        const msg =
-          (err as { message?: string }).message || t("errors.fetchError");
+        const msg = (err as { message?: string }).message || t("errors.fetchError");
         toast.error(msg);
       } finally {
         setLoading(false);
       }
     };
     fetchOrders();
-  }, [page, t]);
+  }, [page, activeStatusFilter, debouncedSearch, t]);
 
-  const filteredOrders = useMemo(() => {
-    return orders.filter((order) => {
-      const matchStatus =
-        activeStatusFilter === STATUS_FILTERS[0].value ||
-        order.orderStatus === activeStatusFilter;
 
-      const lowerSearch = searchTerm.toLowerCase();
-      const matchSearch =
-        !searchTerm ||
-        order.orderId.toLowerCase().includes(lowerSearch) ||
-        order.receiverName.toLowerCase().includes(lowerSearch) ||
-        order.receiverPhone.toLowerCase().includes(lowerSearch);
-
-      return matchStatus && matchSearch;
-    });
-  }, [orders, activeStatusFilter, searchTerm]);
 
   const getStatusBadgeStyles = (status: string) => {
     switch (status.toLowerCase()) {
@@ -171,7 +178,7 @@ export default function ShopOrdersPage() {
               <Loader2 className="w-8 h-8 text-amazon-textMuted animate-spin mb-4" />
               <p className="text-[11px] font-medium">{t("loading")}</p>
             </div>
-          ) : filteredOrders.length === 0 ? (
+          ) : orders.length === 0 ? (
             <div className="p-16 flex flex-col items-center justify-center text-center">
               <Package className="w-16 h-16 text-neutral-300 mb-4" />
               <p className="text-[12px] font-medium text-amazon-text mb-1">
@@ -212,7 +219,7 @@ export default function ShopOrdersPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-amazon-border">
-                  {filteredOrders.map((order) => {
+                  {orders.map((order) => {
                     const firstItem = order.orderItems[0];
                     const hasMore = order.orderItems.length > 1;
 
@@ -257,9 +264,16 @@ export default function ShopOrdersPage() {
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="text-[11px] font-medium text-amazon-text truncate max-w-[200px]">
-                                {firstItem?.productName || t("unknownProduct")}
-                              </p>
+                              <div className="flex flex-col gap-1 max-w-[200px]">
+                                <p className="text-[11px] font-medium text-amazon-text truncate">
+                                  {firstItem?.productName || t("unknownProduct")}
+                                </p>
+                                {order.orderStatus === "Cancelled" && order.cancelledBy && (
+                                  <span className="w-fit px-1.5 py-0.5 text-[9px] font-bold bg-red-100 text-red-700 rounded-sm">
+                                    {order.cancelledBy === "Customer" ? t("cancelledByCustomer") : t("cancelledByShop")}
+                                  </span>
+                                )}
+                              </div>
                               {hasMore && (
                                 <p className="text-[9px] font-normal text-amazon-textMuted mt-0.5">
                                   {t("otherItems", {
@@ -319,7 +333,7 @@ export default function ShopOrdersPage() {
           )}
 
           {/* Pagination */}
-          {(!loading && filteredOrders.length > 0) || page > 1 ? (
+          {(!loading && orders.length > 0) || page > 1 ? (
             <div className="flex items-center justify-between px-5 py-4 border-t border-amazon-border bg-white">
               <p className="text-[10px] font-medium text-amazon-textMuted">
                 {t("page")}{" "}

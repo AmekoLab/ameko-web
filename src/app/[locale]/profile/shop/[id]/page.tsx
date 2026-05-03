@@ -31,7 +31,7 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return { title: t("shopNotFound") };
   }
 }
@@ -66,7 +66,7 @@ export default async function ProfilePage({ params }: PageProps) {
       </div>
     );
   } catch (error) {
-    console.error("Lỗi khi tải trang Profile:", error);
+    // console.error("Lỗi khi tải trang Profile:", error);
     notFound();
   }
 }

@@ -23,7 +23,9 @@ import {
   X,
   Store,
   User,
+  AlertCircle,
 } from "lucide-react";
+import { reputationService, CustomerReputationData } from "@/src/services/reputation.service";
 import { orderService } from "@/src/services/order.service";
 import { CartData, OrderItem } from "@/src/types/order.types";
 import { toast } from "react-toastify";
@@ -166,10 +168,22 @@ function CheckoutContent() {
   // ── Wallet and Auth state ─────────────────────────────────────────────
   const { details: walletDetails } = useAppSelector((state) => state.wallet);
   const { user } = useAppSelector((state) => state.auth);
+  const [reputation, setReputation] = useState<CustomerReputationData | null>(null);
 
   useEffect(() => {
     dispatch(fetchWalletDetails());
   }, [dispatch]);
+
+  // Fetch Reputation
+  useEffect(() => {
+    reputationService.getMyReputation()
+      .then((res) => {
+        if (res.success && res.data) {
+          setReputation(res.data);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch reputation for checkout", err));
+  }, []);
 
   const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -356,7 +370,15 @@ function CheckoutContent() {
         const res = await orderService.checkout(payload);
 
         if (res.success) {
+          if (res.data?.orderGroupId) {
+            localStorage.setItem("pending_order_id", res.data.orderGroupId);
+          }
+
           if (res.data?.paymentUrl) {
+            const sessionMatch = res.data.paymentUrl.match(/cs_(test|live)_[a-zA-Z0-9]+/);
+            if (sessionMatch) {
+              localStorage.setItem("pending_session_id", sessionMatch[0]);
+            }
             window.location.href = res.data.paymentUrl;
           } else {
             window.location.href = `/payment-success?orderId=${res.data?.orderGroupId || ""}`;
@@ -371,8 +393,17 @@ function CheckoutContent() {
           setSubmitting(false);
         }
       } catch (error: unknown) {
-        const err = error as { message?: string };
-        toast.error(err.message || t("toasts.checkoutFailed"));
+        const err = error as { message?: string; response?: any };
+        const status = err?.response?.status;
+        const msg = err?.response?.data?.message || err?.message;
+        
+        if (status === 403 && msg?.includes("locked from purchasing")) {
+          toast.error(t("errorLocked") || "Bạn đã bị khóa tính năng mua hàng do điểm uy tín.");
+        } else if (status === 403 && msg?.includes("Monthly order limit reached")) {
+          toast.error(t("errorLimitReached") || "Bạn đã đạt giới hạn số đơn hàng tối đa trong tháng.");
+        } else {
+          toast.error(msg || t("toasts.checkoutFailed"));
+        }
         setSubmitting(false);
       }
     },
@@ -523,6 +554,21 @@ function CheckoutContent() {
             <ChevronRight className="w-4 h-4" />
             <span>{t("breadcrumb.payment")}</span>
           </nav>
+
+          {/* REPUTATION LOCK WARNING */}
+          {reputation?.gate.isLocked && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
+              <div>
+                <h3 className="font-bold text-red-800 text-sm">
+                  {t("repuLockedTitle") || "Tài khoản bị hạn chế mua hàng"}
+                </h3>
+                <p className="text-red-600 text-sm mt-1">
+                  {t("repuLockedDesc") || "Điểm uy tín của bạn quá thấp nên tính năng đặt hàng đã bị khóa tạm thời. Vui lòng liên hệ CSKH."}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* ─── Shipping Information ─────────────────────── */}
           <div className="mb-10">
@@ -896,15 +942,21 @@ function CheckoutContent() {
             type="submit"
             form="checkout-form"
             disabled={
-              submitting || isCalculatingPreview || cartPreview === null
+              submitting || isCalculatingPreview || cartPreview === null || reputation?.gate?.isLocked
             }
-            className="w-full bg-neutral-900 text-white hover:bg-neutral-800 py-4 rounded-xl font-semibold transition-all text-base shadow-md disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.98]"
+            className={`w-full py-4 rounded-xl font-semibold transition-all text-base shadow-md flex items-center justify-center gap-2 active:scale-[0.98] ${
+              reputation?.gate?.isLocked 
+                ? "bg-neutral-400 text-neutral-100 cursor-not-allowed opacity-80" 
+                : "bg-neutral-900 text-white hover:bg-neutral-800 disabled:opacity-60 disabled:cursor-not-allowed"
+            }`}
           >
             {submitting ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
                 {t("processing")}
               </>
+            ) : reputation?.gate?.isLocked ? (
+              t("checkoutLockedBtn") || "Khóa đặt hàng"
             ) : paymentMethod === 1 ? (
               t("payWithWallet")
             ) : paymentMethod === 2 ? (

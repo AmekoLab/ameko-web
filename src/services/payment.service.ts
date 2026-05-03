@@ -28,4 +28,12 @@ export const paymentService = {
       };
     }
   },
+
+  /**
+   * Verify Stripe Session status.
+   * GET /Payment/verify-session?sessionId={sessionId}
+   */
+  verifySession: async (sessionId: string): Promise<any> => {
+    return await api.get(`/Payment/verify-session?sessionId=${sessionId}`);
+  },
 };

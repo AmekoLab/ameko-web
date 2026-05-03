@@ -7,6 +7,7 @@ import { fetchAdminUserList } from "@/src/store/slices/adminUsersSlice";
 import CreateUserModal from "@/src/components/Admin/CreateUserModal";
 import EditUserModal from "@/src/components/Admin/EditUserModal";
 import { AdminUserItem } from "@/src/types/admin.types";
+import { AdjustReputationModal } from "@/src/components/Admin/AdjustReputationModal";
 
 export default function AdminUsersPage() {
   const t = useTranslations("AdminUsersPage");
@@ -19,6 +20,8 @@ export default function AdminUsersPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUserItem | null>(null);
+  const [showAdjustModal, setShowAdjustModal] = useState(false);
+  const [adjustingUser, setAdjustingUser] = useState<AdminUserItem | null>(null);
   const pageSize = 10;
 
   useEffect(() => {
@@ -234,16 +237,31 @@ export default function AdminUsersPage() {
 
                     {/* Col 7: Actions */}
                     <td className="px-3 py-2 text-center text-[11px] text-amazon-text">
-                      <button
-                        onClick={() => {
-                          setEditingUser(user);
-                          setShowEditModal(true);
-                        }}
-                        className="text-[10px] font-medium text-blue-600 hover:text-blue-800 px-2 py-1 rounded border border-transparent hover:border-blue-200 hover:bg-blue-50 transition-colors"
-                        title={t("editUserTitle")}
-                      >
-                        {t("editUser")}
-                      </button>
+                      <div className="flex items-center justify-center gap-2">
+                        {/* Only show Adjust Reputation for Customers/Shops, not Admins */}
+                        {user.roleName !== "Admin" && user.roleName !== "Shop" && (
+                          <button
+                            onClick={() => {
+                              setAdjustingUser(user);
+                              setShowAdjustModal(true);
+                            }}
+                            className="text-[10px] font-medium text-purple-600 hover:text-purple-800 px-2 py-1 rounded border border-transparent hover:border-purple-200 hover:bg-purple-50 transition-colors"
+                            title="Điều chỉnh điểm Uy tín"
+                          >
+                           {t("reputation")}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => {
+                            setEditingUser(user);
+                            setShowEditModal(true);
+                          }}
+                          className="text-[10px] font-medium text-blue-600 hover:text-blue-800 px-2 py-1 rounded border border-transparent hover:border-blue-200 hover:bg-blue-50 transition-colors"
+                          title={t("editUserTitle")}
+                        >
+                          {t("editUser")}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -318,6 +336,23 @@ export default function AdminUsersPage() {
           dispatch(fetchAdminUserList({ currentPage, pageSize }));
         }}
       />
+
+      {/* Adjust Reputation Modal */}
+      {adjustingUser && (
+        <AdjustReputationModal
+          isOpen={showAdjustModal}
+          onClose={() => {
+            setShowAdjustModal(false);
+            setAdjustingUser(null);
+          }}
+          targetType={adjustingUser.roleName === "Shop" ? "Shop" : "Customer"}
+          targetId={adjustingUser.id}
+          targetName={adjustingUser.fullName || adjustingUser.username}
+          onSuccess={() => {
+            // Optional: You can trigger a re-fetch of the user list here if the API returns reputation in the list
+          }}
+        />
+      )}
     </div>
   );
 }

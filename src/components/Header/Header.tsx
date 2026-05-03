@@ -15,6 +15,8 @@ import { Link, usePathname } from "@/src/i18n/routing";
 import { Loader2 } from "lucide-react";
 import type { AssembledProductItem } from "@/src/types/assembledProduct.types";
 import { assembledProductService } from "@/src/services/assembledProduct.service";
+import { reputationService, CustomerReputationData } from "@/src/services/reputation.service";
+import { shopReputationService, ShopReputationCurrent } from "@/src/services/shopReputation.service";
 
 /* ─── Inline SVG icon helpers ─── */
 const MenuIcon = () => (
@@ -137,6 +139,28 @@ export const Header: FC = () => {
   const [suggestions, setSuggestions] = useState<AssembledProductItem[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // --- Reputation State ---
+  const [reputation, setReputation] = useState<CustomerReputationData | null>(null);
+  const [shopReputation, setShopReputation] = useState<ShopReputationCurrent | null>(null);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+
+    // Fetch Customer Reputation
+    if (user.role === "Customer" || user.role === "User") {
+      reputationService.getMyReputation()
+        .then((res) => { if (res.success) setReputation(res.data); })
+        .catch(console.error);
+    } 
+    
+    // Fetch Shop Reputation
+    if (user.role === "Shop") {
+      shopReputationService.getMyCurrent()
+        .then((res) => { if (res.success) setShopReputation(res.data); })
+        .catch(console.error);
+    }
+  }, [isAuthenticated, user]);
 
   // Cart item count from server cart
   const cartItemCount = serverCart?.orderItems
@@ -501,13 +525,99 @@ export const Header: FC = () => {
               {/* Dropdown */}
               {userDropdownOpen && isAuthenticated && user && (
                 <div className="absolute left-0 top-full mt-1 w-56 bg-white border border-amazon-border shadow-xl py-1 z-50 rounded-md font-sans">
-                  <div className="px-4 py-2.5 border-b border-amazon-border mb-1">
+                  <div className="px-4 py-3 border-b border-amazon-border mb-1">
+                    {/* Line 1: Email */}
                     <p className="text-amazon-text font-bold truncate text-sm leading-tight">
                       {user.email}
                     </p>
-                    <p className="text-xs text-amazon-textMuted mt-0.5">
-                      {user.role}
-                    </p>
+
+                    {/* Line 2: Role & Tier Badge */}
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-xs text-amazon-textMuted">
+                        {user.role}
+                      </p>
+
+                      {/* Render Shop Badge if Shop */}
+                      {shopReputation && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                          shopReputation.badge === "Premium" ? "bg-yellow-100 text-yellow-700" :
+                          shopReputation.badge === "Verified" ? "bg-blue-100 text-blue-700" :
+                          "bg-neutral-100 text-green-700"
+                        }`}>
+                          {shopReputation.badge}
+                        </span>
+                      )}
+
+                      {/* Render Customer Tier if Customer (Old Logic) */}
+                      {reputation && !shopReputation && (
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                            reputation.gate.isLocked
+                              ? "bg-red-100 text-red-700"
+                              : reputation.gate.tier === "High"
+                              ? "bg-green-100 text-green-700"
+                              : reputation.gate.tier === "Mid" || reputation.gate.tier === "Normal"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-orange-100 text-orange-700"
+                          }`}
+                        >
+                          {reputation.gate.isLocked
+                            ? t("reputation.locked")
+                            : reputation.gate.tier === "High"
+                            ? t("reputation.tierHigh")
+                            : reputation.gate.tier === "Mid" || reputation.gate.tier === "Normal"
+                            ? t("reputation.tierMid")
+                            : t("reputation.tierLow")}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Line 3: Reputation Progress Bar for Customer */}
+                    {reputation && !shopReputation && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-[11px] text-amazon-textMuted font-medium">
+                          {t("reputation.label")}
+                        </span>
+                        <div className="flex-1 h-1.5 bg-neutral-200 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ease-out ${
+                              reputation.gate.isLocked
+                                ? "bg-red-500"
+                                : reputation.gate.tier === "High"
+                                ? "bg-green-500"
+                                : reputation.gate.tier === "Mid" || reputation.gate.tier === "Normal"
+                                ? "bg-blue-500"
+                                : "bg-orange-500"
+                            }`}
+                            style={{ width: `${Math.min(Math.max(reputation.currentScore, 0), 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-amazon-text tabular-nums">
+                          {reputation.currentScore}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Reputation Progress Bar for Shop */}
+                    {shopReputation && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-[11px] text-amazon-textMuted font-medium">
+                          {t("reputation.shopLabel") || "Uy tín Shop"}
+                        </span>
+                        <div className="flex-1 h-1.5 bg-neutral-200 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              shopReputation.badge === "Premium" ? "bg-yellow-500" :
+                              shopReputation.badge === "Verified" ? "bg-blue-500" : "bg-green-500"
+                            }`}
+                            style={{ width: `${shopReputation.currentQualityScore}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-amazon-text tabular-nums">
+                          {shopReputation.currentQualityScore}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   {[
                     {
