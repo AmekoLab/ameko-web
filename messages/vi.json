@@ -1,4 +1,21 @@
 {
+  "Financial": {
+    "title": "Doanh thu Shop",
+    "subtitle": "Quản lý dòng tiền, doanh thu và các khoản phí trong tháng.",
+    "closingBalance": "Số dư cuối kỳ",
+    "revenue": "Doanh thu (Đã nhận)",
+    "pending": "Chờ đối soát",
+    "platformFees": "Tổng Phí Sàn",
+    "transactionHistory": "Lịch sử giao dịch",
+    "noData": "Không có dữ liệu",
+    "noDataDesc": "Chưa có giao dịch hoặc ví nào được ghi nhận trong tháng này.",
+    "table": {
+      "time": "Thời gian",
+      "description": "Mô tả",
+      "type": "Loại",
+      "amount": "Số tiền"
+    }
+  },
   "Header": {
     "searchPlaceholderDesktop": "Tìm kiếm sản phẩm...",
     "hiName": "Xin chào, {name}",
@@ -72,7 +89,8 @@
     "ruleBuilder": "Trình Xây dựng Quy tắc",
     "feedback": "Phản hồi",
     "assembledFeedbacks": "Phản hồi SP Lắp Ráp",
-    "processedWithdrawals": "Rút tiền đã xử lý"
+    "processedWithdrawals": "Rút tiền đã xử lý",
+    "financialManagement": "Quản lý tài chính"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -558,7 +576,7 @@
     "amount": "Số Tiền",
     "statusColumn": "Trạng Thái",
     "date": "Ngày",
-    "fee": "Phí",
+    "fee": "Phí nền tảng",
     "grossAmount": "Gốc",
     "runningBalance": "Số dư",
     "noTransactions": "Không tìm thấy giao dịch nào",
@@ -588,7 +606,8 @@
       "SalesPending": "Doanh thu chờ",
       "OrderRefund": "Hoàn tiền đơn hàng",
       "OrderPayment": "Thanh toán đơn hàng",
-      "PlatformFee": "Phí nền tảng"
+      "PlatformFee": "Phí nền tảng",
+      "Deposit": "Nạp tiền"
     },
     "statuses": {
       "-1": "Tất cả trạng thái",
@@ -652,6 +671,7 @@
     "availableBalance": "Tổng Số Dư Khả Dụng",
     "pendingEscrowBalance": "Số Dư Đang Chờ Xử Lý",
     "viewDetails": "Xem Chi Tiết",
+    "depositFunds": "Nạp Tiền",
     "withdrawFunds": "Rút Tiền",
     "changePin": "Đổi PIN"
   },
@@ -675,11 +695,12 @@
   },
   "Common": {
     "save": "Lưu",
+    "all": "Tất cả",
     "cancel": "Hủy",
     "close": "Đóng",
     "back": "Quay lại",
     "status": "Trạng thái",
-    "downloadInvoice": "Xuất hóa đơn",
+    "downloadInvoice": "In phiếu mua hàng",
     "name": "Tên",
     "phone": "Số điện thoại",
     "address": "Địa chỉ",
@@ -703,12 +724,13 @@
     "reject": "Từ chối",
     "processing": "Đang xử lý...",
     "canceling": "Đang hủy...",
-    "confirmCancel": "Xác nhận hủy"
+    "confirmCancel": "Xác nhận hủy",
+    "loadMore" : "Xem thêm"
   },
   "OrderDetailModal": {
     "title": "Chi tiết đơn hàng",
     "loadingOrderDetails": "Đang tải chi tiết đơn hàng...",
-    "downloadInvoice": "Xuất hóa đơn",
+    "downloadInvoice": "In phiếu mua hàng",
     "noOrderData": "Không tìm thấy dữ liệu đơn hàng.",
     "fetchOrderDetailsFailed": "Không thể tải chi tiết đơn hàng",
     "updateStatusSuccess": "Cập nhật trạng thái đơn hàng thành công.",
@@ -745,10 +767,19 @@
     "systemVoucher": "Voucher hệ thống:",
     "finalTotal": "Tổng thanh toán:",
     "cancelled": "Đã hủy",
+    "orderCancelledBy": "Đã hủy bởi",
+    "orderCancelReason": "Lý do hủy đơn",
+    "platformFee": "Phí nền tảng",
+    "netRevenue": "Thực nhận",
+    "revenueRecognizedAt": "Ghi nhận doanh thu lúc",
+    "discountFromPlatform": "Discount from platform",
+    "discountFromShop": "Discount from shop",
+    "evaluateProduct": "Đánh giá sản phẩm",
+    "baseKit": "Base Kit",
     "status": {
       "pending": "Chờ xử lý",
       "processing": "Đang xử lý",
-      "shipped": "Đã giao",
+      "shipped": "Đang giao",
       "completed": "Hoàn thành",
       "cancelled": "Đã hủy",
       "returned": "Đã trả hàng",
@@ -780,6 +811,8 @@
     "viewAllOrders": "Xem tất cả đơn hàng",
     "warrantyAndReturnNotice": "Bạn có vấn đề gì với đơn hàng?",
     "warrantyAndReturnLink": "Nhấn vào đây để Bảo hành và Đổi trả",
+    "orderCancelledBy": "Đã hủy bởi",
+    "orderCancelReason": "Lý do hủy đơn",
     "filters": {
       "all": "Tất cả",
       "pending": "Chờ xử lý",
@@ -792,7 +825,7 @@
       "processing": "Đang xử lý",
       "completed": "Hoàn thành",
       "cancelled": "Đã hủy",
-      "shipped": "Đã giao"
+      "shipped": "Đang giao"
     },
     "paymentStatus": {
       "pending": "Chờ thanh toán",
@@ -1023,6 +1056,7 @@
     "chooseAmekoVoucher": "Chọn Ameko Voucher",
     "selectVoucherFrom": "Chọn voucher từ {shopName}",
     "shopFallbackName": "Cửa hàng",
+    "baseKit" : "Kit khung",
     "voucherModal": {
       "discountPercentageWithCap": "Giảm {value}% (tối đa {cap})",
       "discountPercentage": "Giảm {value}%",
@@ -1354,8 +1388,8 @@
     "typeComponent": "Component",
     "typeAccessory": "Accessory",
     "addonAll": "Addon: Tất cả",
-    "addonEligible": "Có thể làm Addon",
-    "addonNotAddon": "Không phải Addon",
+    "addonEligible": "Có thể bán thêm",
+    "addonNotAddon": "Không thể bán thêm",
     "loadingParts": "Đang tải linh kiện...",
     "noPartsFound": "Không tìm thấy linh kiện.",
     "colPart": "Linh kiện",
@@ -1418,10 +1452,11 @@
     "kitRecipeConfiguration": "Cấu hình công thức kit",
     "switchCount": "Số lượng switch",
     "switchCountPlaceholder": "vd: 82",
-    "stabilizerCount": "Số lượng stabilizer",
+    "stabilizerCount": "Số lượng stab",
     "stabilizerCountPlaceholder": "vd: 5",
+    "stabilizerTooltip": "Stabilizer (thanh cân bằng) là bộ phận giúp các phím dài (như Space, Shift, Enter, Backspace) giữ thăng bằng và không bị chao đảo khi nhấn",
     "specAutoGeneratedHint": "Thông số (công thức + quy trình) sẽ được tự động tạo và gửi dưới dạng JSON.",
-    "isAddonEligible": "Có thể làm Addon",
+    "isAddonEligible": "Có thể bán thêm",
     "thumbnailImage": "Ảnh thumbnail",
     "layerImage": "Ảnh layer",
     "optional": "tùy chọn",
@@ -1469,7 +1504,7 @@
     "stabilizerCount": "Số lượng stabilizer",
     "stabilizerCountPlaceholder": "vd: 5",
     "specAutoGeneratedHint": "Thông số (công thức + quy trình) sẽ được tự động tạo và gửi dưới dạng JSON.",
-    "isAddonEligible": "Có thể làm Addon",
+    "isAddonEligible": "Có thể bán thêm",
     "thumbnailImage": "Ảnh thumbnail",
     "layerImage": "Ảnh layer",
     "thumbnailPreviewAlt": "Xem trước ảnh thumbnail",
@@ -1727,7 +1762,7 @@
       "processing": "Đang xử lý",
       "completed": "Hoàn thành",
       "cancelled": "Đã hủy",
-      "shipped": "Đã giao"
+      "shipped": "Đang giao"
     },
     "title": "Quản lý đơn hàng",
     "subtitle": "Quản lý các đơn hàng khách đặt cho cửa hàng của bạn",
@@ -1753,13 +1788,16 @@
       "processing": "Đang xử lý",
       "completed": "Hoàn thành",
       "cancelled": "Đã hủy",
-      "shipped": "Đã giao",
+      "shipped": "Đang giao",
       "paid": "Đã thanh toán",
       "refunded": "Đã hoàn tiền",
       "failed": "Thất bại"
     },
     "viewOrderDetails": "Xem chi tiết đơn hàng",
-    "page": "Trang"
+    "page": "Trang",
+    "cancelledByShop": "Hủy bởi Cửa hàng",
+    "cancelledByCustomer": "Hủy bởi Khách hàng"
+
   },
   "ShopVouchersPage": {
     "loading": "Đang tải voucher...",
@@ -3079,8 +3117,12 @@
     "adminJudgment": "Duyệt yêu cầu của admin",
     "approveRequest": "Chấp nhận yêu cầu",
     "approveCustomerRequest": "Chấp nhận yêu cầu của khách hàng",
+    "approveShopRequest": "Chấp nhận yêu cầu của shop",
+    "approveShopRequestDesc": "Chấp nhận yêu cầu của shop (Khách hàng sẽ không được hoàn tiền)",
     "rejectProtectShop": "Từ chối",
     "rejectCustomerRequest": "Từ chối yêu cầu của khách hàng",
+    "rejectShopRequest": "Từ chối yêu cầu của shop",
+    "rejectShopRequestDesc": "Từ chối yêu cầu của shop (Khách hàng sẽ được hoàn tiền)",
     "judgmentNote": "Ghi chú duyệt yêu cầu",
     "judgmentNotePlaceholder": "Nhập lý do/ghi chú ...",
     "cancel": "Hủy",

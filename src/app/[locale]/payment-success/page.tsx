@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
+import { useEffect, Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle, Loader2, Package } from "lucide-react";
+import { CheckCircle, Loader2, Package, RefreshCw } from "lucide-react";
 import { useAppDispatch } from "@/src/store/hook";
 import { clearCart } from "@/src/store/slices/cartSlice";
+import { paymentService } from "@/src/services/payment.service";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -14,10 +15,48 @@ function PaymentSuccessContent() {
   const orderId = searchParams.get("orderId");
   
   const referenceId = sessionId || orderId;
+  const [isVerifying, setIsVerifying] = useState(!!sessionId);
+  const [isPaid, setIsPaid] = useState<boolean | null>(null);
+
+  // Poll verify-session endpoint for Stripe payments
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    let isMounted = true;
+
+    if (sessionId && isPaid !== true) {
+      setIsVerifying(true);
+      const verify = async () => {
+        try {
+          const res = await paymentService.verifySession(sessionId);
+          if (res.data?.isPaid && isMounted) {
+            setIsPaid(true);
+            setIsVerifying(false);
+            clearInterval(interval);
+          }
+        } catch (e) {
+          console.error("Verification error:", e);
+        }
+      };
+
+      // Initial check
+      verify();
+      // Poll every 3 seconds
+      interval = setInterval(verify, 3000);
+
+      return () => {
+        isMounted = false;
+        clearInterval(interval);
+      };
+    } else if (!sessionId) {
+      // Wallet payment or VNPay (already confirmed)
+      setIsVerifying(false);
+      setIsPaid(true);
+    }
+  }, [sessionId, isPaid]);
 
   // Clear local cart state once payment is confirmed
   useEffect(() => {
-    if (referenceId) {
+    if (referenceId && isPaid === true) {
       dispatch(clearCart());
       // Also clear localStorage cart
       try {
@@ -26,7 +65,7 @@ function PaymentSuccessContent() {
         // Ignore storage errors
       }
     }
-  }, [referenceId, dispatch]);
+  }, [referenceId, dispatch, isPaid]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-amazon-bgSecondary p-4 text-amazon-text font-sans">
@@ -37,18 +76,26 @@ function PaymentSuccessContent() {
       </Link>
 
       <div className="bg-white border border-amazon-border rounded-md p-6 sm:p-8 max-w-[420px] w-full text-center shadow-sm flex flex-col items-center">
-        {/* Success Icon */}
+        {/* Status Icon */}
         <div className="py-2 w-full">
-          <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100 animate-[scale-in_0.5s_ease-out]">
-            <CheckCircle className="text-green-600 w-8 h-8" />
-          </div>
+          {isVerifying ? (
+            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-100">
+              <RefreshCw className="text-blue-600 w-8 h-8 animate-spin" />
+            </div>
+          ) : (
+            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100 animate-[scale-in_0.5s_ease-out]">
+              <CheckCircle className="text-green-600 w-8 h-8" />
+            </div>
+          )}
           
           <h2 className="text-xl font-bold text-amazon-text mb-2 tracking-tight">
-            Order Confirmed!
+            {isVerifying ? "Processing Payment..." : "Order Confirmed!"}
           </h2>
           
           <p className="text-[13px] text-amazon-textMuted mb-2 leading-relaxed">
-            Your payment was successful. We're processing your order and will notify you once it ships.
+            {isVerifying
+              ? "We're verifying your payment with the gateway. This may take a few seconds..."
+              : "Your payment was successful. We're processing your order and will notify you once it ships."}
           </p>
 
           {/* Transaction Details */}

@@ -374,6 +374,28 @@ const CartItemCard: FC<CartItemCardProps> = ({
             {t("buildComponents")}
           </p>
           <div className="divide-y divide-neutral-100">
+            {/* Base Kit Row */}
+            {item.baseKitPriceSnapshot != null && (
+              <div className="flex items-center gap-3 py-2.5 px-3 bg-white/40">
+                <div className="relative w-10 h-10 bg-neutral-50 shrink-0 border border-neutral-200 rounded-lg overflow-hidden flex items-center justify-center">
+                  <ShoppingBag className="w-5 h-5 text-neutral-300" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-neutral-800 truncate">
+                    {t("baseKit")}
+                  </p>
+                  <p className="text-xs text-neutral-400">
+                    {t("qtyLabel", { quantity: 1 })}
+                  </p>
+                </div>
+                <span className="text-sm text-neutral-500 tabular-nums shrink-0">
+                  {item.baseKitPriceSnapshot > 0
+                    ? `${item.baseKitPriceSnapshot.toLocaleString()}₫`
+                    : t("included") || "Kèm theo"}
+                </span>
+              </div>
+            )}
+            
             {item.orderItemComponents.map((comp, index) => (
               <ComponentRow key={`${comp.partId}-${index}`} component={comp} />
             ))}

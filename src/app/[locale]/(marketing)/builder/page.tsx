@@ -691,7 +691,8 @@ function BuilderContent() {
                 {baseKits.map((kit) => (
                   <KitCard key={kit.id} kit={kit} onClick={handleSelectKit} />
                 ))}
-              </div>
+                  </div>
+                
             </div>
           )}
         </div>

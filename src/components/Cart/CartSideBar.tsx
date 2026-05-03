@@ -254,6 +254,20 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
         {isCustom && expanded && (
           <div className="ml-7 pl-3 border-l-2 border-neutral-100 mt-2">
             <div className="divide-y divide-neutral-50">
+              {/* Base Kit Row */}
+              {item.baseKitPriceSnapshot != null && (
+                <div className="flex items-center gap-2.5 py-2">
+                  <div className="relative w-8 h-8 bg-neutral-50 shrink-0 rounded-md overflow-hidden border border-neutral-100 flex items-center justify-center">
+                    <ShoppingBag className="w-4 h-4 text-neutral-300" />
+                  </div>
+                  <span className="text-xs text-neutral-800 font-medium truncate flex-1">
+                    {t("baseKit")}
+                  </span>
+                  <span className="text-[11px] text-neutral-400 shrink-0">
+                    ×1
+                  </span>
+                </div>
+              )}
               {item.orderItemComponents.map((comp) => (
                 <SidebarComponentRow key={comp.partId} component={comp} />
               ))}

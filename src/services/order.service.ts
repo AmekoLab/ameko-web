@@ -9,6 +9,9 @@ import {
   CalculatePreviewPayload,
   CartPreviewData,
   UpdateShippingAddressPayload,
+  GetMyOrdersParams,
+  GetMyPaymentHistoryParams,
+  PaginatedResult,
 } from "@/src/types/order.types";
 
 export const orderService = {
@@ -37,11 +40,21 @@ export const orderService = {
   },
 
   /**
-   * Fetch user's orders (excluding InCart).
+   * Fetch user's orders (paginated).
    * GET /orders/my-orders
    */
-  getMyOrders: async (): Promise<ApiResponse<CartData[]>> => {
-    return api.get("/orders/my-orders");
+  getMyOrders: async (params?: GetMyOrdersParams): Promise<ApiResponse<PaginatedResult<CartData>>> => {
+    // Construct query string
+    const query = new URLSearchParams();
+    if (params?.page) query.append('page', params.page.toString());
+    if (params?.size) query.append('size', params.size.toString());
+    if (params?.status && params.status !== 'all') query.append('status', params.status);
+    if (params?.shopName) query.append('shopName', params.shopName);
+    if (params?.fromDate) query.append('fromDate', params.fromDate);
+    if (params?.toDate) query.append('toDate', params.toDate);
+
+    const queryString = query.toString();
+    return api.get(`/orders/my-orders${queryString ? `?${queryString}` : ''}`);
   },
 
   /**
@@ -76,11 +89,20 @@ export const orderService = {
   },
 
   /**
-   * Fetch user's payment / order history.
+   * Fetch user's payment / order history (paginated).
    * GET /orders/my-payment-history
    */
-  getMyPaymentHistory: async (): Promise<ApiResponse<OrderGroup[]>> => {
-    return api.get("/orders/my-payment-history");
+  getMyPaymentHistory: async (params?: GetMyPaymentHistoryParams): Promise<ApiResponse<any>> => {
+    const query = new URLSearchParams();
+    if (params?.page) query.append('page', params.page.toString());
+    if (params?.size) query.append('size', params.size.toString());
+    if (params?.paymentStatus && params.paymentStatus !== 'all') query.append('paymentStatus', params.paymentStatus);
+    if (params?.paymentMethod) query.append('paymentMethod', params.paymentMethod);
+    if (params?.fromDate) query.append('fromDate', params.fromDate);
+    if (params?.toDate) query.append('toDate', params.toDate);
+
+    const queryString = query.toString();
+    return api.get(`/orders/my-payment-history${queryString ? `?${queryString}` : ''}`);
   },
 
   /**

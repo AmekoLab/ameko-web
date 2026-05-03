@@ -323,6 +323,19 @@ const OrderCard: FC<OrderCardProps> = ({ order, onViewDetails }) => {
         </div>
       </div>
 
+      {/* Cancellation Notice for OrderCard */}
+      {order.orderStatus === "Cancelled" && order.cancelledBy && (
+        <div className="px-6 py-2 bg-red-50/50 border-b border-red-50">
+          <p className="text-xs text-red-600 font-medium flex items-start sm:items-center gap-1.5">
+            <Info className="w-3.5 h-3.5 shrink-0 mt-0.5 sm:mt-0" />
+            <span>
+              {t("orderCancelledBy")} <strong>{order.cancelledBy === "Customer" ? t("customer") : order.cancelledBy}</strong> 
+              {order.cancelReason ? ` - ${t("orderCancelReason")} : ${order.cancelReason}` : ""}
+            </span>
+          </p>
+        </div>
+      )}
+
       {/* Order Items */}
       <div className="px-6 py-2 flex-grow bg-white">
         {visibleItems.map((item) => (
@@ -435,6 +448,9 @@ export default function MyOrdersPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     if (isInitialized && !isAuthenticated) {
@@ -442,47 +458,47 @@ export default function MyOrdersPage() {
     }
   }, [isInitialized, isAuthenticated, router, pathname]);
 
+  // Trigger fetch when activeFilter changes
   useEffect(() => {
-    if (!isInitialized || !isAuthenticated) {
-      return;
-    }
+    if (!isInitialized || !isAuthenticated) return;
+    setPage(1);
+    fetchOrders(1, activeFilter);
+  }, [activeFilter, isInitialized, isAuthenticated]);
 
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        const res = await orderService.getMyOrders();
-        if (res.success && res.data) {
-          // Filter out InCart orders, then sort newest-first
-          const actualOrders = res.data
-            .filter((o) => o.orderStatus !== "InCart")
-            .sort(
-              (a, b) =>
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime(),
-            );
+  const fetchOrders = async (currentPage: number, statusFilter: string) => {
+    try {
+      if (currentPage === 1) setLoading(true);
+      else setLoadingMore(true);
+
+      const params: any = { page: currentPage, size: 10 };
+      if (statusFilter !== "all") {
+        params.status = statusFilter;
+      }
+
+      const res = await orderService.getMyOrders(params);
+      if (res.success && res.data) {
+        // Filter out InCart just in case (backend shouldn't return it anyway)
+        const actualOrders = res.data.items.filter((o) => o.orderStatus !== "InCart");
+        
+        if (currentPage === 1) {
           setOrders(actualOrders);
         } else {
-          setError(res.message || t("fetchOrdersFailed"));
-          toast.error(res.message || t("fetchOrdersFailed"));
+          setOrders(prev => [...prev, ...actualOrders]);
         }
-      } catch (err: unknown) {
-        const message =
-          (err as { message?: string }).message || t("fetchOrdersFailed");
-        setError(message);
-        toast.error(message);
-      } finally {
-        setLoading(false);
+        setHasNextPage(res.data.hasNextPage);
+      } else {
+        setError(res.message || t("fetchOrdersFailed"));
+        toast.error(res.message || t("fetchOrdersFailed"));
       }
-    };
-
-    fetchOrders();
-  }, [isInitialized, isAuthenticated, t]);
-
-  // Apply status filter
-  const filteredOrders = useMemo(() => {
-    if (activeFilter === "all") return orders;
-    return orders.filter((o) => o.orderStatus === activeFilter);
-  }, [orders, activeFilter]);
+    } catch (err: unknown) {
+      const message = (err as { message?: string }).message || t("fetchOrdersFailed");
+      setError(message);
+      toast.error(message);
+    } finally {
+      if (currentPage === 1) setLoading(false);
+      setLoadingMore(false);
+    }
+  };
 
   if (!isInitialized) return <OrdersSkeleton />;
   if (!isAuthenticated) return null;
@@ -508,7 +524,8 @@ export default function MyOrdersPage() {
                 {t("title")}
               </h1>
               <p className="text-neutral-500 mt-1 text-sm font-medium">
-                {t("totalOrdersPlaced", { count: orders.length })}
+                {/* Total count removed since we don't have total orders across all filters in the paginated response items, 
+                    we only have items for the current page/filter. The user didn't ask to show totalCount from API. */}
               </p>
             </div>
           </div>
@@ -531,41 +548,23 @@ export default function MyOrdersPage() {
         </div>
 
         {/* Filter Tabs */}
-        {orders.length > 0 && (
-          <div className="flex gap-2.5 mb-8 overflow-x-auto pb-3 custom-scrollbar">
-            {STATUS_FILTERS.map((f) => {
-              const count =
-                f.value === "all"
-                  ? orders.length
-                  : orders.filter((o) => o.orderStatus === f.value).length;
-
-              return (
-                <button
-                  key={f.value}
-                  onClick={() => setActiveFilter(f.value)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
-                    activeFilter === f.value
-                      ? "bg-neutral-900 text-white shadow-md"
-                      : "bg-white text-neutral-500 border border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-800"
-                  }`}
-                >
-                  {t(`filters.${f.labelKey}`)}
-                  {count > 0 && (
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-md font-bold ${
-                        activeFilter === f.value
-                          ? "bg-white/20 text-white"
-                          : "bg-neutral-100 text-neutral-600"
-                      }`}
-                    >
-                      {count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        )}
+        <div className="flex gap-2.5 mb-8 overflow-x-auto pb-3 custom-scrollbar">
+          {STATUS_FILTERS.map((f) => {
+            return (
+              <button
+                key={f.value}
+                onClick={() => setActiveFilter(f.value)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
+                  activeFilter === f.value
+                    ? "bg-neutral-900 text-white shadow-md"
+                    : "bg-white text-neutral-500 border border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-800"
+                }`}
+              >
+                {t(`filters.${f.labelKey}`)}
+              </button>
+            );
+          })}
+        </div>
 
         {/* Error State */}
         {error && !loading && (
@@ -581,7 +580,7 @@ export default function MyOrdersPage() {
         )}
 
         {/* Order List */}
-        {filteredOrders.length === 0 && !error ? (
+        {orders.length === 0 && !error ? (
           activeFilter !== "all" ? (
             <div className="text-center py-24 border border-dashed border-neutral-200 bg-white rounded-2xl shadow-sm">
               <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mx-auto mb-5 border border-neutral-100">
@@ -620,13 +619,31 @@ export default function MyOrdersPage() {
           )
         ) : (
           <div className="space-y-6">
-            {filteredOrders.map((order) => (
+            {orders.map((order) => (
               <OrderCard
                 key={order.orderId}
                 order={order}
                 onViewDetails={(id) => setSelectedOrderId(id)}
               />
             ))}
+          </div>
+        )}
+
+        {/* Load More Button */}
+        {hasNextPage && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={() => {
+                const nextPage = page + 1;
+                setPage(nextPage);
+                fetchOrders(nextPage, activeFilter);
+              }}
+              disabled={loadingMore}
+              className="px-6 py-2.5 bg-white border border-neutral-200 text-neutral-700 font-medium rounded-xl hover:bg-neutral-50 transition-colors flex items-center gap-2 shadow-sm"
+            >
+              {loadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
+              {tCommon("loadMore") || "Tải thêm"}
+            </button>
           </div>
         )}
       </div>

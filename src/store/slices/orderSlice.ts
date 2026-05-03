@@ -1,28 +1,30 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { orderService } from "@/src/services/order.service";
-import { OrderGroup } from "@/src/types/order.types";
+import { OrderGroup, GetMyPaymentHistoryParams } from "@/src/types/order.types";
 
 // ─── State ───────────────────────────────────────────────
 interface OrderState {
   orderGroups: OrderGroup[];
   loadingHistory: boolean;
+  hasNextPage: boolean;
   error: string | null;
 }
 
 const initialState: OrderState = {
   orderGroups: [],
   loadingHistory: false,
+  hasNextPage: false,
   error: null,
 };
 
 // ─── Async Thunk: Fetch payment history ──────────────────
 export const fetchMyPaymentHistory = createAsyncThunk(
   "order/fetchMyPaymentHistory",
-  async (_, { rejectWithValue }) => {
+  async (params: GetMyPaymentHistoryParams | undefined, { rejectWithValue }) => {
     try {
-      const res = await orderService.getMyPaymentHistory();
+      const res = await orderService.getMyPaymentHistory(params);
       if (res.success) {
-        return res.data;
+        return { data: res.data, page: params?.page || 1 };
       }
       return rejectWithValue(res.message || "Failed to fetch payment history");
     } catch (error: unknown) {
@@ -45,7 +47,18 @@ const orderSlice = createSlice({
       })
       .addCase(fetchMyPaymentHistory.fulfilled, (state, action) => {
         state.loadingHistory = false;
-        state.orderGroups = action.payload;
+        const payloadData = action.payload.data;
+        
+        // Backwards compatibility check
+        const items = Array.isArray(payloadData) ? payloadData : (payloadData?.items || []);
+        
+        if (action.payload.page === 1) {
+          state.orderGroups = items;
+        } else {
+          state.orderGroups.push(...items);
+        }
+        
+        state.hasNextPage = payloadData?.hasNextPage || false;
       })
       .addCase(fetchMyPaymentHistory.rejected, (state, action) => {
         state.loadingHistory = false;

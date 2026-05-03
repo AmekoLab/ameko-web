@@ -356,7 +356,15 @@ function CheckoutContent() {
         const res = await orderService.checkout(payload);
 
         if (res.success) {
+          if (res.data?.orderGroupId) {
+            localStorage.setItem("pending_order_id", res.data.orderGroupId);
+          }
+
           if (res.data?.paymentUrl) {
+            const sessionMatch = res.data.paymentUrl.match(/cs_(test|live)_[a-zA-Z0-9]+/);
+            if (sessionMatch) {
+              localStorage.setItem("pending_session_id", sessionMatch[0]);
+            }
             window.location.href = res.data.paymentUrl;
           } else {
             window.location.href = `/payment-success?orderId=${res.data?.orderGroupId || ""}`;

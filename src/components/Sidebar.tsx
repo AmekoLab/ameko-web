@@ -182,6 +182,12 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
         { name: t("assembledFeedbacks"), path: "/shop/assembled-feedbacks" },
       ],
     },
+    {
+      groupName: t("group_financial"), // Tái sử dụng key của Admin
+      groupKey: "shopFinancial",
+      icon: Wallet,
+      items: [{ name: t("financialManagement"), path: "/shop/financial" }],
+    },
   ];
 
   let menu: MenuGroup[] = [...commonMenu];

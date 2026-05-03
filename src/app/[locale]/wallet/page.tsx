@@ -12,6 +12,7 @@ import Link from "next/link";
 import WithdrawModal from "@/src/components/Shop/WithdrawModal";
 import ResetPinModal from "@/src/components/Shop/ResetPinModal";
 import ChangePinModal from "@/src/components/Shop/ChangePinModal";
+import DepositModal from "@/src/components/Shop/DepositModal";
 import HeldTransactionsModal from "@/src/components/Shop/HeldTransactionsModal";
 import { useTranslations } from "next-intl";
 
@@ -24,6 +25,7 @@ export default function WalletPage() {
   const [isResetPinOpen, setIsResetPinOpen] = useState(false);
   const [isChangePinOpen, setIsChangePinOpen] = useState(false);
   const [isHeldOpen, setIsHeldOpen] = useState(false);
+  const [isDepositOpen, setIsDepositOpen] = useState(false);
 
   // Code mới đã fix
   const isCustomer = user?.role !== "Shop";
@@ -163,6 +165,13 @@ export default function WalletPage() {
         {/* Action Buttons */}
         {(!isCustomer || hasPin) && (
           <div className="flex flex-col sm:flex-row items-center gap-3 border-t border-neutral-50 pt-8 relative z-10">
+            <button
+              onClick={() => setIsDepositOpen(true)}
+              className="w-full sm:w-auto rounded-xl bg-blue-600 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow active:scale-[0.98] group-action"
+            >
+              {t("depositFunds")}
+            </button>
+
             {!isCustomer && (
               <button
                 disabled={hasPin === false}
@@ -188,6 +197,10 @@ export default function WalletPage() {
 
       {/* Modals */}
       <>
+        <DepositModal 
+          isOpen={isDepositOpen}
+          onClose={() => setIsDepositOpen(false)}
+        />
         {!isCustomer && (
           <WithdrawModal
             isOpen={isWithdrawOpen}
