@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { InputField } from "@/src/components/ui/InputField";
 import { ArrowRight } from "lucide-react";
@@ -16,6 +16,80 @@ interface RegisterFormType {
   email: string;
   password: string;
   confirmPassword: string;
+}
+// ─── PIN Input Component ─────────────────────────────────
+function PinInput({
+  value,
+  onChange,
+  error,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  error?: string;
+}) {
+  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const digits = value.padEnd(6, " ").split("").slice(0, 6);
+
+  const handleChange = (index: number, char: string) => {
+    if (char && !/^\d$/.test(char)) return;
+    const arr = digits.slice();
+    arr[index] = char;
+    const newVal = arr.join("").replace(/\s/g, "");
+    onChange(newVal);
+    if (char && index < 5) {
+      inputsRef.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (e.key === "Backspace" && !digits[index]?.trim() && index > 0) {
+      inputsRef.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
+    onChange(pasted);
+    const focusIdx = Math.min(pasted.length, 5);
+    inputsRef.current[focusIdx]?.focus();
+  };
+
+  return (
+    <div>
+      <div className="flex gap-2 justify-center">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <input
+            key={i}
+            ref={(el) => {
+              inputsRef.current[i] = el;
+            }}
+            type="text"
+            inputMode="numeric"
+            maxLength={1}
+            value={digits[i]?.trim() || ""}
+            onChange={(e) => handleChange(i, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(i, e)}
+            onPaste={handlePaste}
+            className={`w-12 h-14 bg-gray-50 text-center text-xl font-bold rounded-sm border outline-none transition-all ${
+              error
+                ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500 focus:bg-white"
+                : "border-gray-200 focus:border-[#ce2a32] focus:ring-2 focus:ring-[#ce2a32] focus:bg-white"
+            }`}
+          />
+        ))}
+      </div>
+      {error && (
+        <p className="text-xs text-red-500 mt-2 text-center">{error}</p>
+      )}
+    </div>
+  );
 }
 
 export default function RegisterPage() {
@@ -211,17 +285,10 @@ export default function RegisterPage() {
           {step === 2 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-8 duration-300">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1 uppercase tracking-wider">
+                <label className="block text-sm font-bold text-gray-700 mb-3 text-center uppercase tracking-wider">
                   Activation Code
                 </label>
-                <input
-                  type="text"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value)}
-                  placeholder="Enter 6-digit code"
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#ce2a32] focus:border-transparent transition-all placeholder:text-gray-400 text-center text-2xl tracking-[0.5em] font-bold"
-                  maxLength={6}
-                />
+                <PinInput value={otpCode} onChange={setOtpCode} />
               </div>
 
               <button
