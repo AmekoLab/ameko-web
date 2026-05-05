@@ -94,6 +94,9 @@ export interface Product {
 
   // --- Inventory (Optional) ---
   stockQuantity?: number;
+  
+  // --- Shop Info ---
+  shopIsActive?: boolean;
 }
 
 export interface CartItemInput {

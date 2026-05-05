@@ -53,6 +53,7 @@ function mapToProduct(ap: AssembledProductItem): Product {
     model3dId: ap.id,
     specs,
     stockQuantity: ap.quantity ?? 0,
+    shopIsActive: ap.shopIsActive,
   };
 }
 

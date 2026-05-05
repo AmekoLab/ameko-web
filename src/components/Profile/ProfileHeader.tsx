@@ -210,6 +210,13 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                   {shopReputation.badge} Shop
                 </span>
               )}
+
+              {/* INACTIVE STATUS BADGE */}
+              {profile.isActive === false && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-neutral-200 text-neutral-600 border border-neutral-300">
+                  {t("inactiveShop") || "Tạm nghỉ"}
+                </span>
+              )}
             </div>
 
             <p className="text-sm text-amazon-textMuted font-medium mb-3">
@@ -247,6 +254,19 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                 <span className="text-amazon-text">{t("following")}</span>
               </div>
             </div>
+
+            {/* INACTIVE WARNING BANNER */}
+            {profile.isActive === false && (
+              <div className="mb-4 p-3 bg-neutral-50 border border-neutral-200 rounded-md flex items-start gap-2 text-left">
+                <svg className="w-5 h-5 text-neutral-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p className="text-sm font-bold text-neutral-700">{t("shopIsInactiveTitle") || "Cửa hàng đang tạm nghỉ"}</p>
+                  <p className="text-xs text-neutral-500">{t("shopIsInactiveDesc") || "Cửa hàng này hiện không nhận đơn hàng mới hay yêu cầu báo giá. Bạn vẫn có thể xem các sản phẩm."}</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -282,10 +302,17 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                 {/* Dropdown: Set Custom Key */}
                 <div className="relative">
                   <button
-                    onClick={() => setIsDropdownOpen((prev) => !prev)}
+                      onClick={() => setIsDropdownOpen((prev) => !prev)}
+                      disabled={profile.isActive === false}
                     className="flex items-center gap-2 px-6 py-2 bg-amazon-btnPrimary text-amazon-text hover:brightness-95 font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm"
                   >
-                    {t("setCustomKey")} <ChevronDown className="w-4 h-4" />
+                    {t("setCustomKey")} {profile.isActive === false ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-neutral-200 text-neutral-600 border border-neutral-300">
+                  {t("inactiveShop") || "Tạm nghỉ"}
+                </span>
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
                   </button>
 
                   {isDropdownOpen && (
@@ -300,10 +327,17 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
                       </Link>
                       <button
                         onClick={() => {
+                          if (profile.isActive === false) return; // Prevent action
                           setIsCommissionModalOpen(true);
                           setIsDropdownOpen(false);
                         }}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-amazon-text hover:bg-neutral-50 transition-colors w-full text-left"
+                        disabled={profile.isActive === false}
+                        className={`flex items-center gap-2 px-4 py-2.5 text-sm w-full text-left transition-colors ${
+                          profile.isActive === false 
+                            ? "text-neutral-400 bg-neutral-50 cursor-not-allowed" 
+                            : "text-amazon-text hover:bg-neutral-50"
+                        }`}
+                        title={profile.isActive === false ? (t("shopIsInactiveTitle") || "Cửa hàng đang tạm nghỉ") : ""}
                       >
                         <FileText className="w-4 h-4" />{" "}
                         {t("sendQuotationRequest")}

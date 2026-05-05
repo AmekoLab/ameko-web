@@ -12,6 +12,7 @@ import {
   markMessagesAsRead,
 } from "@/src/store/slices/chatSlice";
 import { Message } from "@/src/types/chat.types";
+import { NotificationDto } from "@/src/services/notification.service";
 
 interface ReactionChangedPayload {
   conversationId: number;
@@ -35,6 +36,7 @@ class SocketService {
   private connection: HubConnection | null = null;
   private dispatch: AppDispatch | null = null;
   private messageHandlers = new Set<(msg: Message) => void>();
+  private notificationHandlers = new Set<(noty: NotificationDto) => void>();
 
   async connect(token: string, dispatch: AppDispatch): Promise<void> {
     if (this.connection && this.connection.state !== HubConnectionState.Disconnected) return;
@@ -61,9 +63,10 @@ class SocketService {
     try {
       dispatch(setConnectionStatus("connecting"));
       await this.connection.start();
+      console.log("✅ [SignalR] Hub connected successfully!");
       dispatch(setConnectionStatus("connected"));
     } catch (err) {
-      console.error("[SocketService] Failed to connect:", err);
+      console.error("❌ [SignalR] Connection error:", err);
       dispatch(setConnectionStatus("disconnected"));
       throw err;
     }
@@ -112,6 +115,14 @@ class SocketService {
     this.messageHandlers.delete(handler);
   }
 
+  onNotificationReceived(handler: (noty: NotificationDto) => void) {
+    this.notificationHandlers.add(handler);
+  }
+
+  offNotificationReceived(handler: (noty: NotificationDto) => void) {
+    this.notificationHandlers.delete(handler);
+  }
+
   private registerEventListeners(): void {
     if (!this.connection) return;
 
@@ -135,6 +146,17 @@ class SocketService {
         conversationId: data.conversationId,
         messageIds: data.upToMessageId != null ? [data.upToMessageId] : [],
       }));
+    });
+
+    // --- Notification events ---
+    const handleIncomingNotification = (notification: NotificationDto) => {
+      console.log("🔥 [SignalR] SUCCESS - RECEIVED NOTIFICATION DATA:", notification);
+      this.notificationHandlers.forEach(handler => handler(notification));
+    };
+
+    this.connection.on("notificationReceived", (data) => {
+      console.log("🔔 [SignalR] Caught event: 'notificationReceived'");
+      handleIncomingNotification(data);
     });
   }
 

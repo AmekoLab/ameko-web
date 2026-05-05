@@ -1,4 +1,78 @@
 {
+  "AdminNotificationPage": {
+    "timeJustNow": "Just now",
+    "timeMinutesAgo": "{minutes} mins ago",
+    "timeHoursAgo": "{hours} hours ago",
+    "timeDaysAgo": "{days} days ago",
+    "timeMonthsAgo": "{months} months ago",
+    "toastRequireTitle": "Please enter a title!",
+    "toastBroadcastSuccess": "Broadcast sent successfully!",
+    "toastBroadcastFail": "Failed to broadcast.",
+    "toastBroadcastError": "An error occurred while broadcasting!",
+    "toastUpdateSuccess": "Notification updated!",
+    "toastUpdateFail": "Update failed.",
+    "toastUpdateError": "An error occurred while updating!",
+    "toastDeleteSuccess": "Notification deleted!",
+    "toastDeleteFail": "Delete failed.",
+    "toastDeleteError": "An error occurred while deleting!",
+    "title": "Notification Management",
+    "subtitle": "Manage system notifications, broadcast, edit and delete.",
+    "total": "Total:",
+    "notifications": "notifications",
+    "btnBroadcast": "Send to all",
+    "noNotifications": "No notifications yet",
+    "noNotificationsDesc": "Click 'Send to all' to create the first broadcast.",
+    "colId": "ID",
+    "colTitle": "Title",
+    "colMessage": "Message",
+    "colType": "Type",
+    "colSource": "Source",
+    "colTime": "Time",
+    "colActions": "Actions",
+    "sourceUser": "User",
+    "sourceSystem": "System",
+    "actionView": "View detail",
+    "actionEdit": "Edit",
+    "actionDelete": "Delete",
+    "page": "Page",
+    "prev": "‹ Prev",
+    "next": "Next ›",
+    "modalBroadcastTitle": "Broadcast to server",
+    "modalWarning": "Warning:",
+    "modalWarningDesc": "This notification will be sent to all users. This feature is <notRealtime>not real-time</notRealtime>, users will see it upon reloading the page.",
+    "labelTitle": "Title",
+    "optional": "(optional)",
+    "placeholderTitle": "Notification title",
+    "labelMessage": "Message",
+    "placeholderMessage": "Detailed content...",
+    "labelRedirectUrl": "Redirect URL",
+    "placeholderRedirectUrl": "/promotions or https://...",
+    "btnCancel": "Cancel",
+    "btnSending": "Sending...",
+    "btnSend": "Send",
+    "modalEditTitle": "Edit notification #{id}",
+    "btnSaving": "Saving...",
+    "btnSave": "Save changes",
+    "modalDeleteConfirm": "Confirm deletion?",
+    "modalDeleteDesc": "Notification <targetId>#{id}</targetId> will be permanently deleted. This action cannot be undone.",
+    "btnDeleting": "Deleting..."
+  },
+  "CreateAdminNotyModal": {
+    "toastRequireTitle": "Please enter a title!",
+    "toastSuccess": "Notification sent to {name}",
+    "toastFail": "Failed to send notification",
+    "toastError": "An error occurred while sending",
+    "title": "Send Direct Notification",
+    "recipient": "Recipient:",
+    "labelTitle": "Title",
+    "placeholderTitle": "Enter notification title (Max 200 chars)",
+    "labelMessage": "Detailed Message",
+    "placeholderMessage": "Enter message (Max 1000 chars)",
+    "labelRedirectUrl": "Redirect URL on click",
+    "btnCancel": "Cancel",
+    "btnSending": "Sending...",
+    "btnSend": "Send Notification"
+  },
   "AdjustReputationModal": {
     "title": "Adjust {targetType} Reputation",
     "adjustingFor": "Adjusting for:",
@@ -148,7 +222,8 @@
     "assembledFeedbacks": "Assembled Feedbacks",
     "processedWithdrawals": "Processed Withdrawals",
     "financialManagement": "Financial Management",
-    "reputation": "Reputation"
+    "reputation": "Reputation",
+    "notification" : "Notification"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -161,10 +236,10 @@
     "sectionSubtitle": "The Core Experience",
     "titleLine1": "Build Your",
     "titleLine2": "Own Legacy",
-    "description": "Do not just settle for pre-built keyboards. With our state-of-the-art <strong>Ameko 3D Builder</strong>, you have the power to create a keyboard that reflects your unique style and preferences. Choose from a vast selection of components, customize layouts, and see your design come to life in real-time 3D preview.",
+    "description": "Do not just settle for pre-built keyboards. With our state-of-the-art <strong>Ameko 2D Builder</strong>, you have the power to create a keyboard that reflects your unique style and preferences. Choose from a vast selection of components, customize layouts, and see your design come to life in real-time 3D preview.",
     "feature1": "Multi-Layer Customization",
     "feature2": "Drag & Drop Interface",
-    "feature3": "Real-time 3D Preview",
+    "feature3": "Real-time 2D Preview",
     "ctaText": "Start Building Now",
     "badgeValue": "100+",
     "badgeLabel": "Parts Available"
@@ -300,6 +375,14 @@
     "personalized": "Personalized",
     "standard": "Standard"
   },
+  "ProfileHeader": {
+    "inactiveShop": "On Leave",
+    "shopIsInactiveTitle": "Shop is currently on leave",
+    "shopIsInactiveDesc": "This shop is not accepting new orders or quotation requests. You can still view products."
+  },
+  "ProductInfo": {
+    "shopUnavailable": "Shop Unavailable"
+  },
   "CommentSection": {
     "errorLoad": "Failed to load comments at this time",
     "loading": "Loading...",
@@ -433,7 +516,9 @@
     "noBuildersFound": "No shops found",
     "ratingAll": "All Ratings",
     "rating4Plus": "4.0 & up",
-    "rating45Plus": "4.5 & up"
+    "rating45Plus": "4.5 & up",
+    "inactiveShop": "Inactive",
+    "shopIsInactiveTitle":"Shop Is Inactive"
   },
   "CreateCommissionModal": {
     "errorImageUpload": "Upload image failed, please try again",
@@ -517,7 +602,9 @@
     "rating2Plus": "2+ Stars",
     "rating1Plus": "1+ Stars",
     "rating0Plus": "0+ Stars",
-    "rating45Plus": "4.5+ Stars"
+    "rating45Plus": "4.5+ Stars",
+    "inactiveShop": "Inactive",
+    "shopIsInactiveTitle":"Shop Is Inactive"
   },
   "MyWarrantyRequests": {
     "pageTitle": "Warranty & Returns",
@@ -1272,7 +1359,10 @@
     "followingModalTitle": "Following",
     "reputation": {
       "tooltip": "Quality Score: {score}/100"
-    }
+    },
+    "inactiveShop": "On Leave",
+    "shopIsInactiveTitle": "Shop is currently on leave",
+    "shopIsInactiveDesc": "This shop is not accepting new orders or quotation requests. You can still view products."
   },
   "ProfilePage": {
     "shopNotFound": "Shop Not Found",
@@ -2175,6 +2265,10 @@
       "previewAlt": "Preview",
       "bannerPrompt": "Drag or click to upload banner"
     },
+    "soduvi" : "Current wallet balance",
+    "insufficientBalanceTitle": "Insufficient balance!",
+    "insufficientBalanceDesc": "The system requires a minimum balance of 2,000,000 VND to activate the shop. Please top up your wallet.",
+    "goToDeposit": "Go to Top-up Page",
     "toast": {
       "updateSuccess": "Shop profile updated successfully!",
       "updateFailed": "Failed to update shop profile. Please try again.",
@@ -2682,7 +2776,10 @@
     "usersTotalLabel": "users total",
     "prev": "Prev",
     "next": "Next",
-    "reputation": "Reputation"
+    "reputation": "Reputation",
+    "reputationTitle": "Adjust Reputation Points",
+    "sendNotification": "Send Notification",
+    "sendNotyLabel": "Send Noti"
   },
   "CreateUserModal": {
     "validation": {
@@ -2823,7 +2920,8 @@
     "toastApproveSuccess": "Shop approved successfully!",
     "toastRejectSuccess": "Shop rejected successfully!",
     "toastDecisionFailed": "Handle admin decision failed",
-    "reputation":"Reputation"
+    "reputation":"Reputation",
+    "inactiveShop": "Inactive"
   },
   "ShopApplicationModal": {
     "statusPending": "Pending",
@@ -3664,5 +3762,10 @@
       "noLogs": "No recent reputation changes.",
       "lockedWarning": "Your purchasing ability has been locked due to low reputation score. Please contact support."
     }
+  },
+    "DepositModal": {
+   "paymentMethodTitle": "Payment Method",
+"vnpayDesc": "ATM Card / Domestic E-wallet",
+"stripeDesc": "Visa / Mastercard"
   }
 }

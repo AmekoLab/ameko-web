@@ -805,60 +805,87 @@ export default function CommissionPoolPage() {
                   </span>
                 </div>
               ) : (
-                shopList.map((shop) => (
-                  <div
-                    key={shop.id}
-                    onClick={() => handleSelectShop(shop.id)}
-                    className="p-3 border border-neutral-100 rounded-xl hover:border-neutral-300 hover:shadow-sm cursor-pointer flex items-center justify-between gap-4 transition-all group bg-white"
-                  >
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <div className="w-12 h-12 rounded-lg bg-neutral-50 border border-neutral-100 overflow-hidden shrink-0 flex items-center justify-center">
-                        {shop.logoUrl ? (
-                          <img
-                            src={shop.logoUrl}
-                            alt={shop.shopName}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <Store className="w-6 h-6 text-neutral-300" />
-                        )}
-                      </div>
-                      <div className="flex flex-col min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-semibold text-sm text-neutral-900 group-hover:text-blue-600 transition-colors truncate">
-                            {shop.shopName}
-                          </span>
-                          {shop.badge === 1 && (
-                            <span title="Verified" className="shrink-0 flex">
-                              <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
-                            </span>
-                          )}
-                          {shop.badge === 2 && (
-                            <span title="Premium" className="shrink-0 flex">
-                              <Crown className="w-3.5 h-3.5 text-amber-500" />
-                            </span>
+                shopList.map((shop) => {
+                  const isInactive = shop.isActive === false;
+
+                  return (
+                    <div
+                      key={shop.id}
+                      onClick={() => {
+                        if (isInactive) return; // Prevent selection if inactive
+                        handleSelectShop(shop.id);
+                      }}
+                      className={`p-3 border rounded-xl flex items-center justify-between gap-4 transition-all group ${
+                        isInactive
+                          ? "border-neutral-100 bg-neutral-50/70 opacity-60 cursor-not-allowed grayscale-[50%]"
+                          : "border-neutral-100 hover:border-neutral-300 hover:shadow-sm cursor-pointer bg-white"
+                      }`}
+                      title={isInactive ? (t("shopIsInactiveTitle") || "Shop đang tạm nghỉ") : ""}
+                    >
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        {/* Logo */}
+                        <div className="w-12 h-12 rounded-lg bg-neutral-50 border border-neutral-100 overflow-hidden shrink-0 flex items-center justify-center">
+                          {shop.logoUrl ? (
+                            <img
+                              src={shop.logoUrl}
+                              alt={shop.shopName}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Store className="w-6 h-6 text-neutral-300" />
                           )}
                         </div>
-                        <span className="text-xs text-neutral-500 flex items-center gap-1 mt-0.5">
-                          ⭐ {shop.rating > 0 ? shop.rating.toFixed(1) : "Mới"} 
-                          {shop.qualityScore !== undefined && ` • 🛡️ ${shop.qualityScore}`}
-                        </span>
+                        
+                        {/* Info */}
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className={`font-semibold text-sm truncate transition-colors ${isInactive ? "text-neutral-500" : "text-neutral-900 group-hover:text-blue-600"}`}>
+                              {shop.shopName}
+                            </span>
+                            {shop.badge === 1 && (
+                              <span title="Verified" className="shrink-0 flex">
+                                <ShieldCheck className={`w-3.5 h-3.5 ${isInactive ? "text-neutral-400" : "text-blue-500"}`} />
+                              </span>
+                            )}
+                            {shop.badge === 2 && (
+                              <span title="Premium" className="shrink-0 flex">
+                                <Crown className={`w-3.5 h-3.5 ${isInactive ? "text-neutral-400" : "text-amber-500"}`} />
+                              </span>
+                            )}
+                            
+                            {/* Inactive Badge */}
+                            {isInactive && (
+                              <span className="ml-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-600 uppercase tracking-wide">
+                                {t("inactiveShop") || "Tạm nghỉ"}
+                              </span>
+                            )}
+                          </div>
+                          
+                          <span className="text-xs text-neutral-500 flex items-center gap-1 mt-0.5">
+                            ⭐ {shop.rating > 0 ? shop.rating.toFixed(1) : "Mới"} 
+                            {shop.qualityScore !== undefined && ` • 🛡️ ${shop.qualityScore}`}
+                          </span>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* View Profile Link */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        window.open(`/profile/shop/${shop.id}`, "_blank");
-                      }}
-                      className="shrink-0 flex items-center justify-center w-8 h-8 text-neutral-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title={t("visitShopProfile")}
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))
+                      {/* View Profile Link - Always active so customers can still view */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // Crucial: Prevent parent click
+                          window.open(`/profile/shop/${shop.id}`, "_blank");
+                        }}
+                        className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
+                          isInactive 
+                            ? "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-200" 
+                            : "text-neutral-400 hover:text-blue-600 hover:bg-blue-50"
+                        }`}
+                        title={t("visitShopProfile")}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </button>
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>

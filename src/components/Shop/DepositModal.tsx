@@ -7,6 +7,7 @@ import { z } from "zod";
 import { X, Loader2, Wallet } from "lucide-react";
 import { walletService } from "@/src/services/wallet.service";
 import { toast } from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -15,6 +16,8 @@ interface DepositModalProps {
 
 export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const [loading, setLoading] = useState(false);
+  // 0 = Stripe, 2 = VNPay
+  const [paymentMethod, setPaymentMethod] = useState<number>(2);
 
   const depositSchema = z.object({
     amount: z
@@ -22,7 +25,8 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
       .min(10000, "Minimum deposit is 10,000 VND")
       .max(100000000, "Maximum deposit is 100,000,000 VND"),
   });
-
+   const t = useTranslations("DepositModal");
+  
   type DepositFormData = z.infer<typeof depositSchema>;
 
   const {
@@ -46,6 +50,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
       
       const res = await walletService.deposit({
         amount: data.amount,
+        method: paymentMethod,
         successUrl: `${origin}/wallet/deposit/success`,
         cancelUrl: `${origin}/wallet`,
       });
@@ -110,6 +115,40 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                 {errors.amount.message}
               </p>
             )}
+          </div>
+
+          {/* Payment Method Selector */}
+          <div className="mb-6 mt-4">
+            <label className="block text-sm font-semibold text-neutral-700 mb-2">
+              {t("paymentMethodTitle")}
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              {/* VNPay */}
+              <label 
+                className={`relative flex flex-col items-center p-3 border rounded-xl cursor-pointer transition-all ${
+                  paymentMethod === 2 
+                    ? "border-blue-600 bg-blue-50 ring-1 ring-blue-600" 
+                    : "border-neutral-200 hover:border-blue-300 hover:bg-neutral-50"
+                }`}
+              >
+                <input type="radio" name="method" value={2} checked={paymentMethod === 2} onChange={() => setPaymentMethod(2)} className="sr-only" />
+                <span className="text-sm font-bold text-blue-700">VNPAY</span>
+                <span className="text-[10px] text-neutral-500">{t("vnpayDesc")}</span>
+              </label>
+
+              {/* Stripe */}
+              <label 
+                className={`relative flex flex-col items-center p-3 border rounded-xl cursor-pointer transition-all ${
+                  paymentMethod === 0 
+                    ? "border-purple-600 bg-purple-50 ring-1 ring-purple-600" 
+                    : "border-neutral-200 hover:border-purple-300 hover:bg-neutral-50"
+                }`}
+              >
+                <input type="radio" name="method" value={0} checked={paymentMethod === 0} onChange={() => setPaymentMethod(0)} className="sr-only" />
+                <span className="text-sm font-bold text-[#635BFF]">Stripe</span>
+                <span className="text-[10px] text-neutral-500">{t("stripeDesc")}</span>
+              </label>
+            </div>
           </div>
 
           <button

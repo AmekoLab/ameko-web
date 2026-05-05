@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/src/store/hook";
 import { fetchAdminUserList } from "@/src/store/slices/adminUsersSlice";
 import CreateUserModal from "@/src/components/Admin/CreateUserModal";
 import EditUserModal from "@/src/components/Admin/EditUserModal";
+import CreateAdminNotyModal from "@/src/components/Admin/CreateAdminNotyModal";
 import { AdminUserItem } from "@/src/types/admin.types";
 import { AdjustReputationModal } from "@/src/components/Admin/AdjustReputationModal";
 
@@ -22,6 +23,8 @@ export default function AdminUsersPage() {
   const [editingUser, setEditingUser] = useState<AdminUserItem | null>(null);
   const [showAdjustModal, setShowAdjustModal] = useState(false);
   const [adjustingUser, setAdjustingUser] = useState<AdminUserItem | null>(null);
+  const [showNotyModal, setShowNotyModal] = useState(false);
+  const [notyTargetUser, setNotyTargetUser] = useState<AdminUserItem | null>(null);
   const pageSize = 10;
 
   useEffect(() => {
@@ -246,11 +249,22 @@ export default function AdminUsersPage() {
                               setShowAdjustModal(true);
                             }}
                             className="text-[10px] font-medium text-purple-600 hover:text-purple-800 px-2 py-1 rounded border border-transparent hover:border-purple-200 hover:bg-purple-50 transition-colors"
-                            title="Điều chỉnh điểm Uy tín"
+                            title={t("reputationTitle")}
                           >
                            {t("reputation")}
                           </button>
                         )}
+                        {/* Send Notification Button */}
+                        <button
+                          onClick={() => {
+                            setNotyTargetUser(user);
+                            setShowNotyModal(true);
+                          }}
+                          className="text-[10px] font-medium text-emerald-600 hover:text-emerald-800 px-2 py-1 rounded border border-transparent hover:border-emerald-200 hover:bg-emerald-50 transition-colors"
+                          title={t("sendNotification")}
+                        >
+                          {t("sendNotyLabel")}
+                        </button>
                         <button
                           onClick={() => {
                             setEditingUser(user);
@@ -353,6 +367,16 @@ export default function AdminUsersPage() {
           }}
         />
       )}
+
+      {/* Create Admin Notification Modal */}
+      <CreateAdminNotyModal
+        isOpen={showNotyModal}
+        targetUser={notyTargetUser}
+        onClose={() => {
+          setShowNotyModal(false);
+          setNotyTargetUser(null);
+        }}
+      />
     </div>
   );
 }

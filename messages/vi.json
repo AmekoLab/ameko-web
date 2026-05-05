@@ -1,4 +1,78 @@
 {
+  "AdminNotificationPage": {
+    "timeJustNow": "Vừa xong",
+    "timeMinutesAgo": "{minutes} phút trước",
+    "timeHoursAgo": "{hours} giờ trước",
+    "timeDaysAgo": "{days} ngày trước",
+    "timeMonthsAgo": "{months} tháng trước",
+    "toastRequireTitle": "Vui lòng nhập tiêu đề!",
+    "toastBroadcastSuccess": "Phát thông báo toàn hệ thống thành công!",
+    "toastBroadcastFail": "Không thể phát thông báo.",
+    "toastBroadcastError": "Đã xảy ra lỗi khi phát thông báo!",
+    "toastUpdateSuccess": "Đã cập nhật thông báo!",
+    "toastUpdateFail": "Cập nhật thất bại.",
+    "toastUpdateError": "Đã xảy ra lỗi khi cập nhật!",
+    "toastDeleteSuccess": "Đã xóa thông báo!",
+    "toastDeleteFail": "Xóa thất bại.",
+    "toastDeleteError": "Đã xảy ra lỗi khi xóa!",
+    "title": "Quản lý Thông báo",
+    "subtitle": "Quản lý thông báo hệ thống, phát broadcast, chỉnh sửa và xóa.",
+    "total": "Tổng:",
+    "notifications": "thông báo",
+    "btnBroadcast": "Gửi toàn server",
+    "noNotifications": "Chưa có thông báo nào",
+    "noNotificationsDesc": "Nhấn \"Gửi toàn server\" để tạo broadcast đầu tiên.",
+    "colId": "ID",
+    "colTitle": "Tiêu đề",
+    "colMessage": "Nội dung",
+    "colType": "Loại",
+    "colSource": "Nguồn",
+    "colTime": "Thời gian",
+    "colActions": "Hành động",
+    "sourceUser": "User",
+    "sourceSystem": "System",
+    "actionView": "Xem chi tiết",
+    "actionEdit": "Chỉnh sửa",
+    "actionDelete": "Xóa",
+    "page": "Trang",
+    "prev": "‹ Trước",
+    "next": "Sau ›",
+    "modalBroadcastTitle": "Phát thông báo toàn server",
+    "modalWarning": "Lưu ý:",
+    "modalWarningDesc": "Thông báo này sẽ gửi tới tất cả người dùng. Tính năng này <notRealtime>không đẩy thời gian thực</notRealtime>, người dùng sẽ thấy khi load lại trang.",
+    "labelTitle": "Tiêu đề",
+    "optional": "(tuỳ chọn)",
+    "placeholderTitle": "Tiêu đề thông báo",
+    "labelMessage": "Nội dung",
+    "placeholderMessage": "Nội dung chi tiết...",
+    "labelRedirectUrl": "Đường dẫn điều hướng",
+    "placeholderRedirectUrl": "/promotions hoặc https://...",
+    "btnCancel": "Hủy",
+    "btnSending": "Đang gửi...",
+    "btnSend": "Phát thông báo",
+    "modalEditTitle": "Chỉnh sửa thông báo #{id}",
+    "btnSaving": "Đang lưu...",
+    "btnSave": "Lưu thay đổi",
+    "modalDeleteConfirm": "Xác nhận xóa?",
+    "modalDeleteDesc": "Thông báo <targetId>#{id}</targetId> sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác.",
+    "btnDeleting": "Đang xóa..."
+  },
+  "CreateAdminNotyModal": {
+    "toastRequireTitle": "Vui lòng nhập tiêu đề!",
+    "toastSuccess": "Đã gửi thông báo đến {name}",
+    "toastFail": "Gửi thông báo thất bại",
+    "toastError": "Đã xảy ra lỗi khi gửi",
+    "title": "Gửi thông báo cá nhân",
+    "recipient": "Người nhận:",
+    "labelTitle": "Tiêu đề",
+    "placeholderTitle": "Nhập tiêu đề thông báo (Tối đa 200 ký tự)",
+    "labelMessage": "Nội dung chi tiết",
+    "placeholderMessage": "Nhập nội dung (Tối đa 1000 ký tự)",
+    "labelRedirectUrl": "Đường dẫn khi click (Redirect URL)",
+    "btnCancel": "Hủy",
+    "btnSending": "Đang gửi...",
+    "btnSend": "Gửi thông báo"
+  },
   "AdjustReputationModal": {
     "title": "Điều chỉnh Uy tín {targetType}",
     "adjustingFor": "Đang điều chỉnh cho:",
@@ -148,7 +222,8 @@
     "assembledFeedbacks": "Phản hồi SP Lắp Ráp",
     "processedWithdrawals": "Rút tiền đã xử lý",
     "financialManagement": "Quản lý tài chính",
-    "reputation": "Uy tín"
+    "reputation": "Uy tín",
+    "notification": "Thông báo"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -301,6 +376,14 @@
     "personalized": "Dành cho bạn",
     "standard": "Mới nhất"
   },
+  "ProfileHeader": {
+    "inactiveShop": "Tạm nghỉ",
+    "shopIsInactiveTitle": "Cửa hàng đang tạm nghỉ",
+    "shopIsInactiveDesc": "Cửa hàng này hiện không nhận đơn hàng mới hay yêu cầu báo giá. Bạn vẫn có thể xem các sản phẩm."
+  },
+  "ProductInfo": {
+    "shopUnavailable": "Shop đang tạm nghỉ"
+  },
   "CommentSection": {
     "errorLoad": "Không thể tải bình luận lúc này",
     "loading": "Đang tải...",
@@ -434,7 +517,9 @@
     "noBuildersFound": "Không tìm thấy shop nào",
     "ratingAll": "Đánh giá",
     "rating4Plus": "4.0",
-    "rating45Plus": "4.5"
+    "rating45Plus": "4.5",
+     "inactiveShop": "Tạm nghỉ",
+    "shopIsInactiveTitle":"Shop đang tạm nghỉ"
   },
   "CreateCommissionModal": {
     "errorImageUpload": "Tải ảnh lên thất bại, vui lòng thử lại",
@@ -520,7 +605,9 @@
     "rating0Plus": "0+ Sao",
     "rating45Plus": "4.5+ Sao",
     "sortBy": "Sắp xếp",
-    "filterBy": "Lọc"
+    "filterBy": "Lọc",
+     "inactiveShop": "Tạm nghỉ",
+    "shopIsInactiveTitle":"Shop đang tạm nghỉ"
   },
   "MyWarrantyRequests": {
     "pageTitle": "Bảo Hành & Đổi Trả",
@@ -1275,7 +1362,10 @@
     "followingModalTitle": "Following",
     "reputation": {
       "tooltip": "Điểm uy tín phục vụ: {score}/100"
-    }
+    },
+    "inactiveShop": "Tạm nghỉ",
+    "shopIsInactiveTitle": "Cửa hàng đang tạm nghỉ",
+    "shopIsInactiveDesc": "Cửa hàng này hiện không nhận đơn hàng mới hay yêu cầu báo giá. Bạn vẫn có thể xem các sản phẩm."
   },
   "ProfilePage": {
     "shopNotFound": "Không tìm thấy cửa hàng",
@@ -2178,6 +2268,10 @@
       "previewAlt": "Xem trước",
       "bannerPrompt": "Kéo thả hoặc nhấn để tải ảnh bìa"
     },
+    "soduvi" : "Số dư ví hiện tại",
+    "insufficientBalanceTitle": "Số dư không đủ!",
+    "insufficientBalanceDesc": "Hệ thống yêu cầu duy trì tối thiểu 2.000.000đ để kích hoạt gian hàng. Vui lòng nạp thêm tiền.",
+    "goToDeposit": "Đến trang Nạp Tiền",
     "toast": {
       "updateSuccess": "Cập nhật hồ sơ cửa hàng thành công!",
       "updateFailed": "Không thể cập nhật hồ sơ cửa hàng. Vui lòng thử lại.",
@@ -2687,7 +2781,10 @@
     "usersTotalLabel": "người dùng",
     "prev": "Trước",
     "next": "Tiếp",
-    "reputation": "Uy tín"
+    "reputation": "Uy tín",
+    "reputationTitle": "Điều chỉnh điểm Uy tín",
+    "sendNotification": "Gửi thông báo",
+    "sendNotyLabel": "Gửi Noti"
   },
   "CreateUserModal": {
     "validation": {
@@ -2828,7 +2925,8 @@
     "toastApproveSuccess": "Đã duyệt cửa hàng thành công!",
     "toastRejectSuccess": "Đã từ chối cửa hàng thành công!",
     "toastDecisionFailed": "Xử lý quyết định của quản trị viên thất bại",
-    "reputation": "Uy tín"
+    "reputation": "Uy tín",
+    "inactiveShop" : "Tạm nghỉ"
   },
   "ShopApplicationModal": {
     "statusPending": "Đang chờ duyệt",
@@ -3669,7 +3767,14 @@
       "noLogs": "Chưa có biến động điểm nào.",
       "lockedWarning": "Tài khoản của bạn đã bị khóa tính năng mua hàng do điểm uy tín quá thấp. Vui lòng liên hệ bộ phận CSKH để được hỗ trợ."
     }
+  },
+  "DepositModal": {
+    "paymentMethodTitle": "Phương thức thanh toán",
+"vnpayDesc": "Thẻ ATM / Ví nội địa",
+"stripeDesc": "Thẻ Visa / Mastercard"
   }
+
+
 }
 
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState, useRef, useEffect } from "react";
+import { FC, useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/src/store/hook";
@@ -17,6 +17,9 @@ import type { AssembledProductItem } from "@/src/types/assembledProduct.types";
 import { assembledProductService } from "@/src/services/assembledProduct.service";
 import { reputationService, CustomerReputationData } from "@/src/services/reputation.service";
 import { shopReputationService, ShopReputationCurrent } from "@/src/services/shopReputation.service";
+import { notificationService, NotificationDto } from "@/src/services/notification.service";
+import { socketService } from "@/src/services/socket.service";
+import { toast } from "react-toastify";
 
 /* ─── Inline SVG icon helpers ─── */
 const MenuIcon = () => (
@@ -109,6 +112,28 @@ const HamburgerSmall = () => (
     />
   </svg>
 );
+const BellIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+  </svg>
+);
+
+/* ─── Relative time helper ─── */
+function timeAgo(dateStr: string): string {
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const diff = Math.max(0, now - then);
+  const seconds = Math.floor(diff / 1000);
+  if (seconds < 60) return "Vừa xong";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} phút trước`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} giờ trước`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days} ngày trước`;
+  const months = Math.floor(days / 30);
+  return `${months} tháng trước`;
+}
 
 /* ═══════════════════════════════════════════════════════
    HEADER — Amazon-style dual-row layout
@@ -144,6 +169,17 @@ export const Header: FC = () => {
   const [reputation, setReputation] = useState<CustomerReputationData | null>(null);
   const [shopReputation, setShopReputation] = useState<ShopReputationCurrent | null>(null);
 
+  // --- Notification State ---
+  const [notiOpen, setNotiOpen] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationDto[]>([]);
+  const [notiCursor, setNotiCursor] = useState<string | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notiLoading, setNotiLoading] = useState(false);
+  const [notiLoadingMore, setNotiLoadingMore] = useState(false);
+  const [notiInitialized, setNotiInitialized] = useState(false);
+  const notiRef = useRef<HTMLDivElement>(null);
+  const processedNotisRef = useRef(new Set<number>());
+
   useEffect(() => {
     if (!isAuthenticated || !user) return;
 
@@ -161,6 +197,129 @@ export const Header: FC = () => {
         .catch(console.error);
     }
   }, [isAuthenticated, user]);
+
+  // Fetch unread notification count on mount
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    notificationService.getUnreadCount()
+      .then(res => { 
+        if (res.success && res.data) {
+          setUnreadCount(res.data.unreadCount);
+        } 
+      })
+      .catch(console.error);
+  }, [isAuthenticated, user]);
+
+  // Initialize SignalR connection for real-time events
+  useEffect(() => {
+    console.log("🛠️ [Header] Checking auth for SignalR...");
+    if (!isAuthenticated || !user) return;
+
+    const token = localStorage.getItem("token");
+    if (token) {
+      console.log("🛠️ [Header] Found token, calling socketService.connect()...");
+      socketService.connect(token, dispatch).catch(err => {
+        console.error("❌ [Header] Socket connect failed:", err);
+      });
+    } else {
+      console.log("⚠️ [Header] No token found in localStorage.");
+    }
+  }, [isAuthenticated, user, dispatch]);
+
+  // Load first batch when notification dropdown opens
+  useEffect(() => {
+    if (notiOpen && !notiInitialized && isAuthenticated) {
+      setNotiLoading(true);
+      notificationService.getUserNotifications({ pageSize: 10 })
+        .then(res => {
+          if (res.success && res.data) {
+            setNotifications(res.data.items);
+            setNotiCursor(res.data.nextCursor);
+            setNotiInitialized(true);
+          }
+        })
+        .catch(console.error)
+        .finally(() => setNotiLoading(false));
+    }
+  }, [notiOpen, notiInitialized, isAuthenticated]);
+
+  // Close notification dropdown on outside click
+  useEffect(() => {
+    function handleNotiOutsideClick(event: MouseEvent) {
+      if (notiRef.current && !notiRef.current.contains(event.target as Node)) {
+        setNotiOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleNotiOutsideClick);
+    return () => document.removeEventListener("mousedown", handleNotiOutsideClick);
+  }, []);
+
+  const handleLoadMoreNotifications = useCallback(async () => {
+    if (!notiCursor || notiLoadingMore) return;
+    setNotiLoadingMore(true);
+    try {
+      const res = await notificationService.getUserNotifications({ cursor: notiCursor, pageSize: 10 });
+      if (res.success && res.data) {
+        setNotifications(prev => [...prev, ...res.data.items]);
+        setNotiCursor(res.data.nextCursor);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setNotiLoadingMore(false);
+    }
+  }, [notiCursor, notiLoadingMore]);
+
+  const handleNotificationClick = useCallback(async (noti: NotificationDto) => {
+    // Mark as read locally and on server
+    if (!noti.isRead) {
+      setNotifications(prev => prev.map(n => n.id === noti.id ? { ...n, isRead: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+      notificationService.markAsRead(noti.id).catch(console.error);
+    }
+    setNotiOpen(false);
+    if (noti.redirectUrl) {
+      router.push(noti.redirectUrl);
+    }
+  }, [router]);
+
+  const handleMarkAllAsRead = useCallback(async () => {
+    try {
+      await notificationService.markAllAsRead();
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  // --- Real-time notification listener via SignalR ---
+  useEffect(() => {
+    const handleNewNotification = (newNoty: NotificationDto) => {
+      // 1. Check if we already processed this notification ID (handles duplicate SignalR events)
+      if (processedNotisRef.current.has(newNoty.id)) {
+        return;
+      }
+      processedNotisRef.current.add(newNoty.id);
+
+      console.log("💥 [Header] handleNewNoty triggered! Updating UI state...", newNoty);
+      
+      // 2. Increment badge
+      setUnreadCount(prev => prev + 1);
+
+      // 3. Prepend to list safely
+      setNotifications(prev => {
+        if (prev.some(n => n.id === newNoty.id)) return prev;
+        return [newNoty, ...prev];
+      });
+    };
+
+    socketService.onNotificationReceived(handleNewNotification);
+
+    return () => {
+      socketService.offNotificationReceived(handleNewNotification);
+    };
+  }, []);
 
   // Cart item count from server cart
   const cartItemCount = serverCart?.orderItems
@@ -710,6 +869,118 @@ export const Header: FC = () => {
                 {t("andOrders")}
               </span>
             </Link>
+
+            {/* ── Notification Bell ── */}
+            {isAuthenticated && (
+              <div className="relative hidden md:block" ref={notiRef}>
+                <button
+                  onClick={() => setNotiOpen(prev => !prev)}
+                  className="relative flex items-center px-2 py-1 text-white hover:outline hover:outline-1 hover:outline-white rounded-sm transition-all"
+                  aria-label="Notifications"
+                >
+                  <BellIcon className="w-6 h-6" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-amazon-btnSecondary text-amazon-text text-[10px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Notification Dropdown */}
+                {notiOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-[380px] bg-white border border-amazon-border shadow-2xl rounded-md z-50 font-sans overflow-hidden">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-amazon-border bg-neutral-50">
+                      <h3 className="text-sm font-bold text-amazon-text">Thông báo</h3>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={handleMarkAllAsRead}
+                          className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                        >
+                          Đánh dấu tất cả đã đọc
+                        </button>
+                      )}
+                    </div>
+
+                    {/* List */}
+                    <div className="max-h-[420px] overflow-y-auto">
+                      {notiLoading ? (
+                        <div className="flex items-center justify-center py-10">
+                          <Loader2 className="w-5 h-5 animate-spin text-neutral-400" />
+                        </div>
+                      ) : notifications.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-10 text-neutral-400">
+                          <BellIcon className="w-8 h-8 mb-2 opacity-40" />
+                          <p className="text-sm">Chưa có thông báo nào</p>
+                        </div>
+                      ) : (
+                        <>
+                          {notifications.map((noti) => (
+                            <button
+                              key={noti.id}
+                              onClick={() => handleNotificationClick(noti)}
+                              className={`w-full text-left flex items-start gap-3 px-4 py-3 border-b border-neutral-100 last:border-b-0 transition-colors hover:bg-neutral-50 ${
+                                !noti.isRead ? "bg-blue-50/60" : ""
+                              }`}
+                            >
+                              {/* Icon */}
+                              <div className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center mt-0.5 ${
+                                !noti.isRead ? "bg-blue-100 text-blue-600" : "bg-neutral-100 text-neutral-500"
+                              }`}>
+                                {noti.actorId === null ? (
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+                                  </svg>
+                                ) : (
+                                  <BellIcon className="w-4 h-4" />
+                                )}
+                              </div>
+
+                              {/* Content */}
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-[13px] leading-snug ${
+                                  !noti.isRead ? "font-semibold text-amazon-text" : "font-medium text-neutral-700"
+                                }`}>
+                                  {noti.title}
+                                </p>
+                                {noti.message && (
+                                  <p className="text-xs text-neutral-500 mt-0.5 line-clamp-2">
+                                    {noti.message}
+                                  </p>
+                                )}
+                                <p className="text-[11px] text-neutral-400 mt-1">
+                                  {timeAgo(noti.createdAt)}
+                                </p>
+                              </div>
+
+                              {/* Unread dot */}
+                              {!noti.isRead && (
+                                <span className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2" />
+                              )}
+                            </button>
+                          ))}
+
+                          {/* Load More */}
+                          {notiCursor && (
+                            <button
+                              onClick={handleLoadMoreNotifications}
+                              disabled={notiLoadingMore}
+                              className="w-full py-2.5 text-center text-xs font-semibold text-blue-600 hover:bg-neutral-50 transition-colors disabled:opacity-50"
+                            >
+                              {notiLoadingMore ? (
+                                <Loader2 className="w-4 h-4 animate-spin mx-auto" />
+                              ) : (
+                                "Xem thêm"
+                              )}
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Language Switcher */}
             <div className="hidden md:flex items-center px-1">

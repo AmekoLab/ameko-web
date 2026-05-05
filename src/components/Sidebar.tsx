@@ -129,6 +129,14 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
         { name: t("warrantyRequests"), path: "/admin/warranty-requests" },
       ],
     },
+    {
+      groupName: t("group_system"),
+      groupKey: "system",
+      icon: Settings,
+      items: [
+        { name: t("notification"), path: "/admin/notification" }
+      ],
+    },
   ];
 
   const userMenu: MenuGroup[] = [

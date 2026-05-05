@@ -246,10 +246,23 @@ export default function AdminShopRequestsPage() {
                           )}
                         </div>
                         <div>
-                          <p className="font-bold text-[11px] text-amazon-text mb-0.5">
+                          <p className="font-bold text-[11px] text-amazon-text mb-0.5 truncate max-w-[150px]" title={shop.shopName}>
                             {shop.shopName}
                           </p>
-                          {renderStatusBadge(shop.status)}
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                            {/* Nếu Shop đang Active + Báo tạm nghỉ -> Chỉ hiện Tạm nghỉ */}
+                            {shop.status === ShopStatus.Active && shop.isActive === false ? (
+                              <span 
+                                className="px-1.5 py-0.5 rounded-sm text-[10px] font-bold border whitespace-nowrap bg-neutral-200 text-neutral-600 border-neutral-300 uppercase tracking-wide" 
+                                title="Đã duyệt nhưng Shop đang tự tạm đóng cửa"
+                              >
+                                {t("inactiveShop") || "Tạm nghỉ"}
+                              </span>
+                            ) : (
+                              // Còn lại (Pending, Banned, hoặc Active mở cửa bình thường) -> Hiện badge mặc định
+                              renderStatusBadge(shop.status)
+                            )}
+                          </div>
                         </div>
                       </div>
                     </td>

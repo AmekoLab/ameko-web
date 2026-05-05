@@ -339,17 +339,19 @@ export const ProductInfo = ({
           {/* Add to Cart Button — solid yellow block */}
           <button
             onClick={handleAddToCart}
-            disabled={isOutOfStock || isAddingToCart}
+            disabled={isOutOfStock || isAddingToCart || product.shopIsActive === false}
             type="button"
             className={`flex-1 h-full flex items-center justify-center gap-2 text-[14px] font-black uppercase tracking-[0.2em] transition-colors active:scale-[0.98] rounded-full
               ${
-                isOutOfStock || isAddingToCart
+                isOutOfStock || isAddingToCart || product.shopIsActive === false
                   ? "bg-neutral-200 text-amazon-textMuted cursor-not-allowed"
                   : "bg-amazon-btnPrimary hover:brightness-95 text-amazon-text"
               }
             `}
           >
-            {isAddingToCart ? (
+            {product.shopIsActive === false ? (
+              t("shopUnavailable") || "Shop đang tạm nghỉ"
+            ) : isAddingToCart ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" /> {t("adding")}
               </>
@@ -478,11 +480,13 @@ export const ProductInfo = ({
             </span>
             <button
               onClick={handleAddToCart}
-              disabled={isOutOfStock || isAddingToCart}
+              disabled={isOutOfStock || isAddingToCart || product.shopIsActive === false}
               type="button"
               className="h-10 px-6 bg-amazon-btnPrimary hover:brightness-95 rounded-full text-amazon-text text-[11px] font-black uppercase tracking-[0.18em] transition-all disabled:bg-neutral-200 disabled:text-amazon-textMuted disabled:cursor-not-allowed flex items-center gap-2"
             >
-              {isAddingToCart ? (
+              {product.shopIsActive === false ? (
+                t("shopUnavailable") || "Shop đang tạm nghỉ"
+              ) : isAddingToCart ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t("adding")}
                 </>
