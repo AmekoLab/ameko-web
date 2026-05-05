@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { socialService } from "@/src/services/social.service";
 import { Post } from "@/src/types/social.types";
@@ -8,6 +8,8 @@ import { PostCard } from "./PostCard";
 import { PostSkeleton } from "./PostSkeleton";
 import { RefreshCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useAppDispatch } from "@/src/store/hook";
+import { fetchFollowingList } from "@/src/store/slices/followsSlice";
 
 export default function FeedClient({
   initialPosts = [],
@@ -25,7 +27,39 @@ export default function FeedClient({
   const [, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState<boolean>(false);
   const t = useTranslations("FeedClient");
+  const dispatch = useAppDispatch();
 
+  // ─── Initialize Redux Store for Follows ──────────────────────────────────
+  useEffect(() => {
+    const isAuth = typeof window !== "undefined" && !!localStorage.getItem("user");
+    if (isAuth) {
+      dispatch(fetchFollowingList());
+    }
+  }, [dispatch]);
+
+  // ─── Intersection Observer for infinite scroll ───────────────────────────
+  const observer = useRef<IntersectionObserver | null>(null);
+
+  const lastPostRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore) {
+            setPage((prev) => prev + 1);
+          }
+        },
+        { threshold: 0.1 },
+      );
+
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, hasMore],
+  );
+
+  // ─── Fetch posts (append on page > 1) ────────────────────────────────────
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -47,7 +81,8 @@ export default function FeedClient({
           response = await socialService.getFeed();
         }
 
-        setPosts(response.data.items);
+        const newItems = response.data.items;
+        setPosts((prev) => (page === 1 ? newItems : [...prev, ...newItems]));
         setNextCursor(response.data.nextCursor);
         // Safely handle both cursor-based (hasMore) and page-based (hasNextPage) pagination
         setHasMore(response.data.hasMore ?? response.data.hasNextPage ?? false);
@@ -62,6 +97,13 @@ export default function FeedClient({
     fetchPosts();
   }, [currentFeed, page, userId, t]);
 
+  // ─── Reset page when feed tab changes ────────────────────────────────────
+  useEffect(() => {
+    setPage(1);
+    setPosts([]);
+  }, [currentFeed]);
+
+  // ─── Listen for new post events ──────────────────────────────────────────
   useEffect(() => {
     const onPostCreated = (event: Event) => {
       const customEvent = event as CustomEvent<Post>;
@@ -112,9 +154,17 @@ export default function FeedClient({
 
   return (
     <div className="flex flex-col">
-      {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
-      ))}
+      {posts.map((post, index) => {
+        // Attach ref to the last post for infinite scroll
+        if (index === posts.length - 1) {
+          return (
+            <div ref={lastPostRef} key={post.id}>
+              <PostCard post={post} />
+            </div>
+          );
+        }
+        return <PostCard key={post.id} post={post} />;
+      })}
 
       {isLoading && (
         <>
@@ -135,7 +185,7 @@ export default function FeedClient({
         </div>
       )}
 
-      {!hasMore && !isLoading && (
+      {!hasMore && !isLoading && posts.length > 0 && (
         <div className="py-6 text-center opacity-50">
           <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">
             {t("endOfFeed")}

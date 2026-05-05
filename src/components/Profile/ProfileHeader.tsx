@@ -1,5 +1,5 @@
 "use client";
-import { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import {
   CheckCircle,
@@ -85,6 +85,27 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
     setLocalFollowersCount(profile.followersCount || 0);
   }, [profile.followersCount]);
 
+  // Smart Sync: Track Redux followingIds and update local count automatically
+  const prevFollowingIds = useRef<string[]>(followingIds);
+
+  useEffect(() => {
+    if (!profile?.userId) return;
+
+    // Determine what changed
+    const added = followingIds.filter(id => !prevFollowingIds.current.includes(id));
+    const removed = prevFollowingIds.current.filter(id => !followingIds.includes(id));
+
+    // Update count based on changes targetting this profile
+    if (added.length === 1 && added[0] === profile.userId) {
+      setLocalFollowersCount((prev) => prev + 1);
+    } else if (removed.length === 1 && removed[0] === profile.userId) {
+      setLocalFollowersCount((prev) => Math.max(0, prev - 1));
+    }
+
+    // Update ref for the next cycle
+    prevFollowingIds.current = followingIds;
+  }, [followingIds, profile?.userId]);
+
   // 4. Lấy danh sách đang theo dõi khi vào trang
   useEffect(() => {
     if (isAuthenticated && followingIds.length === 0) {
@@ -110,13 +131,8 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({
   const handleToggleFollow = () => {
     if (!profile.userId) return;
 
+    // Sẽ tự động trigger useEffect Smart Sync ở trên để update số
     dispatch(toggleFollowUser(profile.userId));
-
-    if (isFollowing) {
-      setLocalFollowersCount((prev) => Math.max(0, prev - 1));
-    } else {
-      setLocalFollowersCount((prev) => prev + 1);
-    }
   };
 
   return (

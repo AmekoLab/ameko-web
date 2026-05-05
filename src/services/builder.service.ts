@@ -50,7 +50,7 @@ export const builderService = {
    */
   getBaseKits: async (shopId: string) => {
     return api.get<unknown, ApiResponse<PartListData>>(
-      `/parts?ShopId=${shopId}&PartType=kit`,
+      `/parts?ShopId=${shopId}&PartType=kit&RequireBuilderConfig=true`,
     );
   },
 

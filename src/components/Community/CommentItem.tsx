@@ -157,7 +157,7 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onCommentUpdated, o
           {/* Footer của comment (Like, Reply, Time) */}
           <div className="flex items-center gap-3 px-3 mt-1 text-[10px] font-bold text-gray-500">
             <button className="hover:underline">{t("like")}</button>
-            <button className="hover:underline">{t("reply")}</button>
+            {/* <button className="hover:underline">{t("reply")}</button> */}
             <div className="flex items-center gap-1 font-normal">
               <span>{new Date(comment.createdAt).toLocaleString()}</span>
               {comment.isEdited && (

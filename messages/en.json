@@ -3687,7 +3687,7 @@
     "visitUs": "Visit Us",
     "addressLine1": "Lô E2a, 7 Đ. D1, Long Thạnh Mỹ,",
     "addressLine2": "Thủ Đức, Hồ Chí Minh 700000, VN",
-    "slogan": "German engineering meets Swedish design",
+    "slogan": "Personal mark in every experience",
     "termsOfService": "Terms of Service",
     "cookieSettings": "Cookie Settings",
     "returnsPolicy": "Returns Policy",
@@ -3763,9 +3763,53 @@
       "lockedWarning": "Your purchasing ability has been locked due to low reputation score. Please contact support."
     }
   },
-    "DepositModal": {
-   "paymentMethodTitle": "Payment Method",
-"vnpayDesc": "ATM Card / Domestic E-wallet",
-"stripeDesc": "Visa / Mastercard"
+  "DepositModal": {
+    "paymentMethodTitle": "Payment Method",
+    "vnpayDesc": "ATM Card / Domestic E-wallet",
+    "stripeDesc": "Visa / Mastercard"
+  },
+  "FollowButton": {
+    "follow": "Follow",
+    "following": "Following",
+    "unfollow": "Unfollow",
+    "cancel": "Cancel",
+    "unfollowConfirm": "Unfollow @{name}?",
+    "user": "User"
+  },
+  "FooterPages": {
+    "About": {
+      "title": "About Us",
+      "p1": "AMEKO is a specialized e-commerce platform dedicated to the mechanical keyboard community. Founded in January 2026 by the AmekoLab team (Hoàng Trung Tín, Trịnh Tiến Đạt, Nguyễn Hoàng Gia Thịnh, and Phạm Minh Tuấn), the project was born to completely resolve market barriers: fragmented information, risks of spontaneous transactions, and the complexity of checking component compatibility.",
+      "p2": "By building a comprehensive ecosystem – from an intuitive keyboard design tool, an on-demand custom build matchmaking platform, to a secure escrow payment system – AMEKO is committed to providing the most transparent, professional, and secure trading environment."
+    },
+    "Privacy": {
+      "title": "Privacy Policy",
+      "intro1": "Thank you for visiting our website. We respect and are committed to protecting your privacy and personal information.",
+      "intro2": "This privacy policy explains how we collect, use, and (under certain conditions) disclose your personal information. Protecting your personal data and building your trust is very important to us.",
+      "section1Title": "1. Personal Information Collection",
+      "section1Content1": "We collect, store, and process your information for the purchasing process and subsequent notifications regarding your orders, and to provide services. This includes personal details: title, name, gender, date of birth, email, address, delivery address, phone number, and payment details.",
+      "section1Content2": "We will use the information you provide to process your orders, provide services, and deliver requested information through the website.",
+      "section1Content3": "Your order details are stored securely and cannot be accessed directly by the public. However, you can access your information by logging into your account on the website.",
+      "section2Title": "2. Security",
+      "section2Content1": "We have appropriate technical and security measures in place to prevent unauthorized or unlawful access to, or accidental loss, destruction, or damage to your information.",
+      "section2Content2": "All transaction information will be kept confidential, but in cases required by law enforcement, we will be obliged to provide this information to legal authorities.",
+      "section3Title": "3. Customer Rights",
+      "section3Content1": "You have the right to request access to your personal data and to ask us to correct any inaccuracies in your data free of charge. You also have the right to request that we stop using your personal data for marketing purposes at any time."
+    },
+    "Terms": {
+      "title": "Terms of Service",
+      "intro1": "By accessing our website, you agree to these terms. The website reserves the right to change, modify, add, or remove portions of these Terms and Conditions of Use at any time.",
+      "section1Title": "1. Website Usage Guidelines",
+      "section1Content1": "To use our website, users must be at least 18 years old or be accessing the site under the supervision of a parent or legal guardian.",
+      "section1Content2": "The use of any part of this website for commercial purposes or on behalf of any third party is strictly prohibited without our prior written permission.",
+      "section1Content3": "You must register an account with authentic personal information and update it if any changes occur.",
+      "section2Title": "2. Order Acceptance and Pricing",
+      "section2Content1": "We reserve the right to refuse or cancel your order for any reason at any time. We may ask for additional phone numbers and addresses before accepting an order.",
+      "section2Content2": "We are committed to providing the most accurate pricing information to consumers. However, errors may occasionally occur. Depending on the situation, we will contact you for instructions or notify you of order cancellation.",
+      "section3Title": "3. Trademarks and Copyrights",
+      "section3Content1": "All intellectual property rights (whether registered or unregistered), information content, and all website designs, text, graphics, software, photos, video, music, sound, and underlying source code are our property. The entire contents of the website are protected by Vietnamese copyright laws and international conventions.",
+      "section4Title": "4. Changes and Cancellations",
+      "section4Content1": "In all cases, customers have the right to terminate the transaction if they have notified us of the cancellation and returned the goods received unused and without having derived any benefit from them."
+    }
   }
 }

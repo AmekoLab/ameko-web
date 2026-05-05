@@ -73,3 +73,15 @@ body {
   background: #ce2a32; /* Màu đỏ Cherry */
   opacity: 1;
 }
+
+/* ── Builder: 3D Keyboard pop-in entrance ── */
+@keyframes keyboardPopIn {
+  0% {
+    opacity: 0;
+    transform: rotateX(22deg) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateX(22deg) scale(1);
+  }
+}

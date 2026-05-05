@@ -126,12 +126,37 @@ const KEYBOARD_ROWS: KeyDef[][] = [
 ];
 
 const KEYMAP_CALIBRATION = {
-  pTop: 10.8,
-  pBottom: 18.9,
-  pLeft: 18.1,
-  pRight: 17.4,
-  rowGap: 0.8,
-  colGap: 0.3,
+  pTop: 7,
+  pBottom: 14,
+  pLeft: 13,
+  pRight: 12.5,
+  rowGap: 1.6,
+  colGap: 0.7,
+};
+
+// ─── SECONDARY LEGENDS (Shift-layer characters) ────────────────────────────
+const SUB_LEGENDS: Record<string, string> = {
+  "`": "~",
+  "1": "!",
+  "2": "@",
+  "3": "#",
+  "4": "$",
+  "5": "%",
+  "6": "^",
+  "7": "&",
+  "8": "*",
+  "9": "(",
+  "0": ")",
+  "-": "_",
+  "=": "+",
+  "[": "{",
+  "]": "}",
+  "\\": "|",
+  ";": ":",
+  "'": '"',
+  ",": "<",
+  ".": ">",
+  "/": "?",
 };
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
@@ -232,7 +257,7 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
     <>
       {/* ── KEYBOARD GRID OVERLAY ── */}
       <div
-        className="absolute inset-0 z-[999] pointer-events-auto text-[7.5px] tracking-[0.7px]"
+        className="absolute inset-0 z-[999] pointer-events-auto text-[8px] tracking-[0.7px]"
         style={{
           paddingTop: `${KEYMAP_CALIBRATION.pTop}%`,
           paddingBottom: `${KEYMAP_CALIBRATION.pBottom}%`,
@@ -272,54 +297,100 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
           </div>
         )}
 
-        <div
-          className="w-full h-full flex flex-col"
-          style={{ gap: `${KEYMAP_CALIBRATION.rowGap}%` }}
-        >
-          {KEYBOARD_ROWS.map((row, rowIdx) => (
+        {/* ── 3D PERSPECTIVE CONTAINER ── */}
+        <div className="w-full h-full" style={{ perspective: "1200px" }}>
+          {/* Keyboard case shell — pop-in entrance */}
+          <div
+            className="w-full h-full rounded-xl p-[2.5%] animate-[keyboardPopIn_0.5s_cubic-bezier(0.175,0.885,0.32,1.275)_both]"
+            style={{
+              background: "linear-gradient(180deg, #1e1e1e 0%, #463b38ff 100%)",
+              boxShadow:
+                "0 12px 48px rgba(0,0,0,0.8), 0 2px 0 0 #2a2a2a, inset 0 1px 0 0 rgba(255,255,255,0.06)",
+              transform: "rotateX(22deg)",
+              transformOrigin: "center bottom",
+              transformStyle: "preserve-3d",
+            }}
+          >
+            {/* Recessed plate */}
             <div
-              key={rowIdx}
-              className="flex flex-1"
+              className="w-full h-full flex flex-col rounded-lg p-[1.5%]"
               style={{
-                gap: `${KEYMAP_CALIBRATION.colGap}%`,
-                marginBottom:
-                  rowIdx === 0 ? `${KEYMAP_CALIBRATION.rowGap}%` : undefined,
+                gap: `${KEYMAP_CALIBRATION.rowGap}%`,
+                background: "#0d0d0d",
+                boxShadow:
+                  "inset 0 2px 12px rgba(0,0,0,0.9), inset 0 0 4px rgba(0,0,0,0.6)",
               }}
             >
-              {row.map(([label, flexVal], colIdx) => {
-                const kid = keyId(rowIdx, colIdx, label);
-                const addon = findAddonForKey(kid, selectedAddons);
-                const hasAddon = !!addon;
+            {KEYBOARD_ROWS.map((row, rowIdx) => (
+              <div
+                key={rowIdx}
+                className="flex flex-1"
+                style={{
+                  gap: `${KEYMAP_CALIBRATION.colGap}%`,
+                  marginBottom:
+                    rowIdx === 0 ? `${KEYMAP_CALIBRATION.rowGap}%` : undefined,
+                }}
+              >
+                {row.map(([label, flexVal], colIdx) => {
+                  const kid = keyId(rowIdx, colIdx, label);
+                  const addon = findAddonForKey(kid, selectedAddons);
+                  const hasAddon = !!addon;
 
-                return (
-                  <button
-                    key={kid}
-                    onClick={() => handleKeyClick(kid)}
-                    style={{ flex: flexVal }}
-                    className={`
-                      relative rounded-[3px] transition-all duration-150
-                      flex items-center justify-center font-bold uppercase
-                      ${
+                  return (
+                    <button
+                      key={kid}
+                      onClick={() => handleKeyClick(kid)}
+                      style={{
+                        flex: flexVal,
+                        minHeight: "1.8em",
+                        background: hasAddon
+                          ? "linear-gradient(180deg, rgba(251,146,60,0.22) 0%, rgba(217,119,6,0.13) 100%)"
+                          : "linear-gradient(180deg, #4b5563 0%, #374151 100%)",
+                        boxShadow: hasAddon
+                          ? "0 0 14px 2px rgba(251,146,60,0.45), inset 0 1px 0 0 rgba(251,146,60,0.3), 0 2px 0 0 #92400e, 0 4px 0 0 #78350f, 0 6px 8px rgba(0,0,0,0.5)"
+                          : "inset 0 1px 0 0 rgba(255,255,255,0.09), 0 2px 0 0 #374151, 0 4px 0 0 #1f2937, 0 6px 8px rgba(0,0,0,0.45)",
+                      }}
+                      className={`
+                        relative rounded-[4px] select-none
+                        flex flex-col justify-start pt-[2px] pl-[4px]
+                        font-bold uppercase leading-tight
+                        transition-[transform,filter] duration-100 ease-out
+                        hover:brightness-[1.2]
+                        active:translate-y-[3px] active:brightness-100
+                        ${
+                          hasAddon
+                            ? "border border-orange-400/70 text-orange-300 hover:text-orange-200"
+                            : "border border-white/[0.06] text-white/50 hover:text-white/80"
+                        }
+                      `}
+                      title={
                         hasAddon
-                          ? "border-2 border-orange-400 bg-orange-400/15 shadow-[0_0_8px_rgba(251,146,60,0.4)] text-orange-300"
-                          : "border border-transparent hover:border-white/30 hover:bg-white/5 text-transparent hover:text-white/40"
+                          ? `${addon[1].name} — Click to manage`
+                          : `Customize: ${label}`
                       }
-                    `}
-                    title={
-                      hasAddon
-                        ? `${addon[1].name} — Click to manage`
-                        : `Customize: ${label}`
-                    }
-                  >
-                    {label}
-                    {hasAddon && (
-                      <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-orange-400 rounded-full" />
-                    )}
-                  </button>
-                );
-              })}
+                    >
+                      {SUB_LEGENDS[label] ? (
+                        <>
+                          <span className="text-[0.85em] opacity-60 leading-none">
+                            {SUB_LEGENDS[label]}
+                          </span>
+                          <span className="text-[1em] opacity-90 leading-none">
+                            {label}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-[1em] leading-none">{label}</span>
+                      )}
+                      {hasAddon && (
+                        <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-orange-400 rounded-full shadow-[0_0_6px_rgba(251,146,60,0.8)]" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
 

@@ -83,6 +83,7 @@ export interface WarrantyHistoryItem {
   actionType: number;
   actionName: string;
   comment: string;
+  evidenceUrl?: string;
   createdAt: string;
 }
 
