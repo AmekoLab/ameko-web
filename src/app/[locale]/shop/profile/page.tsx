@@ -21,6 +21,8 @@ import {
 } from "@/src/features/shop/schemas/updateShop.schema";
 import { toast } from "react-toastify";
 import Image from "next/image";
+import Link from "next/link";
+import { walletService } from "@/src/services/wallet.service";
 import {
   Camera,
   CreditCard,
@@ -166,6 +168,8 @@ export default function ShopProfilePage() {
   // State quản lý Modal Xác nhận và Trạng thái loading
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const [isLoadingWallet, setIsLoadingWallet] = useState(false);
 
   const {
     register,
@@ -180,6 +184,18 @@ export default function ShopProfilePage() {
   useEffect(() => {
     dispatch(fetchCurrentShop());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (isConfirmModalOpen && currentShop && !currentShop.isActive) {
+      setIsLoadingWallet(true);
+      walletService.getDetails()
+        .then(res => {
+          if (res.success && res.data) setWalletBalance(res.data.balance);
+        })
+        .catch(err => console.error(err))
+        .finally(() => setIsLoadingWallet(false));
+    }
+  }, [isConfirmModalOpen, currentShop]);
 
   useEffect(() => {
     if (currentShop) {
@@ -298,6 +314,9 @@ export default function ShopProfilePage() {
     );
   }
 
+  const isReactivating = currentShop && !currentShop.isActive;
+  const isInsufficient = isReactivating && walletBalance !== null && walletBalance < 2000000;
+
   return (
     <div className="py-8 px-4 md:px-8 lg:px-12 relative bg-neutral-50 min-h-[calc(100vh-4rem)]">
       {/* ==================== CUSTOM CONFIRM MODAL ==================== */}
@@ -331,6 +350,38 @@ export default function ShopProfilePage() {
                 : t("confirmModal.reopenDescription")}
             </p>
 
+            {/* Số Dư Ví Cảnh Báo */}
+            {isReactivating && (
+              <div className="mb-5 text-left w-full">
+                <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-lg">
+                  <p className="text-xs text-neutral-500 font-medium">{t("soduvi")}</p>
+                  {isLoadingWallet ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-neutral-400 mt-1" />
+                  ) : (
+                    <p className={`text-lg font-black ${isInsufficient ? "text-red-600" : "text-green-600"}`}>
+                      {walletBalance !== null ? walletBalance.toLocaleString("vi-VN") + " ₫" : "---"}
+                    </p>
+                  )}
+                </div>
+{isInsufficient && (
+  <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+    <p className="text-sm font-bold">
+      {t("insufficientBalanceTitle")}
+    </p>
+    <p className="text-xs mt-1">
+      {t("insufficientBalanceDesc")}
+    </p>
+    <Link 
+      href="/wallet" 
+      className="mt-2 inline-block px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded hover:bg-red-700 transition-colors shadow-sm"
+    >
+      {t("goToDeposit")}
+    </Link>
+  </div>
+)}
+              </div>
+            )}
+
             {/* Cụm Nút Hành Động */}
             <div className="flex w-full gap-3">
               <button
@@ -344,7 +395,7 @@ export default function ShopProfilePage() {
               <button
                 type="button"
                 onClick={executeToggleStatus}
-                disabled={isToggling}
+                disabled={isToggling || isLoadingWallet || !!isInsufficient}
                 className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-white text-sm font-medium rounded-lg transition-colors shadow-sm disabled:opacity-70 ${
                   currentShop?.isActive
                     ? "bg-red-600 hover:bg-red-700"

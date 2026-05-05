@@ -69,9 +69,7 @@ export const Footer: FC = () => {
               </h4>
               <ul className="space-y-2.5">
                 <FooterLink href="/about">{t("aboutAmeko")}</FooterLink>
-                <FooterLink href="/news">{t("newsPress")}</FooterLink>
-                <FooterLink href="/esports">{t("esportsTeams")}</FooterLink>
-                <FooterLink href="/distributors">{t("distributors")}</FooterLink>
+                
                 <FooterLink href="/community">{t("community")}</FooterLink>
               </ul>
 
@@ -102,11 +100,9 @@ export const Footer: FC = () => {
               </h4>
               <ul className="space-y-2.5">
                 <FooterLink href="/contact">{t("contactUs")}</FooterLink>
-                <FooterLink href="/shipping">{t("shippingInfo")}</FooterLink>
-                <FooterLink href="/returns">{t("returnsExchanges")}</FooterLink>
-                <FooterLink href="/warranty">{t("warranty")}</FooterLink>
-                <FooterLink href="/downloads">{t("driversDownloads")}</FooterLink>
-                <FooterLink href="/faq">{t("helpFaq")}</FooterLink>
+                <FooterLink href="/orders">{t("shippingInfo")}</FooterLink>
+                <FooterLink href="/my-warranty-requests">{t("returnsExchanges")}</FooterLink>
+                <FooterLink href="/my-warranty-requests">{t("warranty")}</FooterLink>
               </ul>
             </div>
 
@@ -121,7 +117,7 @@ export const Footer: FC = () => {
                 <FooterLink href="/custom-build">{t("buildYourOwnKeyboard")}</FooterLink>
                 <FooterLink href="/orders">{t("yourOrders")}</FooterLink>
                 <FooterLink href="/profile">{t("yourAccount")}</FooterLink>
-                <FooterLink href="/privacy">{t("privacyPolicy")}</FooterLink>
+                <FooterLink href="/privacy-policy">{t("privacyPolicy")}</FooterLink>
               </ul>
             </div>
 
@@ -191,16 +187,14 @@ export const Footer: FC = () => {
         <div className="max-w-7xl mx-auto flex flex-col items-center gap-4 px-6">
           {/* Legal links */}
           <div className="flex flex-wrap justify-center gap-6 text-xs text-gray-400">
-            <Link href="/terms" className="hover:underline hover:text-white">
+            <Link href="/terms-of-service" className="hover:underline hover:text-white">
               {t("termsOfService")}
             </Link>
-            <Link href="/privacy" className="hover:underline hover:text-white">
+            <Link href="/privacy-policy" className="hover:underline hover:text-white">
               {t("privacyPolicy")}
             </Link>
-            <Link href="/cookies" className="hover:underline hover:text-white">
-              {t("cookieSettings")}
-            </Link>
-            <Link href="/returns" className="hover:underline hover:text-white">
+          
+            <Link href="/my-warranty-requests" className="hover:underline hover:text-white">
               {t("returnsPolicy")}
             </Link>
           </div>

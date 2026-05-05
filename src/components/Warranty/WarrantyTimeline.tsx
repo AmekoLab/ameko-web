@@ -8,6 +8,7 @@ import {
   WarrantyHistoryItem,
 } from "@/src/services/warranty.service";
 import { format, parseISO } from "date-fns";
+import Image from "next/image";
 
 // ─── Mappings ──────────────────────────────────────────────
 const ROLE_STYLES: Record<
@@ -53,6 +54,13 @@ const formatDate = (dateStr: string): string => {
 
 const getRoleStyle = (roleName: string) =>
   ROLE_STYLES[roleName] || ROLE_STYLES.Customer;
+
+const extractUrl = (urlStr?: string): string => {
+  if (!urlStr) return "";
+  const match = urlStr.match(/\]\((https?:\/\/[^\)]+)\)/) || urlStr.match(/\((https?:\/\/[^\)]+)\)/);
+  if (match) return match[1];
+  return urlStr;
+};
 
 // ─── Skeleton ──────────────────────────────────────────────
 const TimelineSkeleton: FC = () => (
@@ -167,10 +175,22 @@ const WarrantyTimeline: FC<WarrantyTimelineProps> = ({ issueId }) => {
                   {getActionLabel(item.actionName)}
                 </p>
 
-                {/* Comment */}
-                {item.comment && (
-                  <div className="bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
-                    <p className="text-sm text-gray-600">{item.comment}</p>
+                {/* Comment & Evidence */}
+                {(item.comment || item.evidenceUrl) && (
+                  <div className="bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 mt-1 space-y-2">
+                    {item.comment && (
+                      <p className="text-sm text-gray-600 whitespace-pre-wrap">{item.comment}</p>
+                    )}
+                    {item.evidenceUrl && extractUrl(item.evidenceUrl) && (
+                      <div className="relative w-full max-w-[200px] h-32 rounded border border-gray-200 overflow-hidden bg-white">
+                        <Image
+                          src={extractUrl(item.evidenceUrl)}
+                          alt="Evidence"
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

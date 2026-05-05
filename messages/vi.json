@@ -1,4 +1,78 @@
 {
+  "AdminNotificationPage": {
+    "timeJustNow": "Vừa xong",
+    "timeMinutesAgo": "{minutes} phút trước",
+    "timeHoursAgo": "{hours} giờ trước",
+    "timeDaysAgo": "{days} ngày trước",
+    "timeMonthsAgo": "{months} tháng trước",
+    "toastRequireTitle": "Vui lòng nhập tiêu đề!",
+    "toastBroadcastSuccess": "Phát thông báo toàn hệ thống thành công!",
+    "toastBroadcastFail": "Không thể phát thông báo.",
+    "toastBroadcastError": "Đã xảy ra lỗi khi phát thông báo!",
+    "toastUpdateSuccess": "Đã cập nhật thông báo!",
+    "toastUpdateFail": "Cập nhật thất bại.",
+    "toastUpdateError": "Đã xảy ra lỗi khi cập nhật!",
+    "toastDeleteSuccess": "Đã xóa thông báo!",
+    "toastDeleteFail": "Xóa thất bại.",
+    "toastDeleteError": "Đã xảy ra lỗi khi xóa!",
+    "title": "Quản lý Thông báo",
+    "subtitle": "Quản lý thông báo hệ thống, phát broadcast, chỉnh sửa và xóa.",
+    "total": "Tổng:",
+    "notifications": "thông báo",
+    "btnBroadcast": "Gửi toàn server",
+    "noNotifications": "Chưa có thông báo nào",
+    "noNotificationsDesc": "Nhấn \"Gửi toàn server\" để tạo broadcast đầu tiên.",
+    "colId": "ID",
+    "colTitle": "Tiêu đề",
+    "colMessage": "Nội dung",
+    "colType": "Loại",
+    "colSource": "Nguồn",
+    "colTime": "Thời gian",
+    "colActions": "Hành động",
+    "sourceUser": "User",
+    "sourceSystem": "System",
+    "actionView": "Xem chi tiết",
+    "actionEdit": "Chỉnh sửa",
+    "actionDelete": "Xóa",
+    "page": "Trang",
+    "prev": "‹ Trước",
+    "next": "Sau ›",
+    "modalBroadcastTitle": "Phát thông báo toàn server",
+    "modalWarning": "Lưu ý:",
+    "modalWarningDesc": "Thông báo này sẽ gửi tới tất cả người dùng. Tính năng này <notRealtime>không đẩy thời gian thực</notRealtime>, người dùng sẽ thấy khi load lại trang.",
+    "labelTitle": "Tiêu đề",
+    "optional": "(tuỳ chọn)",
+    "placeholderTitle": "Tiêu đề thông báo",
+    "labelMessage": "Nội dung",
+    "placeholderMessage": "Nội dung chi tiết...",
+    "labelRedirectUrl": "Đường dẫn điều hướng",
+    "placeholderRedirectUrl": "/promotions hoặc https://...",
+    "btnCancel": "Hủy",
+    "btnSending": "Đang gửi...",
+    "btnSend": "Phát thông báo",
+    "modalEditTitle": "Chỉnh sửa thông báo #{id}",
+    "btnSaving": "Đang lưu...",
+    "btnSave": "Lưu thay đổi",
+    "modalDeleteConfirm": "Xác nhận xóa?",
+    "modalDeleteDesc": "Thông báo <targetId>#{id}</targetId> sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác.",
+    "btnDeleting": "Đang xóa..."
+  },
+  "CreateAdminNotyModal": {
+    "toastRequireTitle": "Vui lòng nhập tiêu đề!",
+    "toastSuccess": "Đã gửi thông báo đến {name}",
+    "toastFail": "Gửi thông báo thất bại",
+    "toastError": "Đã xảy ra lỗi khi gửi",
+    "title": "Gửi thông báo cá nhân",
+    "recipient": "Người nhận:",
+    "labelTitle": "Tiêu đề",
+    "placeholderTitle": "Nhập tiêu đề thông báo (Tối đa 200 ký tự)",
+    "labelMessage": "Nội dung chi tiết",
+    "placeholderMessage": "Nhập nội dung (Tối đa 1000 ký tự)",
+    "labelRedirectUrl": "Đường dẫn khi click (Redirect URL)",
+    "btnCancel": "Hủy",
+    "btnSending": "Đang gửi...",
+    "btnSend": "Gửi thông báo"
+  },
   "AdjustReputationModal": {
     "title": "Điều chỉnh Uy tín {targetType}",
     "adjustingFor": "Đang điều chỉnh cho:",
@@ -148,7 +222,8 @@
     "assembledFeedbacks": "Phản hồi SP Lắp Ráp",
     "processedWithdrawals": "Rút tiền đã xử lý",
     "financialManagement": "Quản lý tài chính",
-    "reputation": "Uy tín"
+    "reputation": "Uy tín",
+    "notification": "Thông báo"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -301,6 +376,14 @@
     "personalized": "Dành cho bạn",
     "standard": "Mới nhất"
   },
+  "ProfileHeader": {
+    "inactiveShop": "Tạm nghỉ",
+    "shopIsInactiveTitle": "Cửa hàng đang tạm nghỉ",
+    "shopIsInactiveDesc": "Cửa hàng này hiện không nhận đơn hàng mới hay yêu cầu báo giá. Bạn vẫn có thể xem các sản phẩm."
+  },
+  "ProductInfo": {
+    "shopUnavailable": "Shop đang tạm nghỉ"
+  },
   "CommentSection": {
     "errorLoad": "Không thể tải bình luận lúc này",
     "loading": "Đang tải...",
@@ -434,7 +517,9 @@
     "noBuildersFound": "Không tìm thấy shop nào",
     "ratingAll": "Đánh giá",
     "rating4Plus": "4.0",
-    "rating45Plus": "4.5"
+    "rating45Plus": "4.5",
+     "inactiveShop": "Tạm nghỉ",
+    "shopIsInactiveTitle":"Shop đang tạm nghỉ"
   },
   "CreateCommissionModal": {
     "errorImageUpload": "Tải ảnh lên thất bại, vui lòng thử lại",
@@ -520,7 +605,9 @@
     "rating0Plus": "0+ Sao",
     "rating45Plus": "4.5+ Sao",
     "sortBy": "Sắp xếp",
-    "filterBy": "Lọc"
+    "filterBy": "Lọc",
+     "inactiveShop": "Tạm nghỉ",
+    "shopIsInactiveTitle":"Shop đang tạm nghỉ"
   },
   "MyWarrantyRequests": {
     "pageTitle": "Bảo Hành & Đổi Trả",
@@ -1275,7 +1362,10 @@
     "followingModalTitle": "Following",
     "reputation": {
       "tooltip": "Điểm uy tín phục vụ: {score}/100"
-    }
+    },
+    "inactiveShop": "Tạm nghỉ",
+    "shopIsInactiveTitle": "Cửa hàng đang tạm nghỉ",
+    "shopIsInactiveDesc": "Cửa hàng này hiện không nhận đơn hàng mới hay yêu cầu báo giá. Bạn vẫn có thể xem các sản phẩm."
   },
   "ProfilePage": {
     "shopNotFound": "Không tìm thấy cửa hàng",
@@ -2178,6 +2268,10 @@
       "previewAlt": "Xem trước",
       "bannerPrompt": "Kéo thả hoặc nhấn để tải ảnh bìa"
     },
+    "soduvi" : "Số dư ví hiện tại",
+    "insufficientBalanceTitle": "Số dư không đủ!",
+    "insufficientBalanceDesc": "Hệ thống yêu cầu duy trì tối thiểu 2.000.000đ để kích hoạt gian hàng. Vui lòng nạp thêm tiền.",
+    "goToDeposit": "Đến trang Nạp Tiền",
     "toast": {
       "updateSuccess": "Cập nhật hồ sơ cửa hàng thành công!",
       "updateFailed": "Không thể cập nhật hồ sơ cửa hàng. Vui lòng thử lại.",
@@ -2687,7 +2781,10 @@
     "usersTotalLabel": "người dùng",
     "prev": "Trước",
     "next": "Tiếp",
-    "reputation": "Uy tín"
+    "reputation": "Uy tín",
+    "reputationTitle": "Điều chỉnh điểm Uy tín",
+    "sendNotification": "Gửi thông báo",
+    "sendNotyLabel": "Gửi Noti"
   },
   "CreateUserModal": {
     "validation": {
@@ -2828,7 +2925,8 @@
     "toastApproveSuccess": "Đã duyệt cửa hàng thành công!",
     "toastRejectSuccess": "Đã từ chối cửa hàng thành công!",
     "toastDecisionFailed": "Xử lý quyết định của quản trị viên thất bại",
-    "reputation": "Uy tín"
+    "reputation": "Uy tín",
+    "inactiveShop" : "Tạm nghỉ"
   },
   "ShopApplicationModal": {
     "statusPending": "Đang chờ duyệt",
@@ -3668,6 +3766,55 @@
       "recentLogs": "Lịch sử biến động gần đây",
       "noLogs": "Chưa có biến động điểm nào.",
       "lockedWarning": "Tài khoản của bạn đã bị khóa tính năng mua hàng do điểm uy tín quá thấp. Vui lòng liên hệ bộ phận CSKH để được hỗ trợ."
+    }
+  },
+  "DepositModal": {
+    "paymentMethodTitle": "Phương thức thanh toán",
+    "vnpayDesc": "Thẻ ATM / Ví nội địa",
+    "stripeDesc": "Thẻ Visa / Mastercard"
+  },
+  "FollowButton": {
+    "follow": "Theo dõi",
+    "following": "Đang theo dõi",
+    "unfollow": "Hủy theo dõi",
+    "cancel": "Hủy",
+    "unfollowConfirm": "Hủy theo dõi @{name}?",
+    "user": "Người dùng"
+  },
+  "FooterPages": {
+    "About": {
+      "title": "Về chúng tôi",
+      "p1": "AMEKO là nền tảng thương mại điện tử chuyên biệt dành cho cộng đồng đam mê bàn phím cơ. Được thành lập vào tháng 1 năm 2026 bởi đội ngũ AmekoLab (gồm Hoàng Trung Tín, Trịnh Tiến Đạt, Nguyễn Hoàng Gia Thịnh và Phạm Minh Tuấn), dự án ra đời nhằm giải quyết triệt để những rào cản của thị trường: thông tin phân mảnh, rủi ro giao dịch tự phát và sự phức tạp trong việc kiểm tra tương thích linh kiện.",
+      "p2": "Bằng việc xây dựng một hệ sinh thái toàn diện – từ công cụ thiết kế phím trực quan, nền tảng kết nối chế tác theo yêu cầu, đến hệ thống thanh toán bảo chứng – AMEKO cam kết mang lại một môi trường giao dịch minh bạch, chuyên nghiệp và an toàn nhất."
+    },
+    "Privacy": {
+      "title": "Chính sách bảo mật",
+      "intro1": "Cám ơn quý khách đã quan tâm và truy cập vào website. Chúng tôi tôn trọng và cam kết sẽ bảo mật những thông tin mang tính riêng tư của Quý khách.",
+      "intro2": "Chính sách bảo mật sẽ giải thích cách chúng tôi tiếp nhận, sử dụng và (trong trường hợp nào đó) tiết lộ thông tin cá nhân của Quý khách. Việc bảo vệ dữ liệu cá nhân và gây dựng được niềm tin cho quý khách là vấn đề rất quan trọng với chúng tôi.",
+      "section1Title": "1. Thu thập thông tin cá nhân",
+      "section1Content1": "Chúng tôi thu thập, lưu trữ và xử lý thông tin của bạn cho quá trình mua hàng và cho những thông báo sau này liên quan đến đơn hàng, và để cung cấp dịch vụ, bao gồm một số thông tin cá nhân: danh hiệu, tên, giới tính, ngày sinh, email, địa chỉ, địa chỉ giao hàng, số điện thoại, chi tiết thanh toán, chi tiết thanh toán bằng thẻ hoặc chi tiết tài khoản ngân hàng.",
+      "section1Content2": "Chúng tôi sẽ dùng thông tin quý khách đã cung cấp để xử lý đơn đặt hàng, cung cấp các dịch vụ và thông tin yêu cầu thông qua website và theo yêu cầu của bạn.",
+      "section1Content3": "Chi tiết đơn đặt hàng của bạn được chúng tôi lưu giữ nhưng vì lí do bảo mật nên chúng tôi không công khai trực tiếp được. Tuy nhiên, quý khách có thể tiếp cận thông tin bằng cách đăng nhập tài khoản trên web.",
+      "section2Title": "2. Bảo mật",
+      "section2Content1": "Chúng tôi có biện pháp thích hợp về kỹ thuật và an ninh để ngăn chặn truy cập trái phép hoặc trái pháp luật hoặc mất mát hoặc tiêu hủy hoặc thiệt hại cho thông tin của bạn.",
+      "section2Content2": "Mọi thông tin giao dịch sẽ được bảo mật nhưng trong trường hợp cơ quan pháp luật yêu cầu, chúng tôi sẽ buộc phải cung cấp những thông tin này cho các cơ quan pháp luật.",
+      "section3Title": "3. Quyền lợi khách hàng",
+      "section3Content1": "Quý khách có quyền yêu cầu truy cập vào dữ liệu cá nhân của mình, có quyền yêu cầu chúng tôi sửa lại những sai sót trong dữ liệu của bạn mà không mất phí. Bất cứ lúc nào bạn cũng có quyền yêu cầu chúng tôi ngưng sử dụng dữ liệu cá nhân của bạn cho mục đích tiếp thị."
+    },
+    "Terms": {
+      "title": "Điều khoản dịch vụ",
+      "intro1": "Khi quý khách truy cập vào trang web của chúng tôi có nghĩa là quý khách đồng ý với các điều khoản này. Trang web có quyền thay đổi, chỉnh sửa, thêm hoặc lược bỏ bất kỳ phần nào trong Quy định và Điều kiện sử dụng, vào bất cứ lúc nào.",
+      "section1Title": "1. Hướng dẫn sử dụng web",
+      "section1Content1": "Khi vào web của chúng tôi, người dùng tối thiểu phải 18 tuổi hoặc truy cập dưới sự giám sát của cha mẹ hay người giám hộ hợp pháp.",
+      "section1Content2": "Nghiêm cấm sử dụng bất kỳ phần nào của trang web này với mục đích thương mại hoặc nhân danh bất kỳ đối tác thứ ba nào nếu không được chúng tôi cho phép bằng văn bản.",
+      "section1Content3": "Quý khách phải đăng ký tài khoản với thông tin xác thực về bản thân và phải cập nhật nếu có bất kỳ thay đổi nào.",
+      "section2Title": "2. Chấp nhận đơn hàng và giá cả",
+      "section2Content1": "Chúng tôi có quyền từ chối hoặc hủy đơn hàng của quý khách vì bất kỳ lý do gì vào bất kỳ lúc nào. Chúng tôi có thể hỏi thêm về số điện thoại và địa chỉ trước khi nhận đơn hàng.",
+      "section2Content2": "Chúng tôi cam kết sẽ cung cấp thông tin giá cả chính xác nhất cho người tiêu dùng. Tuy nhiên, đôi lúc vẫn có sai sót xảy ra, tùy theo từng trường hợp chúng tôi sẽ liên hệ hướng dẫn hoặc thông báo hủy đơn hàng đó cho quý khách.",
+      "section3Title": "3. Thương hiệu và bản quyền",
+      "section3Content1": "Mọi quyền sở hữu trí tuệ, nội dung thông tin và tất cả các thiết kế, văn bản, đồ họa, phần mềm, hình ảnh, video, âm nhạc, âm thanh, biên dịch phần mềm, mã nguồn và phần mềm cơ bản đều là tài sản của chúng tôi. Toàn bộ nội dung của trang web được bảo vệ bởi luật bản quyền của Việt Nam và các công ước quốc tế.",
+      "section4Title": "4. Thay đổi, hủy bỏ giao dịch tại website",
+      "section4Content1": "Trong mọi trường hợp, khách hàng đều có quyền chấm dứt giao dịch nếu đã thông báo cho chúng tôi về việc hủy giao dịch, và trả lại hàng hoá đã nhận nhưng chưa sử dụng hoặc hưởng bất kỳ lợi ích nào từ hàng hóa đó."
     }
   }
 }

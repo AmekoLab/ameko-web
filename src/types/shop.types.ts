@@ -64,6 +64,7 @@ export interface ShopPublicProfile {
   userId: string;
   followersCount: number;
   followingCount: number;
+  isActive: boolean;
 }
 
 export interface ApproveShopPayload {

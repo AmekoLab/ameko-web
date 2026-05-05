@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, MouseEvent, useState } from "react";
+import { FC, MouseEvent, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -42,6 +42,7 @@ import { socialService } from "@/src/services/social.service";
 import { CommentSection } from "./CommentSection";
 import { ImageModal } from "./ImageModal";
 import { useTranslations } from "next-intl";
+import FollowButton from "./FollowButton";
 
 export const PostCard: FC<{ post: Post }> = ({ post }) => {
   const t = useTranslations("PostCard");
@@ -70,9 +71,17 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const currentUserStr =
-    typeof window !== "undefined" ? localStorage.getItem("user") : null;
-  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+  const [currentUser, setCurrentUser] = useState<{ id: string; role?: string } | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("user");
+      if (stored) setCurrentUser(JSON.parse(stored));
+    } catch {
+      // ignore parse errors
+    }
+  }, []);
+
   const isOwner = currentUser?.id === post.userId;
   const isAdmin = currentUser?.role === "Admin";
   const canManage = isOwner || isAdmin;
@@ -229,7 +238,7 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                     fill
                   />
                 </div>
-                <div>
+              <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-lg text-amazon-text group-hover:underline">
                       {postDisplayName}
@@ -241,6 +250,13 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                       <span className="bg-[#ce2a32] text-white text-[9px] px-1.5 py-0.5 rounded-sm font-bold uppercase tracking-wider">
                         Available
                       </span>
+                    )}
+                    {!isOwner && currentUser && (
+                      <FollowButton 
+                        targetUserId={post.userId}
+                        targetUserName={post.username || post.fullName || "User"}
+                        targetUserAvatar={post.avatarUrl || "https://res.cloudinary.com/doezwafgz/image/upload/v1765602783/a0a1d1831b40575009c07fad4634ef52_y23lze.jpg"}
+                      />
                     )}
                   </div>
                   <p className="text-sm text-amazon-textMuted font-medium">
@@ -269,6 +285,13 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                       <span className="bg-[#ce2a32] text-white text-[9px] px-1.5 py-0.5 rounded-sm font-bold uppercase tracking-wider">
                         Available
                       </span>
+                    )}
+                    {!isOwner && currentUser && (
+                      <FollowButton 
+                        targetUserId={post.userId}
+                        targetUserName={post.username || post.fullName || "User"}
+                        targetUserAvatar={post.avatarUrl || "https://res.cloudinary.com/doezwafgz/image/upload/v1765602783/a0a1d1831b40575009c07fad4634ef52_y23lze.jpg"}
+                      />
                     )}
                   </div>
                   <p className="text-sm text-amazon-textMuted font-medium">
@@ -563,27 +586,53 @@ export const PostCard: FC<{ post: Post }> = ({ post }) => {
                 </div>
               ) : (
                 reactionsList.map((reaction, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    {reaction.avatarUrl ? (
-                      <Image
-                        src={reaction.avatarUrl}
-                        alt={reaction.username}
-                        width={40}
-                        height={40}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-amazon-btnPrimary/20 text-amazon-btnSecondary flex items-center justify-center font-bold">
-                        {reaction.fullName.charAt(0)}
+                  <div 
+                    key={idx} 
+                    className="flex items-center justify-between hover:bg-neutral-50 p-2 -mx-2 rounded-lg transition-colors"
+                  >
+                    {/* Left Side: Avatar & Info */}
+                    <div className="flex items-center gap-3">
+                      {reaction.avatarUrl ? (
+                        <Image
+                          src={reaction.avatarUrl}
+                          alt={reaction.username}
+                          width={40}
+                          height={40}
+                          className="w-10 h-10 rounded-full object-cover shadow-sm"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-amazon-btnPrimary/20 text-amazon-btnSecondary flex items-center justify-center font-bold shadow-sm">
+                          {reaction.fullName.charAt(0)}
+                        </div>
+                      )}
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-amazon-text leading-tight">
+                          {reaction.username}
+                        </span>
+                        <span className="text-xs text-gray-500 mt-0.5">
+                          {reaction.fullName}
+                        </span>
                       </div>
-                    )}
-                    <div className="flex flex-col">
-                      <span className="text-amazon-text text-sm font-medium">
-                        {reaction.username}
-                      </span>
-                      {/* <span className="text-gray-500 text-xs">
-                        {reaction.username}
-                      </span> */}
+                    </div>
+                    
+                    {/* Right Side: Emoji */}
+                  {/* Emoji Cảm xúc ở bên phải */}
+                    <div 
+                      className="text-2xl drop-shadow-sm" 
+                      title={reaction.reactionType || (reaction as any).type}
+                    >
+                      {(() => {
+                        // 1. Lấy đúng giá trị (bao lô cả trường hợp biến tên là reactionType hoặc type)
+                        const rawType = reaction.reactionType || (reaction as any).type || "";
+                        
+                        // 2. Dọn rác: Xóa khoảng trắng thừa và ép về chuẩn "Chữ hoa đầu, chữ thường sau" 
+                        // Ví dụ: " love " -> "Love", "HAHA" -> "Haha"
+                        const cleanType = rawType.trim();
+                        const formattedType = cleanType.charAt(0).toUpperCase() + cleanType.slice(1).toLowerCase();
+
+                        // 3. Tìm icon trong từ điển, nếu không có thì mới xòe ngón cái
+                        return REACTION_EMOJIS[formattedType as PostReactionType] || "👍";
+                      })()}
                     </div>
                   </div>
                 ))

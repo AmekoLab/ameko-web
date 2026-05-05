@@ -111,8 +111,9 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
         {/* Always-visible Add to Cart text link */}
         <button
           onClick={handleAddToCart}
-          disabled={isAddingToCart}
+          disabled={isAddingToCart || product.shopIsActive === false}
           className="mt-auto flex items-center gap-2 text-amazon-text hover:text-amazon-focus hover:underline text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer w-fit disabled:opacity-60 disabled:cursor-not-allowed"
+          title={product.shopIsActive === false ? "Shop đang tạm nghỉ" : ""}
         >
           {isAddingToCart ? (
             <Loader2 className="w-5 h-5 shrink-0 animate-spin" />
@@ -120,7 +121,11 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
             <ShoppingCart className="w-5 h-5 shrink-0" />
           )}
           <span className="text-sm">
-            {isAddingToCart ? "Adding..." : "Add to Cart"}
+            {product.shopIsActive === false 
+              ? "Shop đang tạm nghỉ" 
+              : isAddingToCart 
+                ? "Adding..." 
+                : "Add to Cart"}
           </span>
         </button>
       </div>

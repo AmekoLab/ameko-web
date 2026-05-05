@@ -499,7 +499,7 @@ export const CreatePost: FC = () => {
                   >
                     <UserPlus className="w-5 h-5 text-blue-500" />
                   </button>
-                  <button
+                  {/* <button
                     type="button"
                     className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
                     title={t("feelingActivity")}
@@ -526,7 +526,7 @@ export const CreatePost: FC = () => {
                     title={t("actionMore")}
                   >
                     <MoreHorizontal className="w-5 h-5 text-amazon-textMuted" />
-                  </button>
+                  </button> */}
                 </div>
               </div>
 

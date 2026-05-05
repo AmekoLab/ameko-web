@@ -33,6 +33,7 @@ import { toast } from "react-toastify";
 import { Logo } from "@/src/components/Header/Logo";
 import { useTranslations } from "next-intl";
 import AIAssistantWidget from "@/src/components/AI/AIAssistantWidget";
+import { motion, AnimatePresence } from "framer-motion";
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 const getZIndex = (categorySlug?: string) => {
@@ -800,9 +801,8 @@ function BuilderContent() {
             }}
           />
 
-          {/* Keyboard layers + Keymap Overlay */}
-          <div className="relative z-50 w-full h-full flex items-center justify-center">
-            {/* Relative anchor for absolute key overlay */}
+          {/* ─── LAYER 1 (z-10): 2D Visualizer centered in 16:9 ─── */}
+          <div className="relative z-10 w-full h-full flex items-center justify-center">
             <div className="relative w-full max-w-5xl aspect-[16/9] flex items-center justify-center">
               <Visualizer
                 selection={session.selection}
@@ -811,9 +811,31 @@ function BuilderContent() {
                   step: currentStepName || "CASE",
                 })}
               />
-              {viewMode === "top" &&
-                session.selection["keycap"] &&
-                isCustomizeMode && (
+            </div>
+          </div>
+
+          {/* ─── LAYER 2 (z-20): Full-bleed blur overlay ─── */}
+          <AnimatePresence>
+            {viewMode === "top" &&
+              session.selection["keycap"] &&
+              isCustomizeMode && (
+                <motion.div
+                  key="customize-blur"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="absolute inset-0 z-20 pointer-events-none bg-black/50 backdrop-blur-md"
+                />
+              )}
+          </AnimatePresence>
+
+          {/* ─── LAYER 3 (z-30): KeymapOverlay on top of blur ─── */}
+          {viewMode === "top" &&
+            session.selection["keycap"] &&
+            isCustomizeMode && (
+              <div className="absolute inset-0 z-30 flex items-center justify-center">
+                <div className="relative w-full max-w-5xl aspect-[16/9]">
                   <KeymapOverlay
                     onAddonSelected={handleAddonSelected}
                     onAddonRemoved={handleAddonRemoved}
@@ -823,9 +845,9 @@ function BuilderContent() {
                     fetchAddons={handleFetchAddons}
                     isProcessing={processing}
                   />
-                )}
-            </div>
-          </div>
+                </div>
+              </div>
+            )}
 
           {/* View toggle — bottom-left */}
           <div className="absolute bottom-6 left-6 z-[60] flex gap-2">

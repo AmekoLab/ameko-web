@@ -37,9 +37,14 @@ function ShopCardSkeleton() {
 function ShopCard({ shop, isMyShop }: { shop: ShopItem; isMyShop: boolean }) {
   const t = useTranslations("CustomBuildPage");
   const initial = shop.shopName?.charAt(0)?.toUpperCase() || "?";
+  const isInactive = shop.isActive === false;
 
   return (
-    <div className="group rounded-sm overflow-hidden border border-amazon-border bg-white transition-all duration-300 hover:border-amazon-focus hover:shadow-lg flex flex-col">
+    <div className={`group rounded-sm overflow-hidden border border-amazon-border transition-all duration-300 flex flex-col ${
+      isInactive 
+        ? "bg-neutral-50 grayscale-[40%] opacity-80" 
+        : "bg-white hover:border-amazon-focus hover:shadow-lg"
+    }`}>
       {/* Banner */}
       <div className="relative h-[130px] overflow-hidden bg-gradient-to-br from-neutral-200 to-neutral-300">
         {shop.bannerUrl ? (
@@ -89,18 +94,27 @@ function ShopCard({ shop, isMyShop }: { shop: ShopItem; isMyShop: boolean }) {
 
         {/* Info */}
         <Link href={`/profile/shop/${shop.id}`}>
-          <div className="flex items-center gap-1.5 mb-1">
-            <h3 className="text-base font-black text-amazon-text uppercase tracking-wide truncate group-hover:text-amazon-link transition-colors">
+          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+            <h3 className={`text-base font-black uppercase tracking-wide truncate transition-colors ${
+              isInactive ? "text-neutral-500" : "text-amazon-text group-hover:text-amazon-link"
+            }`}>
               {shop.shopName}
             </h3>
             {shop.badge === 1 && (
               <span title="Verified Shop" className="shrink-0 flex">
-                <ShieldCheck className="w-4 h-4 text-blue-500" />
+                <ShieldCheck className={`w-4 h-4 ${isInactive ? "text-neutral-400" : "text-blue-500"}`} />
               </span>
             )}
             {shop.badge === 2 && (
               <span title="Premium Shop" className="shrink-0 flex">
-                <Crown className="w-4 h-4 text-amber-500" />
+                <Crown className={`w-4 h-4 ${isInactive ? "text-neutral-400" : "text-amber-500"}`} />
+              </span>
+            )}
+            
+            {/* INACTIVE BADGE */}
+            {isInactive && (
+              <span className="ml-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-600 uppercase tracking-wide border border-neutral-300">
+                {t("inactiveShop") || "Tạm nghỉ"}
               </span>
             )}
           </div>
@@ -144,15 +158,25 @@ function ShopCard({ shop, isMyShop }: { shop: ShopItem; isMyShop: boolean }) {
         {isMyShop ? (
           <Link
             href="/shop/profile"
-            className="mt-auto w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amazon-btnSecondary text-amazon-text text-[13px]  rounded-sm transition-all duration-200 hover:brightness-95 shadow-sm border border-amazon-border active:scale-[0.97]"
+            className="mt-auto w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amazon-btnSecondary text-amazon-text text-[13px] rounded-sm transition-all duration-200 hover:brightness-95 shadow-sm border border-amazon-border active:scale-[0.97]"
           >
             <Settings className="w-4 h-4" />
             {t("manageShop")}
           </Link>
+        ) : isInactive ? (
+          // DISABLED BUTTON FOR INACTIVE SHOP
+          <button
+            disabled
+            className="mt-auto w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-200 text-neutral-500 text-[13px] rounded-sm border border-neutral-300 cursor-not-allowed font-bold"
+            title="Shop đang tạm nghỉ"
+          >
+            <Store className="w-4 h-4" />
+            {t("shopIsInactiveTitle") || "Shop Tạm Nghỉ"}
+          </button>
         ) : (
           <Link
             href={`/builder?shopId=${shop.id}`}
-            className="mt-auto w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amazon-btnPrimary text-amazon-text text-[13px]  rounded-sm transition-all duration-200 hover:brightness-95 shadow-sm border border-amazon-btnPrimary active:scale-[0.97]"
+            className="mt-auto w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amazon-btnPrimary text-amazon-text text-[13px] rounded-sm transition-all duration-200 hover:brightness-95 shadow-sm border border-amazon-btnPrimary active:scale-[0.97]"
           >
             <Keyboard className="w-4 h-4" />
             {t("customizeWithShop")}

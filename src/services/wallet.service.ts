@@ -204,7 +204,7 @@ export const walletService = {
    * Request to deposit funds into the wallet.
    * POST /wallet/deposit
    */
-  deposit: async (payload: { amount: number; successUrl?: string; cancelUrl?: string }): Promise<ApiResponse<{ url: string }>> => {
+  deposit: async (payload: { amount: number; method: number; successUrl?: string; cancelUrl?: string }): Promise<ApiResponse<{ url: string }>> => {
     return api.post<unknown, ApiResponse<{ url: string }>>("/wallet/deposit", payload);
   },
 

@@ -28,6 +28,7 @@ export interface Product {
   image: string;
   category: string;
   status: "In Stock" | "Group Buy" | "Sold Out";
+  shopIsActive?: boolean;
 }
 
 export interface Review {

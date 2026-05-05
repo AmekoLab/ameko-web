@@ -76,6 +76,7 @@ export const ProfileView: FC<{
             status: (item.quantity != null && item.quantity > 0
               ? t("inStock")
               : t("soldOut")) as Product["status"],
+            shopIsActive: profile.isActive,
           }));
 
           if (!ignore) {
