@@ -32,7 +32,6 @@ import { orderService } from "@/src/services/order.service";
 import { toast } from "react-toastify";
 import { Logo } from "@/src/components/Header/Logo";
 import { useTranslations } from "next-intl";
-import AIAssistantWidget from "@/src/components/AI/AIAssistantWidget";
 import { motion, AnimatePresence } from "framer-motion";
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
@@ -48,11 +47,11 @@ const getZIndex = (categorySlug?: string) => {
   return map[categorySlug] || 5;
 };
 
-const formatKeycapPosition = (rawName: string) => {
+const formatKeycapPosition = (rawName: string, t: any) => {
   return rawName.replace(
     /\(Position:\s*R(\d+)-([^-]+)-\d+\)/g,
     (_, rowNum, keyName) => {
-      return `(Position: ${keyName} - Row ${rowNum})`;
+      return `(${t("position")}: ${keyName} - ${t("row")} ${rowNum})`;
     },
   );
 };
@@ -697,9 +696,6 @@ function BuilderContent() {
             </div>
           )}
         </div>
-
-        {/* AI Assistant - No kit selected yet */}
-        <AIAssistantWidget shopId={shopId || undefined} />
       </div>
     );
   }
@@ -921,7 +917,7 @@ function BuilderContent() {
                 <p className="text-[9px] text-amazon-textMuted uppercase font-bold tracking-[0.3em] mb-1">
                   {kitDisplayName}
                 </p>
-                <h2 className="text-2xl font-black uppercase text-amazon-btnSecondary tracking-tight">
+                <h2 className="text-2xl font-bold uppercase text-amazon-btnSecondary">
                   {t("buildSummary")}
                 </h2>
               </div>
@@ -950,7 +946,7 @@ function BuilderContent() {
                           {stepName}
                         </div>
                         <h4 className="text-amazon-text font-black tracking-wide text-[13px] truncate">
-                          {formatKeycapPosition(part.name)}
+                          {formatKeycapPosition(part.name, t)}
                         </h4>
                         <div className="text-amazon-price text-[11px] font-bold">
                           <span className="text-amazon-textMuted mr-1">
@@ -1255,12 +1251,6 @@ function BuilderContent() {
           </div>
         </div>
       )}
-
-      {/* AI Assistant - Kit is active in session */}
-      <AIAssistantWidget
-        shopId={shopId || undefined}
-        baseKitId={session.kitId}
-      />
     </div>
   );
 }

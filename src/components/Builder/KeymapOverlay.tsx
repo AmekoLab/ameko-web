@@ -2,6 +2,7 @@
 
 import { FC, useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { BuilderProduct, SelectedPart } from "@/src/types/builder";
 
 // ─── PROPS ──────────────────────────────────────────────────────────────────
@@ -161,11 +162,11 @@ const SUB_LEGENDS: Record<string, string> = {
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 
-const formatKeycapPosition = (rawName: string) => {
+const formatKeycapPosition = (rawName: string, t: ReturnType<typeof useTranslations>) => {
   return rawName.replace(
     /\(Position:\s*R(\d+)-([^-]+)-\d+\)/g,
     (_, rowNum, keyName) => {
-      return `(Position: ${keyName} - Row ${rowNum})`;
+      return `(${t("position")}: ${keyName} - ${t("row")} ${rowNum})`;
     },
   );
 };
@@ -199,6 +200,7 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
   fetchAddons,
   isProcessing,
 }) => {
+  const t = useTranslations("BuilderPage");
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [showInstruction, setShowInstruction] = useState(true);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -286,10 +288,10 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
               </div>
               <div>
                 <p className="text-[11px] font-black uppercase tracking-[0.15em] text-orange-400 mb-0.5">
-                  Start customizing
+                  {t("keymapStartCustomizing")}
                 </p>
                 <p className="text-[12px] font-medium text-white/90">
-                  Click on any key on the model to select an Artisan Keycap!
+                  {t("keymapClickAnyKey")}
                 </p>
               </div>
             </div>
@@ -365,8 +367,8 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
                       `}
                       title={
                         hasAddon
-                          ? `${addon[1].name} — Click to manage`
-                          : `Customize: ${label}`
+                          ? t("keymapClickToManage", { name: addon[1].name })
+                          : t("keymapCustomizeKey", { label })
                       }
                     >
                       {SUB_LEGENDS[label] ? (
@@ -394,6 +396,13 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
         </div>
       </div>
 
+        {/* Chỉ hiện ghi chú khi không mở Modal Addon */}
+        {!activeKey && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 text-[10px] md:text-[11px] font-medium tracking-widest uppercase pointer-events-none drop-shadow-md text-center w-full">
+            * {t("keymapNote")}
+          </div>
+        )}
+
       {/* ── ADDON MODAL ── */}
       {activeKey && (
         <div
@@ -407,11 +416,11 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b border-amazon-border bg-neutral-50">
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-amazon-textMuted">
-                  Customize Key
+                <p className="text-[12px]  tracking-[0.1em] text-amazon-textMuted">
+                  {t("keymapCustomizeKeyTitle")}
                 </p>
                 <h3 className="text-lg font-black text-amazon-text uppercase tracking-tight">
-                  {`${activeKey.split("-")[1]} - Row ${activeKey.split("-")[0].replace("R", "")}`}
+                  {t("keymapKeyRow", { keyName: activeKey.split("-")[1], rowNum: activeKey.split("-")[0].replace("R", "") })}
                 </h3>
               </div>
               <button
@@ -438,7 +447,7 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
             {activeAddon && (
               <div className="px-5 py-4 border-b border-amazon-border bg-orange-50/50">
                 <p className="text-[9px] font-black uppercase tracking-[0.3em] text-amazon-textMuted mb-2">
-                  Currently Installed
+                  {t("keymapCurrentlyInstalled")}
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 relative rounded border border-orange-200 bg-white shrink-0 overflow-hidden">
@@ -452,7 +461,7 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-black text-amazon-text truncate">
-                      {formatKeycapPosition(activeAddon[1].name)}
+                      {formatKeycapPosition(activeAddon[1].name, t)}
                     </p>
                     <p className="text-[11px] text-amazon-price font-bold">
                       +{activeAddon[1].price.toLocaleString()}₫
@@ -463,7 +472,7 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
                     disabled={isProcessing}
                     className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-red-600 border border-red-200 rounded-sm hover:bg-red-50 transition-all disabled:opacity-50"
                   >
-                    {isProcessing ? "..." : "Remove"}
+                    {isProcessing ? "..." : t("keymapRemove")}
                   </button>
                 </div>
               </div>
@@ -471,8 +480,8 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
 
             {/* Addon list */}
             <div className="px-5 py-4 max-h-[300px] overflow-y-auto custom-scrollbar">
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-amazon-textMuted mb-3">
-                {activeAddon ? "Replace With" : "Choose Addon"}
+              <p className="text-[12px]  tracking-[0.1em] text-amazon-textMuted mb-3">
+                {activeAddon ? t("keymapReplaceWith") : t("keymapChooseAddon")}
               </p>
 
               {isLoadingAddons ? (
@@ -481,7 +490,7 @@ const KeymapOverlay: FC<KeymapOverlayProps> = ({
                 </div>
               ) : availableAddons.length === 0 ? (
                 <p className="text-xs text-amazon-textMuted text-center py-8 font-medium">
-                  No addons available
+                  {t("keymapNoAddons")}
                 </p>
               ) : (
                 <div className="space-y-2">

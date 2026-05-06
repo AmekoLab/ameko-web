@@ -919,6 +919,7 @@
     "discountFromShop": "Discount from shop",
     "evaluateProduct": "Evaluate product",
     "baseKit": "Base Kit",
+    "viewOrEditFeedback": "View or edit feedback",
     "status": {
       "pending": "Pending",
       "processing": "Processing",
@@ -956,7 +957,8 @@
     "warrantyAndReturnLink": "Click here to warranty and return",
     "orderCancelledBy": "Cancelled by",
     "orderCancelReason": "Cancellation reason",
-    "filters": {
+    "customer": "Customer",
+    "filters": {  
       "all": "All",
       "pending": "Pending",
       "processing": "Processing",
@@ -2199,7 +2201,25 @@
     "customerFallback": "Customer",
     "actions": {
       "quote": "Quote",
-      "reject": "Reject"
+      "reject": "Reject",
+      "viewDetail": "View Detail"
+    },
+    "detailModal": {
+      "title": "Request Detail",
+      "customer": "Customer",
+      "shop": "Targeted Shop",
+      "budget": "Budget Range",
+      "quantity": "Quantity",
+      "status": "Status",
+      "createdAt": "Created At",
+      "deadline": "Response Deadline",
+      "description": "Description",
+      "referenceImages": "Reference Images",
+      "submitQuote": "Submit Quote",
+      "close": "Close",
+      "noDeadline": "No deadline set",
+      "alreadyQuoted": "Quote already submitted",
+      "units": "{count} units"
     }
   },
   "SubmitQuoteModal": {
@@ -2624,13 +2644,33 @@
     }
   },
   "ShopCancelRequestsPage": {
+    "actions": {
+      "viewDetails": "View Details",
+      "accept": "Accept",
+      "reject": "Reject",
+      "accepting": "Accepting...",
+      "rejecting": "Rejecting..."
+    },
+    "tabs": {
+      "all": "All",
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "autoCancelled": "Auto Cancelled"
+    },
+    "header": {
+      "title": "Order Cancel Requests",
+      "description": "List of order cancel requests from customers"
+    },
     "toast": {
       "fetchFailed": "Failed to fetch order issues",
-      "fetchUnexpectedError": "An error occurred while fetching issues"
-    },
-    "itemCount": "({count} items)",
-    "header": {
-      "title": "Order Issues Management"
+      "fetchUnexpectedError": "An error occurred while fetching issues",
+      "acceptSuccess": "Cancel request accepted successfully",
+      "acceptFailed": "Failed to accept cancel request",
+      "rejectSuccess": "Cancel request rejected successfully",
+      "rejectFailed": "Failed to reject cancel request",
+      "processError": "An error occurred while processing the request"
     },
     "table": {
       "orderId": "Order ID",
@@ -2638,13 +2678,19 @@
       "amount": "Amount",
       "reason": "Reason",
       "date": "Date",
+      "status": "Status",
       "actions": "Actions"
     },
-    "empty": {
-      "noPendingIssues": "No pending order issues found."
+    "status": {
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "autoCancelled": "Auto Cancelled",
+      "unknown": "Unknown"
     },
-    "actions": {
-      "viewDetails": "View Details"
+    "empty": {
+      "noPendingIssues": "No order issues found."
     }
   },
   "OrderIssueDetailModal": {
@@ -3305,7 +3351,7 @@
     "selectItemsToCancel": "Select items to cancel:",
     "quantityAbbr": "Qty:",
     "refundAbbr": "Refund:",
-    "shippingFeeWarning": "* Shipping fee is only refunded if the entire order is cancelled.",
+    "shippingFeeWarning": "*You will only receive 90% of the amount paid if you cancel your order.",
     "refundPreview": "You will be refunded {amount} for {count} selected items."
   },
   "ChatPage": {
@@ -3359,6 +3405,8 @@
     "noMessagesYet": "No messages yet"
   },
   "BuilderPage": {
+    "position": "Position",
+    "row": "Row",
     "outOfStock": "Out of stock",
     "included": "Included",
     "steps": "{n} steps",
@@ -3393,7 +3441,19 @@
     "emptyVisualizer": "Please select {step} to begin",
     "resetConfirmTitle": "Reset Configuration?",
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "keymapStartCustomizing": "Start customizing",
+    "keymapClickAnyKey": "Click on any key on the model to select an Artisan Keycap!",
+    "keymapClickToManage": "{name} — Click to manage",
+    "keymapCustomizeKey": "Customize: {label}",
+    "keymapCustomizeKeyTitle": "Customize Key",
+    "keymapKeyRow": "{keyName} - Row {rowNum}",
+    "keymapCurrentlyInstalled": "Currently Installed",
+    "keymapRemove": "Remove",
+    "keymapReplaceWith": "Replace With",
+    "keymapChooseAddon": "Choose Addon",
+    "keymapNoAddons": "No addons available",
+    "keymapNote": "* Images are for illustration purposes only"
   },
   "ProductDetailPage": {
     "loadErrorFallback": "Failed to load product details",
@@ -3810,6 +3870,83 @@
       "section3Content1": "All intellectual property rights (whether registered or unregistered), information content, and all website designs, text, graphics, software, photos, video, music, sound, and underlying source code are our property. The entire contents of the website are protected by Vietnamese copyright laws and international conventions.",
       "section4Title": "4. Changes and Cancellations",
       "section4Content1": "In all cases, customers have the right to terminate the transaction if they have notified us of the cancellation and returned the goods received unused and without having derived any benefit from them."
+    },
+    "ReturnPolicy": {
+      "title": "Return & Exchange Policy",
+      "lastUpdated": "Last updated: May 2026",
+      "section1Title": "1. One-for-One Exchange (100% Replacement)",
+      "section1Desc": "Applicable when the defective product meets all of the following conditions:",
+      "section1Cond1": "The product has no physical deformation (scratches, dents, warping, bulging) and does not violate any other warranty conditions set by the Company or Shop.",
+      "section1Cond2": "The purchaser is the end consumer.",
+      "section1Cond3": "Timeframe is calculated from the date on the warranty card:",
+      "section1Time": "Within 30 days for products sold on the AmekoLab platform, we prioritize customer experience above all, provided the defect is not caused by the shop, such as: fire, explosion, water damage, oxidation due to humidity, usage in hot/humid conditions, etc.",
+      "section2Title": "2. Equivalent Product Exchange",
+      "section2Subtitle": "(Ensuring equivalent functionality, specifications, design, and remaining warranty period)",
+      "section2Desc": "Applicable when the defective product meets all of the following conditions:",
+      "section2Cond1": "The product does not violate any warranty conditions set by the Company or Shop.",
+      "section2Cond2": "Timeframe is calculated from the date on the warranty card:",
+      "section2Time": "From the 31st day onward, if the warranty period has expired, return or exchange requests cannot be submitted.",
+      "section3Title": "3. Non-Returnable Categories (Personal Reasons)",
+      "section3Subtitle": "(\"doesn't fit, not used to it, don't like it...\")",
+      "section3ColCategory": "Product Category",
+      "section3ColReason": "Reason",
+      "section3Row1Category": "Keyboards",
+      "section3Row1Reason": "To ensure health and safety standards for customers",
+      "section4Title": "4. Return & Refund Process (On Platform)",
+      "section4Step1": "The customer submits a request under \"Warranty & Returns\" and provides the necessary information.",
+      "section4Step2": "For \"Return & Refund\" requests, the customer ships the product back to the shop as instructed; the refund is processed after the shop confirms receipt of the returned item.",
+      "section4Step3": "In cases of \"Warranty / Quick Refund\" (if approved), returning the item may not be required and is suitable for small compensations or specific agreements.",
+      "section4Note": "Note: Products returned that do not meet the above conditions will be automatically shipped back to the registered address on the customer's order."
+    },
+    "Contact": {
+      "title": "Contact AMEKO",
+      "heroDesc": "Our Customer Support team is ready to assist with orders, warranty, returns, payments, and business partnerships. We prioritize fast, clear, and transparent responses.",
+      "badge": "Support Desk • 7 days/week",
+      "channelsTitle": "Main Support Channels",
+      "emailLabel": "Customer Support Email",
+      "emailValue": "amekolab.captonse@gmail.com",
+      "hotlineLabel": "Hotline",
+      "hotlineValue": "1900-AMEKO (for urgent cases)",
+      "liveChatLabel": "Live Chat",
+      "liveChatValue": "Instant support during working hours",
+      "businessLabel": "Business Partnerships",
+      "businessValue": "business@ameko.vn",
+      "securityLabel": "Security Reports",
+      "securityValue": "security@ameko.vn",
+      "hoursTitle": "Working Hours",
+      "hoursWeekday": "Mon – Sat: 08:30 – 18:00",
+      "hoursWeekend": "Sun & Holidays: 09:00 – 17:00",
+      "hoursResponse": "Response target: within 2–8 business hours (max 24 hours)",
+      "formTitle": "Contact Form",
+      "formName": "Full Name",
+      "formNamePlaceholder": "Enter your full name",
+      "formEmail": "Contact Email",
+      "formEmailPlaceholder": "you@email.com",
+      "formPhone": "Phone Number",
+      "formPhonePlaceholder": "0xxxxxxxxx",
+      "formSubject": "Subject",
+      "formSubjectPlaceholder": "Select a subject",
+      "subjectOrders": "Orders",
+      "subjectWarranty": "Warranty & Returns",
+      "subjectPayment": "Payment",
+      "subjectAccount": "Account",
+      "subjectPartnership": "Partnership",
+      "formMessage": "Request Details",
+      "formMessagePlaceholder": "Describe your issue in detail, include order ID if applicable",
+      "formSubmit": "Submit Support Request",
+      "formSubmitting": "Submitting...",
+      "formNote": "Your information will be handled in accordance with AMEKO's Privacy Policy.",
+      "formSuccess": "Your request has been submitted successfully! We will respond within 2–8 business hours.",
+      "quickLinksTitle": "Quick Support",
+      "quickLink1": "Track Your Order",
+      "quickLink2": "Warranty & Returns Status",
+      "quickLink3": "Register a Shop",
+      "quickLink4": "View FAQ",
+      "processTitle": "Our Process",
+      "processStep1": "Receive & verify information",
+      "processStep2": "Classify request and priority level",
+      "processStep3": "Process or dispatch to relevant department",
+      "processStep4": "Update results and provide next steps"
     }
   }
 }

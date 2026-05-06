@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { AppDispatch, RootState } from "@/src/store/index";
 import {
   fetchShopTargetedRequests,
+  fetchCommissionDetail,
   rejectCommissionRequest,
 } from "@/src/store/slices/commissionSlice";
 import {
@@ -17,6 +18,12 @@ import {
   Banknote,
   Calendar,
   Loader2,
+  Eye,
+  X,
+  Clock,
+  Package,
+  Image as ImageIcon,
+  FileText,
 } from "lucide-react";
 import { SubmitQuoteModal } from "@/src/components/Shop/SubmitQuoteModal";
 
@@ -77,7 +84,7 @@ export default function ShopTargetedRequestsPage() {
   const t = useTranslations("ShopTargetedRequestsPage");
   const tCommon = useTranslations("Common");
   const dispatch = useDispatch<AppDispatch>();
-  const { targetedRequests, loadingTargetedRequests } = useSelector(
+  const { targetedRequests, loadingTargetedRequests, currentRequest, loadingDetail } = useSelector(
     (state: RootState) => state.commission,
   );
 
@@ -85,6 +92,9 @@ export default function ShopTargetedRequestsPage() {
     isOpen: boolean;
     requestId: string;
   }>({ isOpen: false, requestId: "" });
+
+  // ─── Detail Modal State ───
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   // ─── Rejection Modal State ───
   const [rejectModal, setRejectModal] = useState<{
@@ -127,6 +137,17 @@ export default function ShopTargetedRequestsPage() {
     } finally {
       setIsRejecting(false);
     }
+  };
+
+  const handleViewDetail = (requestId: string) => {
+    setDetailModalOpen(true);
+    dispatch(fetchCommissionDetail(requestId));
+  };
+
+  const handleQuoteFromDetail = () => {
+    if (!currentRequest) return;
+    setDetailModalOpen(false);
+    setQuoteModal({ isOpen: true, requestId: currentRequest.commissionRequestId });
   };
 
   return (
@@ -175,6 +196,182 @@ export default function ShopTargetedRequestsPage() {
           </div>
         </div>
       )}
+
+      {/* ── DETAIL MODAL ── */}
+      {detailModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+          onClick={() => setDetailModalOpen(false)}
+        >
+          <div
+            className="bg-white border border-amazon-border w-full max-w-lg rounded-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-amazon-border bg-neutral-50">
+              <h2 className="text-[15px] font-bold text-amazon-text">
+                {t("detailModal.title")}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setDetailModalOpen(false)}
+                className="p-1.5 hover:bg-neutral-200 rounded-full transition-colors text-amazon-textMuted"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="max-h-[70vh] overflow-y-auto custom-scrollbar">
+              {loadingDetail ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="w-7 h-7 animate-spin text-amazon-textMuted" />
+                </div>
+              ) : currentRequest ? (
+                <div className="p-5 space-y-5">
+                  {/* Title */}
+                  <div>
+                    <h3 className="text-lg font-bold text-amazon-text">
+                      {currentRequest.title}
+                    </h3>
+                    <span
+                      className={`inline-block mt-1.5 px-2 py-0.5 rounded-sm text-[11px] font-medium ${
+                        (STATUS_STYLES[currentRequest.status] || DEFAULT_STATUS).bg
+                      } ${(STATUS_STYLES[currentRequest.status] || DEFAULT_STATUS).text}`}
+                    >
+                      {getStatusLabel(currentRequest.status)}
+                    </span>
+                  </div>
+
+                  {/* Info Grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-neutral-50 border border-amazon-border rounded-sm p-3">
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-amazon-textMuted mb-1">
+                        <User className="w-3 h-3" />
+                        {t("detailModal.customer")}
+                      </div>
+                      <p className="text-sm font-semibold text-amazon-text truncate">
+                        {currentRequest.userName}
+                      </p>
+                    </div>
+                    <div className="bg-neutral-50 border border-amazon-border rounded-sm p-3">
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-amazon-textMuted mb-1">
+                        <Banknote className="w-3 h-3" />
+                        {t("detailModal.budget")}
+                      </div>
+                      <p className="text-sm font-bold text-amazon-price">
+                        {formatVND(currentRequest.minBudget)} – {formatVND(currentRequest.maxBudget)}
+                      </p>
+                    </div>
+                    <div className="bg-neutral-50 border border-amazon-border rounded-sm p-3">
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-amazon-textMuted mb-1">
+                        <Package className="w-3 h-3" />
+                        {t("detailModal.quantity")}
+                      </div>
+                      <p className="text-sm font-semibold text-amazon-text">
+                        {t("detailModal.units", { count: currentRequest.quantity })}
+                      </p>
+                    </div>
+                    <div className="bg-neutral-50 border border-amazon-border rounded-sm p-3">
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-amazon-textMuted mb-1">
+                        <Calendar className="w-3 h-3" />
+                        {t("detailModal.createdAt")}
+                      </div>
+                      <p className="text-sm font-semibold text-amazon-text">
+                        {formatDateTime(currentRequest.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Deadline */}
+                  {currentRequest.shopResponseDeadlineAt && (
+                    <div className="flex items-center gap-2 px-3 py-2.5 bg-amber-50 border border-amber-200 rounded-sm">
+                      <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
+                          {t("detailModal.deadline")}
+                        </p>
+                        <p className="text-sm font-semibold text-amber-800">
+                          {formatDateTime(currentRequest.shopResponseDeadlineAt)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Description */}
+                  <div>
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-amazon-textMuted mb-2">
+                      <FileText className="w-3 h-3" />
+                      {t("detailModal.description")}
+                    </div>
+                    <div className="bg-neutral-50 border border-amazon-border rounded-sm p-3 text-sm text-amazon-text whitespace-pre-wrap leading-relaxed">
+                      {currentRequest.description}
+                    </div>
+                  </div>
+
+                  {/* Reference Images */}
+                  {currentRequest.referenceImages && (
+                    <div>
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-amazon-textMuted mb-2">
+                        <ImageIcon className="w-3 h-3" />
+                        {t("detailModal.referenceImages")}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {currentRequest.referenceImages.split(",").map((img, idx) => (
+                          <div
+                            key={idx}
+                            className="relative aspect-square rounded-sm overflow-hidden bg-neutral-100 border border-amazon-border"
+                          >
+                            <Image
+                              src={img.trim()}
+                              alt={`Reference ${idx + 1}`}
+                              fill
+                              className="object-cover"
+                              sizes="200px"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center py-16 text-amazon-textMuted text-sm">
+                  No data
+                </div>
+              )}
+            </div>
+
+            {/* Footer Actions */}
+            {currentRequest && !loadingDetail && (
+              <div className="flex items-center justify-between gap-3 px-5 py-3.5 border-t border-amazon-border bg-neutral-50">
+                <button
+                  type="button"
+                  onClick={() => setDetailModalOpen(false)}
+                  className="px-4 py-2 bg-white hover:bg-neutral-100 border border-amazon-border text-amazon-textMuted font-medium text-[13px] rounded-sm transition-colors"
+                >
+                  {t("detailModal.close")}
+                </button>
+                {currentRequest.hasMyPendingQuote ? (
+                  <span className="px-4 py-2 bg-neutral-100 border border-amazon-border text-amazon-textMuted font-medium text-[13px] rounded-sm cursor-not-allowed">
+                    {t("detailModal.alreadyQuoted")}
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleQuoteFromDetail}
+                    className="flex items-center gap-1.5 px-5 py-2 bg-amazon-btnPrimary border border-amazon-border hover:brightness-95 text-amazon-text font-medium text-[13px] rounded-sm transition-colors shadow-sm"
+                  >
+                    <FileEdit className="w-4 h-4" />
+                    {t("detailModal.submitQuote")}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="py-2 px-2 md:px-6 relative bg-amazon-bgSecondary">
         <h1 className="text-2xl font-bold text-amazon-text flex items-center gap-3">
@@ -219,7 +416,8 @@ export default function ShopTargetedRequestsPage() {
             return (
               <div
                 key={req.commissionRequestId}
-                className="bg-white rounded-sm border border-amazon-border shadow-sm p-5 hover:border-amazon-btnPrimary transition-colors"
+                className="bg-white rounded-sm border border-amazon-border shadow-sm p-5 hover:border-amazon-btnPrimary transition-colors cursor-pointer"
+                onClick={() => handleViewDetail(req.commissionRequestId)}
               >
                 <div className="flex flex-col lg:flex-row gap-4">
                   {/* Thumbnail */}
@@ -278,18 +476,31 @@ export default function ShopTargetedRequestsPage() {
                   {/* Actions */}
                   <div className="flex items-center gap-2 shrink-0 lg:self-center">
                     <button
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewDetail(req.commissionRequestId);
+                      }}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-neutral-50 text-amazon-text font-medium text-[13px] rounded-sm transition-colors border border-amazon-border shadow-sm"
+                    >
+                      <Eye className="w-4 h-4" /> {t("actions.viewDetail")}
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setQuoteModal({
                           isOpen: true,
                           requestId: req.commissionRequestId,
-                        })
-                      }
+                        });
+                      }}
                       className="flex items-center gap-1.5 px-5 py-2 bg-amazon-btnPrimary border border-amazon-border hover:brightness-95 text-amazon-text font-medium text-[13px] rounded-sm transition-colors shadow-sm"
                     >
                       <FileEdit className="w-4 h-4" /> {t("actions.quote")}
                     </button>
                     <button
-                      onClick={() => handleRejectClick(req.commissionRequestId)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRejectClick(req.commissionRequestId);
+                      }}
                       className="flex items-center gap-1.5 px-5 py-2 bg-white hover:bg-red-50 text-red-500 font-medium text-[13px] rounded-sm transition-colors border border-amazon-border shadow-sm"
                     >
                       <XCircle className="w-4 h-4" /> {t("actions.reject")}

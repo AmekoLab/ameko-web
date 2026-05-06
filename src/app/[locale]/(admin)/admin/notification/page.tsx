@@ -378,12 +378,12 @@ export default function AdminNotificationPage() {
 
             <form onSubmit={handleBroadcast} className="p-5 flex flex-col gap-4">
               {/* Warning */}
-              <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-md">
+              {/* <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-md">
                 <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                 <p className="text-[11px] text-amber-800 leading-relaxed">
                   <b>{t("modalWarning")}</b> {t.rich("modalWarningDesc", { notRealtime: (chunks) => <b key="notRealtime">{chunks}</b> })}
                 </p>
-              </div>
+              </div> */}
 
               {/* Title */}
               <div>

@@ -3,11 +3,11 @@ import { ApiResponse } from "@/src/types/auth.types";
 import { OrderIssue, PaginatedOrderIssues } from "../types/orderIssue.types";
 
 export const orderIssueService = {
-  getMyIssues: async (params?: { status?: number, page?: number, pageSize?: number }): Promise<ApiResponse<PaginatedOrderIssues>> => {
+  getMyIssues: async (params?: { Type?: number, status?: number, page?: number, pageSize?: number }): Promise<ApiResponse<PaginatedOrderIssues>> => {
     return api.get('/order-issues/me', { params });
   },
   
-  getShopIssues: async (params?: { Status?: number, page?: number, pageSize?: number }): Promise<ApiResponse<PaginatedOrderIssues>> => {
+  getShopIssues: async (params?: { Type?: number, Status?: number, page?: number, pageSize?: number }): Promise<ApiResponse<PaginatedOrderIssues>> => {
     return api.get('/order-issues/shop', { params });
   },
 
