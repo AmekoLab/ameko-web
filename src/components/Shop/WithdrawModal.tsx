@@ -105,9 +105,16 @@ export default function WithdrawModal({
   // ─── Zod schema (uses runtime balance for max validation)
   const withdrawSchema = z.object({
     amount: z
-      .number({ error: "Please enter a valid amount" })
-      .gt(0, "Amount must be greater than 0")
-      .max(availableBalance, "Amount exceeds available balance"),
+      .string()
+      .min(1, "Please enter a valid amount")
+      .refine((val) => {
+        const num = Number(val.replace(/\D/g, ""));
+        return num > 0;
+      }, "Amount must be greater than 0")
+      .refine((val) => {
+        const num = Number(val.replace(/\D/g, ""));
+        return num <= availableBalance;
+      }, "Amount exceeds available balance"),
     walletPin: z
       .string()
       .length(6, "PIN must be exactly 6 digits")
@@ -125,7 +132,7 @@ export default function WithdrawModal({
   } = useForm<WithdrawFormData>({
     resolver: zodResolver(withdrawSchema),
     defaultValues: {
-      amount: undefined,
+      amount: "",
       walletPin: "",
     },
   });
@@ -137,7 +144,8 @@ export default function WithdrawModal({
   };
 
   const fillMax = () => {
-    setValue("amount", availableBalance, { shouldValidate: true });
+    const formatted = new Intl.NumberFormat("vi-VN").format(availableBalance);
+    setValue("amount", formatted, { shouldValidate: true });
   };
 
   const handleClose = () => {
@@ -154,9 +162,10 @@ export default function WithdrawModal({
 
   const onSubmit = async (data: WithdrawFormData) => {
     setWrongPinError(false);
+    const rawAmount = Number(data.amount.replace(/\D/g, ""));
     const result = await dispatch(
       requestWithdraw({
-        amount: data.amount,
+        amount: rawAmount,
         walletPin: data.walletPin,
       }),
     );
@@ -227,14 +236,23 @@ export default function WithdrawModal({
             </label>
             <div className="relative">
               <input
-                type="number"
+                type="text"
                 placeholder="Enter amount"
-                className={`w-full border rounded-sm p-3 pr-20 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                className={`w-full border rounded-sm p-3 pr-20 outline-none transition-all ${
                   errors.amount
                     ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500"
                     : "border-amazon-border focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus"
                 }`}
-                {...register("amount", { valueAsNumber: true })}
+                {...register("amount")}
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/\D/g, "");
+                  if (!rawValue) {
+                    setValue("amount", "", { shouldValidate: true });
+                  } else {
+                    const formatted = new Intl.NumberFormat("vi-VN").format(Number(rawValue));
+                    setValue("amount", formatted, { shouldValidate: true });
+                  }
+                }}
               />
               <button
                 type="button"

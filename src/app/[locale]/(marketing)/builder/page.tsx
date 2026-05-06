@@ -309,9 +309,9 @@ const KitCard = memo(
           </p>
         )}
         <div className="flex items-center justify-between mt-4 pt-3 border-t border-amazon-border">
-          {/* <span className="text-amazon-price font-black text-xl tracking-tight">
+          <span className="text-amazon-price font-black text-xl tracking-tight">
             {kit.price.toLocaleString()}₫
-          </span> */}
+          </span>
           {specs?.workflow && (
             <span className="text-[10px] text-amazon-textMuted bg-neutral-100 uppercase font-bold px-2 py-1 rounded-sm border border-amazon-border">
               {t("steps", { n: specs.workflow.length })}

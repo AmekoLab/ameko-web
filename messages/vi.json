@@ -134,7 +134,11 @@
       "description": "Mô tả",
       "type": "Loại",
       "amount": "Số tiền"
-    }
+    },
+    "refundsDeducted": "Tiền bị trừ (Hoàn trả)",
+    "withdrawals": "Tiền đã rút",
+    "heldBalance": "Tiền tạm giữ",
+    "pendingWithdrawals": "Đang chờ rút"
   },
   "Header": {
     "searchPlaceholderDesktop": "Tìm kiếm sản phẩm...",

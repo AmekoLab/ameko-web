@@ -109,6 +109,9 @@ export interface WalletTransactionResponse {
   type: string;
   description: string;
   createdAt: string;
+  flowDirection: string;
+  feeAmount: number;
+  netAmount: number;
 }
 
 export interface WalletStatementResponse {
@@ -119,6 +122,10 @@ export interface WalletStatementResponse {
   totalSalesRevenue: number;
   totalSalesPending: number;
   totalPlatformFees: number;
+  totalRefundsDeducted: number;
+  totalWithdrawals: number;
+  totalPendingWithdrawals: number;
+  closingHeldBalance: number;
   transactionCount: number;
   transactions: WalletTransactionResponse[];
 }
