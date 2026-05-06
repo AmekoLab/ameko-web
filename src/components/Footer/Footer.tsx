@@ -193,8 +193,7 @@ export const Footer: FC = () => {
             <Link href="/privacy-policy" className="hover:underline hover:text-white">
               {t("privacyPolicy")}
             </Link>
-          
-            <Link href="/my-warranty-requests" className="hover:underline hover:text-white">
+            <Link href="/return-policy" className="hover:underline hover:text-white">
               {t("returnsPolicy")}
             </Link>
           </div>

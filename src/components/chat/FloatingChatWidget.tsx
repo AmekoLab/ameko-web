@@ -65,7 +65,12 @@ export default function FloatingChatWidget() {
     return () => document.removeEventListener("keydown", handler);
   }, [isOpen, dispatch]);
 
-  const toggle = useCallback(() => dispatch(toggleWidget()), [dispatch]);
+  const isDragging = useRef(false);
+
+  const toggle = useCallback(() => {
+    if (isDragging.current) return;
+    dispatch(toggleWidget());
+  }, [dispatch]);
   const handleBack = useCallback(() => dispatch(setActiveConversation(null)), [dispatch]);
 
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
@@ -74,7 +79,14 @@ export default function FloatingChatWidget() {
   if (!isAuthenticated || isOnChatPage) return null;
 
   return (
-    <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-[200] flex flex-col items-end gap-3">
+    <motion.div
+      drag
+      dragMomentum={false}
+      style={{ touchAction: "none" }}
+      className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-[200] flex flex-col items-end gap-3"
+      onDragStart={() => { isDragging.current = true; }}
+      onDragEnd={() => { requestAnimationFrame(() => { isDragging.current = false; }); }}
+    >
 
       {/* ── Popover ────────────────────────────────────── */}
       <AnimatePresence>
@@ -86,6 +98,7 @@ export default function FloatingChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
+            onPointerDownCapture={(e) => e.stopPropagation()}
             className="
               w-[320px] sm:w-[360px] flex flex-col
               bg-white border border-amazon-border
@@ -146,7 +159,7 @@ export default function FloatingChatWidget() {
           relative w-12 h-12 rounded-full
           bg-amazon-btnPrimary text-amazon-text shadow-xl shadow-black/20
           flex items-center justify-center border border-amazon-border
-          ring-2 ring-white
+          ring-2 ring-white cursor-grab active:cursor-grabbing
         "
       >
         <AnimatePresence mode="wait">
@@ -195,6 +208,6 @@ export default function FloatingChatWidget() {
           )}
         </AnimatePresence>
       </motion.button>
-    </div>
+    </motion.div>
   );
 }

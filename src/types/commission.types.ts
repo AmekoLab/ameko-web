@@ -49,6 +49,7 @@ export interface CommissionRequest {
   hasMyPendingQuote?: boolean;
   shopResponseWindowHours: number;
   customerResponseWindowHours: number;
+  shopResponseDeadlineAt?: string | null;
   quotes: CommissionQuote[];
 }
 

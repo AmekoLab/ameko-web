@@ -921,6 +921,7 @@
     "discountFromShop": "Discount from shop",
     "evaluateProduct": "Đánh giá sản phẩm",
     "baseKit": "Base Kit",
+    "viewOrEditFeedback": "Xem hoặc sửa đánh giá",
     "status": {
       "pending": "Chờ xử lý",
       "processing": "Đang xử lý",
@@ -958,6 +959,7 @@
     "warrantyAndReturnLink": "Nhấn vào đây để Bảo hành và Đổi trả",
     "orderCancelledBy": "Đã hủy bởi",
     "orderCancelReason": "Lý do hủy đơn",
+    "customer": "Khách hàng",
     "filters": {
       "all": "Tất cả",
       "pending": "Chờ xử lý",
@@ -2202,7 +2204,25 @@
     "customerFallback": "Khách hàng",
     "actions": {
       "quote": "Báo giá",
-      "reject": "Từ chối"
+      "reject": "Từ chối",
+      "viewDetail": "Xem chi tiết"
+    },
+    "detailModal": {
+      "title": "Chi tiết yêu cầu",
+      "customer": "Khách hàng",
+      "shop": "Cửa hàng chỉ định",
+      "budget": "Ngân sách",
+      "quantity": "Số lượng",
+      "status": "Trạng thái",
+      "createdAt": "Ngày tạo",
+      "deadline": "Hạn phản hồi",
+      "description": "Mô tả",
+      "referenceImages": "Hình ảnh tham khảo",
+      "submitQuote": "Gửi báo giá",
+      "close": "Đóng",
+      "noDeadline": "Chưa có hạn",
+      "alreadyQuoted": "Đã gửi báo giá",
+      "units": "{count} sản phẩm"
     }
   },
   "SubmitQuoteModal": {
@@ -2627,14 +2647,33 @@
     }
   },
   "ShopCancelRequestsPage": {
+    "actions": {
+      "viewDetails": "Xem chi tiết",
+      "accept": "Chấp nhận",
+      "reject": "Từ chối",
+      "accepting": "Đang chấp nhận...",
+      "rejecting": "Đang từ chối..."
+    },
+    "header": {
+      "title": "Yêu cầu hủy đơn hàng",
+      "description": "Danh sách yêu cầu hủy đơn hàng từ khách hàng"
+    },
+    "tabs": {
+      "all": "Tất cả",
+      "pending": "Chờ xử lý",
+      "inProgress": "Đang xử lý",
+      "accepted": "Đã chấp nhận",
+      "rejected": "Đã từ chối",
+      "autoCancelled": "Tự động hủy"
+    },
     "toast": {
       "fetchFailed": "Không thể tải danh sách vấn đề đơn hàng",
-      "fetchUnexpectedError": "Đã xảy ra lỗi khi tải danh sách vấn đề"
-    },
-    "refundAmountWithCount": "Số tiền hoàn ({count} SP)",
-    "itemCount": "{count} sản phẩm",
-    "header": {
-      "title": "Quản lý vấn đề đơn hàng"
+      "fetchUnexpectedError": "Đã xảy ra lỗi khi tải danh sách vấn đề",
+      "acceptSuccess": "Chấp nhận yêu cầu hủy thành công",
+      "acceptFailed": "Không thể chấp nhận yêu cầu hủy",
+      "rejectSuccess": "Từ chối yêu cầu hủy thành công",
+      "rejectFailed": "Không thể từ chối yêu cầu hủy",
+      "processError": "Đã xảy ra lỗi khi xử lý yêu cầu"
     },
     "table": {
       "orderId": "Mã đơn hàng",
@@ -2642,13 +2681,19 @@
       "amount": "Số tiền",
       "reason": "Lý do",
       "date": "Ngày",
+      "status": "Trạng thái",
       "actions": "Thao tác"
     },
-    "empty": {
-      "noPendingIssues": "Không có vấn đề đơn hàng đang chờ xử lý."
+    "status": {
+      "pending": "Chờ xử lý",
+      "inProgress": "Đang xử lý",
+      "accepted": "Đã chấp nhận",
+      "rejected": "Đã từ chối",
+      "autoCancelled": "Tự động hủy",
+      "unknown": "Không xác định"
     },
-    "actions": {
-      "viewDetails": "Xem chi tiết"
+    "empty": {
+      "noPendingIssues": "Không có vấn đề đơn hàng nào."
     }
   },
   "OrderIssueDetailModal": {
@@ -3310,7 +3355,7 @@
     "selectItemsToCancel": "Chọn sản phẩm muốn hủy:",
     "quantityAbbr": "SL:",
     "refundAbbr": "Hoàn:",
-    "shippingFeeWarning": "* Phí vận chuyển chỉ được hoàn nếu hủy toàn bộ đơn hàng.",
+    "shippingFeeWarning": "*Bạn sẽ chỉ nhận được 90% số tiền đã thanh toán nếu hủy đơn hàng. ",
     "refundPreview": "Bạn sẽ được hoàn {amount} cho {count} sản phẩm đã chọn."
   },
   "ChatPage": {
@@ -3364,6 +3409,8 @@
     "noMessagesYet": "Chưa có tin nhắn"
   },
   "BuilderPage": {
+    "position": "Vị trí",
+    "row": "Hàng",
     "outOfStock": "Hết hàng",
     "included": "Đã bao gồm",
     "steps": "{n} bước",
@@ -3398,7 +3445,19 @@
     "emptyVisualizer": "Vui lòng chọn {step} để bắt đầu",
     "resetConfirmTitle": "Làm mới cấu hình?",
     "cancel": "Hủy bỏ",
-    "confirm": "Đồng ý"
+    "confirm": "Đồng ý",
+    "keymapStartCustomizing": "Bắt đầu tùy chỉnh",
+    "keymapClickAnyKey": "Nhấn vào bất kỳ phím nào trên mô hình để chọn Artisan Keycap!",
+    "keymapClickToManage": "{name} — Nhấn để quản lý",
+    "keymapCustomizeKey": "Tùy chỉnh: {label}",
+    "keymapCustomizeKeyTitle": "Tùy chỉnh phím",
+    "keymapKeyRow": "{keyName} - Hàng {rowNum}",
+    "keymapCurrentlyInstalled": "Đang lắp đặt",
+    "keymapRemove": "Gỡ bỏ",
+    "keymapReplaceWith": "Thay thế bằng",
+    "keymapChooseAddon": "Chọn phụ kiện",
+    "keymapNoAddons": "Không có phụ kiện khả dụng",
+    "keymapNote": "Hình ảnh chỉ mang tính chất minh họa"
   },
   "ProductDetailPage": {
     "loadErrorFallback": "Không thể tải chi tiết sản phẩm",
@@ -3815,6 +3874,83 @@
       "section3Content1": "Mọi quyền sở hữu trí tuệ, nội dung thông tin và tất cả các thiết kế, văn bản, đồ họa, phần mềm, hình ảnh, video, âm nhạc, âm thanh, biên dịch phần mềm, mã nguồn và phần mềm cơ bản đều là tài sản của chúng tôi. Toàn bộ nội dung của trang web được bảo vệ bởi luật bản quyền của Việt Nam và các công ước quốc tế.",
       "section4Title": "4. Thay đổi, hủy bỏ giao dịch tại website",
       "section4Content1": "Trong mọi trường hợp, khách hàng đều có quyền chấm dứt giao dịch nếu đã thông báo cho chúng tôi về việc hủy giao dịch, và trả lại hàng hoá đã nhận nhưng chưa sử dụng hoặc hưởng bất kỳ lợi ích nào từ hàng hóa đó."
+    },
+    "ReturnPolicy": {
+      "title": "Chính sách đổi trả hàng",
+      "lastUpdated": "Cập nhật lần cuối: Tháng 5, 2026",
+      "section1Title": "1. Một đổi một (đổi mới 100%)",
+      "section1Desc": "Áp dụng khi sản phẩm lỗi đáp ứng đầy đủ điều kiện sau:",
+      "section1Cond1": "Sản phẩm không bị biến dạng vật lý (trầy, xước, méo, lồi, lõm) và không vi phạm các điều kiện bảo hành khác của Công ty, Cửa hàng.",
+      "section1Cond2": "Khách hàng mua là người tiêu dùng cuối cùng.",
+      "section1Cond3": "Thời gian tính theo ngày ghi trên phiếu bảo hành:",
+      "section1Time": "Trong vòng 30 ngày đối với sản phẩm có bán trên nền tảng AmekoLab, chúng tôi ưu tiên mọi trải nghiệm của khách hàng lên hàng đầu với các điều kiện sản phẩm không phải lỗi do cửa hàng như: cháy, nổ, ngậm nước, có hiện tượng oxy hóa do ẩm mốc, sử dụng trong điều kiện nóng ẩm,...",
+      "section2Title": "2. Đổi sản phẩm tương đương",
+      "section2Subtitle": "(Đảm bảo tính năng sử dụng, thông số kỹ thuật, mẫu mã và thời hạn bảo hành còn lại)",
+      "section2Desc": "Áp dụng khi sản phẩm lỗi đáp ứng đầy đủ điều kiện sau:",
+      "section2Cond1": "Sản phẩm không vi phạm các điều kiện bảo hành của Công ty, Cửa hàng.",
+      "section2Cond2": "Thời gian tính theo ngày ghi trên phiếu bảo hành:",
+      "section2Time": "Từ ngày thứ 31, nếu đã hết thời hạn bảo hành thì không thể yêu cầu hoàn trả hay đổi trả.",
+      "section3Title": "3. Danh mục không áp dụng đổi trả vì lý do cá nhân",
+      "section3Subtitle": "(\"không hợp, không quen, không thích…\")",
+      "section3ColCategory": "Danh mục sản phẩm",
+      "section3ColReason": "Lý do",
+      "section3Row1Category": "Bàn phím",
+      "section3Row1Reason": "Đảm bảo tiêu chuẩn an toàn sức khỏe cho khách hàng",
+      "section4Title": "4. Quy trình trả hàng & hoàn tiền (trên nền tảng)",
+      "section4Step1": "Khách hàng gửi yêu cầu tại mục \"Bảo hành & Đổi trả\" và cung cấp thông tin cần thiết.",
+      "section4Step2": "Với yêu cầu \"Trả hàng & Hoàn tiền\", khách hàng gửi sản phẩm về shop theo hướng dẫn; hoàn tiền được xử lý sau khi shop xác nhận đã nhận hàng trả.",
+      "section4Step3": "Trường hợp \"Bảo hành / Hoàn tiền nhanh\" (nếu được chấp thuận) có thể không cần trả hàng và phù hợp cho bồi thường nhỏ hoặc theo thỏa thuận riêng.",
+      "section4Note": "Lưu ý: Những sản phẩm đổi trả không đáp ứng các điều kiện nêu trên sẽ được tự động chuyển hoàn về địa chỉ đăng ký theo thông tin đơn hàng của quý khách."
+    },
+    "Contact": {
+      "title": "Liên hệ AMEKO",
+      "heroDesc": "Đội ngũ CSKH của AMEKO sẵn sàng hỗ trợ đơn hàng, bảo hành, đổi trả, thanh toán và hợp tác kinh doanh. Chúng tôi ưu tiên phản hồi nhanh, rõ ràng và minh bạch.",
+      "badge": "Support Desk • 7 ngày/tuần",
+      "channelsTitle": "Kênh hỗ trợ chính",
+      "emailLabel": "Email CSKH",
+      "emailValue": "amekolab.captonse@gmail.com",
+      "hotlineLabel": "Hotline",
+      "hotlineValue": "1900-AMEKO (ưu tiên trường hợp khẩn cấp)",
+      "liveChatLabel": "Chat trực tuyến",
+      "liveChatValue": "Hỗ trợ tức thì trong giờ làm việc",
+      "businessLabel": "Hợp tác kinh doanh",
+      "businessValue": "business@ameko.vn",
+      "securityLabel": "Báo cáo an ninh",
+      "securityValue": "security@ameko.vn",
+      "hoursTitle": "Giờ làm việc",
+      "hoursWeekday": "Thứ 2 – Thứ 7: 08:30 – 18:00",
+      "hoursWeekend": "Chủ nhật & Ngày lễ: 09:00 – 17:00",
+      "hoursResponse": "Mục tiêu phản hồi: trong 2–8 giờ làm việc (tối đa 24 giờ)",
+      "formTitle": "Form liên hệ",
+      "formName": "Họ và tên",
+      "formNamePlaceholder": "Nhập họ tên của bạn",
+      "formEmail": "Email liên hệ",
+      "formEmailPlaceholder": "you@email.com",
+      "formPhone": "Số điện thoại",
+      "formPhonePlaceholder": "0xxxxxxxxx",
+      "formSubject": "Chủ đề",
+      "formSubjectPlaceholder": "Chọn chủ đề",
+      "subjectOrders": "Đơn hàng",
+      "subjectWarranty": "Bảo hành – Đổi trả",
+      "subjectPayment": "Thanh toán",
+      "subjectAccount": "Tài khoản",
+      "subjectPartnership": "Hợp tác",
+      "formMessage": "Nội dung yêu cầu",
+      "formMessagePlaceholder": "Mô tả chi tiết vấn đề, mã đơn hàng nếu có",
+      "formSubmit": "Gửi yêu cầu hỗ trợ",
+      "formSubmitting": "Đang gửi...",
+      "formNote": "Thông tin bạn cung cấp sẽ được xử lý theo Chính sách bảo mật của AMEKO.",
+      "formSuccess": "Yêu cầu của bạn đã được gửi thành công! Chúng tôi sẽ phản hồi trong 2–8 giờ làm việc.",
+      "quickLinksTitle": "Hỗ trợ nhanh",
+      "quickLink1": "Tra cứu đơn hàng",
+      "quickLink2": "Theo dõi bảo hành / đổi trả",
+      "quickLink3": "Đăng ký mở shop",
+      "quickLink4": "Xem câu hỏi thường gặp (FAQ)",
+      "processTitle": "Quy trình xử lý",
+      "processStep1": "Tiếp nhận & xác minh thông tin",
+      "processStep2": "Phân loại yêu cầu và mức độ ưu tiên",
+      "processStep3": "Xử lý hoặc điều phối đến bộ phận liên quan",
+      "processStep4": "Cập nhật kết quả và hướng dẫn tiếp theo"
     }
   }
 }

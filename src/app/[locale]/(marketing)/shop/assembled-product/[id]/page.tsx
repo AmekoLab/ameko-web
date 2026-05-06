@@ -15,7 +15,6 @@ import { ProductInfo } from "@/src/components/Product/ProductInfo";
 import { ProductSpecs } from "@/src/components/Product/ProductSpecs";
 import { SoundTestSection } from "@/src/components/Product/SoundTestSection";
 import { ProductFeedbackList } from "@/src/components/Product/ProductFeedbackList";
-import AIAssistantWidget from "@/src/components/AI/AIAssistantWidget";
 import type { Product, ProductSpecs as SpecsType } from "@/src/types/product";
 import Link from "next/link";
 
@@ -378,12 +377,6 @@ export default function AssembledProductDetailPage() {
 
         {/* Product Feedbacks */}
         <ProductFeedbackList productId={productId} shopId={assembledProduct.shopId} />
-
-        {/* AI Assistant - Contextualized for Assembled Product */}
-        <AIAssistantWidget
-          shopId={assembledProduct.shopId}
-          assembledProductId={assembledProduct.id}
-        />
       </div>
     </div>
   );
