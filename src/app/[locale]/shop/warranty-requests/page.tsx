@@ -25,6 +25,7 @@ import { WarrantyRequest } from "@/src/services/warranty.service";
 import { format, parseISO } from "date-fns";
 import ShopReviewModal from "@/src/components/Warranty/ShopReviewModal";
 import { toast } from "react-toastify";
+import { uploadImage } from "@/src/utils/uploadImage";
 
 // ─── Constants ─────────────────────────────────────────────
 const PAGE_SIZE = 10;
@@ -308,6 +309,7 @@ const ConfirmReceiptModal = ({
   const [actionType, setActionType] = useState<"accept" | "dispute">("accept");
   const [shopResponse, setShopResponse] = useState("");
   const [evidenceUrl, setEvidenceUrl] = useState("");
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -328,6 +330,7 @@ const ConfirmReceiptModal = ({
 
   const isSubmitDisabled =
     isLoading ||
+    isUploadingImage ||
     (actionType === "dispute" && (!shopResponse.trim() || !evidenceUrl.trim()));
 
   return (
@@ -399,16 +402,29 @@ const ConfirmReceiptModal = ({
                   <input
                     type="file"
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files.length > 0) {
-                        setEvidenceUrl(
-                          "[https://res.cloudinary.com/demo/image/upload/sample.jpg](https://res.cloudinary.com/demo/image/upload/sample.jpg)"
-                        );
+                    disabled={isUploadingImage}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setIsUploadingImage(true);
+                        try {
+                          const uploadedUrl = await uploadImage(file);
+                          setEvidenceUrl(uploadedUrl);
+                        } catch (error) {
+                          toast.error(t("uploadError") || "Lỗi tải ảnh. Vui lòng thử lại!");
+                        } finally {
+                          setIsUploadingImage(false);
+                        }
                       }
                     }}
                   />
-                  <div className={`w-full flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-xl transition-colors ${evidenceUrl ? "border-green-400 bg-green-50" : "border-neutral-300 bg-neutral-50 group-hover:bg-neutral-100"}`}>
-                    {evidenceUrl ? (
+                  <div className={`w-full flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-xl transition-colors ${isUploadingImage ? "border-neutral-300 bg-neutral-50" : evidenceUrl ? "border-green-400 bg-green-50" : "border-neutral-300 bg-neutral-50 group-hover:bg-neutral-100"}`}>
+                    {isUploadingImage ? (
+                      <>
+                        <Loader2 className="w-6 h-6 animate-spin text-neutral-400 mb-1" />
+                        <span className="text-xs font-medium text-neutral-500">Đang tải ảnh lên...</span>
+                      </>
+                    ) : evidenceUrl ? (
                       <>
                         <CheckCircle className="w-6 h-6 text-green-500 mb-1" />
                         <span className="text-xs font-medium text-green-600">{t("confirmReceiptModal.disputeEvidenceUploaded")}</span>

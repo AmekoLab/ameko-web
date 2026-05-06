@@ -134,7 +134,11 @@
       "description": "Description",
       "type": "Type",
       "amount": "Amount"
-    }
+    },
+    "refundsDeducted": "Refunds Deducted",
+    "withdrawals": "Withdrawals",
+    "heldBalance": "Held Balance",
+    "pendingWithdrawals": "Pending Withdrawals"
   },
   "Header": {
     "searchPlaceholderDesktop": "Search products...",

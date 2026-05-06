@@ -21,9 +21,16 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
   const depositSchema = z.object({
     amount: z
-      .number({ error: "Please enter a valid amount" })
-      .min(10000, "Minimum deposit is 10,000 VND")
-      .max(100000000, "Maximum deposit is 100,000,000 VND"),
+      .string()
+      .min(1, "Please enter a valid amount")
+      .refine((val) => {
+        const num = Number(val.replace(/\D/g, ""));
+        return num >= 10000;
+      }, "Minimum deposit is 10,000 VND")
+      .refine((val) => {
+        const num = Number(val.replace(/\D/g, ""));
+        return num <= 100000000;
+      }, "Maximum deposit is 100,000,000 VND"),
   });
    const t = useTranslations("DepositModal");
   
@@ -33,10 +40,20 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<DepositFormData>({
     resolver: zodResolver(depositSchema),
   });
+
+  
+  function formatPrice(price: number) {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+  }
+
 
   const handleClose = () => {
     reset();
@@ -47,9 +64,10 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
     setLoading(true);
     try {
       const origin = typeof window !== "undefined" ? window.location.origin : "";
+      const rawAmount = Number(data.amount.replace(/\D/g, ""));
       
       const res = await walletService.deposit({
-        amount: data.amount,
+        amount: rawAmount,
         method: paymentMethod,
         successUrl: `${origin}/wallet/deposit/success`,
         cancelUrl: `${origin}/wallet`,
@@ -100,14 +118,23 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
             </label>
             <div className="relative">
               <input
-                type="number"
+                type="text"
                 placeholder="e.g. 500000"
-                className={`w-full border rounded-sm p-3 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                className={`w-full border rounded-sm p-3 outline-none transition-all ${
                   errors.amount
                     ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500"
                     : "border-amazon-border focus:border-amazon-focus focus:ring-1 focus:ring-amazon-focus"
                 }`}
-                {...register("amount", { valueAsNumber: true })}
+                {...register("amount")}
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/\D/g, "");
+                  if (!rawValue) {
+                    setValue("amount", "", { shouldValidate: true });
+                  } else {
+                    const formatted = new Intl.NumberFormat("vi-VN").format(Number(rawValue));
+                    setValue("amount", formatted, { shouldValidate: true });
+                  }
+                }}
               />
             </div>
             {errors.amount && (

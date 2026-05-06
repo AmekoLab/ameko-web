@@ -1,14 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { walletService, WalletStatementResponse } from "@/src/services/wallet.service";
-import { Loader2, Wallet, TrendingUp, TrendingDown, Building2, AlertCircle } from "lucide-react";
+import { walletService, WalletStatementResponse, WalletTransactionResponse } from "@/src/services/wallet.service";
+import { Loader2, Wallet, TrendingUp, TrendingDown, Building2, AlertCircle, RefreshCcw, CreditCard } from "lucide-react";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 import { useTranslations } from "next-intl";
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
+
+const getTransactionDisplay = (tx: WalletTransactionResponse) => {
+  // 1. In flow
+  if (tx.flowDirection === "In") return { sign: "+", color: "text-green-600" };
+  
+  // 2. Held flow
+  if (tx.flowDirection === "Held") {
+    if (tx.type === "SalesPending") return { sign: "+", color: "text-orange-500" };
+    if (tx.description?.includes("REFUND DEDUCTION")) return { sign: "-", color: "text-red-600" };
+  }
+  
+  // 3. Out flow
+  if (tx.flowDirection === "Out") return { sign: "-", color: "text-red-600" };
+
+  // Fallback if missing
+  return { sign: tx.amount > 0 ? "+" : "", color: tx.amount > 0 ? "text-green-600" : "text-red-600" };
+};
 
 export default function ShopWalletDashboard() {
   const t = useTranslations("Financial");
@@ -87,10 +104,11 @@ export default function ShopWalletDashboard() {
       ) : (
         <>
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm">
               <p className="text-sm font-medium text-neutral-500 mb-1">{t("closingBalance")}</p>
               <h3 className="text-2xl font-bold text-neutral-900">{formatCurrency(statement.closingBalance)}</h3>
+              <div className="text-xs text-neutral-500 mt-1">{t("heldBalance")}: {formatCurrency(statement.closingHeldBalance)}</div>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm">
               <p className="text-sm font-medium text-neutral-500 mb-1 flex items-center gap-1.5"><TrendingUp className="w-4 h-4 text-green-500"/> {t("revenue")}</p>
@@ -103,6 +121,15 @@ export default function ShopWalletDashboard() {
             <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm">
               <p className="text-sm font-medium text-neutral-500 mb-1 flex items-center gap-1.5"><Building2 className="w-4 h-4 text-red-500"/> {t("platformFees")}</p>
               <h3 className="text-2xl font-bold text-red-600">-{formatCurrency(statement.totalPlatformFees)}</h3>
+            </div>
+            <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm">
+              <p className="text-sm font-medium text-neutral-500 mb-1 flex items-center gap-1.5"><RefreshCcw className="w-4 h-4 text-orange-500"/> {t("refundsDeducted")}</p>
+              <h3 className="text-2xl font-bold text-red-600">-{formatCurrency(statement.totalRefundsDeducted)}</h3>
+            </div>
+            <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm">
+              <p className="text-sm font-medium text-neutral-500 mb-1 flex items-center gap-1.5"><CreditCard className="w-4 h-4 text-red-500"/> {t("withdrawals")}</p>
+              <h3 className="text-2xl font-bold text-red-600">-{formatCurrency(statement.totalWithdrawals)}</h3>
+              <div className="text-xs text-neutral-500 mt-1">{t("pendingWithdrawals")}: {formatCurrency(statement.totalPendingWithdrawals)}</div>
             </div>
           </div>
 
@@ -122,22 +149,32 @@ export default function ShopWalletDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
-                  {statement.transactions?.map((tx) => (
-                    <tr key={tx.id} className="hover:bg-neutral-50 transition-colors">
-                      <td className="px-6 py-4 text-neutral-500">
-                        {tx.createdAt ? format(parseISO(tx.createdAt), "dd/MM/yyyy HH:mm") : "N/A"}
-                      </td>
-                      <td className="px-6 py-4 font-medium text-neutral-900">{tx.description}</td>
-                      <td className="px-6 py-4">
-                        <span className="px-2.5 py-1 bg-neutral-100 text-neutral-600 rounded-md text-xs font-semibold">
-                          {tx.type}
-                        </span>
-                      </td>
-                      <td className={`px-6 py-4 font-bold text-right ${tx.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {tx.amount > 0 ? '+' : ''}{formatCurrency(tx.amount)}
-                      </td>
-                    </tr>
-                  ))}
+                  {statement.transactions?.map((tx) => {
+                    const display = getTransactionDisplay(tx);
+                    return (
+                      <tr key={tx.id} className="hover:bg-neutral-50 transition-colors">
+                        <td className="px-6 py-4 text-neutral-500">
+                          {tx.createdAt ? format(parseISO(tx.createdAt), "dd/MM/yyyy HH:mm") : "N/A"}
+                        </td>
+                        <td className="px-6 py-4 font-medium text-neutral-900">{tx.description}</td>
+                        <td className="px-6 py-4">
+                          <span className="px-2.5 py-1 bg-neutral-100 text-neutral-600 rounded-md text-xs font-semibold">
+                            {tx.type}
+                          </span>
+                        </td>
+                        <td className={`px-6 py-4 text-right`}>
+                          <div className={`font-bold ${display.color}`}>
+                            {display.sign}{formatCurrency(Math.abs(tx.netAmount))}
+                          </div>
+                          {tx.feeAmount > 0 && (
+                            <div className="text-[11px] text-neutral-400 font-normal mt-0.5">
+                              (Tổng: {formatCurrency(tx.amount)} - Phí: {formatCurrency(tx.feeAmount)})
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                   {(!statement.transactions || statement.transactions.length === 0) && (
                      <tr>
                        <td colSpan={4} className="px-6 py-8 text-center text-neutral-500">{t("noDataDesc")}</td>
