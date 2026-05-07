@@ -115,6 +115,8 @@ export interface AdminDashboardOverview {
   refundedOrders: number;
   grossMerchandiseValue: number;
   netRevenue: number;
+  platformRevenue: number;
+  shopRevenue: number;
   activeBuyers: number;
   activeShops: number;
   newUsers: number;

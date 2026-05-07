@@ -922,9 +922,9 @@ const OrderDetailModal: FC<OrderDetailModalProps> = ({
                                 )}
 
                                 {/* OTHER COMPONENTS */}
-                                {item.orderItemComponents?.map((part) => (
+                                {item.orderItemComponents?.map((part, index) => (
                                     <div
-                                      key={part.partId}
+                                      key={`${part.partId}-${index}`}
                                       className="flex items-center gap-3"
                                     >
                                       <div className="relative w-10 h-10 bg-white border border-amazon-border rounded-sm flex-shrink-0 overflow-hidden">

@@ -22,11 +22,11 @@ export default function PaymentHealthSection() {
   const mapMethodName = (method: number): string => {
     switch (method) {
       case 0:
-        return t("methodCOD");
+        return t("methodCreditCard");
       case 1:
-        return t("methodBanking");
+        return t("methodWallet");
       case 2:
-        return t("methodEWallet");
+        return t("methodVnPay");
       default:
         return t("methodUnknown");
     }
@@ -37,7 +37,23 @@ export default function PaymentHealthSection() {
       case 0:
         return t("typeOrderPayment");
       case 1:
-        return t("typeSubscription");
+        return t("typeRefund");
+      case 2:
+        return t("typeWithdrawal");
+      case 3:
+        return t("typePlatformFee");
+      case 4:
+        return t("typeRefundToWallet");
+        case 5:
+        return t("typeSalesPending");
+        case 6:
+        return t("typeSalesReleased");
+        case 7:
+        return t("typePaymentByWallet");
+        case 8:
+        return t("typeManualAdjustment");
+        case 9:
+        return t("typeDeposit");
       default:
         return t("typeUnknown");
     }

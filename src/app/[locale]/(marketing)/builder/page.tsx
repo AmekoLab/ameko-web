@@ -7,6 +7,7 @@ import {
   useCallback,
   memo,
   Suspense,
+  useRef,
 } from "react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -68,6 +69,143 @@ const GRID_BG_STYLE: React.CSSProperties = {
   backgroundSize: "40px 40px",
 };
 
+// ─── VISUALIZER LAYER (Bulletproof Implementation) ────────────────────────
+const VisualizerLayer = memo(
+  ({
+    slug,
+    url,
+    name,
+    isHidden,
+  }: {
+    slug: string;
+    url: string;
+    name: string;
+    isHidden: boolean;
+  }) => {
+    // State machine: loading -> loaded | error
+    const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
+    const [showLoader, setShowLoader] = useState(false);
+    
+    // Internal crossfade state
+    const [currentUrl, setCurrentUrl] = useState(url);
+    const [prevUrl, setPrevUrl] = useState<string | null>(null);
+
+    // Pillar 1: URL Tracking (Anti-Race Condition)
+    const activeUrlRef = useRef(url);
+
+    // Handle URL changes
+    useEffect(() => {
+      if (url !== activeUrlRef.current) {
+        setPrevUrl(activeUrlRef.current);
+        setCurrentUrl(url);
+        activeUrlRef.current = url;
+        setStatus("loading");
+        setShowLoader(false);
+      }
+    }, [url]);
+
+    // Pillar 2 & 5: Timeout Safety Valve & Strict Cleanup
+    useEffect(() => {
+      if (status !== "loading") return;
+
+      let isStale = false;
+
+      // Delay loader by 300ms (Cache safety & anti-flash)
+      const loaderTimer = setTimeout(() => {
+        if (!isStale) setShowLoader(true);
+      }, 300);
+
+      // Safety valve: 10 seconds max loading time
+      const safetyTimer = setTimeout(() => {
+        if (!isStale) {
+          console.warn(`[VisualizerLayer] Timeout loading image: ${activeUrlRef.current}`);
+          setStatus("error");
+        }
+      }, 10000);
+
+      return () => {
+        isStale = true;
+        clearTimeout(loaderTimer);
+        clearTimeout(safetyTimer);
+      };
+    }, [currentUrl, status]);
+
+    // Clear prevUrl after crossfade finishes
+    useEffect(() => {
+      if (status === "loaded" || status === "error") {
+        const timer = setTimeout(() => setPrevUrl(null), 500); // matches duration-500
+        return () => clearTimeout(timer);
+      }
+    }, [status]);
+
+    // Pillar 1 & 4: Safe Handlers
+    const handleLoad = useCallback((loadedUrl: string) => {
+      if (activeUrlRef.current === loadedUrl) {
+        setStatus("loaded");
+      }
+    }, []);
+
+    // Pillar 3: Error Handling
+    const handleError = useCallback((failedUrl: string) => {
+      if (activeUrlRef.current === failedUrl) {
+        console.error(`[VisualizerLayer] Failed to load image: ${failedUrl}`);
+        setStatus("error");
+      }
+    }, []);
+
+    // If there's an error and no fallback image, we can just stay invisible
+    const opacityClass = status === "loaded" ? "opacity-100" : "opacity-0";
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: isHidden ? 0 : 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.98 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="absolute inset-0 pointer-events-none"
+        style={{ zIndex: getZIndex(slug) }}
+      >
+        {/* 3-dot wave loading animation */}
+        {status === "loading" && showLoader && (
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            <div className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: "0ms" }} />
+            <div className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: "150ms" }} />
+            <div className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: "300ms" }} />
+          </div>
+        )}
+
+        {/* Previous Image (Maintains view during crossfade) */}
+        {prevUrl && (
+          <Image
+            src={prevUrl}
+            alt={`${name} previous`}
+            fill
+            quality={100}
+            className="object-contain drop-shadow-2xl"
+            sizes="(max-width: 768px) 100vw, 65vw"
+          />
+        )}
+
+        {/* Current Image */}
+        {(status === "loading" || status === "loaded") && (
+          <Image
+            src={currentUrl}
+            alt={name}
+            fill
+            quality={100}
+            className={`object-contain drop-shadow-2xl transition-opacity duration-500 ease-out ${opacityClass}`}
+            priority={slug === "case"}
+            sizes="(max-width: 768px) 100vw, 65vw"
+            onLoad={() => handleLoad(currentUrl)}
+            onError={() => handleError(currentUrl)}
+          />
+        )}
+      </motion.div>
+    );
+  },
+);
+VisualizerLayer.displayName = "VisualizerLayer";
+
 // ─── VISUALIZER ─────────────────────────────────────────────────────────────
 const Visualizer = memo(
   ({
@@ -80,53 +218,8 @@ const Visualizer = memo(
     emptyText: string;
   }) => {
     const hasAnySelection = Object.keys(selection).length > 0;
+    const hasKeycap = !!selection["keycap"];
 
-    const [displayed, setDisplayed] = useState<
-      Record<string, { url: string; name: string }>
-    >({});
-
-    useEffect(() => {
-      let cancelled = false;
-
-      LAYER_ORDER.forEach((slug) => {
-        const part = selection[slug];
-
-        if (!part) {
-          // Part removed — clear immediately
-          setDisplayed((prev) => {
-            if (!prev[slug]) return prev;
-            const next = { ...prev };
-            delete next[slug];
-            return next;
-          });
-          return;
-        }
-
-        // Already showing this exact URL — nothing to do
-        setDisplayed((prev) => {
-          if (prev[slug]?.url === part.layerImageUrl) return prev;
-          // Silently preload in the background
-          const img = new window.Image();
-          img.src = part.layerImageUrl;
-          img.onload = () => {
-            if (cancelled) return;
-            setDisplayed((p) => ({
-              ...p,
-              [slug]: { url: part.layerImageUrl, name: part.name },
-            }));
-          };
-          return prev; // keep old image visible while loading
-        });
-      });
-
-      return () => {
-        cancelled = true;
-      };
-    }, [selection]);
-
-    const hasKeycap = !!displayed["keycap"];
-
-    // viewMode can drive a CSS transform in future; wired but not yet used
     const containerStyle: React.CSSProperties =
       viewMode === "angled"
         ? { transform: "perspective(1200px) rotateY(-8deg) rotateX(4deg)" }
@@ -136,34 +229,22 @@ const Visualizer = memo(
 
     return (
       <div className="relative w-[100%] h-[100%]" style={containerStyle}>
-        {/* Layer stack */}
-        {LAYER_ORDER.map((slug) => {
-          const layer = displayed[slug];
-          if (!layer) return null;
-
-          const isHidden = slug === "switch" && hasKeycap;
-
-          return (
-            <div
-              key={slug}
-              className="absolute inset-0 pointer-events-none transition-opacity duration-300 ease-in-out"
-              style={{
-                zIndex: getZIndex(slug),
-                opacity: isHidden ? 0 : 1,
-              }}
-            >
-              <Image
-                src={layer.url}
-                alt={layer.name}
-                fill
-                quality={100}
-                className="object-contain drop-shadow-2xl transition-opacity duration-300 ease-in-out"
-                priority={slug === "case"}
-                sizes="(max-width: 768px) 100vw, 65vw"
+        {/* Layer stack with crossfade */}
+        <AnimatePresence mode="popLayout">
+          {LAYER_ORDER.map((slug) => {
+            const part = selection[slug];
+            if (!part) return null;
+            return (
+              <VisualizerLayer
+                key={slug} // Using slug as key ensures internal crossfade logic handles updates
+                slug={slug}
+                url={part.layerImageUrl}
+                name={part.name}
+                isHidden={slug === "switch" && hasKeycap}
               />
-            </div>
-          );
-        })}
+            );
+          })}
+        </AnimatePresence>
 
         {/* Empty-state: Blueprint/Wireframe with pulse effect */}
         {!hasAnySelection && (
@@ -194,7 +275,7 @@ const Visualizer = memo(
 );
 Visualizer.displayName = "Visualizer";
 
-// ─── PRODUCT ITEM — Corsair Circle ──────────────────────────────────────────
+// ─── PRODUCT ITEM — Premium Circle with Framer Motion ───────────────────────
 const ProductItem = memo(
   ({
     product,
@@ -210,12 +291,16 @@ const ProductItem = memo(
     onHover?: (p: BuilderProduct) => void;
   }) => {
     const t = useTranslations("BuilderPage");
+    const [thumbLoaded, setThumbLoaded] = useState(false);
 
     return (
-      <div
+      <motion.div
         onClick={() => !isOutOfStock && onClick(product)}
         onMouseEnter={() => !isOutOfStock && onHover?.(product)}
-        className={`group flex flex-col items-center gap-2.5 select-none transition-all ${
+        whileHover={!isOutOfStock ? { scale: 1.04 } : undefined}
+        whileTap={!isOutOfStock ? { scale: 0.96 } : undefined}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        className={`group flex flex-col items-center gap-2.5 select-none ${
           isOutOfStock
             ? "opacity-40 cursor-not-allowed grayscale"
             : "cursor-pointer"
@@ -225,21 +310,28 @@ const ProductItem = memo(
         <div
           className={`
             w-24 h-24 rounded-full relative overflow-hidden flex-shrink-0
-            transition-all duration-150 ease-out flex items-center justify-center bg-white
+            transition-all duration-200 ease-out flex items-center justify-center bg-white
             ${
               isSelected
-                ? "border-[2.5px] border-amazon-focus shadow-md ring-1 ring-amazon-focus/20"
-                : "border border-amazon-border hover:border-neutral-400 shadow-sm"
+                ? "border-[2.5px] border-amazon-focus shadow-lg ring-2 ring-amazon-focus/30 ring-offset-1"
+                : "border border-amazon-border hover:border-neutral-400 hover:shadow-md shadow-sm"
             }
           `}
         >
+          {/* Shimmer while thumbnail loads */}
+          {!thumbLoaded && (
+            <div className="absolute inset-2.5 rounded-full bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 bg-[length:200%_100%] animate-shimmer" />
+          )}
           <Image
             src={product.thumbnailUrl}
             alt={product.name}
             fill
-            className="object-contain p-2.5 group-hover:scale-105 transition-transform duration-200"
+            className={`object-contain p-2.5 group-hover:scale-105 transition-all duration-200 ${
+              thumbLoaded ? "opacity-100" : "opacity-0"
+            }`}
             sizes="96px"
             loading="lazy"
+            onLoad={() => setThumbLoaded(true)}
           />
         </div>
 
@@ -266,7 +358,7 @@ const ProductItem = memo(
             </p>
           )}
         </div>
-      </div>
+      </motion.div>
     );
   },
 );
@@ -778,10 +870,10 @@ function BuilderContent() {
       {/* ═══════════════════════════════════════
           MAIN CONTENT
       ═══════════════════════════════════════ */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* ── LEFT: VISUALIZER ── */}
         <div
-          className="flex-[62] relative flex flex-col items-center justify-center overflow-hidden"
+          className="h-[45vh] shrink-0 lg:h-auto lg:shrink lg:flex-[62] relative flex flex-col items-center justify-center overflow-hidden"
           style={GRID_BG_STYLE}
         >
           {/* Radial vignette removed for light theme since we just want clean minimal white grid */}
@@ -906,7 +998,7 @@ function BuilderContent() {
         </div>
 
         {/* ── RIGHT: CONFIGURATOR / SUMMARY ── */}
-        <div className="hidden lg:flex flex-[38] flex-col z-10 bg-white border-l border-amazon-border shadow-2xl">
+        <div className="flex flex-1 lg:flex-[38] flex-col z-10 bg-white border-t lg:border-t-0 border-l-0 lg:border-l border-amazon-border shadow-2xl">
           {currentStepName === "summary" ? (
             /* ─────────────────────────────────────
                SUMMARY VIEW
@@ -1130,29 +1222,42 @@ function BuilderContent() {
 
               {/* Product grid — 3 circles per row */}
               <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar bg-neutral-50">
-                <div
-                  key={currentStepName}
-                  className="grid grid-cols-3 gap-x-4 gap-y-7 animate-fadeIn"
-                >
-                  {currentProducts.map((product) => {
-                    const isOutOfStock =
-                      stockMap[product.partId] !== undefined &&
-                      stockMap[product.partId] <= 0;
-                    return (
-                      <ProductItem
-                        key={product.optionId}
-                        product={product}
-                        isSelected={
-                          session.selection[currentStepName || ""]?.id ===
-                          product.partId
-                        }
-                        isOutOfStock={isOutOfStock}
-                        onClick={handleSelectComponent}
-                        onHover={handleProductHover}
-                      />
-                    );
-                  })}
-                </div>
+                {processing && currentProducts.length === 0 ? (
+                  /* Shimmer skeleton grid while loading */
+                  <div className="grid grid-cols-3 gap-x-4 gap-y-7">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="flex flex-col items-center gap-2.5">
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 bg-[length:200%_100%] animate-shimmer" />
+                        <div className="w-16 h-3 rounded bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 bg-[length:200%_100%] animate-shimmer" />
+                        <div className="w-10 h-2.5 rounded bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 bg-[length:200%_100%] animate-shimmer" />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    key={currentStepName}
+                    className="grid grid-cols-3 gap-x-4 gap-y-7 animate-fadeIn"
+                  >
+                    {currentProducts.map((product) => {
+                      const isOutOfStock =
+                        stockMap[product.partId] !== undefined &&
+                        stockMap[product.partId] <= 0;
+                      return (
+                        <ProductItem
+                          key={product.optionId}
+                          product={product}
+                          isSelected={
+                            session.selection[currentStepName || ""]?.id ===
+                            product.partId
+                          }
+                          isOutOfStock={isOutOfStock}
+                          onClick={handleSelectComponent}
+                          onHover={handleProductHover}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Footer — Subtotal + BACK / NEXT */}

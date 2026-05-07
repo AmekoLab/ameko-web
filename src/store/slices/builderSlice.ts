@@ -178,6 +178,7 @@ const initialState: BuilderState = {
 // Helper: Apply BuilderPayload to state (reused by start & select)
 // ============================================================
 function applyBuilderPayload(state: BuilderState, payload: BuilderPayload) {
+  const previousStepName = state.currentStepName;
   state.session = payload.session;
   state.workflowSteps = payload.workflowSteps;
 
@@ -186,10 +187,33 @@ function applyBuilderPayload(state: BuilderState, payload: BuilderPayload) {
     state.currentStepName = "summary";
     state.currentProducts = [];
   } else if (payload.nextStep) {
-    state.currentStepName = payload.nextStep.step.name;
-    state.currentProducts = payload.nextStep.products;
-    // Cache products per step for free-flow navigation
+    // Cache products from the server response regardless
     state.stepProducts[payload.nextStep.step.name] = payload.nextStep.products;
+
+    // Enforce sequential progression: only advance by exactly 1 step
+    const prevIdx = previousStepName
+      ? payload.workflowSteps.indexOf(previousStepName)
+      : -1;
+    const serverNextIdx = payload.workflowSteps.indexOf(
+      payload.nextStep.step.name,
+    );
+    const expectedNextIdx = prevIdx + 1;
+
+    if (
+      prevIdx >= 0 &&
+      serverNextIdx > expectedNextIdx &&
+      expectedNextIdx < payload.workflowSteps.length
+    ) {
+      // Server tried to skip — override to the correct sequential step
+      const correctStepName = payload.workflowSteps[expectedNextIdx];
+      state.currentStepName = correctStepName;
+      state.currentProducts =
+        state.stepProducts[correctStepName] || [];
+    } else {
+      // Server's nextStep is correct (or we're at init) — use it
+      state.currentStepName = payload.nextStep.step.name;
+      state.currentProducts = payload.nextStep.products;
+    }
   } else {
     // Fallback — no next step and not complete
     state.currentStepName = "summary";

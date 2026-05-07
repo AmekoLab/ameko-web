@@ -114,7 +114,7 @@ export default function ShopRulesBuilderPage() {
   }, [partsState]);
 
   const kits = useMemo(
-    () => allParts.filter((part) => part.partType === "kit"),
+    () => allParts.filter((part) => part.partType === "kit" && !part.isDeleted),
     [allParts],
   );
 
