@@ -58,6 +58,28 @@ const handleAuthFailure = (reason: unknown) => {
   return Promise.reject(reason);
 };
 
+// ---------------------------------------------------------------------------
+// Refresh Token Queue/Mutex — prevents parallel refresh requests
+// ---------------------------------------------------------------------------
+type QueueEntry = {
+  resolve: (token: string) => void;
+  reject: (reason: unknown) => void;
+};
+
+let isRefreshing = false;
+let failedQueue: QueueEntry[] = [];
+
+const processQueue = (error: unknown, token: string | null = null): void => {
+  failedQueue.forEach((entry) => {
+    if (error) {
+      entry.reject(error);
+    } else {
+      entry.resolve(token!);
+    }
+  });
+  failedQueue = [];
+};
+
 // 1. Khởi tạo instance
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -89,7 +111,7 @@ api.interceptors.response.use(
     return response.data;
   },
   async (error: AxiosError) => {
-    const createStandardError = (message: string, extraData: any = {}) => {
+    const createStandardError = (message: string, extraData: Record<string, unknown> = {}) => {
       const err = new Error(message);
       Object.assign(err, extraData);
       return err;
@@ -128,69 +150,105 @@ api.interceptors.response.use(
       | undefined;
 
     if (!originalRequest) {
-      const backendData = error.response?.data as any;
+      const backendData = error.response?.data as Record<string, unknown> | undefined;
       if (backendData) {
-        return Promise.reject(createStandardError(backendData.message || error.message, backendData));
+        return Promise.reject(createStandardError((backendData.message as string) || error.message, backendData));
       }
       return Promise.reject(error);
-    } // A. Bỏ qua các API Auth (Login/Register...) để tránh vòng lặp
+    }
 
+    // A. Bỏ qua các API Auth (Login/Register...) để tránh vòng lặp
     if (
       originalRequest.url?.includes("/login") ||
       originalRequest.url?.includes("/register")
     ) {
-      const backendData = error.response?.data as any;
+      const backendData = error.response?.data as Record<string, unknown> | undefined;
       if (backendData) {
-        return Promise.reject(createStandardError(backendData.message || error.message, backendData));
+        return Promise.reject(createStandardError((backendData.message as string) || error.message, backendData));
       }
       return Promise.reject(error);
-    } // B. Xử lý Refresh Token khi lỗi 401
+    }
 
+    // B. Xử lý Refresh Token khi lỗi 401 (Queue/Mutex pattern)
     if (status === 401 && !originalRequest._retry) {
-      if (typeof window !== "undefined") {
-        originalRequest._retry = true;
-
-        try {
-          const refreshToken = localStorage.getItem("refreshToken");
-          const userStr = localStorage.getItem("user");
-          const userObj = userStr ? JSON.parse(userStr) : null;
-          const userId = userObj?.id;
-
-          if (!refreshToken || !userId) {
-            return handleAuthFailure(new Error("Missing credentials"));
-          } // Gọi Refresh Token (Dùng axios gốc để tránh interceptor này)
-
-          const res = await axios.post(
-            `${API_BASE_URL}/Users/refresh-token/${userId}`,
-            { refreshToken: refreshToken },
-          ); // Kiểm tra kết quả refresh
-
-          if (res.data.success) {
-            const { token: newAccessToken, refreshToken: newRefreshToken } =
-              res.data.data; // Lưu token mới
-
-            localStorage.setItem("token", newAccessToken);
-            localStorage.setItem("refreshToken", newRefreshToken); // Cập nhật header cho request cũ và gọi lại
-
-            originalRequest.headers.set(
-              "Authorization",
-              `Bearer ${newAccessToken}`,
-            ); // Cập nhật mặc định cho các request sau
-
-            api.defaults.headers.common["Authorization"] =
-              `Bearer ${newAccessToken}`;
-
-            return api(originalRequest);
-          }
-        } catch (refreshError) {
-          return handleAuthFailure(refreshError);
-        }
+      // Guard: only run in browser context
+      if (typeof window === "undefined") {
+        return Promise.reject(error);
       }
-    } // Trả về lỗi chuẩn
 
-    const backendData = error.response?.data as any;
+      // If a refresh is already in-flight, queue this request and wait
+      if (isRefreshing) {
+        return new Promise<string>((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then((newToken) => {
+          originalRequest.headers.set("Authorization", `Bearer ${newToken}`);
+          return api(originalRequest);
+        });
+      }
+
+      // This is the first 401 — take ownership of the refresh
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const refreshToken = localStorage.getItem("refreshToken");
+        const userStr = localStorage.getItem("user");
+        const userObj = userStr ? JSON.parse(userStr) : null;
+        const userId = userObj?.id as string | undefined;
+
+        if (!refreshToken || !userId) {
+          processQueue(new Error("Missing credentials"));
+          isRefreshing = false;
+          return handleAuthFailure(new Error("Missing credentials"));
+        }
+
+        // Gọi Refresh Token (Dùng axios gốc để tránh interceptor này)
+        const res = await axios.post(
+          `${API_BASE_URL}/Users/refresh-token/${userId}`,
+          { refreshToken },
+        );
+
+        // Kiểm tra kết quả refresh
+        if (res.data.success) {
+          const { token: newAccessToken, refreshToken: newRefreshToken } =
+            res.data.data;
+
+          // Lưu token mới
+          localStorage.setItem("token", newAccessToken);
+          localStorage.setItem("refreshToken", newRefreshToken);
+
+          // Cập nhật mặc định cho các request sau
+          api.defaults.headers.common["Authorization"] =
+            `Bearer ${newAccessToken}`;
+
+          // Release all queued requests with the new token
+          processQueue(null, newAccessToken);
+
+          // Retry the original request
+          originalRequest.headers.set(
+            "Authorization",
+            `Bearer ${newAccessToken}`,
+          );
+
+          return api(originalRequest);
+        }
+
+        // Refresh returned success: false — treat as failure
+        const failReason = new Error("Refresh token rejected by server");
+        processQueue(failReason);
+        return handleAuthFailure(failReason);
+      } catch (refreshError) {
+        processQueue(refreshError);
+        return handleAuthFailure(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    // Trả về lỗi chuẩn
+    const backendData = error.response?.data as Record<string, unknown> | undefined;
     if (backendData) {
-      return Promise.reject(createStandardError(backendData.message || error.message, backendData));
+      return Promise.reject(createStandardError((backendData.message as string) || error.message, backendData));
     }
     return Promise.reject(error);
   },

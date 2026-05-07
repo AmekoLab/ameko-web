@@ -24,7 +24,7 @@ import {
   Activity,
   TrendingUp,
   TrendingDown,
-  Info
+  Info,
 } from "lucide-react";
 import Link from "next/link";
 import { ShopStatus } from "@/src/types/shop.types";
@@ -32,7 +32,11 @@ import { ShopApplicationModal } from "@/src/components/Profile/ShopApplicationMo
 import { UpdateShopApplicationModal } from "@/src/components/Profile/UpdateShopApplicationModal";
 import { fetchCurrentShop } from "@/src/store/slices/shopSlice";
 import { useTranslations } from "next-intl";
-import { reputationService, CustomerReputationData, ReputationLog } from "@/src/services/reputation.service";
+import {
+  reputationService,
+  CustomerReputationData,
+  ReputationLog,
+} from "@/src/services/reputation.service";
 
 export default function ProfilePage() {
   const t = useTranslations("ProfileUserPage");
@@ -48,7 +52,9 @@ export default function ProfilePage() {
   const [isUpdateShopModalOpen, setIsUpdateShopModalOpen] = useState(false);
 
   // --- Reputation State ---
-  const [reputation, setReputation] = useState<CustomerReputationData | null>(null);
+  const [reputation, setReputation] = useState<CustomerReputationData | null>(
+    null,
+  );
   const [reputationLogs, setReputationLogs] = useState<ReputationLog[]>([]);
   const [isLoadingReputation, setIsLoadingReputation] = useState(false);
 
@@ -57,16 +63,17 @@ export default function ProfilePage() {
       setIsLoadingReputation(true);
       Promise.all([
         reputationService.getMyReputation(),
-        reputationService.getMyReputationLogs(1, 5) // Fetch top 5 recent logs
+        reputationService.getMyReputationLogs(1, 5), // Fetch top 5 recent logs
       ])
         .then(([repRes, logsRes]) => {
           if (repRes.success && repRes.data) setReputation(repRes.data);
-          if (logsRes.success && logsRes.data) setReputationLogs(logsRes.data.items);
+          if (logsRes.success && logsRes.data)
+            setReputationLogs(logsRes.data.items);
         })
         .catch((err) => console.error("Failed to fetch reputation data", err))
         .finally(() => setIsLoadingReputation(false));
     }
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
     if (isInitialized && !user) {
@@ -125,8 +132,8 @@ export default function ProfilePage() {
       <div className="bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.08)] rounded-xl overflow-hidden border border-neutral-100 relative">
         {/* Header Background */}
         <div className="h-32 bg-neutral-100 border-b border-neutral-200 relative overflow-hidden">
-           {/* Abstract pattern for banner */}
-           <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-200/60 via-neutral-100/10 to-transparent"></div>
+          {/* Abstract pattern for banner */}
+          <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-200/60 via-neutral-100/10 to-transparent"></div>
         </div>
 
         <div className="px-6 sm:px-10 pb-10">
@@ -191,7 +198,8 @@ export default function ProfilePage() {
                       onClick={() => setIsApplicationModalOpen(true)}
                       className="px-4 py-2 bg-white text-neutral-700 font-medium hover:bg-neutral-50 text-sm rounded-lg border border-neutral-200 transition-colors flex items-center gap-2 whitespace-nowrap shadow-sm"
                     >
-                      <Eye className="w-4 h-4 text-neutral-400" /> {t("viewApplication")}
+                      <Eye className="w-4 h-4 text-neutral-400" />{" "}
+                      {t("viewApplication")}
                     </button>
                   </div>
                 )}
@@ -246,7 +254,8 @@ export default function ProfilePage() {
                       onClick={() => setIsApplicationModalOpen(true)}
                       className="px-4 py-2.5 bg-white border border-neutral-200 text-neutral-700 text-sm font-medium rounded-lg hover:bg-neutral-50 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap"
                     >
-                      <Eye className="w-4 h-4 text-neutral-400" /> {t("viewOriginal")}
+                      <Eye className="w-4 h-4 text-neutral-400" />{" "}
+                      {t("viewOriginal")}
                     </button>
                     <button
                       onClick={() => setIsUpdateShopModalOpen(true)}
@@ -261,7 +270,7 @@ export default function ProfilePage() {
               {/* TRƯỜNG HỢP 3: ACTIVE */}
               {currentShop && currentShop.status === ShopStatus.Active && (
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-5 transition-all">
-                   <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4">
                     <div className="w-14 h-14 bg-white border border-blue-100 shadow-sm rounded-full flex items-center justify-center text-blue-600 shrink-0">
                       <ShoppingBag className="w-6 h-6" />
                     </div>
@@ -286,7 +295,7 @@ export default function ProfilePage() {
               {/* TRƯỜNG HỢP 4: BANNED */}
               {currentShop && currentShop.status === ShopStatus.Banned && (
                 <div className="bg-white border border-red-200 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-5 shadow-sm relative overflow-hidden">
-                   <div className="absolute top-0 left-0 w-1 h-full bg-red-600"></div>
+                  <div className="absolute top-0 left-0 w-1 h-full bg-red-600"></div>
                   <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center shrink-0">
                     <Ban className="w-6 h-6" />
                   </div>
@@ -316,8 +325,9 @@ export default function ProfilePage() {
               {isLoadingReputation ? (
                 <div className="h-48 bg-neutral-100 animate-pulse rounded-xl border border-neutral-200"></div>
               ) : reputation ? (
-                <div className={`p-6 rounded-xl border relative overflow-hidden shadow-sm ${reputation.gate.isLocked ? "bg-red-50/50 border-red-200" : "bg-white border-neutral-200"}`}>
-                  
+                <div
+                  className={`p-6 rounded-xl border relative overflow-hidden shadow-sm ${reputation.gate.isLocked ? "bg-red-50/50 border-red-200" : "bg-white border-neutral-200"}`}
+                >
                   {/* Decorative Icon */}
                   <div className="absolute -right-4 -top-4 opacity-[0.03] pointer-events-none">
                     <Shield className="w-48 h-48" />
@@ -327,52 +337,82 @@ export default function ProfilePage() {
                     {/* Left: Score & Progress */}
                     <div className="flex-1">
                       <h3 className="font-bold text-lg text-neutral-900 flex items-center gap-2 mb-6">
-                        {reputation.gate.isLocked ? <ShieldAlert className="w-6 h-6 text-red-500" /> : <ShieldCheck className="w-6 h-6 text-green-500" />}
+                        {reputation.gate.isLocked ? (
+                          <ShieldAlert className="w-6 h-6 text-red-500" />
+                        ) : (
+                          <ShieldCheck className="w-6 h-6 text-green-500" />
+                        )}
                         {t("repu.title")}
                       </h3>
-                      
+
                       <div className="flex items-end gap-3 mb-2">
                         <span className="text-4xl font-black tracking-tighter text-neutral-900">
                           {reputation.currentScore}
                         </span>
-                        <span className="text-sm font-medium text-neutral-500 mb-1.5">/ 100 {t("repu.points")}</span>
-                        
-                        <span className={`ml-auto px-3 py-1 text-xs font-bold rounded-full border ${
-                            reputation.gate.isLocked ? "bg-red-100 text-red-700 border-red-200" :
-                            reputation.gate.tier === "High" ? "bg-green-100 text-green-700 border-green-200" :
-                            reputation.gate.tier === "Mid" || reputation.gate.tier === "Normal" ? "bg-blue-100 text-blue-700 border-blue-200" :
-                            "bg-orange-100 text-orange-700 border-orange-200"
-                        }`}>
-                          {reputation.gate.isLocked ? t("repu.locked") : `${t("repu.tier")}: ${reputation.gate.tier}`}
+                        <span className="text-sm font-medium text-neutral-500 mb-1.5">
+                          / 100 {t("repu.points")}
+                        </span>
+
+                        <span
+                          className={`ml-auto px-3 py-1 text-xs font-bold rounded-full border ${
+                            reputation.gate.isLocked
+                              ? "bg-red-100 text-red-700 border-red-200"
+                              : reputation.gate.tier === "High"
+                                ? "bg-green-100 text-green-700 border-green-200"
+                                : reputation.gate.tier === "Mid" ||
+                                    reputation.gate.tier === "Normal"
+                                  ? "bg-blue-100 text-blue-700 border-blue-200"
+                                  : "bg-orange-100 text-orange-700 border-orange-200"
+                          }`}
+                        >
+                          {reputation.gate.isLocked
+                            ? t("repu.locked")
+                            : `${t("repu.tier")}: ${reputation.gate.tier}`}
                         </span>
                       </div>
 
                       <div className="w-full h-2.5 bg-neutral-100 rounded-full overflow-hidden border border-neutral-200/60">
                         <div
                           className={`h-full transition-all duration-1000 ease-out ${
-                            reputation.gate.isLocked ? "bg-red-500" :
-                            reputation.gate.tier === "High" ? "bg-green-500" :
-                            reputation.gate.tier === "Mid" || reputation.gate.tier === "Normal" ? "bg-blue-500" : "bg-orange-500"
+                            reputation.gate.isLocked
+                              ? "bg-red-500"
+                              : reputation.gate.tier === "High"
+                                ? "bg-green-500"
+                                : reputation.gate.tier === "Mid" ||
+                                    reputation.gate.tier === "Normal"
+                                  ? "bg-blue-500"
+                                  : "bg-orange-500"
                           }`}
-                          style={{ width: `${Math.min(Math.max(reputation.currentScore, 0), 100)}%` }}
+                          style={{
+                            width: `${Math.min(Math.max(reputation.currentScore, 0), 100)}%`,
+                          }}
                         />
                       </div>
 
                       <div className="grid grid-cols-2 gap-4 mt-6">
                         <div className="bg-neutral-50 rounded-lg p-3 border border-neutral-100">
-                          <p className="text-xs text-neutral-500 font-medium mb-1">{t("repu.monthlyLimit")}</p>
+                          <p className="text-xs text-neutral-500 font-medium mb-1">
+                            {t("repu.monthlyLimit")}
+                          </p>
                           <p className="text-sm font-bold text-neutral-800">
-                            {reputation.gate.monthlyOrderLimit === 0 ? t("repu.unlimited") : `${reputation.gate.monthlyOrderLimit} ${t("repu.orders")}`}
+                            {reputation.gate.monthlyOrderLimit === 0
+                              ? t("repu.unlimited")
+                              : `${reputation.gate.monthlyOrderLimit} ${t("repu.orders")}`}
                           </p>
                         </div>
                         <div className="bg-neutral-50 rounded-lg p-3 border border-neutral-100">
-                          <p className="text-xs text-neutral-500 font-medium mb-1">{t("repu.autoCancels")}</p>
+                          <p className="text-xs text-neutral-500 font-medium mb-1">
+                            {t("repu.autoCancels")}
+                          </p>
                           <p className="text-sm font-bold text-neutral-800">
-                            {reputation.monthlyAutoCancels} <span className="text-xs font-normal text-neutral-500">/ 10</span>
+                            {reputation.monthlyAutoCancels}{" "}
+                            <span className="text-xs font-normal text-neutral-500">
+                              / 10
+                            </span>
                           </p>
                         </div>
                       </div>
-                      
+
                       {reputation.gate.isLocked && (
                         <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm font-medium flex items-start gap-2">
                           <Info className="w-5 h-5 shrink-0" />
@@ -387,9 +427,9 @@ export default function ProfilePage() {
                         <Activity className="w-4 h-4 text-neutral-400" />
                         {t("repu.recentLogs")}
                       </h4>
-                      
+
                       {reputationLogs.length > 0 ? (
-                        <div className="space-y-3">
+                        <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
                           {reputationLogs.map((log) => (
                             <div key={log.id} className="flex gap-3 text-sm">
                               <div className="mt-0.5 shrink-0">
@@ -404,13 +444,18 @@ export default function ProfilePage() {
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-neutral-800 font-medium leading-snug">{log.reason}</p>
+                                <p className="text-neutral-800 font-medium leading-snug">
+                                  {log.reason}
+                                </p>
                                 <p className="text-xs text-neutral-400 mt-0.5">
                                   {new Date(log.createdAt).toLocaleDateString()}
                                 </p>
                               </div>
-                              <div className={`font-bold shrink-0 ${log.delta > 0 ? "text-green-600" : "text-red-600"}`}>
-                                {log.delta > 0 ? "+" : ""}{log.delta}
+                              <div
+                                className={`font-bold shrink-0 ${log.delta > 0 ? "text-green-600" : "text-red-600"}`}
+                              >
+                                {log.delta > 0 ? "+" : ""}
+                                {log.delta}
                               </div>
                             </div>
                           ))}
@@ -436,19 +481,25 @@ export default function ProfilePage() {
               </h3>
               <div className="space-y-4 text-sm mt-4">
                 <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-neutral-100">
-                  <span className="text-neutral-500 font-medium">{t("email")}</span>
+                  <span className="text-neutral-500 font-medium">
+                    {t("email")}
+                  </span>
                   <span className="font-medium text-neutral-800 break-all text-right ml-4">
                     {user.email}
                   </span>
                 </div>
                 <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-neutral-100">
-                  <span className="text-neutral-500 font-medium">{t("phone")}</span>
+                  <span className="text-neutral-500 font-medium">
+                    {t("phone")}
+                  </span>
                   <span className="font-medium text-neutral-800">
                     {user.phoneNumber || t("notProvided")}
                   </span>
                 </div>
                 <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-neutral-100">
-                  <span className="text-neutral-500 font-medium">{t("username")}</span>
+                  <span className="text-neutral-500 font-medium">
+                    {t("username")}
+                  </span>
                   <span className="font-medium text-neutral-800">
                     @{user.username}
                   </span>
@@ -456,23 +507,29 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Store Details (CHỈ HIỆN NẾU KHÔNG PHẢI ADMIN) */}
-            {user.role !== "Admin" && (
+            {/* Store Details (only show for Seller or when shop data exists) */}
+            {(user?.role === "Seller" || currentShop) && (
               <div className="p-6 sm:p-8 bg-neutral-50 rounded-xl border border-neutral-100">
                 <h3 className="font-semibold text-neutral-900 mb-6 text-sm flex items-center gap-2 border-b border-neutral-200 pb-3">
                   {t("storeAbstract")}
                 </h3>
                 <div className="space-y-4 text-sm mt-4">
                   <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-neutral-100">
-                    <span className="text-neutral-500 font-medium">{t("address")}</span>
+                    <span className="text-neutral-500 font-medium">
+                      {t("address")}
+                    </span>
                     <span className="font-medium text-neutral-800 text-right max-w-[60%] truncate ml-4">
                       {user.storeAddress || t("noAddressProvided")}
                     </span>
                   </div>
                   <div className="flex flex-col gap-2 bg-white p-3 rounded-lg border border-neutral-100">
-                    <span className="text-neutral-500 font-medium">{t("bio")}</span>
+                    <span className="text-neutral-500 font-medium">
+                      {t("bio")}
+                    </span>
                     <p className="font-medium text-neutral-700 leading-relaxed text-[13px]">
-                      {user.storeDescription ? `"${user.storeDescription}"` : t("noDescriptionAvailable")}
+                      {user.storeDescription
+                        ? `"${user.storeDescription}"`
+                        : t("noDescriptionAvailable")}
                     </p>
                   </div>
                 </div>

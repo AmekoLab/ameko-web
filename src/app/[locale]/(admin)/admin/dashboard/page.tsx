@@ -81,6 +81,18 @@ export default function DashboardPage() {
       sub: null,
     },
     {
+      id: "platform-revenue",
+      label: t("cardsplatformRevenue"),
+      value: formatVND(data.platformRevenue),
+      sub: null,
+    },
+    {
+      id: "shop-revenue",
+      label: t("cardsshopRevenue"),
+      value: formatVND(data.shopRevenue),
+      sub: null,
+    },
+    {
       id: "orders",
       label: t("cardOrders"),
       value: data.totalOrders,
@@ -116,7 +128,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Metric Cards */}
-      <div className="shrink-0 grid grid-cols-4 gap-3">
+      <div className="shrink-0 grid grid-cols-2 lg:grid-cols-3 gap-3">
         {cards.map((card) => {
           return (
             <div

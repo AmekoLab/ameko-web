@@ -268,9 +268,9 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
                   </span>
                 </div>
               )}
-              {item.orderItemComponents.map((comp) => (
-                <SidebarComponentRow key={comp.partId} component={comp} />
-              ))}
+            {item.orderItemComponents.map((comp, index) => (
+  <SidebarComponentRow key={`${comp.partId}-${index}`} component={comp} />
+))}
             </div>
           </div>
         )}
