@@ -65,14 +65,17 @@ export default function ShopRulesBuilderPage() {
 
   const getErrorMessage = useCallback(
     (error: unknown): string => {
-      const errorWithMessage = error as {
+      // Try Axios-style error first: response.data.message / response.data.errors
+      const axiosError = error as {
+        response?: { data?: { message?: string; errors?: string } };
         message?: string;
         errors?: string;
       };
-
       return (
-        errorWithMessage?.message ||
-        errorWithMessage?.errors ||
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.errors ||
+        axiosError?.message ||
+        axiosError?.errors ||
         t("toastSaveError")
       );
     },
@@ -218,7 +221,7 @@ export default function ShopRulesBuilderPage() {
             const key = `${p.componentId}::${p.stepName}`;
             if (seenRoot.has(key)) {
               toast.error(
-              t("toastDuplicateComponent"),
+                t("toastDuplicateComponent"),
                 { autoClose: 7000 },
               );
               return;
@@ -295,6 +298,21 @@ export default function ShopRulesBuilderPage() {
           prev ? { ...prev, completed: 1 } : prev,
         );
 
+        // ── Refresh existingConfig so the canvas reflects the actual saved state ──
+        try {
+          const refreshRes = await partService.getKitConfig(selectedKit.id);
+          const directRes = refreshRes as { success?: boolean; data?: unknown };
+          const nestedRes = refreshRes as { data?: { success?: boolean; data?: unknown } };
+          if (directRes.success) {
+            setExistingConfig(directRes.data ?? null);
+          } else if (nestedRes.data?.success) {
+            setExistingConfig(nestedRes.data.data ?? null);
+          }
+        } catch {
+          // Non-critical: a refresh failure doesn't affect the saved data
+          console.warn("Could not refresh config after save");
+        }
+
         toast.success(t("toastSaveSuccess"));
       } catch (error) {
         console.error("Two-stage save failed:", error);
@@ -304,7 +322,7 @@ export default function ShopRulesBuilderPage() {
         setSaveProgress(null);
       }
     },
-    [getErrorMessage, selectedKit, t],
+    [getErrorMessage, selectedKit, setExistingConfig, t],
   );
 
   const executeResetRules = useCallback(async () => {

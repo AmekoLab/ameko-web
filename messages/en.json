@@ -90,7 +90,7 @@
   "ShopReputation": {
     "title": "Shop Reputation",
     "subtitle": "Track your performance and service quality",
-    "currentScore": "Current Quality Score",
+    "currentScore": "Current Reputation Score",
     "currentBadge": "Shop Badge",
     "breakdownTitle": "Detailed Metrics Breakdown",
     "issueRate": "Issue Rate",
@@ -135,6 +135,10 @@
       "type": "Type",
       "amount": "Amount"
     },
+    "month": "Month",
+    "year": "Year",
+    "total": "Total",
+    "fee": "Fee",
     "refundsDeducted": "Refunds Deducted",
     "withdrawals": "Withdrawals",
     "heldBalance": "Held Balance",
@@ -227,7 +231,7 @@
     "processedWithdrawals": "Processed Withdrawals",
     "financialManagement": "Financial Management",
     "reputation": "Reputation",
-    "notification" : "Notification"
+    "notification": "Notification"
   },
   "HeroVideoSection": {
     "title": "AMEKO",
@@ -522,7 +526,7 @@
     "rating4Plus": "4.0 & up",
     "rating45Plus": "4.5 & up",
     "inactiveShop": "Inactive",
-    "shopIsInactiveTitle":"Shop Is Inactive"
+    "shopIsInactiveTitle": "Shop Is Inactive"
   },
   "CreateCommissionModal": {
     "errorImageUpload": "Upload image failed, please try again",
@@ -608,7 +612,7 @@
     "rating0Plus": "0+ Stars",
     "rating45Plus": "4.5+ Stars",
     "inactiveShop": "Inactive",
-    "shopIsInactiveTitle":"Shop Is Inactive"
+    "shopIsInactiveTitle": "Shop Is Inactive"
   },
   "MyWarrantyRequests": {
     "pageTitle": "Warranty & Returns",
@@ -773,7 +777,7 @@
       "transactionId": "Transaction ID",
       "time": "Time",
       "typeLabel": "Type",
-      
+
       "statusLabel": "Status",
       "target": "Target",
       "system": "System",
@@ -842,7 +846,7 @@
   },
   "Common": {
     "save": "Save",
-    "all" : "All",
+    "all": "All",
     "cancel": "Cancel",
     "cancelled": "Cancelled",
     "close": "Close",
@@ -962,7 +966,7 @@
     "orderCancelledBy": "Cancelled by",
     "orderCancelReason": "Cancellation reason",
     "customer": "Customer",
-    "filters": {  
+    "filters": {
       "all": "All",
       "pending": "Pending",
       "processing": "Processing",
@@ -1411,6 +1415,7 @@
     "ordersPerCustomer": "Orders / Customer",
     "avgRepurchaseCycle": "Avg Repurchase Cycle",
     "avgRepurchaseCycleValue": "{days} days",
+    "avgRepurchaseCycleHours": "{hours} hours",
     "customersWithOrders": "Customers With Orders",
     "totalOrders": "Total Orders",
     "noData": "No data."
@@ -1568,13 +1573,12 @@
     "editPart": "Edit part",
     "deletePart": "Delete part",
     "restorePartTitle": "Restore Part",
-    "restorePartConfirm" :"Are you sure you want to restore this part?",
+    "restorePartConfirm": "Are you sure you want to restore this part?",
     "cancel": "Cancel",
     "confirmRestore": "Confirm Restore",
     "restorePart": "Restore Part",
     "restoreSuccess": "Part restored successfully!",
     "restoreFailed": "Failed to restore part"
-
   },
   "CreatePartModal": {
     "validationPartNameRequired": "Part name is required",
@@ -2289,7 +2293,7 @@
       "previewAlt": "Preview",
       "bannerPrompt": "Drag or click to upload banner"
     },
-    "soduvi" : "Current wallet balance",
+    "soduvi": "Current wallet balance",
     "insufficientBalanceTitle": "Insufficient balance!",
     "insufficientBalanceDesc": "The system requires a minimum balance of 2,000,000 VND to activate the shop. Please top up your wallet.",
     "goToDeposit": "Go to Top-up Page",
@@ -2754,8 +2758,8 @@
     "subCancelled": "Cancelled: {n}",
     "subBuyers": "Buyers: {n}",
     "subShops": "Shops: {n}",
-      "cardsplatformRevenue": "Platform Revenue",
-    "cardsshopRevenue" : "Shop Revenue"
+    "cardsplatformRevenue": "Platform Revenue",
+    "cardsshopRevenue": "Shop Revenue"
   },
   "PaymentHealth": {
     "title": "Payment Health",
@@ -2780,8 +2784,8 @@
     "methodWallet": "Wallet",
     "methodUnknown": "Unknown",
     "typeOrderPayment": "Order Payment",
-     "typeRefund": "Refund",
-    "typeWithdrawal" : "Withdrawal",
+    "typeRefund": "Refund",
+    "typeWithdrawal": "Withdrawal",
     "typePlatformFee": "Platform Fee",
     "typeRefundToWallet": "Refund To Wallet",
     "typeSalesPending": "Sales Pending",
@@ -2981,7 +2985,7 @@
     "toastApproveSuccess": "Shop approved successfully!",
     "toastRejectSuccess": "Shop rejected successfully!",
     "toastDecisionFailed": "Handle admin decision failed",
-    "reputation":"Reputation",
+    "reputation": "Reputation",
     "inactiveShop": "Inactive"
   },
   "ShopApplicationModal": {
@@ -3320,7 +3324,7 @@
     "pageLabel": "Page",
     "prev": "Prev",
     "next": "Next",
-   "awaitingAdminReview": "System is reviewing evidence..."
+    "awaitingAdminReview": "System is reviewing evidence..."
   },
   "AdminDecisionModal": {
     "validationSelectJudgment": "Please select a judgment",
@@ -3468,7 +3472,51 @@
     "keymapReplaceWith": "Replace With",
     "keymapChooseAddon": "Choose Addon",
     "keymapNoAddons": "No addons available",
-    "keymapNote": "* Images are for illustration purposes only"
+    "keymapNote": "Images are for illustration purposes only",
+    "help": {
+      "switch": {
+        "linear": {
+          "title": "🔴 Linear",
+          "desc": "Speed & Smoothness: Zero tactile bump for a buttery-smooth keystroke. The ultimate choice for rapid-fire gaming reflexes and ultra-quiet acoustics."
+        },
+        "tactile": {
+          "title": "🟤 Tactile",
+          "desc": "Feedback & Precision: Features a pronounced tactile bump mid-keystroke. Delivers satisfying confirmation for heavy typists, developers, and productivity enthusiasts."
+        },
+        "clicky": {
+          "title": "🔵 Clicky",
+          "desc": "Classic & Crisp: Produces the signature high-pitched mechanical 'click'. Extremely satisfying to type on, though highly audible (use with caution in open offices)."
+        }
+      },
+      "plate": {
+        "alu": {
+          "title": "🛡️ Aluminum",
+          "desc": "Rigid & Clacky: The enthusiast standard. Delivers a firm, solid bottom-out feel and produces a brighter, sharper acoustic signature."
+        },
+        "pc": {
+          "title": "🧊 Polycarbonate (PC)",
+          "desc": "Flexible & Thocky: A softer material that absorbs vibrations, providing a bouncy typing experience and generating a highly desired deep, muted sound profile."
+        },
+        "fr4": {
+          "title": "⚡ FR4",
+          "desc": "Balanced & Snappy: High-density fiberglass that bridges the gap. Offers a perfect middle ground—less stiff than aluminum, less bouncy than PC, with a clean sound."
+        }
+      },
+      "keycap": {
+        "cherry": {
+          "title": "🍒 Cherry Profile",
+          "desc": "Ergonomic Excellence: A lower, sculpted profile designed to hug your fingertips. Engineered for high-speed typing and minimal wrist fatigue during marathon sessions."
+        },
+        "oem": {
+          "title": "🏢 OEM Profile",
+          "desc": "The Industry Standard: Slightly taller than Cherry. This is the familiar, out-of-the-box shape found on most premium pre-built gaming keyboards today."
+        },
+        "sa": {
+          "title": "🗼 SA Profile",
+          "desc": "Vintage & Booming: A tall, spherical profile that screams retro aesthetics. The large internal acoustic chamber creates a booming sound. (Wrist rest highly recommended)."
+        }
+      }
+    }
   },
   "ProductDetailPage": {
     "loadErrorFallback": "Failed to load product details",

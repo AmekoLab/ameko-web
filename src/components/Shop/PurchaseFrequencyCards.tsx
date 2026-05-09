@@ -66,6 +66,26 @@ export default function PurchaseFrequencyCards({
 
   const cards = useMemo(() => {
     if (!data) return [];
+
+    // Hàm chuyển đổi Ngày sang Giờ nếu nhỏ hơn 1
+    const formatRepurchaseCycle = (days: number) => {
+      if (!days || days === 0) return "0";
+
+      if (days < 1) {
+        // Chuyển sang giờ và làm tròn 1 chữ số thập phân (vd: 7.9)
+        const hours = (days * 24).toFixed(1);
+        // Nếu chẵn giờ (vd: 8.0) thì bỏ số .0 đi cho đẹp
+        const cleanHours = hours.endsWith(".0") ? hours.slice(0, -2) : hours;
+        return t("avgRepurchaseCycleHours", { hours: cleanHours });
+      }
+
+      // Nếu là ngày thì cũng làm tròn cho đẹp (tránh vụ 1.33333 ngày)
+      const cleanDays = days.toFixed(1).endsWith(".0")
+        ? days.toFixed(0)
+        : days.toFixed(1);
+      return t("avgRepurchaseCycleDays", { days: cleanDays });
+    };
+
     return [
       {
         label: t("ordersPerCustomer"),
@@ -73,9 +93,7 @@ export default function PurchaseFrequencyCards({
       },
       {
         label: t("avgRepurchaseCycle"),
-        value: t("avgRepurchaseCycleValue", {
-          days: data.averageDaysBetweenOrders,
-        }),
+        value: formatRepurchaseCycle(data.averageDaysBetweenOrders), // <-- Gọi hàm ở đây
       },
       {
         label: t("customersWithOrders"),

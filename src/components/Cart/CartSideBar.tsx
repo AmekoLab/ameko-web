@@ -115,9 +115,10 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
       item.productImage ||
       (isCustom ? item.orderItemComponents[0]?.partImageUrl : null);
 
-    const productLink = (item as any).productId || (item as any).assembledProductId 
-      ? `/shop/assembled-product/${(item as any).productId || (item as any).assembledProductId}` 
-      : '#';
+    let productLink = '#';
+    if ((item as any).assembledProductId) {
+      productLink = `/shop/assembled-product/${(item as any).assembledProductId}`;
+    }
 
     return (
       <div
@@ -141,7 +142,9 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
           <Link 
             href={productLink}
             onClick={() => dispatch(setCartOpen(false))}
-            className="relative w-[72px] h-[72px] shrink-0 bg-neutral-50 rounded-lg border border-neutral-100 overflow-hidden block hover:opacity-85 transition-opacity"
+            className={`relative w-[72px] h-[72px] shrink-0 bg-neutral-50 rounded-lg border border-neutral-100 overflow-hidden block transition-opacity ${
+              productLink === '#' ? 'pointer-events-none cursor-default' : 'hover:opacity-85'
+            }`}
           >
             {displayImage ? (
               <Image
@@ -163,7 +166,9 @@ const SidebarCartItem: FC<SidebarItemProps> = memo(
               <Link 
                 href={productLink}
                 onClick={() => dispatch(setCartOpen(false))}
-                className="group/prodlink outline-none block"
+                className={`group/prodlink outline-none block ${
+                  productLink === '#' ? 'pointer-events-none cursor-default' : ''
+                }`}
               >
                 <span className="text-sm text-neutral-800 group-hover/prodlink:text-blue-600 line-clamp-2 pr-3 leading-snug transition-colors">
                   {item.productName}
