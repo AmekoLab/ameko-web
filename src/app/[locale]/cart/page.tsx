@@ -183,9 +183,10 @@ const CartItemCard: FC<CartItemCardProps> = ({
     item.productImage ||
     (isCustom ? item.orderItemComponents[0]?.partImageUrl : null);
 
-  const productLink = (item as any).productId || (item as any).assembledProductId 
-    ? `/shop/assembled-product/${(item as any).productId || (item as any).assembledProductId}` 
-    : '#';
+  let productLink = '#';
+  if ((item as any).assembledProductId) {
+    productLink = `/shop/assembled-product/${(item as any).assembledProductId}`;
+  }
 
   return (
     <div
@@ -206,7 +207,9 @@ const CartItemCard: FC<CartItemCardProps> = ({
 
         <Link 
           href={productLink}
-          className="relative w-20 h-20 shrink-0 overflow-hidden bg-neutral-50 rounded-lg border border-neutral-100 block hover:opacity-85 transition-opacity"
+          className={`relative w-20 h-20 shrink-0 overflow-hidden bg-neutral-50 rounded-lg border border-neutral-100 block transition-opacity ${
+            productLink === '#' ? 'pointer-events-none cursor-default' : 'hover:opacity-85'
+          }`}
         >
           {displayImage ? (
             <Image
@@ -224,7 +227,12 @@ const CartItemCard: FC<CartItemCardProps> = ({
         </Link>
 
         <div className="flex-1 min-w-0 pr-2">
-          <Link href={productLink} className="group/prodlink outline-none block">
+          <Link 
+            href={productLink} 
+            className={`group/prodlink outline-none block ${
+              productLink === '#' ? 'pointer-events-none cursor-default' : ''
+            }`}
+          >
             <p className="text-sm font-medium text-neutral-800 group-hover/prodlink:text-blue-600 line-clamp-2 leading-snug transition-colors">
               {item.productName}
             </p>

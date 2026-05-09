@@ -104,6 +104,17 @@ export interface UpdateUserResponse {
   emailConfirmed: boolean;
   phoneNumberConfirmed: boolean;
 }
+export interface TopShopItem {
+  shopId: string;
+  shopName: string;
+  orderCount: number;
+}
+
+export interface TopShopsResponse {
+  fromUtc: string;
+  toUtc: string;
+  items: TopShopItem[];
+}
 
 // --- Admin Dashboard Overview ---
 export interface AdminDashboardOverview {

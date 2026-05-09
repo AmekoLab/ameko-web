@@ -135,6 +135,10 @@
       "type": "Loại",
       "amount": "Số tiền"
     },
+    "month": "Tháng",
+    "year": "Năm",
+    "total": "Tổng",
+    "fee": "Phí",
     "refundsDeducted": "Tiền bị trừ (Hoàn trả)",
     "withdrawals": "Tiền đã rút",
     "heldBalance": "Tiền tạm giữ",
@@ -163,7 +167,7 @@
     "cancelOrder": "Hủy đơn hàng",
     "transactions": "Giao dịch",
     "wallet": "Ví",
-    "customRequests": "Yêu cầu tùy chỉnh",
+    "customRequests": "Yêu cầu đặt hàng",
     "paymentHistory": "Lịch sử thanh toán",
     "allProducts": "Tất cả sản phẩm",
     "buildYourOwnKeyboard": "Cá nhân hóa bàn phím",
@@ -322,7 +326,7 @@
     "sortPriceAsc": "Giá: Thấp đến Cao",
     "clearSearch": "Xóa tìm kiếm",
     "searchResultsFor": "Kết quả tìm kiếm cho",
-    
+
     "sortPriceDesc": "Giá: Cao đến Thấp",
     "loadMore": "Tải Thêm",
     "noProductsMsg": "Không có sản phẩm nào khớp với bộ lọc của bạn.",
@@ -522,8 +526,8 @@
     "ratingAll": "Đánh giá",
     "rating4Plus": "4.0",
     "rating45Plus": "4.5",
-     "inactiveShop": "Tạm nghỉ",
-    "shopIsInactiveTitle":"Shop đang tạm nghỉ"
+    "inactiveShop": "Tạm nghỉ",
+    "shopIsInactiveTitle": "Shop đang tạm nghỉ"
   },
   "CreateCommissionModal": {
     "errorImageUpload": "Tải ảnh lên thất bại, vui lòng thử lại",
@@ -610,8 +614,8 @@
     "rating45Plus": "4.5+ Sao",
     "sortBy": "Sắp xếp",
     "filterBy": "Lọc",
-     "inactiveShop": "Tạm nghỉ",
-    "shopIsInactiveTitle":"Shop đang tạm nghỉ"
+    "inactiveShop": "Tạm nghỉ",
+    "shopIsInactiveTitle": "Shop đang tạm nghỉ"
   },
   "MyWarrantyRequests": {
     "pageTitle": "Bảo Hành & Đổi Trả",
@@ -874,7 +878,7 @@
     "processing": "Đang xử lý...",
     "canceling": "Đang hủy...",
     "confirmCancel": "Xác nhận hủy",
-    "loadMore" : "Xem thêm"
+    "loadMore": "Xem thêm"
   },
   "OrderDetailModal": {
     "title": "Chi tiết đơn hàng",
@@ -1207,7 +1211,7 @@
     "chooseAmekoVoucher": "Chọn Ameko Voucher",
     "selectVoucherFrom": "Chọn voucher từ {shopName}",
     "shopFallbackName": "Cửa hàng",
-    "baseKit" : "Kit khung",
+    "baseKit": "Kit khung",
     "voucherModal": {
       "discountPercentageWithCap": "Giảm {value}% (tối đa {cap})",
       "discountPercentage": "Giảm {value}%",
@@ -1414,6 +1418,7 @@
     "ordersPerCustomer": "Đơn / Khách hàng",
     "avgRepurchaseCycle": "Chu kỳ mua lại TB",
     "avgRepurchaseCycleValue": "{days} ngày",
+    "avgRepurchaseCycleHours": "{hours} giờ",
     "customersWithOrders": "Khách có đơn hàng",
     "totalOrders": "Tổng đơn hàng",
     "noData": "Không có dữ liệu."
@@ -1445,7 +1450,8 @@
     "remind": "Nhắc nhở",
     "page": "Trang",
     "prev": "Trước",
-    "next": "Sau"
+    "next": "Sau",
+    "gift": "Tặng voucher"
   },
   "ConversionSummarySection": {
     "title": "Chuyển đổi đơn hàng",
@@ -1957,7 +1963,6 @@
     "page": "Trang",
     "cancelledByShop": "Hủy bởi Cửa hàng",
     "cancelledByCustomer": "Hủy bởi Khách hàng"
-
   },
   "ShopVouchersPage": {
     "loading": "Đang tải voucher...",
@@ -2292,7 +2297,7 @@
       "previewAlt": "Xem trước",
       "bannerPrompt": "Kéo thả hoặc nhấn để tải ảnh bìa"
     },
-    "soduvi" : "Số dư ví hiện tại",
+    "soduvi": "Số dư ví hiện tại",
     "insufficientBalanceTitle": "Số dư không đủ!",
     "insufficientBalanceDesc": "Hệ thống yêu cầu duy trì tối thiểu 2.000.000đ để kích hoạt gian hàng. Vui lòng nạp thêm tiền.",
     "goToDeposit": "Đến trang Nạp Tiền",
@@ -2706,7 +2711,7 @@
       "processFailed": "Không thể xử lý vấn đề.",
       "unexpectedError": "Đã xảy ra lỗi."
     },
-    "refundAmountWithCount" : "Số tiền hoàn ({count} SP)",
+    "refundAmountWithCount": "Số tiền hoàn ({count} SP)",
     "itemCount": "{count} sản phẩm",
     "title": "Chi tiết vấn đề",
     "fields": {
@@ -2759,7 +2764,15 @@
     "subBuyers": "Người mua: {n}",
     "subShops": "Cửa hàng: {n}",
     "cardsplatformRevenue": "Doanh thu hệ thống",
-    "cardsshopRevenue" : "Doanh thu các cửa hàng "
+    "cardsshopRevenue": "Doanh thu các cửa hàng ",
+    "topShopsTitle": "Top Shops nhiều đơn nhất",
+    "topLabel": "Top",
+    "startDateLabel": "Từ ngày",
+    "endDateLabel": "Đến ngày",
+    "filterButton": "Lọc",
+    "loadingTopShops": "Đang tải dữ liệu...",
+    "noDataTopShops": "Không có dữ liệu trong khoảng thời gian này.",
+    "ordersCountLabel": "Đơn hàng"
   },
   "PaymentHealth": {
     "title": "Sức khỏe thanh toán",
@@ -2785,7 +2798,7 @@
     "methodUnknown": "Không xác định",
     "typeOrderPayment": "Thanh toán đơn hàng",
     "typeRefund": "Hoàn tiền",
-    "typeWithdrawal" : "Rút tiền",
+    "typeWithdrawal": "Rút tiền",
     "typePlatformFee": "Phí sàn",
     "typeRefundToWallet": "Hoàn tiền vào ví",
     "typeSalesPending": "Tiền bán hàng cộng vào ví ",
@@ -2987,7 +3000,7 @@
     "toastRejectSuccess": "Đã từ chối cửa hàng thành công!",
     "toastDecisionFailed": "Xử lý quyết định của quản trị viên thất bại",
     "reputation": "Uy tín",
-    "inactiveShop" : "Tạm nghỉ"
+    "inactiveShop": "Tạm nghỉ"
   },
   "ShopApplicationModal": {
     "statusPending": "Đang chờ duyệt",
@@ -3302,7 +3315,7 @@
     "statusReturning": "Đang hoàn trả",
     "shopRejected": "Shop từ chối",
     "Disputed": "Tranh chấp",
-    "Disputed " : "Tranh chấp",
+    "Disputed ": "Tranh chấp",
     "statusReturned": "Đã hoàn trả",
     "statusCompleted": "Hoàn tất",
     "statusUnknownCode": "Không xác định #{status}",
@@ -3473,7 +3486,51 @@
     "keymapReplaceWith": "Thay thế bằng",
     "keymapChooseAddon": "Chọn phụ kiện",
     "keymapNoAddons": "Không có phụ kiện khả dụng",
-    "keymapNote": "Hình ảnh chỉ mang tính chất minh họa"
+    "keymapNote": "Hình ảnh chỉ mang tính chất minh họa",
+    "help": {
+      "switch": {
+        "linear": {
+          "title": "🔴 Linear (Tuyến tính)",
+          "desc": "Tốc độ & Mượt mà: Hành trình phím trơn tru tuyệt đối, không có điểm khấc. Lựa chọn tối thượng cho game thủ cần phản xạ chớp nhoáng hoặc người yêu thích sự êm ái."
+        },
+        "tactile": {
+          "title": "🟤 Tactile (Khấc cản)",
+          "desc": "Phản hồi & Chính xác: Cảm nhận rõ ràng từng nhịp gõ với điểm nảy đặc trưng. Cấu trúc hoàn hảo cho cường độ gõ phím cao, coder và những ai cần sự chắc chắn trên từng ngón tay."
+        },
+        "clicky": {
+          "title": "🔵 Clicky (Clicky)",
+          "desc": "Cổ điển & Đã tai: Tái tạo âm thanh lách cách vang dội đặc trưng. Mang lại cảm giác gõ đầy phấn khích nhưng cần cân nhắc khi sử dụng trong môi trường văn phòng yên tĩnh."
+        }
+      },
+      "plate": {
+        "alu": {
+          "title": "🛡️ Nhôm (Aluminum)",
+          "desc": "Cứng cáp & Sắc nét: Lựa chọn tiêu chuẩn của giới chơi phím. Cấu trúc kim loại mang lại độ đầm chắc tuyệt đối và âm thanh gõ vang, sắc bén (Clacky)."
+        },
+        "pc": {
+          "title": "🧊 Polycarbonate (PC)",
+          "desc": "Mềm mại & Trầm ấm: Vật liệu dẻo dai giúp giảm chấn xuất sắc, tạo độ nhún (flex) đàn hồi khi gõ. Tối ưu hóa để tạo ra âm thanh trầm đục (Thocky) cực kỳ nịnh tai."
+        },
+        "fr4": {
+          "title": "⚡ Sợi thủy tinh (FR4)",
+          "desc": "Cân bằng & Linh hoạt: Chất liệu bảng mạch cao cấp mang đến sự trung hòa hoàn hảo: không quá cứng như Nhôm, không quá mềm như PC. Phản hồi gõ gọn gàng và tinh tế."
+        }
+      },
+      "keycap": {
+        "cherry": {
+          "title": "🍒 Cherry Profile",
+          "desc": "Công thái học tối ưu: Độ cao thấp, form dáng vát cong ôm sát ngón tay. Thiết kế lý tưởng để lướt phím tốc độ cao mà không gây mỏi cổ tay trong thời gian dài."
+        },
+        "oem": {
+          "title": "🏢 OEM Profile",
+          "desc": "Tiêu chuẩn phổ thông: Form dáng quen thuộc với độ cao nhỉnh hơn Cherry. Đây là profile tiêu chuẩn thường được trang bị trên các dòng bàn phím Gaming cao cấp hiện nay."
+        },
+        "sa": {
+          "title": "🗼 SA Profile",
+          "desc": "Cổ điển & Thượng lưu: Thiết kế hình cầu cao vút, mang đậm phong cách Retro nguyên bản. Buồng âm lớn tạo ra tiếng gõ vang dội. (Khuyến nghị sử dụng kèm kê tay)."
+        }
+      }
+    }
   },
   "ProductDetailPage": {
     "loadErrorFallback": "Không thể tải chi tiết sản phẩm",
@@ -3970,5 +4027,3 @@
     }
   }
 }
-
-

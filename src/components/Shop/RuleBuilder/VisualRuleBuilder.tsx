@@ -584,29 +584,40 @@ export default function VisualRuleBuilder({
             return;
           }
 
-          const [targetStep, targetTag] = rule.split(":");
-          const safeTargetStep = targetStep?.trim().toLowerCase();
-          const safeTargetTag = targetTag?.trim();
+          // Split by pipe to handle one-to-many branching (e.g. "step1:grp-x|step2:grp-x")
+          const ruleSegments = rule.split("|").map((s) => s.trim()).filter(Boolean);
 
-          if (!safeTargetStep || !safeTargetTag) {
-            return;
-          }
+          ruleSegments.forEach((segment) => {
+            const [targetStep, targetTag] = segment.split(":");
+            const safeTargetStep = targetStep?.trim().toLowerCase();
+            const safeTargetTag = targetTag?.trim();
 
-          const targetNodes = initialNodes.filter((n) => {
-            const isCorrectStep =
-              n.data.stepName.toLowerCase() === safeTargetStep;
-            const nodeTags = typeof n.data.tags === "string" ? n.data.tags : "";
-            const hasMatchingTag = nodeTags.includes(safeTargetTag);
-            return isCorrectStep && hasMatchingTag;
-          });
+            if (!safeTargetStep || !safeTargetTag) {
+              return;
+            }
 
-          targetNodes.forEach((targetNode) => {
-            initialEdges.push({
-              id: `edge-${sourceNode.id}-${targetNode.id}`,
-              source: sourceNode.id,
-              target: targetNode.id,
-              animated: true,
-              style: { stroke: "#3b82f6", strokeWidth: 2 },
+            const targetNodes = initialNodes.filter((n) => {
+              const isCorrectStep =
+                n.data.stepName.toLowerCase() === safeTargetStep;
+              const nodeTags =
+                typeof n.data.tags === "string" ? n.data.tags : "";
+              // STRICT match: split tags by comma, compare each one exactly
+              const tagList = nodeTags.split(",").map((t) => t.trim());
+              const hasMatchingTag = tagList.includes(safeTargetTag);
+              return isCorrectStep && hasMatchingTag;
+            });
+
+            targetNodes.forEach((targetNode) => {
+              const edgeId = `edge-${sourceNode.id}-${targetNode.id}`;
+              if (!initialEdges.some((e) => e.id === edgeId)) {
+                initialEdges.push({
+                  id: edgeId,
+                  source: sourceNode.id,
+                  target: targetNode.id,
+                  animated: true,
+                  style: { stroke: "#3b82f6", strokeWidth: 2 },
+                });
+              }
             });
           });
         });
@@ -726,8 +737,8 @@ export default function VisualRuleBuilder({
       const nextY =
         laneNodes.length > 0
           ? Math.max(...laneNodes.map((node) => node.position.y)) +
-            ROW_HEIGHT +
-            20
+          ROW_HEIGHT +
+          20
           : 0;
 
       const newNodeId = uuidv4();
@@ -753,19 +764,33 @@ export default function VisualRuleBuilder({
 
       setNodes((currentNodes) => currentNodes.concat(newNode));
 
-      if (
-        lastAddedNodeId &&
-        nodes.some((node) => node.id === lastAddedNodeId)
-      ) {
-        setEdges((currentEdges) =>
-          currentEdges.concat({
-            id: `auto-${lastAddedNodeId}-${newNodeId}-${uuidv4().slice(0, 8)}`,
-            source: lastAddedNodeId,
-            target: newNodeId,
-            type: "smoothstep",
-            animated: true,
-          }),
-        );
+      // Auto-connect ONLY when the new node is exactly one workflow step
+      // AFTER the last added node. This prevents wrong same-step edges
+      // (e.g. Case→Case or Plate→Plate) that corrupt tags and nextStepFilterRules.
+      if (lastAddedNodeId && nodes.some((node) => node.id === lastAddedNodeId)) {
+        const lastAddedNode = nodes.find((n) => n.id === lastAddedNodeId);
+        if (lastAddedNode) {
+          const lastStepIndex = workflow.findIndex((w) => {
+            const stepLabel = w.step?.trim() || w.title?.trim() || "";
+            return stepLabel.toLowerCase() === lastAddedNode.data.stepName.toLowerCase();
+          });
+
+          // Only auto-connect if the new node is exactly the next step in workflow
+          const isNextStep =
+            lastStepIndex !== -1 && laneIndex === lastStepIndex + 1;
+
+          if (isNextStep) {
+            setEdges((currentEdges) =>
+              currentEdges.concat({
+                id: `auto-${lastAddedNodeId}-${newNodeId}-${uuidv4().slice(0, 8)}`,
+                source: lastAddedNodeId,
+                target: newNodeId,
+                type: "smoothstep",
+                animated: true,
+              }),
+            );
+          }
+        }
       }
 
       setLastAddedNodeId(newNodeId);
@@ -822,24 +847,60 @@ export default function VisualRuleBuilder({
       }
     });
 
+    // ─── Recursive depth calculator (memoized + cycle-safe) ──
+    // Root nodes = 0, children = parent depth + 1
+    // e.g. Case(0) -> Plate(1) -> Switch(2) -> Keycap(3)
+    const depthCache: Record<string, number> = {};
+    const depthVisiting = new Set<string>();
+    const getNodeDepth = (nodeId: string): number => {
+      if (depthCache[nodeId] !== undefined) return depthCache[nodeId];
+      if (depthVisiting.has(nodeId)) {
+        // Cycle detected — treat as root to break the loop
+        depthCache[nodeId] = 0;
+        return 0;
+      }
+      depthVisiting.add(nodeId);
+      const incomingToThisNode = edges.filter((e) => e.target === nodeId);
+      if (incomingToThisNode.length === 0) {
+        depthCache[nodeId] = 0;
+        depthVisiting.delete(nodeId);
+        return 0;
+      }
+      const parentId = incomingToThisNode[0].source;
+      const depth = getNodeDepth(parentId) + 1;
+      depthCache[nodeId] = depth;
+      depthVisiting.delete(nodeId);
+      return depth;
+    };
+
     nodes.forEach((node) => {
       const data = node.data;
       const incomingEdges = edges.filter((edge) => edge.target === node.id);
       const outgoingEdges = edges.filter((edge) => edge.source === node.id);
 
+      // Skip only true orphan nodes (no edges at all).
+      // Nodes with only incoming edges (last step) or only outgoing edges (first step)
+      // are valid and must be included in the payload.
       if (incomingEdges.length === 0 && outgoingEdges.length === 0) {
         return;
       }
 
       let nextStepRules: string | null = null;
       if (outgoingEdges.length > 0) {
-        const targetNodeId = outgoingEdges[0].target;
-        const targetNode = nodes.find((item) => item.id === targetNodeId);
-        const targetStep = targetNode?.data.stepName ?? "";
         const sourceKey = sourceNodeKeys[node.id];
+        if (sourceKey) {
+          // Pick the most common target stepName across ALL outgoing edges
+          // so stray auto-connect edges to wrong steps don't corrupt the rule.
+          const stepCount: Record<string, number> = {};
+          for (const edge of outgoingEdges) {
+            const s = nodes.find((n) => n.id === edge.target)?.data.stepName ?? "";
+            if (s) stepCount[s] = (stepCount[s] ?? 0) + 1;
+          }
+          const targetStep = Object.entries(stepCount).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
 
-        if (targetStep && sourceKey) {
-          nextStepRules = `${targetStep}:${sourceKey}`;
+          if (targetStep) {
+            nextStepRules = `${targetStep}:${sourceKey}`;
+          }
         }
       }
 
@@ -855,7 +916,7 @@ export default function VisualRuleBuilder({
         baseKitId: baseKit.id,
         componentId: data.part.id,
         stepName: data.stepName,
-       stepOrder: incomingEdges.length === 0 ? 0 : 1,
+        stepOrder: getNodeDepth(node.id),
         isDefault: false,
         tags: incomingEdges.length > 0 ? myTags : null,
         nextStepFilterRule: nextStepRules,
@@ -865,7 +926,37 @@ export default function VisualRuleBuilder({
       });
     });
 
-    console.log("PARENT-GROUP ALGORITHM PAYLOAD:", optionsPayloads);
+    // Mirror the BE dedup check so the user sees a clear error before the API call
+    const dedupKey = (p: RulePayload) =>
+      `${p.componentId}|${p.stepName.trim()}|${p.tags?.trim() ?? ""}`;
+    const keyCount = new Map<string, number>();
+    for (const p of optionsPayloads) {
+      const k = dedupKey(p);
+      keyCount.set(k, (keyCount.get(k) ?? 0) + 1);
+    }
+    const dupeKey = [...keyCount.entries()].find(([, c]) => c > 1)?.[0];
+    if (dupeKey) {
+      const dupeNode = nodes.find(
+        (n) => dedupKey({
+          componentId: n.data.part.id,
+          stepName: n.data.stepName,
+          tags: [...new Set(
+            edges.filter(e => e.target === n.id)
+              .map(e => sourceNodeKeys[e.source])
+              .filter((k): k is string => Boolean(k))
+          )].join(",") || null,
+        } as RulePayload) === dupeKey
+      );
+      const partName = dupeNode?.data.part.name ?? dupeKey.split("|")[0];
+      toast.error(
+        `Duplicate: "${partName}" xuất hiện nhiều lần với cùng tags. ` +
+        `Hãy xóa node dupe và nối cả 2 case vào cùng 1 node plate.`,
+      );
+      console.error("DUPLICATE PAYLOAD DETECTED:", dupeKey, optionsPayloads);
+      return;
+    }
+
+    console.log("PAYLOAD TO API:", optionsPayloads);
 
     if (onSave) {
       onSave(optionsPayloads);
@@ -950,7 +1041,7 @@ export default function VisualRuleBuilder({
 
             {sidebarGroups.map((group) => {
               const isCollapsed = collapsedGroups[group.key];
-              
+
               return (
                 <section key={group.key} className="space-y-1">
                   <button
@@ -969,9 +1060,8 @@ export default function VisualRuleBuilder({
                   </button>
 
                   <div
-                    className={`space-y-2 overflow-hidden transition-all ${
-                      isCollapsed ? "h-0 opacity-0" : "pb-2 opacity-100"
-                    }`}
+                    className={`space-y-2 overflow-hidden transition-all ${isCollapsed ? "h-0 opacity-0" : "pb-2 opacity-100"
+                      }`}
                   >
                     {group.parts.map((part) => (
                       <button

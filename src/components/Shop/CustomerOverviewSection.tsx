@@ -104,10 +104,10 @@ export default function CustomerOverviewSection({
       {
         label: t("customers"),
         value: formatNumber(data.totalCustomers),
-        subtext: t("newReturning", {
-          newCount: formatNumber(data.newCustomers),
-          returningCount: formatNumber(data.returningCustomers),
-        }),
+        // subtext: t("newReturning", {
+        //   newCount: formatNumber(data.newCustomers),
+        //   returningCount: formatNumber(data.returningCustomers),
+        // }),
       },
       {
         label: t("retention"),

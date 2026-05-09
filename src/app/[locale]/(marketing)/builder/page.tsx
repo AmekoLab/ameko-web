@@ -83,9 +83,11 @@ const VisualizerLayer = memo(
     isHidden: boolean;
   }) => {
     // State machine: loading -> loaded | error
-    const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
+    const [status, setStatus] = useState<"loading" | "loaded" | "error">(
+      "loading",
+    );
     const [showLoader, setShowLoader] = useState(false);
-    
+
     // Internal crossfade state
     const [currentUrl, setCurrentUrl] = useState(url);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
@@ -118,7 +120,9 @@ const VisualizerLayer = memo(
       // Safety valve: 10 seconds max loading time
       const safetyTimer = setTimeout(() => {
         if (!isStale) {
-          console.warn(`[VisualizerLayer] Timeout loading image: ${activeUrlRef.current}`);
+          console.warn(
+            `[VisualizerLayer] Timeout loading image: ${activeUrlRef.current}`,
+          );
           setStatus("error");
         }
       }, 10000);
@@ -168,9 +172,18 @@ const VisualizerLayer = memo(
         {/* 3-dot wave loading animation */}
         {status === "loading" && showLoader && (
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-            <div className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: "0ms" }} />
-            <div className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: "150ms" }} />
-            <div className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: "300ms" }} />
+            <div
+              className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce"
+              style={{ animationDelay: "0ms" }}
+            />
+            <div
+              className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce"
+              style={{ animationDelay: "150ms" }}
+            />
+            <div
+              className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce"
+              style={{ animationDelay: "300ms" }}
+            />
           </div>
         )}
 
@@ -783,8 +796,7 @@ function BuilderContent() {
                 {baseKits.map((kit) => (
                   <KitCard key={kit.id} kit={kit} onClick={handleSelectKit} />
                 ))}
-                  </div>
-                
+              </div>
             </div>
           )}
         </div>
@@ -804,7 +816,7 @@ function BuilderContent() {
   // const addOnsTotal = session.totalPrice - baseKitPrice;
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden text-amazon-text bg-amazon-bgSecondary">
+    <div className="h-[100dvh] flex flex-col overflow-hidden text-amazon-text bg-amazon-bgSecondary">
       {/* ═══════════════════════════════════════
           HEADER — Corsair style
       ═══════════════════════════════════════ */}
@@ -836,7 +848,10 @@ function BuilderContent() {
         </div>
 
         {/* Step nav — Corsair: name only, white underline active */}
-        <div className="flex-1 flex items-center h-full overflow-x-auto custom-scrollbar">
+        <div
+          className="flex-1 flex items-center h-full overflow-x-auto overscroll-contain scroll-smooth scrollbar-hide"
+          style={{ scrollbarWidth: "none" }}
+        >
           {navItems.map((step) => {
             const isSummary = step.slug === "summary";
             const isClickable =
@@ -870,7 +885,7 @@ function BuilderContent() {
       {/* ═══════════════════════════════════════
           MAIN CONTENT
       ═══════════════════════════════════════ */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden">
         {/* ── LEFT: VISUALIZER ── */}
         <div
           className="h-[45vh] shrink-0 lg:h-auto lg:shrink lg:flex-[62] relative flex flex-col items-center justify-center overflow-hidden"
@@ -998,7 +1013,7 @@ function BuilderContent() {
         </div>
 
         {/* ── RIGHT: CONFIGURATOR / SUMMARY ── */}
-        <div className="flex flex-1 lg:flex-[38] flex-col z-10 bg-white border-t lg:border-t-0 border-l-0 lg:border-l border-amazon-border shadow-2xl">
+        <div className="flex flex-1 lg:flex-[38] flex-col min-h-0 z-10 bg-white border-t lg:border-t-0 border-l-0 lg:border-l border-amazon-border shadow-2xl">
           {currentStepName === "summary" ? (
             /* ─────────────────────────────────────
                SUMMARY VIEW
@@ -1015,12 +1030,15 @@ function BuilderContent() {
               </div>
 
               {/* BOM list */}
-              <div className="flex-1 overflow-y-auto px-5 py-4 custom-scrollbar bg-neutral-50">
-                <div className="space-y-2">
+              <div
+                className="flex-1 h-full overflow-y-auto overscroll-contain scroll-smooth scrollbar-hide px-5 py-4 bg-neutral-50"
+                style={{ scrollbarWidth: "none" }}
+              >
+                <div className="flex flex-col space-y-2">
                   {Object.entries(session.selection).map(([stepName, part]) => (
                     <div
                       key={stepName}
-                      className="flex items-center gap-3 p-3 cursor-pointer transition-all group/bom"
+                      className="flex items-center gap-3 p-3 cursor-pointer transition-all group/bom shrink-0"
                       onClick={() => handleStepClick(stepName)}
                       title={t("editStep", { stepName })}
                     >
@@ -1202,31 +1220,148 @@ function BuilderContent() {
                 </h2>
 
                 {/* Help me choose */}
-                <button className="mt-3 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-amazon-link px-4 py-1.5 rounded-sm transition-all hover:bg-neutral-50 border border-amazon-border shadow-sm">
-                  <svg
-                    className="w-3.5 h-3.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {t("helpMeChoose")}
-                </button>
+                <div className="relative group inline-block mt-3">
+                  <button className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-amazon-link px-4 py-1.5 rounded-sm transition-all hover:bg-neutral-50 border border-amazon-border shadow-sm">
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {t("helpMeChoose")}
+                  </button>
+
+                  {/* Dynamic Tooltip Popover */}
+                  {(currentStepName === "switch" ||
+                    currentStepName === "plate" ||
+                    currentStepName === "keycap") && (
+                    <div className="absolute top-full left-0 mt-2 w-64 p-4 bg-neutral-900/95 backdrop-blur-md rounded-lg shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] border border-neutral-700 pointer-events-none">
+                      <div className="absolute -top-1.5 left-6 w-3 h-3 bg-neutral-900/95 border-t border-l border-neutral-700 rotate-45" />
+                      <div className="relative z-10 flex flex-col gap-2.5 text-left">
+                        {currentStepName === "switch" && (
+                          <>
+                            <p className="text-[11px] leading-relaxed">
+                              <span className="text-white font-bold block mb-0.5">
+                                🔴 {t("help.switch.linear.title")}{" "}
+                                {/* Linear */}:
+                              </span>{" "}
+                              <span className="text-neutral-300">
+                                {t("help.switch.linear.desc")}{" "}
+                                {/* Smooth and quiet. Perfect for office use or fast gaming. */}
+                              </span>
+                            </p>
+                            <p className="text-[11px] leading-relaxed">
+                              <span className="text-white font-bold block mb-0.5">
+                                🟤 {t("help.switch.tactile.title")}{" "}
+                                {/* Tactile */}:
+                              </span>{" "}
+                              <span className="text-neutral-300">
+                                {t("help.switch.tactile.desc")}{" "}
+                                {/* Has a tactile bump. Great for typing and coding. */}
+                              </span>
+                            </p>
+                            <p className="text-[11px] leading-relaxed">
+                              <span className="text-white font-bold block mb-0.5">
+                                🔵 {t("help.switch.clicky.title")}{" "}
+                                {/* Clicky */}:
+                              </span>{" "}
+                              <span className="text-neutral-300">
+                                {t("help.switch.clicky.desc")}{" "}
+                                {/* Loud and clicky sound. Fun to type, but not for quiet offices! */}
+                              </span>
+                            </p>
+                          </>
+                        )}
+                        {currentStepName === "plate" && (
+                          <>
+                            <p className="text-[11px] leading-relaxed">
+                              <span className="text-white font-bold block mb-0.5">
+                                🛡️ {t("help.plate.alu.title")} {/* Aluminum */}:
+                              </span>{" "}
+                              <span className="text-neutral-300">
+                                {t("help.plate.alu.desc")}{" "}
+                                {/* Stiff and clacky. The safe, standard choice. */}
+                              </span>
+                            </p>
+                            <p className="text-[11px] leading-relaxed">
+                              <span className="text-white font-bold block mb-0.5">
+                                🧊 {t("help.plate.pc.title")}{" "}
+                                {/* PC (Polycarbonate) */}:
+                              </span>{" "}
+                              <span className="text-neutral-300">
+                                {t("help.plate.pc.desc")}{" "}
+                                {/* Flexible and thocky (deep sound). */}
+                              </span>
+                            </p>
+                            <p className="text-[11px] leading-relaxed">
+                              <span className="text-white font-bold block mb-0.5">
+                                ⚡ {t("help.plate.fr4.title")} {/* FR4 */}:
+                              </span>{" "}
+                              <span className="text-neutral-300">
+                                {t("help.plate.fr4.desc")}{" "}
+                                {/* Balanced stiffness and sound. */}
+                              </span>
+                            </p>
+                          </>
+                        )}
+                        {currentStepName === "keycap" && (
+                          <>
+                            <p className="text-[11px] leading-relaxed">
+                              <span className="text-white font-bold block mb-0.5">
+                                🍒 {t("help.keycap.cherry.title")}{" "}
+                                {/* Cherry */}:
+                              </span>{" "}
+                              <span className="text-neutral-300">
+                                {t("help.keycap.cherry.desc")}{" "}
+                                {/* Standard, comfortable height for daily typing. */}
+                              </span>
+                            </p>
+                            <p className="text-[11px] leading-relaxed">
+                              <span className="text-white font-bold block mb-0.5">
+                                🏢 {t("help.keycap.oem.title")} {/* OEM */}:
+                              </span>{" "}
+                              <span className="text-neutral-300">
+                                {t("help.keycap.oem.desc")}{" "}
+                                {/* Slightly taller, common on pre-built keyboards. */}
+                              </span>
+                            </p>
+                            <p className="text-[11px] leading-relaxed">
+                              <span className="text-white font-bold block mb-0.5">
+                                🗼 {t("help.keycap.sa.title")} {/* SA */}:
+                              </span>{" "}
+                              <span className="text-neutral-300">
+                                {t("help.keycap.sa.desc")}{" "}
+                                {/* Very tall, vintage look, loud sound. */}
+                              </span>
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Product grid — 3 circles per row */}
-              <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar bg-neutral-50">
+              <div
+                className="flex-1 h-full overflow-y-auto overscroll-contain scroll-smooth scrollbar-hide px-6 py-6 bg-neutral-50"
+                style={{ scrollbarWidth: "none" }}
+              >
                 {processing && currentProducts.length === 0 ? (
                   /* Shimmer skeleton grid while loading */
                   <div className="grid grid-cols-3 gap-x-4 gap-y-7">
                     {Array.from({ length: 6 }).map((_, i) => (
-                      <div key={i} className="flex flex-col items-center gap-2.5">
+                      <div
+                        key={i}
+                        className="flex flex-col items-center gap-2.5"
+                      >
                         <div className="w-24 h-24 rounded-full bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 bg-[length:200%_100%] animate-shimmer" />
                         <div className="w-16 h-3 rounded bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 bg-[length:200%_100%] animate-shimmer" />
                         <div className="w-10 h-2.5 rounded bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 bg-[length:200%_100%] animate-shimmer" />
