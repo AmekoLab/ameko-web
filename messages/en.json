@@ -141,7 +141,7 @@
     "fee": "Fee",
     "refundsDeducted": "Refunds Deducted",
     "withdrawals": "Withdrawals",
-    "heldBalance": "Held Balance",
+    "heldBalance": "Closing Held Balance",
     "pendingWithdrawals": "Pending Withdrawals"
   },
   "Header": {

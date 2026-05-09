@@ -114,7 +114,7 @@ export default function Sidebar({ role = "staff" }: { role?: string }) {
       groupKey: "financial",
       icon: Wallet,
       items: [
-        { name: t("wallet"), path: "/admin/wallet" },
+        // { name: t("wallet"), path: "/admin/wallet" },
         { name: t("pendingWithdrawals"), path: "/admin/pending-withdrawals" },
         { name: t("transactions"), path: "/admin/transactions" },
         { name: t("vouchers"), path: "/admin/vouchers" },
