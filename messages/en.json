@@ -1447,7 +1447,8 @@
     "remind": "Remind",
     "page": "Page",
     "prev": "Prev",
-    "next": "Next"
+    "next": "Next",
+    "gift": "Gift Voucher"
   },
   "ConversionSummarySection": {
     "title": "Order Conversion",
@@ -2759,7 +2760,15 @@
     "subBuyers": "Buyers: {n}",
     "subShops": "Shops: {n}",
     "cardsplatformRevenue": "Platform Revenue",
-    "cardsshopRevenue": "Shop Revenue"
+    "cardsshopRevenue": "Shop Revenue",
+    "topShopsTitle": "Top Shops by Orders",
+    "topLabel": "Top",
+    "startDateLabel": "Start Date",
+    "endDateLabel": "End Date",
+    "filterButton": "Filter",
+    "loadingTopShops": "Loading top shops...",
+    "noDataTopShops": "No data in this period.",
+    "ordersCountLabel": "Orders"
   },
   "PaymentHealth": {
     "title": "Payment Health",

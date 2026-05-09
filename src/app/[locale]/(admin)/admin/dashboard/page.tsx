@@ -6,6 +6,7 @@ import { AdminDashboardOverview } from "@/src/types/admin.types";
 import { adminService } from "@/src/services/admin.service";
 import PaymentHealthSection from "@/src/components/Admin/PaymentHealthSection";
 import RiskOverviewSection from "@/src/components/Admin/RiskOverviewSection";
+import TopShopsSection from "@/src/components/Admin/TopShopsSection";
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -154,6 +155,7 @@ export default function DashboardPage() {
       {/* Render sequentially, full width */}
       <PaymentHealthSection />
       <RiskOverviewSection />
+      <TopShopsSection />
     </div>
   );
 }

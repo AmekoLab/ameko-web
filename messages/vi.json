@@ -1450,7 +1450,8 @@
     "remind": "Nhắc nhở",
     "page": "Trang",
     "prev": "Trước",
-    "next": "Sau"
+    "next": "Sau",
+    "gift": "Tặng voucher"
   },
   "ConversionSummarySection": {
     "title": "Chuyển đổi đơn hàng",
@@ -2763,7 +2764,15 @@
     "subBuyers": "Người mua: {n}",
     "subShops": "Cửa hàng: {n}",
     "cardsplatformRevenue": "Doanh thu hệ thống",
-    "cardsshopRevenue": "Doanh thu các cửa hàng "
+    "cardsshopRevenue": "Doanh thu các cửa hàng ",
+    "topShopsTitle": "Top Shops nhiều đơn nhất",
+    "topLabel": "Top",
+    "startDateLabel": "Từ ngày",
+    "endDateLabel": "Đến ngày",
+    "filterButton": "Lọc",
+    "loadingTopShops": "Đang tải dữ liệu...",
+    "noDataTopShops": "Không có dữ liệu trong khoảng thời gian này.",
+    "ordersCountLabel": "Đơn hàng"
   },
   "PaymentHealth": {
     "title": "Sức khỏe thanh toán",

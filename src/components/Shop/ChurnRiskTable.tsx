@@ -2,11 +2,17 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
+import { Ticket } from "lucide-react";
 import { shopDashboardService } from "@/src/services/shopDashboard.service";
 import type {
   ChurnRiskResponse,
   CustomerOverviewParams,
 } from "@/src/types/shop-dashboard.types";
+import { useAppDispatch } from "@/src/store/hook";
+import { createNegotiationVoucherThunk } from "@/src/store/slices/voucherSlice";
+import { toast } from "react-toastify";
+import GiftVoucherModal from "./ShopDashboard/GiftVoucherModal";
+
 
 // ── Helpers ──
 
@@ -16,15 +22,6 @@ const formatVND = (value: number): string =>
     currency: "VND",
     maximumFractionDigits: 0,
   }).format(value);
-
-const formatDate = (iso: string): string => {
-  const d = new Date(iso);
-  return d.toLocaleDateString("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }); // Bỏ bớt giờ phút
-};
 
 // ── Inactive days severity ──
 
@@ -50,9 +47,16 @@ interface ChurnRiskTableProps {
 
 export default function ChurnRiskTable({ filters }: ChurnRiskTableProps) {
   const t = useTranslations("ChurnRiskTable");
+  const dispatch = useAppDispatch();
   const [data, setData] = useState<ChurnRiskResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
+
+  const [giftModal, setGiftModal] = useState({
+    isOpen: false,
+    customerId: "",
+    customerName: "",
+  });
 
   const prevFilters = useRef(filters);
   useEffect(() => {
@@ -85,11 +89,28 @@ export default function ChurnRiskTable({ filters }: ChurnRiskTableProps) {
     };
   }, [filters, page]);
 
+  const handleConfirmGift = async (discount: number, minOrder: number) => {
+    try {
+      await dispatch(
+        createNegotiationVoucherThunk({
+          targetUserId: giftModal.customerId,
+          discountAmount: discount,
+          minOrderValue: minOrder,
+        })
+      ).unwrap();
+      
+      toast.success("Tặng voucher thành công!");
+      setGiftModal({ ...giftModal, isOpen: false });
+    } catch (error) {
+      toast.error(typeof error === "string" ? error : "Tặng voucher thất bại!");
+    }
+  };
+
   const btnClass =
     "border border-amazon-border bg-white hover:bg-neutral-50 text-[11px] font-medium text-amazon-text px-2 py-1 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors";
 
   return (
-    <div className="flex flex-col h-full w-full min-h-0 bg-white border border-amazon-border shadow-sm rounded-md overflow-hidden">
+    <div className="flex flex-col h-full w-full min-h-0 bg-white border border-amazon-border shadow-sm rounded-md overflow-hidden relative">
       {/* Header - Siêu mỏng, không Icon */}
       <div className="px-3 py-2 border-b border-amazon-border bg-neutral-50 shrink-0 flex flex-col justify-center">
         <h3 className="text-sm font-bold text-amazon-text leading-tight">
@@ -169,8 +190,12 @@ export default function ChurnRiskTable({ filters }: ChurnRiskTableProps) {
                     </td>
                     {/* Action */}
                     <td className="px-2 py-1.5">
-                      <button className="text-[10px] bg-white border border-amazon-border hover:bg-neutral-50 text-amazon-text px-2 py-1 shadow-sm rounded-sm transition-colors whitespace-nowrap">
-                        {t("remind")}
+                      <button 
+                        onClick={() => setGiftModal({ isOpen: true, customerId: item.customerId, customerName: item.customerName })}
+                        className="flex items-center text-[10px] bg-white border border-amazon-border hover:bg-neutral-50 text-amazon-text px-2 py-1 shadow-sm rounded-sm transition-colors whitespace-nowrap"
+                      >
+                        <Ticket className="w-3 h-3 mr-1" />
+                        {t("gift")}
                       </button>
                     </td>
                   </tr>
@@ -209,6 +234,14 @@ export default function ChurnRiskTable({ filters }: ChurnRiskTableProps) {
           </div>
         </div>
       )}
+
+      {/* Gift Voucher Modal Rendering */}
+      <GiftVoucherModal
+        isOpen={giftModal.isOpen}
+        customerName={giftModal.customerName}
+        onClose={() => setGiftModal({ ...giftModal, isOpen: false })}
+        onConfirm={handleConfirmGift}
+      />
     </div>
   );
 }

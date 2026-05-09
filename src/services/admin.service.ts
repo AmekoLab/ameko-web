@@ -4,6 +4,7 @@ import {
   AdminDashboardOverview,
   PaymentHealthData,
   RiskOverviewData,
+  TopShopsResponse,
 } from "@/src/types/admin.types";
 
 export const adminService = {
@@ -53,4 +54,23 @@ export const adminService = {
       throw error;
     }
   },
+
+  getTopShopsByOrders: async (top: number = 3, startDate?: string, endDate?: string): Promise<TopShopsResponse> => {
+    try {
+      const params = new URLSearchParams();
+      params.append('top', top.toString());
+      
+      if (startDate) params.append('startDate', startDate);
+      if (endDate) params.append('endDate', endDate);
+
+      const res: ApiResponse<TopShopsResponse> = await api.get(`/admin-dashboard/shops/top-orders?${params.toString()}`);
+      
+      return res.data;
+    } catch (error) {
+      console.error("Failed to fetch top shops by orders:", error);
+      throw error;
+    }
+  },
 };
+
+

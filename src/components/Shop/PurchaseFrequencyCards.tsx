@@ -87,10 +87,10 @@ export default function PurchaseFrequencyCards({
     };
 
     return [
-      {
-        label: t("ordersPerCustomer"),
-        value: String(data.ordersPerCustomer),
-      },
+      // {
+      //   label: t("ordersPerCustomer"),
+      //   value: String(data.ordersPerCustomer),
+      // },
       {
         label: t("avgRepurchaseCycle"),
         value: formatRepurchaseCycle(data.averageDaysBetweenOrders), // <-- Gọi hàm ở đây
@@ -128,7 +128,7 @@ export default function PurchaseFrequencyCards({
           ))}
         </div>
       ) : data ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
           {cards.map((card) => (
             <MetricCard key={card.label} {...card} />
           ))}
